@@ -1,0 +1,47 @@
+Automated Assignment of Human Readable Descriptions (AHRD)
+==========================================================
+
+Protein function has often been transferred from characterized proteins to
+novel proteins based on sequence similarity, e.g. using the best BLAST hit. To
+assign human readable descriptions to predicted proteins we developed a new
+program called Automatic assignment of human readable descriptions (AHRD). We
+aim to select descriptions that are concise and informative, precise in regard
+to function and use standard nomenclature. AHRD scores BLAST hits taken from
+searches against different databases on the basis of the trust put into these
+databases and the local alignment quality. The BLAST hit descriptions are
+tokenized into informative words and a lexical analysis scores these tokens
+according to their frequency and the quality of the BLAST hits they occur in.
+Shared tokens with Gene-Ontology Annotations increase the description-scoring
+in order to use standard nomenclature where possible. Finally the best scoring
+description is assigned.
+
+1. Requirements:
+
+AHRD is a Java-Program which requires Java 1.5 or higher.
+
+
+2. Usage:
+
+All AHRD-Inputs are passed to AHRD in a single YML-File.
+See ahrd_input.yml for details.
+
+Basically AHRD needs a FASTA-File of amino acid sequences and three different
+files conatining the results from BLAST searches in the three databases:
+Uniprot/trEMBL, Uniprot/Swissprot and TAIR10.
+
+Additionally the parameters can be set manually (NOT RECOMMENDED).
+
+An example AHRD-call is given in ahrd_test_run.sh:
+
+java -Xmx2g -jar ahrd.jar ahrd_input.jar
+
+3. Recommended BLAST-Search:
+
+For your query proteins you should start three independent BLAST searches in
+the three different databases mentioned above:
+
+blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
+
+Three different example results are given in test_input/.
+
+Have Fun!

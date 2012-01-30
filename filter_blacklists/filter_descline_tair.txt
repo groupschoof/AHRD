@@ -1,0 +1,14 @@
+\sOS=.*$
+(?i)OS.*[.].*protein
+(?i)^H0.*protein
+(?i)contains.*
+IPR.*
+\(GB.*\)
+\(TAIR.*\)
+(?i)\|\s*Symbols:\s*[^\|]*\|\s*
+chr\d:\d+-\d+\s+(FORWARD|REVERSE)\s*
+\w{2,}\d{1,2}(g|G)\d+(\.\d)*\s+
+\b\S+\|\S+\|\S+
+\s+\|\s+
+\[.*\]
+^(\s|/|\(|\)|-|\+|\*|,|;|\.|\:|\||\d)+$
