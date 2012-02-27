@@ -39,7 +39,11 @@ AHRD is recommended to be run on batches of 1,000 to 2,000 proteins. If you
 want to annotate a whole genome use the included Batcher to split your
 input-data into Batches of appropriate size. (see section Batcher)
 
-h3. 2.1 AHRD Example run:
+h3. 2.1 Building the executable jar:
+
+Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
+
+h3. 2.2 AHRD Example run:
 
 <pre> java -Xmx2g -jar ./dist/ahrd.jar ./test/resources/ahrd_input.yml </pre>
 
@@ -47,7 +51,7 @@ or just execute
 
 <pre> ant test.run </pre>
 
-h3. 2.2 Recommended BLAST-Search:
+h3. 2.3 Recommended BLAST-Search:
 
 For your query proteins you should start three independent BLAST searches e.g.
 in the three different databases mentioned above:
@@ -56,7 +60,7 @@ in the three different databases mentioned above:
 blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
 </pre>
 
-h3. 2.3 Batcher:
+h3. 2.4 Batcher:
 
 Start the Batcher with:
 <pre>mkdir test/resources/batch_ymls 
@@ -64,7 +68,7 @@ java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./test/resources/batcher_input_
 You will have to edit ./test/resources/batcher_input_test.yml according to your
 needs.
 
-h3. 3.1 Algorithm:
+h3. 3 Algorithm:
 
 Based on e-values the 200 best scoring blast results are chosen from each
 database-search (e.g. Swissprot, TAIR, trEMBL). For all 600 resulting candidate
@@ -99,7 +103,7 @@ meaningless "fill words". If available an assigned Interpro domain is appended
 to the description line and each line will contain an evaluation section that
 reflects the significance of the assigned human readable description.
 
-h4. 3.2 Pseudo-Code
+h4. 3.1 Pseudo-Code
 
 # Choose 600 best scoring blast results
 # Filter description lines of above blast-results using regular expressions:
@@ -113,30 +117,26 @@ h4. 3.2 Pseudo-Code
 # Choose best scoring description line
 # Append InterProScan description to chosen description line if available
 
-h4. 3.3 Used Formulae and Parameters:
+h4. 3.2 Used Formulae and Parameters:
 
 <img src="http://github.com/asishallab/AHRD/raw/master/images/formulae.jpg" />
 
-h5. 3.4 Above formulae use the following parameters as given in ./test/resources/ahrd_input.yml 
+h5. 3.3 Above formulae use the following parameters as given in ./test/resources/ahrd_input.yml 
 
-h6. 3.4.1 The weights in formula Token-Score are:  
+h6. 3.3.1 The weights in formula Token-Score are:  
 
 <pre>token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2 </pre> and Blast-Database specific:
 <pre>weight: 100 </pre>
 
-h6. 3.4.2 The weight in formula Lexical-Score is:
+h6. 3.3.2 The weight in formula Lexical-Score is:
 
 <pre>description_score_relative_description_frequency_weight: 0.6 </pre>
 
-h6. 3.4.3 The weight in formula Description-Score also is Blast-database specific:
+h6. 3.3.3 The weight in formula Description-Score also is Blast-database specific:
 
 <pre>description_score_bit_score_weight: 0.2 </pre>
-
-h2. 3. Building the executable jar:
-
-Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 
 h2. 4. Testing:
 
@@ -146,4 +146,18 @@ h2. 5. License
 
 See attached file LICENSE.txt for details.
 
-Have Fun!
+h2. Authors
+Kathrin Klee and Asis Hallab
+
+Group "Plant Computational Biology"
+Prof. Dr. Heiko Schoof
+
+Max Planck Institute for Plant Breeding Research
+Carl-von-Linné-Weg 10
+50829 Köln (Cologne)
+Germany
+
+INRES - Institut für Nutzpflanzenwissenschaften und Ressourcenschutz
+Nußallee 9
+53115 Bonn
+Germany
