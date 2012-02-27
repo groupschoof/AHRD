@@ -143,20 +143,20 @@ h4. 3.2 Used Formulae and Parameters:
 
 <img src="http://github.com/asishallab/AHRD/raw/master/images/formulae.jpg" />
 
-h5. 3.3 Above formulae use the following parameters as given in ./test/resources/ahrd_input.yml 
+h5. 3.3 Above formulae use the following parameters as given in ./test/resources/ahrd_input_test_run.yml
 
-h6. 3.3.1 The weights in formula Token-Score are:  
+h5. 3.3.1 The weights in formula Token-Score are:  
 
 <pre>token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2 </pre> and Blast-Database specific:
 <pre>weight: 100 </pre>
 
-h6. 3.3.2 The weight in formula Lexical-Score is:
+h5. 3.3.2 The weight in formula Lexical-Score is:
 
 <pre>description_score_relative_description_frequency_weight: 0.6 </pre>
 
-h6. 3.3.3 The weight in formula Description-Score also is Blast-database specific:
+h5. 3.3.3 The weight in formula Description-Score also is Blast-database specific:
 
 <pre>description_score_bit_score_weight: 0.2 </pre>
 
