@@ -71,7 +71,7 @@ needs.
 h3. 2.5 Output:
 
 AHRD's quality-code consist of a four character string, where each character is
-either '-' if the respective criteria is met or '*' otherwise. There meaning is
+either '-' if the respective criteria is met or '*' otherwise. Their meaning is
 explained in the following table:
 
 | Position | Criteria |
