@@ -37,9 +37,11 @@ Additionally all parameters can be set manually (see Section Parameters).
 
 h3. 2.1. AHRD Example run:
 
-<pre>
-java -Xmx2g -jar ahrd.jar ahrd_input.jar
-</pre>
+<pre> java -Xmx2g -jar ahrd.jar ahrd_input.jar </pre>
+
+or just execute
+
+<pre> ant test.run </pre>
 
 h3. 2.2. Recommended BLAST-Search:
 
@@ -89,23 +91,31 @@ h4. Workflow
 
 # Choose 600 best scoring blast results
 # Filter description lines of above blast-results using regular expressions:
-## Reject those matched by any regex given in ./test/resources/blacklist_descline.txt,
-## delete those parts of each description line, matching any regex in ./test/resources/filter_descline_sprot.txt. 
+## Reject those matched by any regex given in e.g. ./test/resources/blacklist_descline.txt,
+## Delete those parts of each description line, matching any regex in e.g. ./test/resources/filter_descline_sprot.txt. 
 # Divide each description line into tokens (characters of collective meaning)
+## In terms of score ignore any tokens matching regexs given e.g. in ./test/resources/blacklist_token.txt.
 # Token score (calculated from: bitscore, database weight, overlap score)
 # Lexical score (calculated from: Token score, High score factor, Pattern factor, Correction factor)
 # Description score (calculated from: Lexical score, GO score, Blast score)
 # Choose best scoring description line
 # Append InterProScan description to chosen description line if available
 
+h4. Formulae
 
 
-h2. Building an executable jar:
 
-<pre>ant dist</pre> will create the executable JAR-File:
-<pre>./dist/ahrd.jar</pre>
 
-h2. 4. License
+h2. 3. Building the executable jar:
+
+Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
+
+h2. 4. Testing:
+
+If you want to run the complete Junit Test-Suite execute: <pre>ant</pre>
+
+h2. 5. License
+
 See attached file LICENSE.txt for details.
 
 Have Fun!
