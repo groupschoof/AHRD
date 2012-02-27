@@ -34,7 +34,7 @@ genes from a fungal genome searching yeast databases might be more
 recommendable than using TAIR (_Arabidopsis thaliana_).
 
 All parameters can be set manually, or the default ones can be used as given in
-the example input file ./test/resources/ahrd_input_test_run.yml (see Section
+the example input file ./test/resources/ahrd_input_test_run.yml (see section
 Parameters).
 
 AHRD is recommended to be run on batches of 1,000 to 2,000 proteins. If you
