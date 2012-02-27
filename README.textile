@@ -25,15 +25,17 @@ All AHRD-Inputs are passed to AHRD in a single YML-File.
 See test/resources/ahrd_input.yml for details.
 (About YAML-Format see <a href="http://en.wikipedia.org/wiki/YAML">Wikipedia</a>)
 
-Basically AHRD needs a FASTA-File of amino acid sequences and three different
-files containing the results from different BLAST searches, in our example we
+Basically AHRD needs a FASTA-File of amino acid sequences and different files
+containing the results from the respective BLAST searches, in our example we
 searched three databases: Uniprot/trEMBL, Uniprot/Swissprot and TAIR10. Note,
 that AHRD is generic and can make use of any number of different Blast
-databases that do not have to be the above ones. If annotating genes from a
-fungal genome searching for yeast-sequences of high similarity might be
-recommendable.
+databases that do not necessarily have to be the above ones. If annotating
+genes from a fungal genome searching for yeast-sequences of high similarity
+might be more recommendable.
 
-Additionally all parameters can be set manually (see Section Parameters).
+All parameters can be set manually, or the default ones can be used as given in
+the example input file ./test/resources/ahrd_input.yml (see Section
+Parameters).
 
 AHRD is recommended to be run on batches of 1,000 to 2,000 proteins. If you
 want to annotate a whole genome use the included Batcher to split your
@@ -53,7 +55,7 @@ or just execute
 
 h3. 2.3 Recommended BLAST-Search:
 
-For your query proteins you should start three independent BLAST searches e.g.
+For your query proteins you should start independent BLAST searches e.g.
 in the three different databases mentioned above:
 
 <pre>
@@ -69,6 +71,14 @@ You will have to edit ./test/resources/batcher_input_test.yml according to your
 needs.
 
 h3. 2.5 Output:
+
+AHRD writes out a CSV table with the following columns:
+# Protein-Accesion -- The Query Protein's Accession
+# Blast-Hit-Accession -- The Accession of the Protein the assigned description was taken from.
+# AHRD-Quality-Code -- explained below
+# Human-Readable-Description -- The assigned HRD
+# Interpro-ID (Description) -- If AHRD was started with InterProScan-Results, they are appended here.
+# Gene-Ontology-ID (Name) -- If AHRD was started with Gene-Ontology-Annotations, they are appended here.
 
 AHRD's quality-code consist of a four character string, where each character is
 either '-' if the respective criteria is met or '*' otherwise. Their meaning is
