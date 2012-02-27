@@ -147,6 +147,7 @@ h2. 5. License
 See attached file LICENSE.txt for details.
 
 h2. 6. Authors
+
 Kathrin Klee and Asis Hallab
 
 Group "Plant Computational Biology"
