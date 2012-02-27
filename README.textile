@@ -1,5 +1,4 @@
-Automated Assignment of Human Readable Descriptions (AHRD)
-==========================================================
+h1. Automated Assignment of Human Readable Descriptions (AHRD)
 
 Protein function has often been transferred from characterized proteins to
 novel proteins based on sequence similarity, e.g. using the best BLAST hit. To
@@ -15,12 +14,12 @@ Shared tokens with Gene-Ontology Annotations increase the description-scoring
 in order to use standard nomenclature where possible. Finally the best scoring
 description is assigned.
 
-1. Requirements:
+h2. 1. Requirements:
 
 AHRD is a Java-Program which requires Java 1.5 or higher.
 
 
-2. Usage:
+h2. 2. Usage:
 
 All AHRD-Inputs are passed to AHRD in a single YML-File.
 See ahrd_input.yml for details.
@@ -33,9 +32,11 @@ Additionally the parameters can be set manually (NOT RECOMMENDED).
 
 An example AHRD-call is given in ahrd_test_run.sh:
 
+<pre>
 java -Xmx2g -jar ahrd.jar ahrd_input.jar
+</pre>
 
-3. Recommended BLAST-Search:
+h3. 3. Recommended BLAST-Search:
 
 For your query proteins you should start three independent BLAST searches in
 the three different databases mentioned above:
