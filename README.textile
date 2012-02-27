@@ -111,7 +111,7 @@ h5. Above formulae use the following parameters as given in ./test/resources/ahr
 <pre>token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2 </pre> and Blast-Database specific:
-<pre> weight: 100 </pre>
+<pre>weight: 100 </pre>
 
 # The weight in formula Lexical-Score is:
 <pre>description_score_relative_description_frequency_weight: 0.6 </pre>
