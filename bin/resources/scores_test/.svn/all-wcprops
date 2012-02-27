@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/rep/!svn/ver/2702/AHRD/trunk/test/resources/scores_test
+END
+sprot_patternTest.blastout
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/rep/!svn/ver/2702/AHRD/trunk/test/resources/scores_test/sprot_patternTest.blastout
+END
+prot_patternTest.fa
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/rep/!svn/ver/2702/AHRD/trunk/test/resources/scores_test/prot_patternTest.fa
+END
+tair_patternTest.blastout
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/rep/!svn/ver/2702/AHRD/trunk/test/resources/scores_test/tair_patternTest.blastout
+END
+ahrd_input.yml
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/rep/!svn/ver/2702/AHRD/trunk/test/resources/scores_test/ahrd_input.yml
+END
+trembl_patternTest.blastout
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/rep/!svn/ver/2702/AHRD/trunk/test/resources/scores_test/trembl_patternTest.blastout
+END

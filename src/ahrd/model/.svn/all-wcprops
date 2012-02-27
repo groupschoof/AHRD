@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/rep/!svn/ver/2779/AHRD/trunk/src/ahrd/model
+END
+Protein.java
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/rep/!svn/ver/2738/AHRD/trunk/src/ahrd/model/Protein.java
+END
+InterproResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/rep/!svn/ver/2705/AHRD/trunk/src/ahrd/model/InterproResult.java
+END
+ReferenceDescription.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/rep/!svn/ver/2717/AHRD/trunk/src/ahrd/model/ReferenceDescription.java
+END
+BlastResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/rep/!svn/ver/2736/AHRD/trunk/src/ahrd/model/BlastResult.java
+END
+TokenScoreCalculator.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/rep/!svn/ver/2779/AHRD/trunk/src/ahrd/model/TokenScoreCalculator.java
+END
+BlastSearchContentAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/rep/!svn/ver/2736/AHRD/trunk/src/ahrd/model/BlastSearchContentAdapter.java
+END
+LexicalScoreCalculator.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/rep/!svn/ver/2701/AHRD/trunk/src/ahrd/model/LexicalScoreCalculator.java
+END
+GeneOntologyResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/rep/!svn/ver/2705/AHRD/trunk/src/ahrd/model/GeneOntologyResult.java
+END
+DescriptionScoreCalculator.java
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/rep/!svn/ver/2713/AHRD/trunk/src/ahrd/model/DescriptionScoreCalculator.java
+END
+Blast2GoAnnot.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/rep/!svn/ver/2735/AHRD/trunk/src/ahrd/model/Blast2GoAnnot.java
+END
+EvaluationScoreCalculator.java
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/rep/!svn/ver/2738/AHRD/trunk/src/ahrd/model/EvaluationScoreCalculator.java
+END

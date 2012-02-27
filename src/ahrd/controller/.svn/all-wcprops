@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/rep/!svn/ver/2784/AHRD/trunk/src/ahrd/controller
+END
+Settings.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/rep/!svn/ver/2770/AHRD/trunk/src/ahrd/controller/Settings.java
+END
+Utils.java
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/rep/!svn/ver/2776/AHRD/trunk/src/ahrd/controller/Utils.java
+END
+Evaluator.java
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/rep/!svn/ver/2739/AHRD/trunk/src/ahrd/controller/Evaluator.java
+END
+Parameters.java
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/rep/!svn/ver/2779/AHRD/trunk/src/ahrd/controller/Parameters.java
+END
+Trainer.java
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/rep/!svn/ver/2779/AHRD/trunk/src/ahrd/controller/Trainer.java
+END
+Batcher.java
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/rep/!svn/ver/2784/AHRD/trunk/src/ahrd/controller/Batcher.java
+END
+TrainerBatcher.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/rep/!svn/ver/2772/AHRD/trunk/src/ahrd/controller/TrainerBatcher.java
+END
+AHRD.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/rep/!svn/ver/2771/AHRD/trunk/src/ahrd/controller/AHRD.java
+END

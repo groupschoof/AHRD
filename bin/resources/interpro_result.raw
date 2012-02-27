@@ -1,0 +1,7 @@
+gene:chr01.502:mRNA:chr01.502	D5F4B7ECDABA1591	567	HMMPfam	PF00560	LRR_1	262	283	0.038	T	02-Mar-2011	IPR000535	Leucine-rich repeat	Molecular Function: protein binding (GO:0005515)
+gene:chr01.502:mRNA:chr01.502	D5F4B7ECDABA1591	567	HMMPfam	PF00560	LRR_1	285	306	0.0029	T	02-Mar-2011	IPR000535	Leucine-rich repeat	Molecular Function: protein binding (GO:0005515)
+gene:chr01.1056:mRNA:chr01.1056	C8B2F9945C9994A1	256	Seg	seg	seg	27	45	NA	?	02-Mar-2011	NULL	NULL
+gene:chr01.1056:mRNA:chr01.1056	C8B2F9945C9994A1	256	superfamily	SSF48264	Cytochrome P450	25	253	1.1e-41	T	02-Mar-2011	IPR000536	Cytochrome P450	Molecular Function: monooxygenase activity (GO:0004497), Molecular Function: iron ion binding (GO:0005506), Molecular Function: electron carrier activity (GO:0009055), Molecular Function: heme binding (GO:0020037)
+gene:chr01.1056:mRNA:chr01.1056	C8B2F9945C9994A1	256	HMMPanther	PTHR19383:SF171	FLAVONOID 3-HYDROXYLASE	4	248	7.2e-69	T	02-Mar-2011	NULL	NULL	
+gene:chr01.1056:mRNA:chr01.1056	C8B2F9945C9994A1	256	HMMPanther	PTHR19383	CYTOCHROME P450	4	248	7.2e-69	T	02-Mar-2011	IPR000006	Cytochrome P450	Molecular Function: monooxygenase activity (GO:0004497), Molecular Function: iron ion binding (GO:0005506), Molecular Function: electron carrier activity (GO:0009055), Molecular Function: heme binding (GO:0020037)
+gene:chr01.1056:mRNA:chr01.1056	C8B2F9945C9994A1	256	Coil	coil	coiled-coil	204	225	NA	?	02-Mar-2011	NULL	NULL

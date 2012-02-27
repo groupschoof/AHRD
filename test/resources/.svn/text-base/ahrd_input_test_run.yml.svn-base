@@ -1,0 +1,30 @@
+proteins_fasta: /projects/irg/grp_pcb/projects/AHRD/Test_AHRD_Java/singletest/manually-curated-genes.fasta
+
+blast_dbs:
+  swissprot:
+    weight: 100
+    file: /projects/irg/grp_pcb/projects/AHRD/Test_AHRD_Java/singletest/sprot.blastout
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_sprot.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+
+  tair:
+    weight: 50
+    file: /projects/irg/grp_pcb/projects/AHRD/Test_AHRD_Java/singletest/tair.blastout
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_tair.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+
+  trembl:
+    weight: 10
+    file: /projects/irg/grp_pcb/projects/AHRD/Test_AHRD_Java/singletest/trembl.blastout
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_trembl.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+
+interpro_database: /projects/irg/grp_pcb/projects/AHRD/Test_AHRD_Java/singletest/interpro_31.xml
+interpro_result: /projects/irg/grp_pcb/projects/AHRD/Test_AHRD_Java/singletest/interproresult.raw
+
+gene_ontology_result: /projects/irg/grp_pcb/projects/AHRD/Test_AHRD_Java/singletest/all_sifter_results_filtered_renamed_parsed.csv
+
+output: /projects/irg/grp_pcb/projects/AHRD/Test_AHRD_Java/singletest/ahrd_output.csv

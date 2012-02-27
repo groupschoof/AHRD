@@ -1,0 +1,606 @@
+BLASTP 2.2.21 [Jun-14-2009]
+
+
+Reference: Altschul, Stephen F., Thomas L. Madden, Alejandro A. Schaffer, 
+Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), 
+"Gapped BLAST and PSI-BLAST: a new generation of protein database search
+programs",  Nucleic Acids Res. 25:3389-3402.
+
+Reference for compositional score matrix adjustment: Altschul, Stephen F., 
+John C. Wootton, E. Michael Gertz, Richa Agarwala, Aleksandr Morgulis,
+Alejandro A. Schaffer, and Yi-Kuo Yu (2005) "Protein database searches
+using compositionally adjusted substitution matrices", FEBS J. 272:5101-5109.
+
+Query= Solyc11g010630.2.1
+         (172 letters)
+
+Database: trembl_min_1000_2011_min_solyc.fa 
+           16,502,056 sequences; 5,356,666,569 total letters
+
+Searching..................................................done
+
+
+
+                                                                 Score    E
+Sequences producing significant alignments:                      (bits) Value
+
+tr|F6I2F0|F6I2F0_VITVI Putative uncharacterized protein OS=Vitis...   220   6e-56
+tr|B9T9K4|B9T9K4_RICCO Putative uncharacterized protein OS=Ricin...   169   2e-40
+tr|F6H138|F6H138_VITVI Putative uncharacterized protein OS=Vitis...   163   7e-39
+tr|B9RJX7|B9RJX7_RICCO Putative uncharacterized protein OS=Ricin...   159   2e-37
+tr|B9GN46|B9GN46_POPTR Predicted protein OS=Populus trichocarpa ...   159   2e-37
+tr|B7FN94|B7FN94_MEDTR Putative uncharacterized protein OS=Medic...   150   7e-35
+tr|F2CQA0|F2CQA0_HORVD Predicted protein OS=Hordeum vulgare var....   115   3e-24
+tr|A5AHT4|A5AHT4_VITVI Putative uncharacterized protein OS=Vitis...   114   4e-24
+tr|F2CQ72|F2CQ72_HORVD Predicted protein (Fragment) OS=Hordeum v...   111   4e-23
+tr|Q93VQ7|Q93VQ7_ARATH AT4G38060 protein OS=Arabidopsis thaliana...   102   3e-20
+tr|B6U047|B6U047_MAIZE Putative uncharacterized protein OS=Zea m...   102   3e-20
+tr|F2D757|F2D757_HORVD Predicted protein OS=Hordeum vulgare var....    99   2e-19
+tr|B4G0D6|B4G0D6_MAIZE Putative uncharacterized protein OS=Zea m...    98   4e-19
+tr|D8SBT8|D8SBT8_SELML Putative uncharacterized protein OS=Selag...    90   1e-16
+tr|A9RRF3|A9RRF3_PHYPA Predicted protein OS=Physcomitrella paten...    83   2e-14
+tr|A9T7X7|A9T7X7_PHYPA Predicted protein OS=Physcomitrella paten...    81   5e-14
+tr|A9T4Q5|A9T4Q5_PHYPA Predicted protein OS=Physcomitrella paten...    80   1e-13
+tr|B8BAS4|B8BAS4_ORYSI Putative uncharacterized protein OS=Oryza...    78   4e-13
+tr|C5YKV3|C5YKV3_SORBI Putative uncharacterized protein Sb07g020...    78   5e-13
+tr|Q9SZK6|Q9SZK6_ARATH Putative protei OS=Arabidopsis thaliana G...    77   9e-13
+tr|B6SJT1|B6SJT1_MAIZE Putative uncharacterized protein OS=Zea m...    76   2e-12
+tr|D7M9K7|D7M9K7_ARALL Putative uncharacterized protein OS=Arabi...    75   2e-12
+tr|Q6Z552|Q6Z552_ORYSJ Os08g0414300 protein OS=Oryza sativa subs...    75   2e-12
+tr|B6TNM8|B6TNM8_MAIZE Putative uncharacterized protein OS=Zea m...    62   2e-08
+tr|Q6H4S2|Q6H4S2_ORYSJ Os09g0376300 protein OS=Oryza sativa subs...    59   2e-07
+tr|B8BEZ9|B8BEZ9_ORYSI Putative uncharacterized protein OS=Oryza...    59   2e-07
+tr|Q9LSM6|Q9LSM6_ARATH AT5g65480/K19O4_1 OS=Arabidopsis thaliana...    57   1e-06
+tr|B9G3A6|B9G3A6_ORYSJ Putative uncharacterized protein OS=Oryza...    57   1e-06
+tr|D7MTY7|D7MTY7_ARALL Putative uncharacterized protein OS=Arabi...    55   3e-06
+
+>tr|F6I2F0|F6I2F0_VITVI Putative uncharacterized protein OS=Vitis
+           vinifera GN=VIT_00s0779g00010 PE=4 SV=1
+          Length = 170
+
+ Score =  220 bits (561), Expect = 6e-56,   Method: Compositional matrix adjust.
+ Identities = 112/172 (65%), Positives = 132/172 (76%), Gaps = 3/172 (1%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEPVSNGSSMNPLQDFGFGLKEQSDSLKFKSVRGANLASTTXX 60
+           MAVS  R+SWW WGGK+KEPVSNGSS+N   D+G GL+E  D++KF SV+ A++ S++  
+Sbjct: 1   MAVSFPRISWWMWGGKDKEPVSNGSSLNSTPDWGLGLREH-DTVKFPSVKRADVTSSSSK 59
+
+Query: 61  XXXXXXXXXXXXXXDEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGDD 120
+                         D +YDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDF +DDE D 
+Sbjct: 60  VKRKWQSREERRI-DREYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFLSDDETDR 118
+
+Query: 121 SFAVLVPCYRHDCREIGE-PNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+           +FAVLVPCYRH C+E+ E PN+  LSAI+NL N Y AEGKKY+EQWLSSLQN
+Sbjct: 119 TFAVLVPCYRHGCKELVEDPNDHLLSAIKNLRNEYSAEGKKYVEQWLSSLQN 170
+
+
+>tr|B9T9K4|B9T9K4_RICCO Putative uncharacterized protein OS=Ricinus
+           communis GN=RCOM_0320400 PE=4 SV=1
+          Length = 169
+
+ Score =  169 bits (427), Expect = 2e-40,   Method: Compositional matrix adjust.
+ Identities = 101/176 (57%), Positives = 120/176 (68%), Gaps = 11/176 (6%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEPVSNGSSMNP-LQDFGFGLKEQSDSLKFKSVRGANLASTTX 59
+           MAVSLTR  WW W GKEK+ VSNGSS+N    D+  GL+E  DS+KF +    NLAS   
+Sbjct: 1   MAVSLTRFPWWIWSGKEKDSVSNGSSLNSSTTDWSSGLREL-DSVKFTT---KNLASARK 56
+
+Query: 60  XXXXXXXXXXXXXXXDEKY-DVVLVPSDG-VCLSGSESDDSDWSIGWLEPHAPDFQNDDE 117
+                          D++Y D V+VPSDG +CLSGSESD  DWSIGW+EPH  +F++DDE
+Sbjct: 57  VKRKWHSREERRV--DKQYGDAVVVPSDGGICLSGSESDGPDWSIGWVEPHGLEFRSDDE 114
+
+Query: 118 GDDSFAVLVPCYRHDCREIGE-PNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQNF 172
+            DD FAVLVPCYR  C+E+ E  NNQ LSAI+NL N + +EGK YME WLSSLQNF
+Sbjct: 115 TDDGFAVLVPCYRPGCKELVENSNNQLLSAIKNLPNEFSSEGKNYME-WLSSLQNF 169
+
+
+>tr|F6H138|F6H138_VITVI Putative uncharacterized protein OS=Vitis
+           vinifera GN=VIT_18s0001g07600 PE=4 SV=1
+          Length = 192
+
+ Score =  163 bits (413), Expect = 7e-39,   Method: Compositional matrix adjust.
+ Identities = 94/174 (54%), Positives = 111/174 (63%), Gaps = 7/174 (4%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEPVSNGSSMNPLQDFGFGLKEQSDSLKFKSVRGANLASTTXX 60
+           M+VSLT LSWW W GK +EP    +  +       GL E  D+LKF  V+GAN+ ST+  
+Sbjct: 22  MSVSLTHLSWWLWSGKHQEPKRLSNGSSLNSSQDSGLWE-PDALKFPLVKGANMTSTSRR 80
+
+Query: 61  XXXXXXXXXXXXXXDEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGDD 120
+                         D +YDVVLVPSD  C+SGSESDDSDWSIGWLEPH P+FQ+DDE D 
+Sbjct: 81  TKRKWQSREERKI-DREYDVVLVPSDAGCVSGSESDDSDWSIGWLEPHGPEFQSDDELDG 139
+
+Query: 121 SFAVLVPCY---RHDCREIGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+           SFAVLVPCY   R+D  E  + N +  S I N+ +GY AE  KYMEQWLSSLQ 
+Sbjct: 140 SFAVLVPCYGRGRNDVVE--DANKKIFSTIGNIPDGYSAENGKYMEQWLSSLQR 191
+
+
+>tr|B9RJX7|B9RJX7_RICCO Putative uncharacterized protein OS=Ricinus
+           communis GN=RCOM_1039590 PE=4 SV=1
+          Length = 170
+
+ Score =  159 bits (401), Expect = 2e-37,   Method: Compositional matrix adjust.
+ Identities = 89/173 (51%), Positives = 111/173 (64%), Gaps = 6/173 (3%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEP-VSNGSSMNPLQDFGFGLKEQSDSLKFKSVRGANLASTTX 59
+           MAV+ T LSWW W GK ++P + N SS+N   D       +SD+LKF  VR AN+AS++ 
+Sbjct: 1   MAVAFTNLSWWLWSGKHQDPRIPNASSLNSRPDSDLW---ESDNLKFPLVRRANVASSSR 57
+
+Query: 60  XXXXXXXXXXXXXXXDEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGD 119
+                          D +YDVVLVPSDG C+SGSESDDSD+SIGWLEPH   FQ+DD+ D
+Sbjct: 58  RVKRKWHSREERKI-DREYDVVLVPSDGGCVSGSESDDSDYSIGWLEPHGAGFQSDDDMD 116
+
+Query: 120 DSFAVLVPCY-RHDCREIGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+            SFAVLVPCY R   +   +  N    AI N+ +G+  E K+YME+WLSSLQN
+Sbjct: 117 SSFAVLVPCYGRAQDKVFEDSKNNMFGAIVNIQDGFSNESKRYMEEWLSSLQN 169
+
+
+>tr|B9GN46|B9GN46_POPTR Predicted protein OS=Populus trichocarpa
+           GN=POPTRDRAFT_551664 PE=4 SV=1
+          Length = 166
+
+ Score =  159 bits (401), Expect = 2e-37,   Method: Compositional matrix adjust.
+ Identities = 94/174 (54%), Positives = 113/174 (64%), Gaps = 10/174 (5%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEP-VSNGSSMNPLQDFGFGLKEQSDSLKFKSVRGANLASTTX 59
+           MAV+ T LSWW W GK +EP +SNGSS+N   D    L E SD+LKF  V+  N+AS++ 
+Sbjct: 1   MAVAFTNLSWWLWSGKHQEPRISNGSSLNARPDSD--LWESSDTLKFPLVQ-TNVASSSR 57
+
+Query: 60  XXXXXXXXXXXXXXXDEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGD 119
+                          D +YDVVLVPSDG C+SGSESDDSD+SIGWLEPH P+FQ+DD+ D
+Sbjct: 58  RVKRKWHSREERKI-DREYDVVLVPSDGGCVSGSESDDSDYSIGWLEPHGPEFQSDDDTD 116
+
+Query: 120 DSFAVLVPCY-RHDCREIGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQNF 172
+           +SFAVLVPCY R       +  N    AI N+    P E KKYMEQWLSS+QN 
+Sbjct: 117 NSFAVLVPCYGRVQDNAFEDKKNNLFGAIVNI----PDESKKYMEQWLSSVQNI 166
+
+
+>tr|B7FN94|B7FN94_MEDTR Putative uncharacterized protein OS=Medicago
+           truncatula PE=2 SV=1
+          Length = 171
+
+ Score =  150 bits (379), Expect = 7e-35,   Method: Compositional matrix adjust.
+ Identities = 83/174 (47%), Positives = 108/174 (62%), Gaps = 7/174 (4%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEP--VSNGSSMNPLQDFGFGLKEQSDSLKFKSVRGANLASTT 58
+           M+V+ T LSWW W GK +EP   S G+S+N   D       +S+ ++F  V+ AN+ S++
+Sbjct: 1   MSVAFTNLSWWLWSGKHQEPRISSKGTSINSSTDLNM---LESEVMRFPLVQ-ANIGSSS 56
+
+Query: 59  XXXXXXXXXXXXXXXXDEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEG 118
+                           D +YDVVLVPSDG C+SGSESDDSDWSIGWLEPH P F +DDE 
+Sbjct: 57  KKVKRKWNSREERRKVDREYDVVLVPSDGGCVSGSESDDSDWSIGWLEPHGPGFPSDDET 116
+
+Query: 119 DDSFAVLVPCYRHDCREIGE-PNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+           D+SFAVLVPCY  D   I E   +  L+ + +  + Y  E KKY+E WLSS++N
+Sbjct: 117 DNSFAVLVPCYGRDYGRIEEDTKSNLLNGVGHFLDSYSDESKKYVENWLSSIRN 170
+
+
+>tr|F2CQA0|F2CQA0_HORVD Predicted protein OS=Hordeum vulgare var.
+           distichum PE=2 SV=1
+          Length = 175
+
+ Score =  115 bits (287), Expect = 3e-24,   Method: Compositional matrix adjust.
+ Identities = 76/179 (42%), Positives = 98/179 (54%), Gaps = 12/179 (6%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEPVSN----GSSMN--PLQDFGFGLKEQSDSLKFKSVRGANL 54
+           MA+ L R + W W G     V N    G+++      +F  G +E +D+L F S   A  
+Sbjct: 1   MAMGLGRFTHWLWPGNAAR-VGNHELPGTALTGASFPEFPSGFRE-ADALAF-STAAAGG 57
+
+Query: 55  ASTTXXXXXXXXXXXXXXXXDEKYDVVLVPSDGV-CLSGSESDDSDWSIGWLEPHAPDFQ 113
+                               D +YD+V+VPSDG  CLSGSESDDSDWSIGWLEP AP+ Q
+Sbjct: 58  RRARQRRVKNQRRSRGEPRIDREYDMVIVPSDGGGCLSGSESDDSDWSIGWLEPQAPEMQ 117
+
+Query: 114 NDDEGDDSFAVLVPCYRH-DCREIGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+            D + + SFAVLVPCYRH    +   P  +FL A      G  ++GK ++E+WLSSLQN
+Sbjct: 118 TDGDQETSFAVLVPCYRHGRAEQPAMPQARFLGAGPLADRGL-SDGKNFVEEWLSSLQN 175
+
+
+>tr|A5AHT4|A5AHT4_VITVI Putative uncharacterized protein OS=Vitis
+           vinifera GN=VITISV_010189 PE=4 SV=1
+          Length = 1093
+
+ Score =  114 bits (286), Expect = 4e-24,   Method: Compositional matrix adjust.
+ Identities = 55/86 (63%), Positives = 65/86 (75%), Gaps = 5/86 (5%)
+
+Query: 75  DEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCY---RH 131
+           D +YDVVLVPSD  C+SGSESDDSDWSIGWLEPH P+FQ+DDE D SFAVLVPCY   R+
+Sbjct: 21  DREYDVVLVPSDAGCVSGSESDDSDWSIGWLEPHGPEFQSDDELDGSFAVLVPCYGRGRN 80
+
+Query: 132 DCREIGEPNNQFLSAIENLSNGYPAE 157
+           D   + + N +  S I N+ +GY AE
+Sbjct: 81  DV--VEDANKKIFSTIGNIPDGYSAE 104
+
+
+>tr|F2CQ72|F2CQ72_HORVD Predicted protein (Fragment) OS=Hordeum
+           vulgare var. distichum PE=2 SV=1
+          Length = 144
+
+ Score =  111 bits (278), Expect = 4e-23,   Method: Compositional matrix adjust.
+ Identities = 58/99 (58%), Positives = 71/99 (71%), Gaps = 3/99 (3%)
+
+Query: 75  DEKYDVVLVPSDGV-CLSGSESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCYRH-D 132
+           D +YD+V+VPSDG  CLSGSESDDSDWSIGWLEP AP+ Q D + + SFAVLVPCYRH  
+Sbjct: 47  DREYDMVIVPSDGGGCLSGSESDDSDWSIGWLEPQAPEMQTDGDQETSFAVLVPCYRHGR 106
+
+Query: 133 CREIGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+             +   P  +FL A      G  ++GK ++E+WLSSLQN
+Sbjct: 107 AEQPAMPQARFLGAGPLADRGL-SDGKNFVEEWLSSLQN 144
+
+
+>tr|Q93VQ7|Q93VQ7_ARATH AT4G38060 protein OS=Arabidopsis thaliana
+           GN=AT4G38060 PE=2 SV=1
+          Length = 136
+
+ Score =  102 bits (253), Expect = 3e-20,   Method: Compositional matrix adjust.
+ Identities = 48/78 (61%), Positives = 55/78 (70%), Gaps = 1/78 (1%)
+
+Query: 96  DDSDWSIGWLEPHAPDFQNDDEGDDS-FAVLVPCYRHDCREIGEPNNQFLSAIENLSNGY 154
+           D  +WS+GW EPH PDFQ+DDEG+D  F VLVPCYR         NNQ LSA++NL NG 
+Sbjct: 59  DGPEWSVGWTEPHGPDFQSDDEGNDGGFLVLVPCYRAVVEGSSNNNNQLLSAVKNLPNGL 118
+
+Query: 155 PAEGKKYMEQWLSSLQNF 172
+           P +GK YMEQWLSSLQ  
+Sbjct: 119 PPDGKNYMEQWLSSLQKL 136
+
+
+>tr|B6U047|B6U047_MAIZE Putative uncharacterized protein OS=Zea mays
+           PE=2 SV=1
+          Length = 178
+
+ Score =  102 bits (253), Expect = 3e-20,   Method: Compositional matrix adjust.
+ Identities = 77/180 (42%), Positives = 104/180 (57%), Gaps = 11/180 (6%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEPVS------NGSSMNPLQDFGFGLKEQSDSLKFKSVRGANL 54
+           M+++L+R + W W G    PV+       G + +   DF  G +E  D++ F + RGA  
+Sbjct: 1   MSMALSRFTQWLWPGSAAAPVAAHEHPNEGLTSSSFPDFPSGFRE-PDTVTFYTGRGAGG 59
+
+Query: 55  ASTTXXXXXXXXXXXXXXXXDEKYDVVLVPSDGV-CLSGSESDDSDWSIGWLEPHAPDFQ 113
+                               D +YD+V+VPSDG  CLSGS+SDDSDWSIGWLEP AP+ Q
+Sbjct: 60  RRARPRRVRNRRRSRGEPRVDREYDMVIVPSDGGGCLSGSDSDDSDWSIGWLEPQAPELQ 119
+
+Query: 114 NDDEGDDSFAVLVPCYRHDCRE--IGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+            D + ++ FAVLVPCYRH  +E   G    +FL A   L+NG  ++GK ++EQWLS LQN
+Sbjct: 120 TDGDPENCFAVLVPCYRHGRQEQQPGRHEGRFLGA-GTLTNGGFSDGKNFVEQWLSFLQN 178
+
+
+>tr|F2D757|F2D757_HORVD Predicted protein OS=Hordeum vulgare var.
+           distichum PE=2 SV=1
+          Length = 220
+
+ Score = 99.0 bits (245), Expect = 2e-19,   Method: Compositional matrix adjust.
+ Identities = 65/154 (42%), Positives = 82/154 (53%), Gaps = 11/154 (7%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEPVSN----GSSMN--PLQDFGFGLKEQSDSLKFKSVRGANL 54
+           MA+ L R + W W G     V N    G+++      +F  G +E +D+L F S   A  
+Sbjct: 1   MAMGLGRFTHWLWPGNAAR-VGNHELPGTALTGASFPEFPSGFRE-ADALAF-STAAAGG 57
+
+Query: 55  ASTTXXXXXXXXXXXXXXXXDEKYDVVLVPSDGV-CLSGSESDDSDWSIGWLEPHAPDFQ 113
+                               D +YD+V+VPSDG  CLSGSESDDSDWSIGWLEP AP+ Q
+Sbjct: 58  RRARQRRVKNQRRSRGEPRIDREYDMVIVPSDGGGCLSGSESDDSDWSIGWLEPQAPEMQ 117
+
+Query: 114 NDDEGDDSFAVLVPCYRH-DCREIGEPNNQFLSA 146
+            D + + SFAVLVPCYRH    +   P  +FL A
+Sbjct: 118 TDGDQETSFAVLVPCYRHGRAEQPAMPQARFLGA 151
+
+
+>tr|B4G0D6|B4G0D6_MAIZE Putative uncharacterized protein OS=Zea mays
+           PE=2 SV=1
+          Length = 174
+
+ Score = 97.8 bits (242), Expect = 4e-19,   Method: Compositional matrix adjust.
+ Identities = 75/181 (41%), Positives = 102/181 (56%), Gaps = 17/181 (9%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEPV------SNGSSMNPLQDFGFGLKEQSDSLKFKSVRGANL 54
+           M+++L+R + W W G     V      S G + +   DF  G +E  D++ F +      
+Sbjct: 1   MSMALSRFTQWLWPGGAAARVDTHEHPSGGLTSSSFPDFPSGFRE-PDTVTFYT----GR 55
+
+Query: 55  ASTTXXXXXXXXXXXXXXXXDEKYDVVLVPSDGV-CLSGSESDDSDWSIGWLEPHAPDFQ 113
+                               D +YD+V+VPSDG  CLSGS+SDDSDWSIGWLEP AP+ Q
+Sbjct: 56  QRARPRRVRNRRRSRGEARVDREYDMVIVPSDGGGCLSGSDSDDSDWSIGWLEPQAPELQ 115
+
+Query: 114 NDDEGDDSFAVLVPCYRHDCREIGEPNNQ---FLSAIENLSNGYPAEGKKYMEQWLSSLQ 170
+            D + ++ FAVLVPCYRH  R+  +P  Q   FL A   L++G P++GK ++EQWLSS Q
+Sbjct: 116 TDGDPENCFAVLVPCYRHG-RQEQQPRRQEGRFLGA-GALTDGGPSDGKNFVEQWLSSFQ 173
+
+Query: 171 N 171
+           N
+Sbjct: 174 N 174
+
+
+>tr|D8SBT8|D8SBT8_SELML Putative uncharacterized protein
+           OS=Selaginella moellendorffii GN=SELMODRAFT_444640 PE=4
+           SV=1
+          Length = 198
+
+ Score = 89.7 bits (221), Expect = 1e-16,   Method: Compositional matrix adjust.
+ Identities = 51/112 (45%), Positives = 68/112 (60%), Gaps = 18/112 (16%)
+
+Query: 75  DEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCY--RHD 132
+           DE++D+V+V +DG C+SGSES+DSDWS+GWLEPH+ DF +D E  +SFAVLVPCY     
+Sbjct: 89  DEEFDLVVVHTDGCCMSGSESEDSDWSVGWLEPHSTDFSSDSE--ESFAVLVPCYGSSRT 146
+
+Query: 133 CREIGEPNNQ------------FLSAIENLS--NGYPAEGKKYMEQWLSSLQ 170
+            R I                   L+ I + S  N   A+ +K++E WLSSL 
+Sbjct: 147 RRNISSAAPASNPPPPTVWAAALLTTISSGSNRNAAAAQQRKHVEDWLSSLH 198
+
+
+>tr|A9RRF3|A9RRF3_PHYPA Predicted protein OS=Physcomitrella patens
+           subsp. patens GN=PHYPADRAFT_160556 PE=4 SV=1
+          Length = 256
+
+ Score = 82.8 bits (203), Expect = 2e-14,   Method: Compositional matrix adjust.
+ Identities = 34/55 (61%), Positives = 45/55 (81%)
+
+Query: 75  DEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCY 129
+           D ++D+V+VP+DG+ +SGSESD SDWS+GW EPH   F  ++E +DSFAVLVPCY
+Sbjct: 66  DPEFDLVIVPADGISMSGSESDVSDWSVGWFEPHHNGFTTENEIEDSFAVLVPCY 120
+
+
+>tr|A9T7X7|A9T7X7_PHYPA Predicted protein OS=Physcomitrella patens
+           subsp. patens GN=PHYPADRAFT_168528 PE=4 SV=1
+          Length = 436
+
+ Score = 81.3 bits (199), Expect = 5e-14,   Method: Compositional matrix adjust.
+ Identities = 34/55 (61%), Positives = 45/55 (81%)
+
+Query: 75  DEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCY 129
+           D ++D+V+VP+DG+ +SGSESD SDWS+GW EPH   F  ++E +DSFAVLVPCY
+Sbjct: 171 DPEFDLVIVPADGISMSGSESDVSDWSVGWFEPHHNGFTTENELEDSFAVLVPCY 225
+
+
+>tr|A9T4Q5|A9T4Q5_PHYPA Predicted protein OS=Physcomitrella patens
+           subsp. patens GN=PHYPADRAFT_88051 PE=4 SV=1
+          Length = 253
+
+ Score = 79.7 bits (195), Expect = 1e-13,   Method: Compositional matrix adjust.
+ Identities = 34/55 (61%), Positives = 46/55 (83%), Gaps = 2/55 (3%)
+
+Query: 75  DEKYDVVLVPSDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCY 129
+           D ++D+V+VP DG+ +SGS++DDSDWSIGW EPH+  F +D+E  DSFAVL+PCY
+Sbjct: 76  DSEFDMVIVPPDGISVSGSDTDDSDWSIGWFEPHSKKFTDDEE--DSFAVLMPCY 128
+
+
+>tr|B8BAS4|B8BAS4_ORYSI Putative uncharacterized protein OS=Oryza
+           sativa subsp. indica GN=OsI_29233 PE=4 SV=1
+          Length = 174
+
+ Score = 78.2 bits (191), Expect = 4e-13,   Method: Compositional matrix adjust.
+ Identities = 46/102 (45%), Positives = 60/102 (58%), Gaps = 11/102 (10%)
+
+Query: 75  DEKYDVVLVPSD---GVCLSGSESDDSD--WSIGWLEPHAPDFQNDDEGDDSFAVLVPCY 129
+           D ++D+V+VP D   GV    S+S   D  WSIGWLEP  P+  +D + D SFAVLVPCY
+Sbjct: 79  DREHDMVVVPLDVGGGVDGYSSDSGSDDSDWSIGWLEPQGPELHSDGDSDGSFAVLVPCY 138
+
+Query: 130 RHDCREIGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+           RH  R + EP          L +G  +  K ++E+WLSSL N
+Sbjct: 139 RHGRRRVEEPGRG------RLVDGNVSGAKNFVERWLSSLPN 174
+
+
+>tr|C5YKV3|C5YKV3_SORBI Putative uncharacterized protein Sb07g020220
+           OS=Sorghum bicolor GN=Sb07g020220 PE=4 SV=1
+          Length = 175
+
+ Score = 78.2 bits (191), Expect = 5e-13,   Method: Compositional matrix adjust.
+ Identities = 66/181 (36%), Positives = 94/181 (51%), Gaps = 16/181 (8%)
+
+Query: 1   MAVSLTRLSWWWWGG--------KEKEPVSNGSSMNPLQDFGFGLKEQSDSLKFKSVRGA 52
+           MA+SL+R+S W W G        +E   VS   +     D   G +E  D +     R  
+Sbjct: 1   MAMSLSRISHWIWPGSRTRNRRGREPPAVSTAVTKGLFPDSPSGFRE-PDPVG----RPG 55
+
+Query: 53  NLASTTXXXXXXXXXXXXXXXXDEKYDVVLVPSDG-VCLSGSESDDSDWSIGWLEPHAPD 111
+           + A+                  D +  +V+V SDG  CLS S+SD SDWSIGWLEP AP+
+Sbjct: 56  SGAARPRKGKIRRRGDRGEDRVDGERGMVIVQSDGDGCLSDSDSDGSDWSIGWLEPLAPE 115
+
+Query: 112 FQNDDEGDDSFAVLVPCYRHD-CREIGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQ 170
+            Q+D + + SFAVLVPCYRH        P+ +F      +++G  ++ K ++EQW+SSL+
+Sbjct: 116 LQSDADSEGSFAVLVPCYRHSRADRPARPDGRF-PGPGGVAHGGVSDNKNFVEQWVSSLR 174
+
+Query: 171 N 171
+           N
+Sbjct: 175 N 175
+
+
+>tr|Q9SZK6|Q9SZK6_ARATH Putative protei OS=Arabidopsis thaliana
+           GN=F20D10.180 PE=4 SV=1
+          Length = 125
+
+ Score = 77.0 bits (188), Expect = 9e-13,   Method: Compositional matrix adjust.
+ Identities = 36/61 (59%), Positives = 42/61 (68%), Gaps = 1/61 (1%)
+
+Query: 96  DDSDWSIGWLEPHAPDFQNDDEGDD-SFAVLVPCYRHDCREIGEPNNQFLSAIENLSNGY 154
+           D  +WS+GW EPH PDFQ+DDEG+D  F VLVPCYR         NNQ LSA++NL NG 
+Sbjct: 59  DGPEWSVGWTEPHGPDFQSDDEGNDGGFLVLVPCYRAVVEGSSNNNNQLLSAVKNLPNGL 118
+
+Query: 155 P 155
+           P
+Sbjct: 119 P 119
+
+
+>tr|B6SJT1|B6SJT1_MAIZE Putative uncharacterized protein OS=Zea mays
+           PE=2 SV=1
+          Length = 180
+
+ Score = 76.3 bits (186), Expect = 2e-12,   Method: Compositional matrix adjust.
+ Identities = 66/179 (36%), Positives = 89/179 (49%), Gaps = 16/179 (8%)
+
+Query: 1   MAVSLTRLSWWWWGGKEKEPV------SNGSSMNPLQDFGFGLKEQSDSLKFKSVRGANL 54
+           M+++L+R + W W G     V      S G + +   DF  G +E  D++ F +      
+Sbjct: 1   MSMALSRFTQWLWPGGAAARVDTHEHPSGGLTSSSFPDFPSGFRE-PDTVTFYT----GR 55
+
+Query: 55  ASTTXXXXXXXXXXXXXXXXDEKYDVVLVPSDGV-CLSGSESDDSDWSIGWLEPHAPDFQ 113
+                               D +YD+V+VPSDG  CLSGS+SDDSDWSIGWLEP AP+ Q
+Sbjct: 56  QRARPRRVRNRRRSRGEARVDREYDMVIVPSDGGGCLSGSDSDDSDWSIGWLEPQAPELQ 115
+
+Query: 114 NDDEGDDSFAVLVPCYRHDCREIGEPNNQ---FLSAIENLSNGYPAEGKKYMEQWLSSL 169
+            D + ++ FAVLVPCYRH  R+  +P  Q   FL A      G   E    M  ++  L
+Sbjct: 116 TDGDPENCFAVLVPCYRHG-RQEQQPRRQEGRFLGAGALTDGGPSGEHAHLMCDFIDML 173
+
+
+>tr|D7M9K7|D7M9K7_ARALL Putative uncharacterized protein
+           OS=Arabidopsis lyrata subsp. lyrata GN=ARALYDRAFT_490808
+           PE=4 SV=1
+          Length = 126
+
+ Score = 75.5 bits (184), Expect = 2e-12,   Method: Compositional matrix adjust.
+ Identities = 38/61 (62%), Positives = 43/61 (70%), Gaps = 2/61 (3%)
+
+Query: 96  DDSDWSIGWLEPHAPDFQNDDEGDD-SFAVLVPCYRHDCREIGEPNNQFLSAIENLSNGY 154
+           D  +WS+GW EPH PDFQ+DDEGDD  F VLVPCYR    E    NNQ LSA++NL NG 
+Sbjct: 58  DGPEWSVGWTEPHGPDFQSDDEGDDGGFLVLVPCYRA-VAEGSSNNNQLLSAVKNLPNGL 116
+
+Query: 155 P 155
+           P
+Sbjct: 117 P 117
+
+
+>tr|Q6Z552|Q6Z552_ORYSJ Os08g0414300 protein OS=Oryza sativa subsp.
+           japonica GN=OSJNBa0007M04.37 PE=2 SV=1
+          Length = 172
+
+ Score = 75.5 bits (184), Expect = 2e-12,   Method: Compositional matrix adjust.
+ Identities = 47/100 (47%), Positives = 61/100 (61%), Gaps = 9/100 (9%)
+
+Query: 75  DEKYDVVLVP---SDGVCLSGSESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCYRH 131
+           D ++D+V+VP         S S SDDSDWSIGWLEP  P+  +D + D SFAVLVPCYRH
+Sbjct: 79  DREHDMVVVPLGGGGDGYSSDSGSDDSDWSIGWLEPQGPELHSDGDSDGSFAVLVPCYRH 138
+
+Query: 132 DCREIGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+               + EP          L++G  + GK ++E+WLSSL N
+Sbjct: 139 GRCRVEEPGRG------RLADGNVSGGKNFVERWLSSLPN 172
+
+
+>tr|B6TNM8|B6TNM8_MAIZE Putative uncharacterized protein OS=Zea mays
+           PE=2 SV=1
+          Length = 153
+
+ Score = 62.4 bits (150), Expect = 2e-08,   Method: Compositional matrix adjust.
+ Identities = 46/98 (46%), Positives = 59/98 (60%), Gaps = 16/98 (16%)
+
+Query: 75  DEKYDVVLVPSDG-VCLSGSESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCYRHDC 133
+           D ++ +V+V SDG  CLS S+SD SDWSIGWLEP APD  +D + + SFAVLVPCYR   
+Sbjct: 71  DSEHGMVIVQSDGDGCLSDSDSDASDWSIGWLEPLAPDLHSDVDSEGSFAVLVPCYRRG- 129
+
+Query: 134 REIGEPNNQFLSAIENLSNGYPAEGKKYMEQWLSSLQN 171
+             +  P               P + +  +EQW+SSLQN
+Sbjct: 130 -RVDRP-------------ARPDDNRTSVEQWVSSLQN 153
+
+
+>tr|Q6H4S2|Q6H4S2_ORYSJ Os09g0376300 protein OS=Oryza sativa subsp.
+           japonica GN=OSJNBa0041C07.4 PE=2 SV=1
+          Length = 168
+
+ Score = 59.3 bits (142), Expect = 2e-07,   Method: Compositional matrix adjust.
+ Identities = 53/172 (30%), Positives = 73/172 (42%), Gaps = 29/172 (16%)
+
+Query: 1   MAVSLTRLSWWWW------------GGKEKEPVSNGSSMNPLQDFGFGLKEQSDSLKFKS 48
+           MA+ L R + W W               E    + G +     DF  G +E  D++ F +
+Sbjct: 1   MAMGLNRFTQWLWPASTARAAAAAATTHELPTTAAGLTSASFPDFPSGFRE-PDTVTFAA 59
+
+Query: 49  VRGANLASTTXXXXXXXXXXXXXXXXDEKYDVVLVPSDGVCLSGSES----DDSDWSIGW 104
+                    T                D ++D+V+V SD     G  S    DDSDW+IGW
+Sbjct: 60  ---------TTRRRGGRRSRREEDRVDREFDMVIVASDDGGGGGWLSGSESDDSDWAIGW 110
+
+Query: 105 LEPHAPDFQNDDEGDDSFAVLVPCYRHDCRE-IGEPNN--QFLSAIENLSNG 153
+            E  +P+ Q D + D  FAVLV CYRH   E  G P+    FL+   +L+NG
+Sbjct: 111 QEKLSPELQTDGDPDGCFAVLVRCYRHGQPEPAGRPDGGAHFLATAASLANG 162
+
+
+>tr|B8BEZ9|B8BEZ9_ORYSI Putative uncharacterized protein OS=Oryza
+           sativa subsp. indica GN=OsI_31151 PE=4 SV=1
+          Length = 168
+
+ Score = 59.3 bits (142), Expect = 2e-07,   Method: Compositional matrix adjust.
+ Identities = 53/172 (30%), Positives = 73/172 (42%), Gaps = 29/172 (16%)
+
+Query: 1   MAVSLTRLSWWWW------------GGKEKEPVSNGSSMNPLQDFGFGLKEQSDSLKFKS 48
+           MA+ L R + W W               E    + G +     DF  G +E  D++ F  
+Sbjct: 1   MAMGLNRFTQWLWPASTARAAAAAATTHELPTAAAGLTSASFPDFPSGFRE-PDTVTF-- 57
+
+Query: 49  VRGANLASTTXXXXXXXXXXXXXXXXDEKYDVVLVPSDGVCLSGSES----DDSDWSIGW 104
+                  + T                D ++D+V+V SD     G  S    DDSDW+IGW
+Sbjct: 58  -------AATTRRRGGRRSRREEDRVDREFDMVIVASDDGGGGGWLSGSESDDSDWAIGW 110
+
+Query: 105 LEPHAPDFQNDDEGDDSFAVLVPCYRHDCRE-IGEPNN--QFLSAIENLSNG 153
+            E  +P+ Q D + D  FAVLV CYRH   E  G P+    FL+   +L+NG
+Sbjct: 111 QEKLSPELQTDGDPDGCFAVLVRCYRHGQPEPAGRPDGGAHFLATAASLANG 162
+
+
+>tr|Q9LSM6|Q9LSM6_ARATH AT5g65480/K19O4_1 OS=Arabidopsis thaliana
+           GN=At5g65480 PE=2 SV=1
+          Length = 153
+
+ Score = 57.0 bits (136), Expect = 1e-06,   Method: Compositional matrix adjust.
+ Identities = 34/78 (43%), Positives = 41/78 (52%), Gaps = 11/78 (14%)
+
+Query: 94  ESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCYRHDCREIGE--PNNQFLSAIENLS 151
+           E DD +WSIGW+EPH P F+ +D+    F VLVP Y+      G   PN  F  A     
+Sbjct: 82  EPDDPEWSIGWVEPHGPGFKAEDDDCGGFVVLVPLYKKVMDGSGNQIPNGFFSPA----- 136
+
+Query: 152 NGYPAEGKKYMEQWLSSL 169
+               A   K MEQWLSS+
+Sbjct: 137 ----APDGKNMEQWLSSM 150
+
+
+>tr|B9G3A6|B9G3A6_ORYSJ Putative uncharacterized protein OS=Oryza
+           sativa subsp. japonica GN=OsJ_29158 PE=4 SV=1
+          Length = 159
+
+ Score = 56.6 bits (135), Expect = 1e-06,   Method: Compositional matrix adjust.
+ Identities = 30/61 (49%), Positives = 38/61 (62%), Gaps = 3/61 (4%)
+
+Query: 96  DDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCYRHDCRE-IGEPNN--QFLSAIENLSN 152
+           DDSDW+IGW E  +P+ Q D + D  FAVLV CYRH   E  G P+    FL+   +L+N
+Sbjct: 93  DDSDWAIGWQEKLSPELQTDGDPDGCFAVLVRCYRHGQPEPAGRPDGGAHFLATAASLAN 152
+
+Query: 153 G 153
+           G
+Sbjct: 153 G 153
+
+
+>tr|D7MTY7|D7MTY7_ARALL Putative uncharacterized protein
+           OS=Arabidopsis lyrata subsp. lyrata GN=ARALYDRAFT_919881
+           PE=4 SV=1
+          Length = 150
+
+ Score = 55.5 bits (132), Expect = 3e-06,   Method: Compositional matrix adjust.
+ Identities = 33/78 (42%), Positives = 40/78 (51%), Gaps = 11/78 (14%)
+
+Query: 94  ESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCYRHDCREIGE--PNNQFLSAIENLS 151
+           E DD +WSIGW+EPH P F+  ++    F VLVP Y+      G   PN  F  A     
+Sbjct: 79  EPDDPEWSIGWVEPHGPGFKTQEDDCGGFVVLVPLYKKVLDGSGNQIPNGFFSPA----- 133
+
+Query: 152 NGYPAEGKKYMEQWLSSL 169
+               A   K MEQWLSS+
+Sbjct: 134 ----APDGKNMEQWLSSM 147
+
+
+  Database: trembl_min_1000_2011_min_solyc.fa
+    Posted date:  Oct 18, 2011 10:19 AM
+  Number of letters in database: 5,356,666,569
+  Number of sequences in database:  16,502,056
+  
+Lambda     K      H
+   0.323    0.141    0.425 
+
+Gapped
+Lambda     K      H
+   0.267   0.0410    0.140 
+
+
+Matrix: BLOSUM62
+Gap Penalties: Existence: 11, Extension: 1
+Number of Sequences: 16502056
+Number of Hits to DB: 59,113,136,586
+Number of extensions: -1896524247
+Number of successful extensions: 6974514
+Number of sequences better than 1.0e-04: 72562
+Number of HSP's gapped: 6703807
+Number of HSP's successfully gapped: 161050
+Length of database: 5,356,666,569
+Neighboring words threshold: 11
+Window for multiple hits: 40
+X1: 16 ( 7.5 bits)
+X2: 38 (14.6 bits)
+X3: 64 (24.7 bits)
+S1: 41 (21.9 bits)
+S2: 119 (50.4 bits)
+

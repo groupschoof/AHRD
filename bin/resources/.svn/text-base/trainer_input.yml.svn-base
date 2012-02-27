@@ -1,0 +1,37 @@
+proteins_fasta: ./test/resources/proteins.fasta
+references_fasta: ./test/resources/references.fasta
+
+blast_dbs:
+  swissprot:
+    weight: 100
+    file: ./test/resources/swissprot.pairwise
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_sprot.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+    description_score_bit_score_weight: 0.2
+
+  tair:
+    weight: 50
+    file: ./test/resources/tair.pairwise
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_tair.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+    description_score_bit_score_weight: 0.4
+
+  trembl:
+    weight: 10
+    file: ./test/resources/trembl.pairwise
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_trembl.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+    description_score_bit_score_weight: 0.4
+
+interpro_database: ./test/resources/interpro_31.xml
+interpro_result: ./test/resources/interpro_result.raw
+gene_ontology_result: ./test/resources/go_results.csv
+token_score_bit_score_weight: 0.5
+token_score_database_score_weight: 0.3
+token_score_overlap_score_weight: 0.2
+description_score_relative_description_frequency_weight: 0.6
+output: ./test/ahrd_output.csv
+remember_simulated_annealing_path: true

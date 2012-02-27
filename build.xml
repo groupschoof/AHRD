@@ -1,0 +1,101 @@
+<project name="AHRD" default="test" basedir=".">
+	<description>
+    Assign Human Readable Description (AHRD)
+  </description>
+	<!-- set global properties for this build -->
+	<property name="src" location="src" />
+	<property name="classes" location="classes" />
+	<property name="test.classes" location="classes/ahrd/test" />
+	<property name="lib" location="lib" />
+	<property name="src.test" location="test" />
+	<property name="dist" location="dist" />
+
+	<path id="classpath.compile">
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="classpath.test">
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement location="${classes}" />
+	</path>
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${classes}" />
+		<delete>
+			<fileset dir="${classes}" />
+		</delete>
+		<mkdir dir="${classes}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<!-- Compile the java code from ${src} into ${classes} -->
+		<javac srcdir="${src}" destdir="${classes}" includeAntRuntime="yes" nowarn="off">
+			<compilerarg value="-Xlint:unchecked" />
+			<classpath refid="classpath.compile" />
+		</javac>
+	</target>
+
+	<target name="compile.test" depends="compile" description="compile the test-classes">
+		<javac srcdir="${src.test}" destdir="${classes}" includeAntRuntime="yes" nowarn="off">
+			<compilerarg value="-Xlint:unchecked" />
+			<classpath refid="classpath.test" />
+		</javac>
+	</target>
+
+	<target name="dist" depends="compile" description="generate the distribution">
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist}" />
+		<unzip dest="${classes}">
+			<fileset dir="${lib}" />
+		</unzip>
+
+		<!-- Put everything in ${classes} into the ahrd.jar file -->
+		<jar jarfile="${dist}/ahrd.jar" basedir="${classes}" manifest="MANIFEST.MF" />
+
+		<delete>
+			<fileset dir="${classes}" />
+		</delete>
+	</target>
+
+	<target name="clean" description="clean up">
+		<!-- Delete the ${classes} and ${dist} directory trees -->
+		<delete dir="${classes}" />
+		<delete dir="${dist}" />
+	</target>
+
+	<target name="test" depends="compile.test">
+		<junit printsummary="true" fork="true" forkmode="perTest" maxmemory="2048m">
+			<classpath refid="classpath.test" />
+			<formatter type="plain" usefile="false" />
+			<!-- <test name="ahrd.test.AhrdTest" /> -->
+			<batchtest>
+				<fileset dir="${classes}" includes="**/*Test.class" />
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="test.run" depends="compile.test">
+		<junit printsummary="true" fork="true" forkmode="perTest" maxmemory="2048m">
+			<classpath refid="classpath.test" />
+			<formatter type="plain" usefile="false" />
+			<test name="ahrd.test.AhrdTestRun" />
+		</junit>
+	</target>
+
+	<target name="test.regexs" depends="compile.test">
+		<junit printsummary="true" fork="true" forkmode="perTest">
+			<classpath refid="classpath.test" />
+			<formatter type="plain" usefile="false" />
+			<test name="ahrd.test.TestRegexs" />
+		</junit>
+	</target>
+
+</project>
+
