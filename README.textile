@@ -81,7 +81,7 @@ AHRD writes out a CSV table with the following columns:
 # Gene-Ontology-ID (Name) -- If AHRD was started with Gene-Ontology-Annotations, they are appended here.
 
 AHRD's quality-code consists of a four character string, where each character is
-either '-' if the respective criteria is met or '*' otherwise. Their meaning is
+either '*' if the respective criteria is met or '-' otherwise. Their meaning is
 explained in the following table:
 
 | Position | Criteria |
