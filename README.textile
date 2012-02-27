@@ -37,7 +37,7 @@ Additionally all parameters can be set manually (see Section Parameters).
 
 h3. 2.1. AHRD Example run:
 
-<pre> java -Xmx2g -jar ahrd.jar ahrd_input.jar </pre>
+<pre> java -Xmx2g -jar ./dist/ahrd.jar ./test/resources/ahrd_input.yml </pre>
 
 or just execute
 
