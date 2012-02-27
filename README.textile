@@ -47,7 +47,7 @@ Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 
 h3. 2.2 AHRD Example run:
 
-<pre> java -Xmx2g -jar ./dist/ahrd.jar ./test/resources/ahrd_input.yml </pre>
+<pre> java -Xmx2g -jar ./dist/ahrd.jar ./test/resources/ahrd_input_test_run.yml </pre>
 
 or just execute
 

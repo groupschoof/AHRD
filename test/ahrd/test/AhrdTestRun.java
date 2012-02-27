@@ -12,7 +12,7 @@ public class AhrdTestRun {
 
 	@Test
 	public void testRun() throws Exception {
-		String[] args = {"./test/resources/ahrd_input.yml"};
+		String[] args = {"./test/resources/ahrd_input_test_run.yml"};
 		AHRD.main(args);
 		// No error?, then we are happy..
 		assertTrue(true);
