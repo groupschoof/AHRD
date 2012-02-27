@@ -14,12 +14,12 @@ Shared tokens with Gene-Ontology Annotations increase the description-scoring
 in order to use standard nomenclature where possible. Finally the best scoring
 description is assigned.
 
-h2. 1. Requirements:
+h2. 1 Requirements:
 
 AHRD is a Java-Program which requires Java 1.5 or higher.
 
 
-h2. 2. Usage:
+h2. 2 Usage:
 
 All AHRD-Inputs are passed to AHRD in a single YML-File.
 See test/resources/ahrd_input.yml for details.
@@ -35,7 +35,7 @@ recommendable.
 
 Additionally all parameters can be set manually (see Section Parameters).
 
-h3. 2.1. AHRD Example run:
+h3. 2.1 AHRD Example run:
 
 <pre> java -Xmx2g -jar ./dist/ahrd.jar ./test/resources/ahrd_input.yml </pre>
 
@@ -43,7 +43,7 @@ or just execute
 
 <pre> ant test.run </pre>
 
-h3. 2.2. Recommended BLAST-Search:
+h3. 2.2 Recommended BLAST-Search:
 
 For your query proteins you should start three independent BLAST searches e.g.
 in the three different databases mentioned above:
@@ -52,7 +52,7 @@ in the three different databases mentioned above:
 blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
 </pre>
 
-h3. 2.3. Algorithm:
+h3. 2.3.1 Algorithm:
 
 Based on e-values the 200 best scoring blast results are chosen from each
 database-search (e.g. Swissprot, TAIR, trEMBL). For all 600 resulting candidate
@@ -87,7 +87,7 @@ meaningless "fill words". If available an assigned Interpro domain is appended
 to the description line and each line will contain an evaluation section that
 reflects the significance of the assigned human readable description.
 
-h4. Pseudo-Code
+h4. 2.3.2 Pseudo-Code
 
 # Choose 600 best scoring blast results
 # Filter description lines of above blast-results using regular expressions:
@@ -101,22 +101,22 @@ h4. Pseudo-Code
 # Choose best scoring description line
 # Append InterProScan description to chosen description line if available
 
-h4. Used Formulae and Parameters:
+h4. 2.3.3 Used Formulae and Parameters:
 
 <img src="http://github.com/asishallab/AHRD/raw/master/images/formulae.jpg" />
 
-h5. Above formulae use the following parameters as given in ./test/resources/ahrd_input.yml 
+h5. 2.3.4 Above formulae use the following parameters as given in ./test/resources/ahrd_input.yml 
 
-# The weights in formula Token-Score are:  
+h6. 2.3.4.1 The weights in formula Token-Score are:  
 <pre>token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2 </pre> and Blast-Database specific:
 <pre>weight: 100 </pre>
 
-# The weight in formula Lexical-Score is:
+h6. 2.3.4.2 The weight in formula Lexical-Score is:
 <pre>description_score_relative_description_frequency_weight: 0.6 </pre>
 
-# The weight in formula Description-Score also is Blast-database specific:
+h6. 2.3.4.3 The weight in formula Description-Score also is Blast-database specific:
 <pre>description_score_bit_score_weight: 0.2 </pre>
 
 h2. 3. Building the executable jar:
@@ -125,7 +125,7 @@ Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 
 h2. 4. Testing:
 
-If you want to run the complete Junit Test-Suite execute: <pre>ant</pre>
+If you want to run the complete JUnit Test-Suite execute: <pre>ant</pre>
 
 h2. 5. License
 
