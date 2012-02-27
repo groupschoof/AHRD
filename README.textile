@@ -31,7 +31,7 @@ searched three databases: Uniprot/trEMBL, Uniprot/Swissprot and TAIR10. Note,
 that AHRD is generic and can make use of any number of different Blast
 databases that do not necessarily have to be the above ones. If e.g. annotating
 genes from a fungal genome searching yeast databases might be more
-recommendable than using TAIR (_Arabidopsis thalina_).
+recommendable than using TAIR (_Arabidopsis thaliana_).
 
 All parameters can be set manually, or the default ones can be used as given in
 the example input file ./test/resources/ahrd_input_test_run.yml (see Section
