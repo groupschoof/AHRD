@@ -103,7 +103,7 @@ h4. Workflow
 
 h4. Formulae
 
-
+:https://github.com/asishallab/AHRD/raw/master/images/formulae.jpg
 
 
 h2. 3. Building the executable jar:
