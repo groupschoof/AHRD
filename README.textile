@@ -103,7 +103,7 @@ h4. Pseudo-Code
 
 h4. Used Formulae
 
-!http://github.com/asishallab/AHRD/raw/master/images/formulae.jpg
+<img src="http://github.com/asishallab/AHRD/raw/master/images/formulae.jpg" />
 
 
 h2. 3. Building the executable jar:
