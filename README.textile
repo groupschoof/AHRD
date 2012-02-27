@@ -39,7 +39,7 @@ Parameters).
 
 AHRD is recommended to be run on batches of 1,000 to 2,000 proteins. If you
 want to annotate a whole genome use the included Batcher to split your
-input-data into Batches of appropriate size. (see section Batcher)
+input-data into Batches of appropriate size (see section Batcher).
 
 h3. 2.1 Building the executable jar:
 
