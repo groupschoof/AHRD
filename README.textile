@@ -22,27 +22,90 @@ AHRD is a Java-Program which requires Java 1.5 or higher.
 h2. 2. Usage:
 
 All AHRD-Inputs are passed to AHRD in a single YML-File.
-See ahrd_input.yml for details.
+See test/resources/ahrd_input.yml for details.
+(About YAML-Format see :http://en.wikipedia.org/wiki/YAML)
 
 Basically AHRD needs a FASTA-File of amino acid sequences and three different
-files conatining the results from BLAST searches in the three databases:
-Uniprot/trEMBL, Uniprot/Swissprot and TAIR10.
+files containing the results from different BLAST searches, in our example we
+searched three databases: Uniprot/trEMBL, Uniprot/Swissprot and TAIR10.  Note,
+that AHRD is generic and can make use of any number of different Blast
+databases that do not have to be the above ones. If annotating genes from a
+fungal genome searching for yeast-sequences of high similarity might be
+recommendable.
 
-Additionally the parameters can be set manually (NOT RECOMMENDED).
+Additionally all parameters can be set manually (see Section Parameters).
 
-An example AHRD-call is given in ahrd_test_run.sh:
+h3. 2.1. AHRD Example run:
 
 <pre>
 java -Xmx2g -jar ahrd.jar ahrd_input.jar
 </pre>
 
-h3. 3. Recommended BLAST-Search:
+h3. 2.2. Recommended BLAST-Search:
 
-For your query proteins you should start three independent BLAST searches in
-the three different databases mentioned above:
+For your query proteins you should start three independent BLAST searches e.g.
+in the three different databases mentioned above:
 
+<pre>
 blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
+</pre>
 
-Three different example results are given in test_input/.
+h3. 2.3. Algorithm:
+
+Based on e-values the 200 best scoring blast results are chosen from each
+database-search (e.g. Swissprot, TAIR, trEMBL). For all 600 resulting candidate
+description lines a score is calculated using a lexical approach. First each
+description line is passed through two regular expression filters. The first
+filter discards any matching description line in order to ignore descriptions
+like e.g. 'Whole genome shotgun sequence', while the second filter tailors the
+description lines deleting matching parts, in order to discard e.g. the
+trailing Species-Descriptions 'OS=Arabidopsis thaliana [...]". In the second
+step the scoring each description line is split into single tokens, which are
+passed through a blacklist filter, ignoring all matching tokens in terms of
+score. Tokens are sequences of characters with a collective meaning. For each
+token a score is calculated from three single scores with different weights,
+the bit score, the database score and the overlap score. The bit score is
+provided within the blast result. The database score is a fixed score for each
+blast database, based on the description quality of the database. The overlap
+score reflects the overlap of the query and subject sequence. In the second
+step the sum of all token scores from a description line is divided by a
+correction factor that avoids the scoring system from being biased towards
+longer or shorter description lines. In the third step the predicted gene
+ontology terms, if available, are used to evaluate the description lines and to
+get a better ranking. Therefore only gene ontology terms with a probability
+greater than 0.4 are used. From this ranking now the best scoring description
+line can be chosen. In the last step a domain name provided by InterProScan
+results, if available, is extracted and appended to the best scoring
+description line for each uncharacterized protein.
+
+In the end for each uncharacterized protein a description line is selected that
+comes from a high-scoring BLAST match, that contains words occurring frequently
+in the descriptions of highest scoring BLAST matches and that does not contain
+meaningless "fill words". If available an assigned Interpro domain is appended
+to the description line and each line will contain an evaluation section that
+reflects the significance of the assigned human readable description.
+
+h4. Workflow
+
+# Choose 600 best scoring blast results
+# Filter description lines of above blast-results using regular expressions:
+## Reject those matched by any regex given in ./test/resources/blacklist_descline.txt,
+## delete those parts of each description line, matching any regex in ./test/resources/filter_descline_sprot.txt. 
+# Divide each description line into tokens (characters of collective meaning)
+# Token score (calculated from: bitscore, database weight, overlap score)
+# Lexical score (calculated from: Token score, High score factor, Pattern factor, Correction factor)
+# Description score (calculated from: Lexical score, GO score, Blast score)
+# Choose best scoring description line
+# Append InterProScan description to chosen description line if available
+
+
+
+h2. Building an executable jar:
+
+<pre>ant dist</pre> will create the executable JAR-File:
+<pre>./dist/ahrd.jar</pre>
+
+h2. 4. License
+See attached file LICENSE.txt for details.
 
 Have Fun!
