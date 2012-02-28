@@ -8,6 +8,7 @@ gene_ontology_result: ./test/resources/go_results.csv
 batch_ymls_dir: ./test/resources/trainer_batch_ymls
 no_start_positions_in_parameter_space: 10
 remember_simulated_annealing_path: true
+find_highest_possible_evaluation_score: true
 output_dir: ./test/resources/
 blast_dbs:
   swissprot:

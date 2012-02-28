@@ -180,7 +180,8 @@ Carl-von-Linné-Weg 10
 50829 Köln (Cologne)
 Germany
 
-INRES - Institut für Nutzpflanzenwissenschaften und Ressourcenschutz
-Nußallee 9
+INRES Crop Bioinformatics
+University of Bonn
+Katzenburgweg 2
 53115 Bonn
 Germany

@@ -69,6 +69,10 @@ public class Evaluator extends AHRD {
 			evaluator.assignHumanReadableDescriptions();
 			// Evaluate AHRD's performance for each Protein:
 			evaluator.calculateEvaluationScores();
+			// If requested, calculate the highest possibly achievable
+			// evaluation score:
+			if (getSettings().doFindHighestPossibleEvaluationScore())
+				evaluator.findHighestPossibleEvaluationScores();
 			// Generate Output:
 			OutputWriter ow = new OutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
@@ -93,6 +97,20 @@ public class Evaluator extends AHRD {
 	public void calculateEvaluationScores() {
 		for (Protein prot : getProteins().values()) {
 			prot.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		}
+	}
+
+	/**
+	 * Calculates the evaluation-score as defined in function
+	 * calculateEvaluationScores() for each Protein's Blast-Results'
+	 * Description-Lines and stores the maximum possible score each Protein's
+	 * EvaluationScoreCalculator. This is used to get more accurate information
+	 * of how well AHRD performs.
+	 */
+	public void findHighestPossibleEvaluationScores() {
+		for (Protein prot : getProteins().values()) {
+			prot.getEvaluationScoreCalculator()
+					.findHighestPossibleEvaluationScore();
 		}
 	}
 

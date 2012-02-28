@@ -29,7 +29,7 @@ public class OutputWriter {
 	public static final DecimalFormat FRMT = new DecimalFormat("#,###0.###");
 
 	private Collection<Protein> proteins;
-	
+
 	public OutputWriter(Collection<Protein> proteins) {
 		setProteins(proteins);
 	}
@@ -41,12 +41,10 @@ public class OutputWriter {
 		// Column-Names:
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
-		bw
-				.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
+		bw.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
 
 		if (getSettings().isInTrainingMode()) {
-			bw
-					.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+			bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
@@ -55,13 +53,14 @@ public class OutputWriter {
 			bw.write("\t\"Tokens (tkn->score)\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
-			bw
-					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
+			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
-			bw
-					.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
+			bw.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
+		}
+		if (getSettings().doFindHighestPossibleEvaluationScore()) {
+			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
 		}
 
 		bw.write("\n");
@@ -89,6 +88,9 @@ public class OutputWriter {
 					&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
 				csvRow += buildBlast2GoColumns(prot);
 			}
+			if (getSettings().doFindHighestPossibleEvaluationScore()) {
+				csvRow += buildHighestPossibleEvaluationScoreColumn(prot);
+			}
 
 			// Write row to CSV:
 			csvRow += "\n";
@@ -96,6 +98,12 @@ public class OutputWriter {
 		}
 
 		bw.close();
+	}
+
+	public String buildHighestPossibleEvaluationScoreColumn(Protein prot) {
+		return "\t"
+				+ FRMT.format(prot.getEvaluationScoreCalculator()
+						.getHighestPossibleEvaluationScore());
 	}
 
 	public String buildBlast2GoColumns(Protein prot) {
@@ -199,8 +207,8 @@ public class OutputWriter {
 							.relativeBlastScore(hsbr));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
-							.getDescLinePatternFrequencies().get(
-									hsbr.patternize()));
+							.getDescLinePatternFrequencies()
+							.get(hsbr.patternize()));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
 							.getMaxDescriptionLineFrequency());
@@ -272,8 +280,8 @@ public class OutputWriter {
 			descLine += "\t\tUnknown protein\t";
 		}
 		// Interpro
-		List<InterproResult> sortedIprs = new ArrayList<InterproResult>(protein
-				.getInterproResults());
+		List<InterproResult> sortedIprs = new ArrayList<InterproResult>(
+				protein.getInterproResults());
 		Collections.sort(sortedIprs);
 		for (Iterator<InterproResult> i = sortedIprs.iterator(); i.hasNext();) {
 			InterproResult ipr = i.next();

@@ -210,6 +210,15 @@ public class TrainerBatcher extends Batcher {
 						.toString()))
 			batchYml.put(Settings.REMEMBER_SIMULATED_ANNEALING_PATH_KEY, true);
 
+		// Pass on boolean parameter find_highest_possible_evaluation_score, if
+		// given and set to true:
+		if (getInput().get(Settings.FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY) != null
+				&& Boolean.parseBoolean(getInput().get(
+						Settings.FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY)
+						.toString()))
+			batchYml.put(Settings.FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY,
+					true);
+
 		return batchYml;
 	}
 }

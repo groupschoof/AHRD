@@ -2,8 +2,10 @@ package ahrd.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -135,8 +137,14 @@ public class EvaluationScoreCalculatorTest {
 				"best", "annotator")));
 		p.getEvaluationScoreCalculator().setReferenceDescription(rd);
 		// mock description assigned by AHRD:
-		BlastResult ahrdsRes = TestUtils.mockBlastResult("AHRDv2_Acc", 0.001,
-				"AHRD is the best annotator", 0, 200, 30000.0, "swissprot",
+		BlastResult ahrdsRes = TestUtils.mockBlastResult(
+				"AHRDv2_Acc",
+				0.001,
+				"AHRD is the best annotator",
+				0,
+				200,
+				30000.0,
+				"swissprot",
 				new HashSet<String>(Arrays.asList("ahrd", "is", "the", "best",
 						"annotator")));
 		p.getDescriptionScoreCalculator()
@@ -144,21 +152,40 @@ public class EvaluationScoreCalculatorTest {
 		// mock competitive results
 		p.getEvaluationScoreCalculator().addUnchangedBlastResult(
 				"swissprot",
-				TestUtils.mockBlastResult("Sprot One", 0.001,
-						"AHRD is the best", 0, 200, 30000.0, "swissprot",
+				TestUtils.mockBlastResult(
+						"Sprot One",
+						0.001,
+						"AHRD is the best",
+						0,
+						200,
+						30000.0,
+						"swissprot",
 						new HashSet<String>(Arrays.asList("ahrd", "is", "the",
 								"best"))));
 		p.getEvaluationScoreCalculator().addUnchangedBlastResult(
 				"trembl",
-				TestUtils.mockBlastResult("trEMBL One", 0.001,
-						"AHRD is best eaten alive", 0, 200, 30000.0, "trembl",
+				TestUtils.mockBlastResult(
+						"trEMBL One",
+						0.001,
+						"AHRD is best eaten alive",
+						0,
+						200,
+						30000.0,
+						"trembl",
 						new HashSet<String>(Arrays.asList("ahrd", "is", "best",
 								"eaten", "alive"))));
 		p.getEvaluationScoreCalculator().addUnchangedBlastResult(
 				"tair",
-				TestUtils.mockBlastResult("TAIR One", 0.001, "AHRD is a sheep",
-						0, 200, 30000.0, "tair", new HashSet<String>(Arrays
-								.asList("ahrd", "is", "a", "sheep"))));
+				TestUtils.mockBlastResult(
+						"TAIR One",
+						0.001,
+						"AHRD is a sheep",
+						0,
+						200,
+						30000.0,
+						"tair",
+						new HashSet<String>(Arrays.asList("ahrd", "is", "a",
+								"sheep"))));
 		// mock Blast2GoAnnots:
 		String b2gResEntry = "accession\tGO:123456\tAHRD horn growthase";
 		String b2gResEntryTwo = "accession\tGO:654321\tGoat wool growthase";
@@ -197,6 +224,52 @@ public class EvaluationScoreCalculatorTest {
 	}
 
 	@Test
+	public void testFindHighestPossibleEvaluationScore() {
+		// Mock Protein:
+		Protein p = TestUtils.mockProtein();
+		// Mock reference description:
+		ReferenceDescription rd = new ReferenceDescription();
+		rd.setAccession("AHRDv2_Acc");
+		rd.setDescription("AHRD is the best annotator");
+		rd.setTokens(new HashSet<String>(Arrays.asList("ahrd", "is", "the",
+				"best", "annotator")));
+		p.getEvaluationScoreCalculator().setReferenceDescription(rd);
+		// Mock first BlastResults:
+		List<BlastResult> swissprotRes = new ArrayList<BlastResult>();
+		swissprotRes.add(TestUtils.mockBlastResult(
+				"AHRDv2_Acc",
+				0.001,
+				"AHRD is the best annotator",
+				0,
+				200,
+				30000.0,
+				"swissprot",
+				new HashSet<String>(Arrays.asList("ahrd", "is", "the", "best",
+						"annotator"))));
+		// ... and the second BlastResult:
+		swissprotRes.add(TestUtils
+				.mockBlastResult(
+						"Sprot One",
+						0.001,
+						"AHRD is the best",
+						0,
+						200,
+						30000.0,
+						"swissprot",
+						new HashSet<String>(Arrays.asList("ahrd", "is", "the",
+								"best"))));
+		p.getBlastResults().put("swissprot", swissprotRes);
+		// test:
+		p.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
+		assertNotNull("Highest possible evaluation score should be not null", p
+				.getEvaluationScoreCalculator()
+				.getHighestPossibleEvaluationScore());
+		assertEquals("Highest possible evaluation score should be 1.0", p
+				.getEvaluationScoreCalculator()
+				.getHighestPossibleEvaluationScore(), 1.0, 0.0);
+	}
+
+	@Test
 	public void testAddBlast2GoAnnot() {
 		Protein p = TestUtils.mockProtein();
 		String b2gResEntry = "accession\tGO:123456\tSheep horn growthase";
@@ -208,15 +281,17 @@ public class EvaluationScoreCalculatorTest {
 		p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2gaRef);
 		assertEquals(1, p.getEvaluationScoreCalculator().getBlast2GoAnnots()
 				.size());
-		assertEquals("Sheep horn growthase", p.getEvaluationScoreCalculator()
-				.getBlast2GoAnnots().toArray(new Blast2GoAnnot[] {})[0]
-				.getDescription());
+		assertEquals(
+				"Sheep horn growthase",
+				p.getEvaluationScoreCalculator().getBlast2GoAnnots()
+						.toArray(new Blast2GoAnnot[] {})[0].getDescription());
 		p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2gaClone);
 		assertEquals(1, p.getEvaluationScoreCalculator().getBlast2GoAnnots()
 				.size());
-		assertEquals("Sheep horn growthase", p.getEvaluationScoreCalculator()
-				.getBlast2GoAnnots().toArray(new Blast2GoAnnot[] {})[0]
-				.getDescription());
+		assertEquals(
+				"Sheep horn growthase",
+				p.getEvaluationScoreCalculator().getBlast2GoAnnots()
+						.toArray(new Blast2GoAnnot[] {})[0].getDescription());
 		p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2gaTwo);
 		assertEquals(2, p.getEvaluationScoreCalculator().getBlast2GoAnnots()
 				.size());
@@ -252,5 +327,5 @@ public class EvaluationScoreCalculatorTest {
 		assertEquals(b2gaTwo, rankedB2gas.get(1));
 		assertEquals(b2gaThree, rankedB2gas.get(2));
 	}
-	
+
 }

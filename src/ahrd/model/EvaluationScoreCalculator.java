@@ -34,6 +34,7 @@ public class EvaluationScoreCalculator {
 	private Double evalScoreMinBestCompScore;
 	private Double truePositivesRate;
 	private Double falsePositivesRate;
+	private Double highestPossibleEvaluationScore;
 
 	public EvaluationScoreCalculator(Protein protein) {
 		super();
@@ -212,7 +213,6 @@ public class EvaluationScoreCalculator {
 			Double bestCompEvlScr = 0.0;
 			if (getUnchangedBlastResults().size() > 0) {
 				for (String blastDatabase : getUnchangedBlastResults().keySet()) {
-					// BlastHits are sorted by their e-value ascending:
 					BlastResult cmpt = getUnchangedBlastResults().get(
 							blastDatabase);
 					if (cmpt != null) {
@@ -220,8 +220,8 @@ public class EvaluationScoreCalculator {
 						// actually assigned Description, WITHOUT filtering each
 						// Token with the BLACKLIST:
 						cmpt.tokenizeForEvaluation();
-						cmpt.setEvaluationScore(fBetaScore(cmpt
-								.getEvaluationTokens(),
+						cmpt.setEvaluationScore(fBetaScore(
+								cmpt.getEvaluationTokens(),
 								getReferenceDescription().getTokens()));
 						// Find best performing competitor-method:
 						if (cmpt.getEvaluationScore() > bestCompEvlScr)
@@ -232,9 +232,9 @@ public class EvaluationScoreCalculator {
 			// Also compare with the Blast2GO-Annotation(s), if present:
 			if (getBlast2GoAnnots() != null) {
 				for (Blast2GoAnnot b2ga : getBlast2GoAnnots()) {
-					b2ga.setEvaluationScore(fBetaScore(b2ga
-							.getEvaluationTokens(), getReferenceDescription()
-							.getTokens()));
+					b2ga.setEvaluationScore(fBetaScore(
+							b2ga.getEvaluationTokens(),
+							getReferenceDescription().getTokens()));
 					// Find best performing competitor-method:
 					if (b2ga.getEvaluationScore() > bestCompEvlScr)
 						bestCompEvlScr = b2ga.getEvaluationScore();
@@ -242,6 +242,30 @@ public class EvaluationScoreCalculator {
 			}
 			// Compare AHRD's performance:
 			setEvalScoreMinBestCompScore(getEvalutionScore() - bestCompEvlScr);
+		}
+	}
+
+	/**
+	 * In order to get more accurate information of how well AHRD performs, we
+	 * infer the highest possible score by calculating the evaluation-score for
+	 * each BlastResult's Description and remembering the highest achieved
+	 * score.
+	 */
+	public void findHighestPossibleEvaluationScore() {
+		setHighestPossibleEvaluationScore(0.0);
+		for (List<BlastResult> resultsFromBlastDatabase : getProtein()
+				.getBlastResults().values()) {
+			for (BlastResult cmpt : resultsFromBlastDatabase) {
+				// Generate the set of Evaluation-Tokens from the
+				// actually assigned Description, WITHOUT filtering each
+				// Token with the BLACKLIST:
+				cmpt.tokenizeForEvaluation();
+				cmpt.setEvaluationScore(fBetaScore(cmpt.getEvaluationTokens(),
+						getReferenceDescription().getTokens()));
+				// Find best performing BlastResult-Description:
+				if (cmpt.getEvaluationScore() > getHighestPossibleEvaluationScore())
+					setHighestPossibleEvaluationScore(cmpt.getEvaluationScore());
+			}
 		}
 	}
 
@@ -338,6 +362,15 @@ public class EvaluationScoreCalculator {
 
 	public void setBlast2GoAnnots(Set<Blast2GoAnnot> blast2GoAnnots) {
 		this.blast2GoAnnots = blast2GoAnnots;
+	}
+
+	public Double getHighestPossibleEvaluationScore() {
+		return highestPossibleEvaluationScore;
+	}
+
+	public void setHighestPossibleEvaluationScore(
+			Double highestPossibleEvaluationScore) {
+		this.highestPossibleEvaluationScore = highestPossibleEvaluationScore;
 	}
 
 }

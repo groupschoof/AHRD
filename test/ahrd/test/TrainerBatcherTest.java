@@ -2,6 +2,7 @@ package ahrd.test;
 
 import static ahrd.controller.Parameters.randomParameters;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.FileNotFoundException;
@@ -103,6 +104,17 @@ public class TrainerBatcherTest {
 				Boolean.parseBoolean(batchYml.get(
 						Settings.REMEMBER_SIMULATED_ANNEALING_PATH_KEY)
 						.toString()));
+		// Assert boolean parameter 'find_highest_possible_evaluation_score'
+		// gets passed on:
+		assertNotNull(
+				"Batch's YML should contain boolean parameter 'find_highest_possible_evaluation_score'",
+				batchYml.get(Settings.FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY));
+		assertEquals(
+				"Batch's YML should have set boolean parameter 'find_highest_possible_evaluation_score' to TRUE.",
+				"true",
+				batchYml.get(
+						Settings.FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY)
+						.toString());
 	}
 
 	private boolean assertNotNullAndNotEmpty(String toBeValidated) {

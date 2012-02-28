@@ -37,14 +37,15 @@ public class EvaluatorTest {
 				"After setting up Blast2GoAnnots the Evaluator should have assigned a Blast2GoAnnot to the protein with accession 'gene:chr01.1056:mRNA:chr01.1056'.",
 				evaluator.getProteins().get("gene:chr01.502:mRNA:chr01.502")
 						.getEvaluationScoreCalculator().getBlast2GoAnnots());
-		assertEquals("nrpb6a dna binding dna-directed rna polymerase", evaluator
-				.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
-				.getEvaluationScoreCalculator().getBlast2GoAnnots().toArray(
-						new Blast2GoAnnot[] {})[0].getDescription());
-		assertEquals(6, evaluator.getProteins().get(
-				"gene:chr01.1056:mRNA:chr01.1056").getEvaluationScoreCalculator()
-				.getBlast2GoAnnots().toArray(new Blast2GoAnnot[] {})[0]
-				.getEvaluationTokens().size());
+		assertEquals("nrpb6a dna binding dna-directed rna polymerase",
+				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
+						.getEvaluationScoreCalculator().getBlast2GoAnnots()
+						.toArray(new Blast2GoAnnot[] {})[0].getDescription());
+		assertEquals(6,
+				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
+						.getEvaluationScoreCalculator().getBlast2GoAnnots()
+						.toArray(new Blast2GoAnnot[] {})[0]
+						.getEvaluationTokens().size());
 	}
 
 	@Test
@@ -53,18 +54,20 @@ public class EvaluatorTest {
 		evaluator.initializeProteins();
 		evaluator.setupReferences();
 		assertEquals(2, evaluator.getProteins().size());
-		assertNotNull(evaluator.getProteins().get(
-				"gene:chr01.1056:mRNA:chr01.1056").getEvaluationScoreCalculator()
-				.getReferenceDescription());
+		assertNotNull(evaluator.getProteins()
+				.get("gene:chr01.1056:mRNA:chr01.1056")
+				.getEvaluationScoreCalculator().getReferenceDescription());
 		assertNotNull(evaluator.getProteins()
 				.get("gene:chr01.502:mRNA:chr01.502")
 				.getEvaluationScoreCalculator().getReferenceDescription());
-		assertEquals("Receptor-like protein kinase", evaluator.getProteins().get(
-				"gene:chr01.1056:mRNA:chr01.1056").getEvaluationScoreCalculator()
-				.getReferenceDescription().getDescription());
-		assertEquals(4, evaluator.getProteins().get(
-				"gene:chr01.1056:mRNA:chr01.1056").getEvaluationScoreCalculator()
-				.getReferenceDescription().getTokens().size());
+		assertEquals("Receptor-like protein kinase", evaluator.getProteins()
+				.get("gene:chr01.1056:mRNA:chr01.1056")
+				.getEvaluationScoreCalculator().getReferenceDescription()
+				.getDescription());
+		assertEquals(4,
+				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
+						.getEvaluationScoreCalculator()
+						.getReferenceDescription().getTokens().size());
 	}
 
 	@Test
@@ -76,8 +79,8 @@ public class EvaluatorTest {
 		assertEquals(
 				"Parsing the BlastResults should also trigger tokenization of the Description-Lines of the unchanged BlastHits!",
 				2, evaluator.getProteins().get("gene:chr01.502:mRNA:chr01.502")
-						.getEvaluationScoreCalculator().getUnchangedBlastResults()
-						.get("swissprot").getTokens().size());
+						.getEvaluationScoreCalculator()
+						.getUnchangedBlastResults().get("swissprot")
+						.getTokens().size());
 	}
-
 }

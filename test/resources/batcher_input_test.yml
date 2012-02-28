@@ -40,5 +40,5 @@ interpro_database: ./test/resources/interpro_31.xml
 write_token_set_to_output: false
 write_best_blast_hits_to_output: false
 gene_ontology_results_dir: ./test/resources/gene_ontology_results
-
+find_highest_possible_evaluation_score: true
 output_dir: ./test/resources/

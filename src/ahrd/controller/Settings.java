@@ -66,6 +66,7 @@ public class Settings implements Cloneable {
 	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
 	public static final String NO_START_POSITIONS_IN_PARAM_SPACE = "no_start_positions_in_parameter_space";
 	public static final String REMEMBER_SIMULATED_ANNEALING_PATH_KEY = "remember_simulated_annealing_path";
+	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
 
 	/**
 	 * Fields:
@@ -109,6 +110,11 @@ public class Settings implements Cloneable {
 	 * optimization with the drawback of higher memory usage.
 	 */
 	private boolean rememberSimulatedAnnealingPath = false;
+	/**
+	 * Evaluation or Optimization might be interested in the highest possibly
+	 * achievable evaluation-score:
+	 */
+	private boolean findHighestPossibleEvaluationScore = false;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -196,6 +202,12 @@ public class Settings implements Cloneable {
 				&& Boolean.parseBoolean(input.get(
 						REMEMBER_SIMULATED_ANNEALING_PATH_KEY).toString()))
 			this.rememberSimulatedAnnealingPath = true;
+		// Evaluation or Optimization might be interested in the highest
+		// possibly achievable evaluation-score:
+		if (input.get(FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY) != null
+				&& Boolean.parseBoolean(input.get(
+						FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY).toString()))
+			this.findHighestPossibleEvaluationScore = true;
 	}
 
 	/**
@@ -455,6 +467,14 @@ public class Settings implements Cloneable {
 
 	public boolean isInTrainingMode() {
 		return (getPathToReferencesFasta() != null && getPathToReferencesFasta() != "");
+	}
+
+	/**
+	 * Evaluation or Optimization might be interested in the highest possibly
+	 * achievable evaluation-score.
+	 */
+	public boolean doFindHighestPossibleEvaluationScore() {
+		return this.findHighestPossibleEvaluationScore;
 	}
 
 	/**
