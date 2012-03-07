@@ -14,10 +14,21 @@ Shared tokens with Gene-Ontology Annotations increase the description-scoring
 in order to use standard nomenclature where possible. Finally the best scoring
 description is assigned.
 
-h2. 1 Requirements:
+h2. 1.1 Requirements:
 
 AHRD is a Java-Program which requires Java 1.5 or higher.
 
+
+h2. 1.2 Installation:
+
+h3. 1.2.1 Get AHRD
+
+Copy (clone) AHRD to your computer using git:
+<pre>git clone git://github.com/asishallab/AHRD.git</pre>
+
+h3. 1.2.2 Build the executable jar:
+
+Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 
 h2. 2 Usage:
 
@@ -40,10 +51,6 @@ Parameters).
 AHRD is recommended to be run on batches of 1,000 to 2,000 proteins. If you
 want to annotate a whole genome use the included Batcher to split your
 input-data into Batches of appropriate size (see section Batcher).
-
-h3. 2.1 Building the executable jar:
-
-Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 
 h3. 2.2 AHRD Example run:
 
