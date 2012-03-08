@@ -1,10 +1,10 @@
-This repository is deprecated!
+h1. This repository is deprecated!
 
-Please visit the new repository at:
+*Please visit the new repository at:*
 
 https://github.com/groupschoof/AHRD
 
-In order to checkout the latest version from the new repository, delete your
+In order to checkout the _latest version_ from the new repository, delete your
 old clone (directory) of AHRD and execute:
 <pre>git clone git://github.com/groupschoof/AHRD.git</pre>
 
