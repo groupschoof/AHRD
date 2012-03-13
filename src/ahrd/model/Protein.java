@@ -11,8 +11,9 @@ import java.util.Set;
 import ahrd.exception.MissingAccessionException;
 
 public class Protein {
-	
+
 	private String accession;
+	private String sequence;
 	private Integer sequenceLength;
 	private Map<String, List<BlastResult>> blastResults;
 	private Set<InterproResult> interproResults = new HashSet<InterproResult>();
@@ -31,7 +32,25 @@ public class Protein {
 		setLexicalScoreCalculator(new LexicalScoreCalculator(this));
 		setDescriptionScoreCalculator(new DescriptionScoreCalculator(this));
 		// If current Settings require evaluation of AHRD's performance or are
-		// set to train AHRD's parameters, a EvaluationScoreCalculator is needed:
+		// set to train AHRD's parameters, a EvaluationScoreCalculator is
+		// needed:
+		if (getSettings().getWriteBestBlastHitsToOutput()
+				|| getSettings().isInTrainingMode())
+			setEvaluationScoreCalculator(new EvaluationScoreCalculator(this));
+	}
+
+	public Protein(String accession, String aaSequence) {
+		super();
+		setAccession(accession);
+		setSequence(aaSequence);
+		setSequenceLength(aaSequence.length());
+		setBlastResults(new HashMap<String, List<BlastResult>>());
+		setTokenScoreCalculator(new TokenScoreCalculator(this));
+		setLexicalScoreCalculator(new LexicalScoreCalculator(this));
+		setDescriptionScoreCalculator(new DescriptionScoreCalculator(this));
+		// If current Settings require evaluation of AHRD's performance or are
+		// set to train AHRD's parameters, a EvaluationScoreCalculator is
+		// needed:
 		if (getSettings().getWriteBestBlastHitsToOutput()
 				|| getSettings().isInTrainingMode())
 			setEvaluationScoreCalculator(new EvaluationScoreCalculator(this));
@@ -52,7 +71,14 @@ public class Protein {
 		for (String sequence_part : sequence_parts) {
 			sequence += sequence_part.trim();
 		}
-		return new Protein(accession, sequence.length());
+		// Construct the new Protein, either storing its AA-sequence or just the
+		// sequence's length:
+		Protein p = null;
+		if (getSettings().doOutputFasta())
+			p = new Protein(accession, sequence);
+		else
+			p = new Protein(accession, sequence.length());
+		return p;
 	}
 
 	/**
@@ -208,5 +234,13 @@ public class Protein {
 	public void setEvaluationScoreCalculator(
 			EvaluationScoreCalculator evaluationScoreCalculator) {
 		this.evaluationScoreCalculator = evaluationScoreCalculator;
+	}
+
+	public String getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(String sequence) {
+		this.sequence = sequence;
 	}
 }

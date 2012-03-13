@@ -4,6 +4,7 @@ import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Settings.setSettings;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +22,8 @@ import ahrd.model.BlastResult;
 import ahrd.model.GeneOntologyResult;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
+import ahrd.view.FastaOutputWriter;
+import ahrd.view.IOutputWriter;
 import ahrd.view.OutputWriter;
 
 public class AHRD {
@@ -66,7 +69,8 @@ public class AHRD {
 			// Write result to output-file:
 			System.out.println("Writing output to '"
 					+ getSettings().getPathToOutput() + "'.");
-			OutputWriter ow = new OutputWriter(ahrd.getProteins().values());
+			IOutputWriter ow = initializeOutputWriter(ahrd.getProteins()
+					.values());
 			ow.writeOutput();
 			// Log
 			System.out.println("Wrote output in " + ahrd.takeTime()
@@ -76,6 +80,16 @@ public class AHRD {
 			System.err.println("We are sorry, an un-expected ERROR occurred:");
 			e.printStackTrace(System.err);
 		}
+	}
+
+	public static IOutputWriter initializeOutputWriter(
+			Collection<Protein> proteins) {
+		IOutputWriter ow = null;
+		if (getSettings().doOutputFasta())
+			ow = new FastaOutputWriter(proteins);
+		else
+			ow = new OutputWriter(proteins);
+		return ow;
 	}
 
 	/**

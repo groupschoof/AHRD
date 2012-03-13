@@ -67,6 +67,7 @@ public class Settings implements Cloneable {
 	public static final String NO_START_POSITIONS_IN_PARAM_SPACE = "no_start_positions_in_parameter_space";
 	public static final String REMEMBER_SIMULATED_ANNEALING_PATH_KEY = "remember_simulated_annealing_path";
 	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
+	public static final String OUTPUT_FASTA_KEY = "output_fasta";
 
 	/**
 	 * Fields:
@@ -115,6 +116,10 @@ public class Settings implements Cloneable {
 	 * achievable evaluation-score:
 	 */
 	private boolean findHighestPossibleEvaluationScore = false;
+	/**
+	 * Write output as fasta-file?
+	 */
+	private boolean outputFasta = false;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -158,6 +163,8 @@ public class Settings implements Cloneable {
 				.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
 		setWriteScoresToOutput(Boolean.parseBoolean((String) input
 				.get(WRITE_SCORES_TO_OUTPUT)));
+		setOutputFasta(Boolean.parseBoolean((String) input
+				.get(OUTPUT_FASTA_KEY)));
 		// Generate the Blacklists and Filters for each Blast-Database from
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
@@ -535,5 +542,13 @@ public class Settings implements Cloneable {
 
 	public void setParameters(Parameters parameters) {
 		this.parameters = parameters;
+	}
+
+	public boolean doOutputFasta() {
+		return outputFasta;
+	}
+
+	public void setOutputFasta(boolean outputFasta) {
+		this.outputFasta = outputFasta;
 	}
 }
