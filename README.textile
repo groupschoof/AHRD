@@ -33,7 +33,7 @@ Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 h2. 2 Usage:
 
 All AHRD-Inputs are passed to AHRD in a single YML-File.
-See test/resources/ahrd_input.yml for details.
+See ./ahrd_example_input.yml for details.
 (About YAML-Format see <a href="http://en.wikipedia.org/wiki/YAML">Wikipedia</a>)
 
 Basically AHRD needs a FASTA-File of amino acid sequences and different files
