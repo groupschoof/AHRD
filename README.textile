@@ -54,7 +54,7 @@ input-data into Batches of appropriate size (see section Batcher).
 
 h3. 2.2 AHRD Example run:
 
-<pre>java -Xmx2g -jar ./dist/ahrd.jar ./test/resources/ahrd_input_test_run.yml </pre>
+<pre>java -Xmx2g -jar ./dist/ahrd.jar ahrd_example_input.yml </pre>
 
 or just execute
 
@@ -92,9 +92,9 @@ AHRD writes out a CSV table with the following columns:
 # Interpro-ID (Description) -- If AHRD was started with InterProScan-Results, they are appended here.
 # Gene-Ontology-ID (Name) -- If AHRD was started with Gene-Ontology-Annotations, they are appended here.
 
-AHRD's quality-code consists of a four character string, where each character is
-either '*' if the respective criteria is met or '-' otherwise. Their meaning is
-explained in the following table:
+AHRD's quality-code consists of a four character string, where each character
+is either *'*'* if the respective criteria is met or *'-'* otherwise. Their
+meaning is explained in the following table:
 
 | Position | Criteria |
 | 1 | Bit score of the blast result is >50 and e-value is <e-10 |
@@ -169,7 +169,7 @@ h4. 3.2 Used Formulae and Parameters:
 
 h5. 3.3 Parameters
 
-Above formulae use the following parameters as given in *./test/resources/ahrd_input_test_run.yml*
+Above formulae use the following parameters as given in *./ahrd_example_input.yml*
 
 h5. 3.3.1 The weights in formula Token-Score are:  
 
