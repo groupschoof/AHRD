@@ -16,3 +16,6 @@ test/ahrd_output.csv
 # Ignore subversion related files
 .svn
 .svnignore
+
+# Ignore Mac OS X related files:
+.DS_Store

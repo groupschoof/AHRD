@@ -26,10 +26,16 @@ public class BlastResultTest {
 
 	@Test
 	public void testPatternize() {
-		BlastResult br = TestUtils.mockBlastResult("accession_5", 5.0,
-				"description_5 Fly-Wing formation", 10, 20, 30.0, "trembl",
+		BlastResult br = TestUtils.mockBlastResult(
+				"accession_5",
+				5.0,
+				"description_5 Fly-Wing formation",
+				10,
+				20,
+				30.0,
+				"trembl",
 				new HashSet<String>(Arrays.asList("description", "5", "fly",
-						"wing", "formation")));		
+						"wing", "formation")));
 		assertEquals("5descriptionflyformationwing", br.patternize());
 	}
 
@@ -57,8 +63,8 @@ public class BlastResultTest {
 	@Test
 	public void testParseBlastResultsOfQueryProteins()
 			throws MissingProteinException, SAXException, IOException {
-    // Strangely the following line missing causes a NPE in Java 7:
-    TestUtils.initTestSettings();
+		// Strangely the following line missing causes a NPE in Java 7:
+		TestUtils.initTestSettings();
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		assertTrue(protDb.containsKey("gene:chr01.1056:mRNA:chr01.1056"));
 		assertTrue(protDb.containsKey("gene:chr01.502:mRNA:chr01.502"));
@@ -71,25 +77,25 @@ public class BlastResultTest {
 		assertEquals(16, protDb.get("gene:chr01.502:mRNA:chr01.502")
 				.getBlastResults().get("swissprot").size());
 
-		BlastResult br = (BlastResult) protDb.get(
-				"gene:chr01.1056:mRNA:chr01.1056").getBlastResults().get(
-				"swissprot").get(0);
+		BlastResult br = (BlastResult) protDb
+				.get("gene:chr01.1056:mRNA:chr01.1056").getBlastResults()
+				.get("swissprot").get(0);
 		assertEquals("sp|Q9SCZ4|FERON_ARATH", br.getAccession());
 		assertEquals(0.0, br.getEValue(), 0.0);
 		assertEquals(1095, br.getBitScore(), 0.0);
 		assertEquals(30.0, br.getStart(), 0.0);
 		assertEquals(895.0, br.getEnd(), 0.0);
-		assertEquals("Receptor-like protein kinase FERONIA", br
-				.getDescription());
+		assertEquals("Receptor-like protein kinase FERONIA",
+				br.getDescription());
 		// While parsing the BlastResults for a Protein, the
 		// frequencies of each Description-Line should be
 		// measured. This is after the Description-Line
 		// passes the blacklist-check and has it's "bad
 		// tokens" filtered out.
-		Protein p = protDb.get("gene:chr01.502:mRNA:chr01.502");		
+		Protein p = protDb.get("gene:chr01.502:mRNA:chr01.502");
 		assertTrue(p.getDescriptionScoreCalculator()
-				.getDescLinePatternFrequencies().containsKey(
-						"dicerendoribonuclease"));
+				.getDescLinePatternFrequencies()
+				.containsKey("dicerendoribonuclease"));
 		assertEquals(13.0, p.getDescriptionScoreCalculator()
 				.getDescLinePatternFrequencies().get("dicerendoribonuclease"),
 				0);
