@@ -57,6 +57,8 @@ public class BlastResultTest {
 	@Test
 	public void testParseBlastResultsOfQueryProteins()
 			throws MissingProteinException, SAXException, IOException {
+    // Strangely the following line missing causes a NPE in Java 7:
+    TestUtils.initTestSettings();
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		assertTrue(protDb.containsKey("gene:chr01.1056:mRNA:chr01.1056"));
 		assertTrue(protDb.containsKey("gene:chr01.502:mRNA:chr01.502"));
