@@ -79,6 +79,11 @@ needs.
 
 h3. 2.5 Output:
 
+AHRD supports two different formats. The default one is a tab-delimited table.
+The other is FASTA-Format.
+
+h4. 2.5.1 Tab-Delimited Table:
+
 AHRD writes out a CSV table with the following columns:
 # Protein-Accesion -- The Query Protein's Accession
 # Blast-Hit-Accession -- The Accession of the Protein the assigned description was taken from.
@@ -96,6 +101,18 @@ explained in the following table:
 | 2 | Overlap of the blast result is >60% |
 | 3 | Top token score of assigned HRD is >0.5 |
 | 4 | Gene ontology terms found in description line |
+
+h4. 2.5.2 Fasta-Format:
+
+To set AHRD to write its output in FASTA-Format set the following switch in the input.yml:
+
+<pre>
+output_fasta: true
+</pre>
+
+AHRD will write a valid FASTA-File of your query-proteins where the Header will
+be composed of the same parts as above, but here separated by whitespaces.
+
 
 h3. 3 Algorithm:
 
