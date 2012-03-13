@@ -1,0 +1,109 @@
+BLASTP 2.2.21 [Jun-14-2009]
+
+
+Reference: Altschul, Stephen F., Thomas L. Madden, Alejandro A. Schaffer, 
+Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), 
+"Gapped BLAST and PSI-BLAST: a new generation of protein database search
+programs",  Nucleic Acids Res. 25:3389-3402.
+
+Reference for compositional score matrix adjustment: Altschul, Stephen F., 
+John C. Wootton, E. Michael Gertz, Richa Agarwala, Aleksandr Morgulis,
+Alejandro A. Schaffer, and Yi-Kuo Yu (2005) "Protein database searches
+using compositionally adjusted substitution matrices", FEBS J. 272:5101-5109.
+
+Query= Solyc11g010630.2.1
+         (172 letters)
+
+Database: tair_10_min_sprot_created_2011_rand_1000.fasta 
+           33,275 sequences; 13,361,438 total letters
+
+Searching..................................................done
+
+
+
+                                                                 Score    E
+Sequences producing significant alignments:                      (bits) Value
+
+AT4G38060.2 | Symbols:  | unknown protein | chr4:17873709-178743...   102   2e-22
+AT4G38060.1 | Symbols:  | unknown protein | chr4:17874002-178743...    77   5e-15
+AT5G65480.1 | Symbols:  | unknown protein | chr5:26176827-261774...    57   6e-09
+
+>AT4G38060.2 | Symbols:  | unknown protein | chr4:17873709-17874379
+           REVERSE
+          Length = 136
+
+ Score =  102 bits (253), Expect = 2e-22,   Method: Compositional matrix adjust.
+ Identities = 48/78 (61%), Positives = 55/78 (70%), Gaps = 1/78 (1%)
+
+Query: 96  DDSDWSIGWLEPHAPDFQNDDEGDDS-FAVLVPCYRHDCREIGEPNNQFLSAIENLSNGY 154
+           D  +WS+GW EPH PDFQ+DDEG+D  F VLVPCYR         NNQ LSA++NL NG 
+Sbjct: 59  DGPEWSVGWTEPHGPDFQSDDEGNDGGFLVLVPCYRAVVEGSSNNNNQLLSAVKNLPNGL 118
+
+Query: 155 PAEGKKYMEQWLSSLQNF 172
+           P +GK YMEQWLSSLQ  
+Sbjct: 119 PPDGKNYMEQWLSSLQKL 136
+
+
+>AT4G38060.1 | Symbols:  | unknown protein | chr4:17874002-17874379
+           REVERSE
+          Length = 125
+
+ Score = 77.0 bits (188), Expect = 5e-15,   Method: Compositional matrix adjust.
+ Identities = 36/61 (59%), Positives = 42/61 (68%), Gaps = 1/61 (1%)
+
+Query: 96  DDSDWSIGWLEPHAPDFQNDDEGDD-SFAVLVPCYRHDCREIGEPNNQFLSAIENLSNGY 154
+           D  +WS+GW EPH PDFQ+DDEG+D  F VLVPCYR         NNQ LSA++NL NG 
+Sbjct: 59  DGPEWSVGWTEPHGPDFQSDDEGNDGGFLVLVPCYRAVVEGSSNNNNQLLSAVKNLPNGL 118
+
+Query: 155 P 155
+           P
+Sbjct: 119 P 119
+
+
+>AT5G65480.1 | Symbols:  | unknown protein | chr5:26176827-26177434
+           FORWARD
+          Length = 153
+
+ Score = 57.0 bits (136), Expect = 6e-09,   Method: Compositional matrix adjust.
+ Identities = 34/78 (43%), Positives = 41/78 (52%), Gaps = 11/78 (14%)
+
+Query: 94  ESDDSDWSIGWLEPHAPDFQNDDEGDDSFAVLVPCYRHDCREIGE--PNNQFLSAIENLS 151
+           E DD +WSIGW+EPH P F+ +D+    F VLVP Y+      G   PN  F  A     
+Sbjct: 82  EPDDPEWSIGWVEPHGPGFKAEDDDCGGFVVLVPLYKKVMDGSGNQIPNGFFSPA----- 136
+
+Query: 152 NGYPAEGKKYMEQWLSSL 169
+               A   K MEQWLSS+
+Sbjct: 137 ----APDGKNMEQWLSSM 150
+
+
+  Database: tair_10_min_sprot_created_2011_rand_1000.fasta
+    Posted date:  Oct 4, 2011 11:57 AM
+  Number of letters in database: 13,361,438
+  Number of sequences in database:  33,275
+  
+Lambda     K      H
+   0.323    0.141    0.425 
+
+Gapped
+Lambda     K      H
+   0.267   0.0410    0.140 
+
+
+Matrix: BLOSUM62
+Gap Penalties: Existence: 11, Extension: 1
+Number of Sequences: 33275
+Number of Hits to DB: 153,539,082
+Number of extensions: 6508906
+Number of successful extensions: 35084
+Number of sequences better than 1.0e-04: 1572
+Number of HSP's gapped: 26208
+Number of HSP's successfully gapped: 4630
+Length of database: 13,361,438
+Neighboring words threshold: 11
+Window for multiple hits: 40
+X1: 16 ( 7.5 bits)
+X2: 38 (14.6 bits)
+X3: 64 (24.7 bits)
+S1: 41 (21.9 bits)
+S2: 100 (43.1 bits)
+

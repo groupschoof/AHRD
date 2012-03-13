@@ -1,0 +1,28 @@
+shell_script: ./test/resources/start_ahrd_batched.sh
+ahrd_call: "java -Xmx2048m -cp ./dist/ahrd.jar ahrd.controller.Trainer #batch#"
+proteins_fasta: ./test/resources/proteins.fasta
+references_fasta: ./test/resources/references.fasta
+interpro_database: ./test/resources/interpro_31.xml
+interpro_result: ./test/resources/interpro_result.raw
+gene_ontology_result: ./test/resources/go_results.csv
+batch_ymls_dir: ./test/resources/trainer_batch_ymls
+no_start_positions_in_parameter_space: 10
+remember_simulated_annealing_path: true
+find_highest_possible_evaluation_score: true
+output_dir: ./test/resources/
+blast_dbs:
+  swissprot:
+    file: ./test/resources/swissprot.pairwise
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_sprot.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+  tair:
+    file: ./test/resources/tair.pairwise
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_tair.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+  trembl:
+    file: ./test/resources/trembl.pairwise
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_trembl.txt
+    token_blacklist: ./test/resources/blacklist_token.txt

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/apps-1.7.1.jar"/>
+	<classpathentry kind="lib" path="lib/biojava-1.7.1.jar"/>
+	<classpathentry kind="lib" path="lib/bytecode.jar"/>
+	<classpathentry kind="lib" path="lib/commons-cli.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-dbcp-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-pool-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/demos-1.7.1.jar"/>
+	<classpathentry kind="lib" path="lib/dtd-xercesImpl.jar"/>
+	<classpathentry kind="lib" path="lib/jarjar-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jgrapht-jdk1.5.jar"/>
+	<classpathentry kind="lib" path="lib/junit-4.9b2.jar"/>
+	<classpathentry kind="lib" path="lib/objenesis-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/serializer.jar"/>
+	<classpathentry kind="lib" path="lib/xalan.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
+	<classpathentry kind="lib" path="lib/xom-1.2.6.jar"/>
+	<classpathentry kind="lib" path="lib/yamlbeans-1.06.jar"/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>
