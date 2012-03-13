@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ahrd.exception.MissingAccessionException;
@@ -18,6 +19,11 @@ public class ProteinTest {
 
 	public ProteinTest() {
 		super();
+	}
+
+	@Before
+	public void setup() throws IOException {
+		TestUtils.initTestSettings();
 	}
 
 	@Test
@@ -75,7 +81,6 @@ public class ProteinTest {
 	public void testProteinConstructionFromFastaWithSequence()
 			throws MissingAccessionException, IOException {
 		// Setup trigger to also remember the AA-Sequence in memory:
-		TestUtils.initTestSettings();
 		getSettings().setOutputFasta(true);
 		// NOTE: We expect this method to be called with a split String, read
 		// from a FASTA-File.
