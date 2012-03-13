@@ -16,7 +16,7 @@ description is assigned.
 
 h2. 1.1 Requirements:
 
-AHRD is a Java-Program which requires Java 1.5 or higher.
+AHRD is a Java-Program which requires Java 1.5 or higher and ant.
 
 
 h2. 1.2 Installation:
