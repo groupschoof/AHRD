@@ -196,7 +196,7 @@ See attached file LICENSE.txt for details.
 
 h2. 6. Authors
 
-Kathrin Klee and Asis Hallab
+Kathrin Klee, Asis Hallab and Heiko Schoof
 
 Group "Plant Computational Biology"
 Prof. Dr. Heiko Schoof
