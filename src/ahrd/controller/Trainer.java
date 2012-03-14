@@ -99,12 +99,13 @@ public class Trainer extends Evaluator {
 			if (getSettings().rememberSimulatedAnnealingPath())
 				getTestedParameters()
 						.add(getSettings().getParameters().clone());
-			// Write output of current iteration:
-			this.outWriter.writeIterationOutput(getSettings());
 			// Initialize the next iteration.
 			// Find locally optimal (according to objective function)
 			// Parameters:
-			acceptOrRejectParameters();
+			int acceptedCurrParameters = acceptOrRejectParameters();
+			// Write output of current iteration:
+			this.outWriter.writeIterationOutput(getSettings(),
+					acceptedCurrParameters);
 			// Try a slightly changes set of Parameters:
 			initNeighbouringSettings();
 			// Cool down temperature:
@@ -214,19 +215,30 @@ public class Trainer extends Evaluator {
 	 * 
 	 * @Note: Settings are cloned to avoid changing parameters, we want to
 	 *        remember unchanged!
+	 * 
+	 * @return int - 0, if current Settings were NOT accepted, 1, if they were
+	 *         better performing and therefore accepted, -1, if they performed
+	 *         worse than the currently accepted Settings, but were accepted in
+	 *         spite of this.
 	 */
-	public void acceptOrRejectParameters() {
+	public int acceptOrRejectParameters() {
+		int accepted = 0;
 		double acceptCurrSettingsProb = acceptanceProbability();
-		if (acceptCurrSettingsProb == 1.0)
+		if (acceptCurrSettingsProb == 1.0) {
 			setAcceptedParameters(getSettings().getParameters().clone());
-		else {
+			accepted = 1;
+		} else {
 			// Take random decision
 			Random r = Utils.random;
-			if (r.nextDouble() <= acceptCurrSettingsProb)
+			if (r.nextDouble() <= acceptCurrSettingsProb) {
 				setAcceptedParameters(getSettings().getParameters().clone());
+				accepted = -1;
+			} else
+				accepted = 0;
 			// else discard the current Settings and continue with the so far
 			// optimal ones.
 		}
+		return accepted;
 	}
 
 	/**

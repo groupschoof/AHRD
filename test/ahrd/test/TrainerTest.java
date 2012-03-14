@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import nu.xom.ParsingException;
 
@@ -128,18 +130,47 @@ public class TrainerTest {
 	@Test
 	public void testAcceptOrRejectParameters() {
 		getSettings().setAvgEvaluationScore(0.5);
-		this.trainer.acceptOrRejectParameters();
+		int a = this.trainer.acceptOrRejectParameters();
 		assertEquals(getSettings().getParameters(),
 				this.trainer.getAcceptedParameters());
+		assertEquals(
+				"The currently evaluated Settings were the first and thus must have been accepted with probability 1.0. Returned int should thus be 1.",
+				1, a);
 		this.trainer.initNeighbouringSettings();
 		getSettings().setAvgEvaluationScore(0.75);
 		assertTrue(
 				"Before calling trainer.acceptOrRejectParameters() accepted Parameters should NOT equal currently evaluated set of Parameters.",
 				!getSettings().getParameters().equals(
 						this.trainer.getAcceptedParameters()));
-		this.trainer.acceptOrRejectParameters();
+		a = this.trainer.acceptOrRejectParameters();
+		assertEquals(
+				"The currently evaluated Settings were better than the currently accepted Settings and thus must have been accepted with probability 1.0. Returned int should thus be 1.",
+				1, a);
 		assertEquals(getSettings().getParameters(),
 				this.trainer.getAcceptedParameters());
+		// Verify, that some worse performing settings get sometimes accepted or
+		// rejected, respectively!
+		// P('Accept worse performing Settings') is higher for high Temperatures
+		getSettings().setTemperature(10000);
+		getSettings().setOptimizationAcceptanceProbabilityScalingFactor(
+				new Double(1500000));
+		this.trainer.initNeighbouringSettings();
+		getSettings().setAvgEvaluationScore(0.745);
+		assertTrue(
+				"Before calling trainer.acceptOrRejectParameters() accepted Parameters should NOT equal currently evaluated set of Parameters.",
+				!getSettings().getParameters().equals(
+						this.trainer.getAcceptedParameters()));
+		Set<Integer> as = new HashSet<Integer>();
+		for (int i = 0; i < 1000; i++) {
+			as.add(this.trainer.acceptOrRejectParameters());
+		}
+		// 1000 iterations should have accepted or rejected at least once
+		assertTrue(
+				"1000 iterations should have accepted worse performing settings least once",
+				as.contains(-1));
+		assertTrue(
+				"1000 iterations should have rejected worse performing settings least once",
+				as.contains(0));
 	}
 
 	/**

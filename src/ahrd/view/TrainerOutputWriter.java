@@ -39,7 +39,7 @@ public class TrainerOutputWriter {
 
 	public void writeHeader() throws IOException {
 		this.bufWrtr
-				.write("Temperature\tAverage Evaluation-Score\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Pattern-Factor-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight");
+				.write("Temperature\tAverage Evaluation-Score\tAccepted\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Pattern-Factor-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight");
 		for (String blastDb : this.sortedBlastDatabases) {
 			this.bufWrtr.write("\t" + blastDb + "-Weight");
 			this.bufWrtr.write("\t" + blastDb
@@ -48,21 +48,22 @@ public class TrainerOutputWriter {
 		this.bufWrtr.write("\n");
 	}
 
-	public void writeIterationOutput(Settings currentSettings)
+	public void writeIterationOutput(Settings currentSettings, int accepted)
 			throws IOException {
-		this.bufWrtr.write(settingsRow(currentSettings, false));
+		this.bufWrtr.write(settingsRow(currentSettings, accepted, false));
 	}
 
 	public void writeFinalOutput(Settings acceptedSettings) throws IOException {
-		this.bufWrtr.write(settingsRow(acceptedSettings, true));
+		this.bufWrtr.write(settingsRow(acceptedSettings, 1, true));
 		this.bufWrtr.close();
 	}
 
-	public String settingsRow(Settings s, boolean bestSettings) {
+	public String settingsRow(Settings s, int accepted, boolean bestSettings) {
 		String col = bestSettings ? "best-settings" : s.getTemperature()
 				.toString();
 		col += "\t" + s.getAvgEvaluationScore() + "\t"
 				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
+				+ accepted + "\t"
 				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
 				+ FRMT.format(s.getDescriptionScorePatternFactorWeight())
 				+ "\t" + FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"

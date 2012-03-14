@@ -227,15 +227,15 @@ public class Settings implements Cloneable {
 			this.coolDownBy = Integer.parseInt((String) input
 					.get(COOL_DOWN_BY_KEY));
 		if (input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY) != null)
-			this.optimizationAcceptanceProbabilityScalingFactor = Double
+			setOptimizationAcceptanceProbabilityScalingFactor(Double
 					.parseDouble((String) input
-							.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY));
+							.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY)));
 		if (input.get(MUTATOR_MEAN_KEY) != null)
-			this.mutatorMean = Double.parseDouble((String) input
-					.get(MUTATOR_MEAN_KEY));
+			setMutatorMean(Double.parseDouble((String) input
+					.get(MUTATOR_MEAN_KEY)));
 		if (input.get(MUTATOR_DEVIATION_KEY) != null)
-			this.mutatorDeviation = Double.parseDouble((String) input
-					.get(MUTATOR_DEVIATION_KEY));
+			setMutatorDeviation(Double.parseDouble((String) input
+					.get(MUTATOR_DEVIATION_KEY)));
 		if (input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY) != null
 				&& Boolean.parseBoolean(input.get(
 						REMEMBER_SIMULATED_ANNEALING_PATH_KEY).toString()))
@@ -593,6 +593,19 @@ public class Settings implements Cloneable {
 
 	public Double getMutatorDeviation() {
 		return mutatorDeviation;
+	}
+
+	public void setMutatorMean(Double mutatorMean) {
+		this.mutatorMean = mutatorMean;
+	}
+
+	public void setMutatorDeviation(Double mutatorDeviation) {
+		this.mutatorDeviation = mutatorDeviation;
+	}
+
+	public void setOptimizationAcceptanceProbabilityScalingFactor(
+			Double optimizationAcceptanceProbabilityScalingFactor) {
+		this.optimizationAcceptanceProbabilityScalingFactor = optimizationAcceptanceProbabilityScalingFactor;
 	}
 
 }
