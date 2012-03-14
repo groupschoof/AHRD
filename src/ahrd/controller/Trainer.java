@@ -135,11 +135,16 @@ public class Trainer extends Evaluator {
 
 	/**
 	 * Calculates Acceptance-Probability according to the <strong>simulated
-	 * annealing</strong> algorithm.
+	 * annealing</strong> algorithm. The distribution of P('Accept worse
+	 * performing parameter-sets') := exp(- delta(scores)*scaling-factor /
+	 * current-temperature)
 	 * 
 	 * @return Double - The calculated acceptance-probability
 	 */
 	public Double acceptanceProbability() {
+		// Scaling-Factor referenced for reading convenience. ;-)
+		Double sf = getSettings()
+				.getOptimizationAcceptanceProbabilityScalingFactor();
 		// If current Settings perform better than the so far found best, accept
 		// them:
 		double p = 1.0;
@@ -150,7 +155,7 @@ public class Trainer extends Evaluator {
 						.getAvgEvaluationScore()) {
 			double scoreDiff = getAcceptedParameters().getAvgEvaluationScore()
 					- getSettings().getAvgEvaluationScore();
-			p = Math.exp(-scoreDiff / getSettings().getTemperature());
+			p = Math.exp(-(scoreDiff * sf) / getSettings().getTemperature());
 		}
 		return p;
 	}

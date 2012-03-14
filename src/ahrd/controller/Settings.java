@@ -64,6 +64,7 @@ public class Settings implements Cloneable {
 	public static final Integer BLAST_DB_WEIGHT_MUTATOR_SEED = 10;
 	public static final String TEMPERATURE_KEY = "temperature";
 	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
+	public static final String OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY = "optimization_acceptance_probability_scaling_factor";
 	public static final String NO_START_POSITIONS_IN_PARAM_SPACE = "no_start_positions_in_parameter_space";
 	public static final String REMEMBER_SIMULATED_ANNEALING_PATH_KEY = "remember_simulated_annealing_path";
 	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
@@ -105,6 +106,12 @@ public class Settings implements Cloneable {
 	 * value the current temperature gets cooled down each step. (Default is 1)
 	 */
 	private Integer coolDownBy = 1;
+	/**
+	 * For the <strong>simulated annealing</strong> algorithm, this is the
+	 * scaling factor for the probability distribution P('Accept worse scoring
+	 * Parameter-Set') := exp(-delta_scores*scaling_factor/current-temperature).
+	 */
+	private Double optimizationAcceptanceProbabilityScalingFactor = 45000000.0;
 	/**
 	 * Break with the classic simulated annealing approach and remember each
 	 * visited Parameter-Set and its score. This enables speeding up the
@@ -205,6 +212,10 @@ public class Settings implements Cloneable {
 		if (input.get(COOL_DOWN_BY_KEY) != null)
 			this.coolDownBy = Integer.parseInt((String) input
 					.get(COOL_DOWN_BY_KEY));
+		if (input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY) != null)
+			this.optimizationAcceptanceProbabilityScalingFactor = Double
+					.parseDouble((String) input
+							.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY));
 		if (input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY) != null
 				&& Boolean.parseBoolean(input.get(
 						REMEMBER_SIMULATED_ANNEALING_PATH_KEY).toString()))
@@ -551,4 +562,9 @@ public class Settings implements Cloneable {
 	public void setOutputFasta(boolean outputFasta) {
 		this.outputFasta = outputFasta;
 	}
+
+	public Double getOptimizationAcceptanceProbabilityScalingFactor() {
+		return optimizationAcceptanceProbabilityScalingFactor;
+	}
+	
 }

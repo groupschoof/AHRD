@@ -107,10 +107,10 @@ public class TrainerTest {
 		assertEquals(1.0, trainer.acceptanceProbability(), 0.0);
 		// test current Settings worse than accepted ones:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		getSettings().setAvgEvaluationScore(0.5);
-		// exp(-(1.0 - 0.5)/1000) = 0.99950012497916927057
-		assertEquals(0.99950012497916927057, trainer.acceptanceProbability(),
-				0.0000001);
+		getSettings().setAvgEvaluationScore(0.9999741);
+		// exp(-(0.0000259*45,000,000)/1000) = 0.3117667
+		assertEquals(0.3117667, trainer.acceptanceProbability(),
+				0.000001);
 	}
 
 	@Test
