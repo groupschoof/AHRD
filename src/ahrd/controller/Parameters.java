@@ -4,7 +4,7 @@ import static ahrd.controller.Utils.roundToNDecimalPlaces;
 import static ahrd.controller.Utils.randomMultipleOfOneTenth;
 import static ahrd.controller.Utils.randomMultipleOfTen;
 import static ahrd.controller.Utils.randomSaveSubtract;
-
+import static ahrd.controller.Settings.getSettings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,11 +118,12 @@ public class Parameters implements Cloneable {
 
 	public void mutateBlastDatabaseWeight() {
 		String blastDb = randomBlastDatabaseName();
-		Integer bdbw = getBlastDbWeight(blastDb);
-		if (randomSaveSubtract(bdbw, Settings.BLAST_DB_WEIGHT_MUTATOR_SEED))
-			bdbw -= Settings.BLAST_DB_WEIGHT_MUTATOR_SEED;
+		Long bdbw = getBlastDbWeight(blastDb).longValue();
+		Long mutateBy = mutateBlastDatabaseWeightBy();
+		if (randomSaveSubtract(bdbw, mutateBy))
+			bdbw -= mutateBy;
 		else
-			bdbw += Settings.BLAST_DB_WEIGHT_MUTATOR_SEED;
+			bdbw += mutateBy;
 
 		setBlastDbWeight(blastDb, bdbw.toString());
 	}
@@ -130,19 +131,21 @@ public class Parameters implements Cloneable {
 	public void mutateDescriptionScoreBitScoreWeight() {
 		String blastDb = randomBlastDatabaseName();
 		Double bsw = getDescriptionScoreBitScoreWeight(blastDb);
-		if (randomSaveSubtract(bsw, Settings.PERCENTAGE_MUTATOR_SEED))
-			bsw -= Settings.PERCENTAGE_MUTATOR_SEED;
+		Double mutateBy = mutatePercentageBy();
+		if (randomSaveSubtract(bsw, mutateBy))
+			bsw -= mutateBy;
 		else
-			bsw += Settings.PERCENTAGE_MUTATOR_SEED;
+			bsw += mutateBy;
 		setDescriptionScoreBitScoreWeight(blastDb, bsw.toString());
 	}
 
 	public void mutateDescriptionScorePatternFactorWeight() {
 		double pfw = getDescriptionScorePatternFactorWeight();
-		if (randomSaveSubtract(pfw, Settings.PERCENTAGE_MUTATOR_SEED))
-			pfw -= Settings.PERCENTAGE_MUTATOR_SEED;
+		Double mutateBy = mutatePercentageBy();
+		if (randomSaveSubtract(pfw, mutateBy))
+			pfw -= mutateBy;
 		else
-			pfw += Settings.PERCENTAGE_MUTATOR_SEED;
+			pfw += mutateBy;
 		setDescriptionScorePatternFactorWeight(pfw);
 	}
 
@@ -169,10 +172,11 @@ public class Parameters implements Cloneable {
 	 */
 	public void mutateTokenScoreBitScoreWeight() {
 		Double bsw = getTokenScoreBitScoreWeight();
-		if (randomSaveSubtract(bsw, Settings.PERCENTAGE_MUTATOR_SEED))
-			bsw = bsw - Settings.PERCENTAGE_MUTATOR_SEED;
+		Double mutateBy = mutatePercentageBy();
+		if (randomSaveSubtract(bsw, mutateBy))
+			bsw = bsw - mutateBy;
 		else
-			bsw = bsw + Settings.PERCENTAGE_MUTATOR_SEED;
+			bsw = bsw + mutateBy;
 		setTokenScoreBitScoreWeight(bsw);
 		// normalize:
 		normalizeTokenScoreWeights();
@@ -185,10 +189,11 @@ public class Parameters implements Cloneable {
 	 */
 	public void mutateTokenScoreDatabaseScoreWeight() {
 		Double dbsw = getTokenScoreDatabaseScoreWeight();
-		if (randomSaveSubtract(dbsw, Settings.PERCENTAGE_MUTATOR_SEED))
-			dbsw = dbsw - Settings.PERCENTAGE_MUTATOR_SEED;
+		Double mutateBy = mutatePercentageBy();
+		if (randomSaveSubtract(dbsw, mutateBy))
+			dbsw = dbsw - mutateBy;
 		else
-			dbsw = dbsw + Settings.PERCENTAGE_MUTATOR_SEED;
+			dbsw = dbsw + mutateBy;
 		setTokenScoreDatabaseScoreWeight(dbsw);
 		// normalize:
 		normalizeTokenScoreWeights();
@@ -201,13 +206,45 @@ public class Parameters implements Cloneable {
 	 */
 	public void mutateTokenScoreOverlapScoreWeight() {
 		Double osw = getTokenScoreOverlapScoreWeight();
-		if (randomSaveSubtract(osw, Settings.PERCENTAGE_MUTATOR_SEED))
-			osw = osw - Settings.PERCENTAGE_MUTATOR_SEED;
+		Double mutateBy = mutatePercentageBy();
+		if (randomSaveSubtract(osw, mutateBy))
+			osw = osw - mutateBy;
 		else
-			osw = osw + Settings.PERCENTAGE_MUTATOR_SEED;
+			osw = osw + mutateBy;
 		setTokenScoreOverlapScoreWeight(osw);
 		// normalize:
 		normalizeTokenScoreWeights();
+	}
+
+	/**
+	 * Returns the absolute of a random Gaussian distributed value with mean
+	 * Settings.MUTATOR_MEAN and deviation Settings.MUTATOR_DEVIATION.
+	 * 
+	 * @Note: Only the <strong>absolute</strong> of the random Gaussian is
+	 *        returned, as to subtract or add is decided elsewhere.
+	 * 
+	 * @return Double - The value to add or subtract from the Percentage to
+	 *         mutate.
+	 */
+	public Double mutatePercentageBy() {
+		return Math.abs(Utils.random.nextGaussian()
+				* getSettings().getMutatorDeviation()
+				+ getSettings().getMutatorMean());
+	}
+
+	/**
+	 * Returns 100 multiplied with the rounded up absolute of a random Gaussian
+	 * distributed value with mean Settings.MUTATOR_MEAN and deviation
+	 * Settings.MUTATOR_DEVIATION.
+	 * 
+	 * @Note: Only the <strong>absolute</strong> of the random Gaussian is
+	 *        returned, as to subtract or add is decided elsewhere.
+	 * 
+	 * @return Long - The value to add or subtract from the Percentage to
+	 *         mutate.
+	 */
+	public Long mutateBlastDatabaseWeightBy() {
+		return new Double(Math.ceil(100.0 * mutatePercentageBy())).longValue();
 	}
 
 	/**

@@ -60,11 +60,11 @@ public class Settings implements Cloneable {
 	public static final String REFERENCES_FASTA_KEY = "references_fasta";
 	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
 	public static final String BLAST_2_GO_ANNOT_FILE_KEY = "blast2go";
-	public static final Double PERCENTAGE_MUTATOR_SEED = 0.10;
-	public static final Integer BLAST_DB_WEIGHT_MUTATOR_SEED = 10;
 	public static final String TEMPERATURE_KEY = "temperature";
 	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
 	public static final String OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY = "optimization_acceptance_probability_scaling_factor";
+	public static final String MUTATOR_MEAN_KEY = "mutator_mean";
+	public static final String MUTATOR_DEVIATION_KEY = "mutator_deviation";
 	public static final String NO_START_POSITIONS_IN_PARAM_SPACE = "no_start_positions_in_parameter_space";
 	public static final String REMEMBER_SIMULATED_ANNEALING_PATH_KEY = "remember_simulated_annealing_path";
 	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
@@ -112,6 +112,20 @@ public class Settings implements Cloneable {
 	 * Parameter-Set') := exp(-delta_scores*scaling_factor/current-temperature).
 	 */
 	private Double optimizationAcceptanceProbabilityScalingFactor = 45000000.0;
+	/**
+	 * In simulated annealing optimization each cycle has to mutate the current
+	 * Parameter-Set to generate a neighboring set in parameter space. The
+	 * random value used to add or subtract to a single parameter is Gaussian
+	 * distributed and has the following mean:
+	 */
+	private Double mutatorMean = 0.2;
+	/**
+	 * In simulated annealing optimization each cycle has to mutate the current
+	 * Parameter-Set to generate a neighboring set in parameter space. The
+	 * random value used to add or subtract to a single parameter is Gaussian
+	 * distributed and has the following standard deviation:
+	 */
+	private Double mutatorDeviation = 0.2;
 	/**
 	 * Break with the classic simulated annealing approach and remember each
 	 * visited Parameter-Set and its score. This enables speeding up the
@@ -216,6 +230,12 @@ public class Settings implements Cloneable {
 			this.optimizationAcceptanceProbabilityScalingFactor = Double
 					.parseDouble((String) input
 							.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY));
+		if (input.get(MUTATOR_MEAN_KEY) != null)
+			this.mutatorMean = Double.parseDouble((String) input
+					.get(MUTATOR_MEAN_KEY));
+		if (input.get(MUTATOR_DEVIATION_KEY) != null)
+			this.mutatorDeviation = Double.parseDouble((String) input
+					.get(MUTATOR_DEVIATION_KEY));
 		if (input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY) != null
 				&& Boolean.parseBoolean(input.get(
 						REMEMBER_SIMULATED_ANNEALING_PATH_KEY).toString()))
@@ -566,5 +586,13 @@ public class Settings implements Cloneable {
 	public Double getOptimizationAcceptanceProbabilityScalingFactor() {
 		return optimizationAcceptanceProbabilityScalingFactor;
 	}
-	
+
+	public Double getMutatorMean() {
+		return mutatorMean;
+	}
+
+	public Double getMutatorDeviation() {
+		return mutatorDeviation;
+	}
+
 }

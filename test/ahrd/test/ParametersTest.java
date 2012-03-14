@@ -107,12 +107,9 @@ public class ParametersTest {
 		// test:
 		p.mutateDescriptionScorePatternFactorWeight();
 		assertTrue(
-				"mutateDescriptionScorePatternFactorWeight() should increase or diminish dspfw by "
-						+ Settings.PERCENTAGE_MUTATOR_SEED,
-				(new Double(dspfw + Settings.PERCENTAGE_MUTATOR_SEED).equals(p
-						.getDescriptionScorePatternFactorWeight()) || new Double(
-						dspfw - Settings.PERCENTAGE_MUTATOR_SEED).equals(p
-						.getDescriptionScorePatternFactorWeight())));
+				"mutateDescriptionScorePatternFactorWeight() should increase or diminish dspfw",
+				!dspfw.equals(getSettings()
+						.getDescriptionScorePatternFactorWeight()));
 	}
 
 	@Test
@@ -306,5 +303,38 @@ public class ParametersTest {
 		assertTrue(
 				"Changed Swissprot-DescriptionScoreBitScoreWeight should result in inequality.",
 				!p.equals(q));
+	}
+
+	@Test
+	public void testMutatePercentageBy() {
+		Double mutateBy = null;
+		// As it is a random variable, try a couple of times:
+		for (int i = 0; i < 10000; i++) {
+			mutateBy = getSettings().getParameters().mutatePercentageBy();
+			// Verify:
+			assertNotNull(
+					"Mutation of Percentages must be done by NON NULL Double-Values.",
+					mutateBy);
+			assertTrue(
+					"Mutation of Percentages should always be by a positive value",
+					mutateBy > 0.0);
+		}
+	}
+
+	@Test
+	public void testMutateBlastDatabaseWeightBy() {
+		Long mutateBy = null;
+		// As it is a random variable, try a couple of times:
+		for (int i = 0; i < 10000; i++) {
+			mutateBy = getSettings().getParameters()
+					.mutateBlastDatabaseWeightBy();
+			// Verify:
+			assertNotNull(
+					"Mutation of BlastDatabaseWeights must be done by NON NULL Long-Values.",
+					mutateBy);
+			assertTrue(
+					"Mutation of BlastDatabaseWeights should always be by a positive value, but was "
+							+ mutateBy, mutateBy > 0.0);
+		}
 	}
 }
