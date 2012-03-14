@@ -194,17 +194,21 @@ public class TrainerBatcher extends Batcher {
 		if (getInput().get(Settings.TEMPERATURE_KEY) != null)
 			batchYml.put(Settings.TEMPERATURE_KEY,
 					(String) getInput().get(Settings.TEMPERATURE_KEY));
-
 		if (getInput().get(Settings.COOL_DOWN_BY_KEY) != null)
 			batchYml.put(Settings.COOL_DOWN_BY_KEY,
 					(String) getInput().get(Settings.COOL_DOWN_BY_KEY));
-
 		if (getInput()
 				.get(Settings.OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY) != null)
 			batchYml.put(
 					Settings.OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY,
 					(String) getInput()
 							.get(Settings.OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY));
+		if (getInput().get(Settings.MUTATOR_MEAN_KEY) != null)
+			batchYml.put(Settings.MUTATOR_MEAN_KEY,
+					(String) getInput().get(Settings.MUTATOR_MEAN_KEY));
+		if (getInput().get(Settings.MUTATOR_DEVIATION_KEY) != null)
+			batchYml.put(Settings.MUTATOR_DEVIATION_KEY, (String) getInput()
+					.get(Settings.MUTATOR_DEVIATION_KEY));
 
 		// Path to Batch's YML-File:
 		batchYml.put(PATH_TO_BATCH_YML_KEY, generatePathToBatchYml(batchName));

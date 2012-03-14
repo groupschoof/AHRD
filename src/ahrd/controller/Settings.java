@@ -111,7 +111,7 @@ public class Settings implements Cloneable {
 	 * scaling factor for the probability distribution P('Accept worse scoring
 	 * Parameter-Set') := exp(-delta_scores*scaling_factor/current-temperature).
 	 */
-	private Double optimizationAcceptanceProbabilityScalingFactor = 45000000.0;
+	private Double optimizationAcceptanceProbabilityScalingFactor = 200000000.0;
 	/**
 	 * In simulated annealing optimization each cycle has to mutate the current
 	 * Parameter-Set to generate a neighboring set in parameter space. The
@@ -125,7 +125,7 @@ public class Settings implements Cloneable {
 	 * random value used to add or subtract to a single parameter is Gaussian
 	 * distributed and has the following standard deviation:
 	 */
-	private Double mutatorDeviation = 0.2;
+	private Double mutatorDeviation = 0.25;
 	/**
 	 * Break with the classic simulated annealing approach and remember each
 	 * visited Parameter-Set and its score. This enables speeding up the

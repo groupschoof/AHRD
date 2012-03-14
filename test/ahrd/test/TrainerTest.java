@@ -108,9 +108,11 @@ public class TrainerTest {
 		// test current Settings worse than accepted ones:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
 		getSettings().setAvgEvaluationScore(0.9999741);
-		// exp(-(0.0000259*45,000,000)/1000) = 0.3117667
-		assertEquals(0.3117667, trainer.acceptanceProbability(),
-				0.000001);
+		// exp(-(0.0000259*200,000,000)/1000) = 0.005628006
+		assertEquals(0.005628006, trainer.acceptanceProbability(), 0.000000001);
+		// exp(-(0.0000259*200,000,000)/10000) = 0.5957108
+		getSettings().setTemperature(10000);
+		assertEquals(0.5957108, trainer.acceptanceProbability(), 0.000001);
 	}
 
 	@Test
