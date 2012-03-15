@@ -51,6 +51,10 @@ public class Trainer extends Evaluator {
 			bestSettings.setParameters(trainer.getBestParameters());
 			trainer.outWriter.writeFinalOutput(bestSettings,
 					trainer.getAvgMaxEvaluationScore());
+			System.out
+					.println("Logged path through parameter- and score-space into:\n"
+							+ getSettings()
+									.getPathToSimulatedAnnealingPathLog());
 			System.out.println("Written output into:\n"
 					+ getSettings().getPathToOutput());
 		} catch (Exception e) {

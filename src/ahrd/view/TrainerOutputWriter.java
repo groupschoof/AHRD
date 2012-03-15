@@ -84,9 +84,9 @@ public class TrainerOutputWriter {
 		String col = s.getTemperature().toString() + "\t";
 		if (avgMaxEvalScore != null)
 			col += avgMaxEvalScore + "\t";
-		col += s.getAvgEvaluationScore() + "\t"
-				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t" + accepted
-				+ "\t" + FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
+		col += s.getAvgEvaluationScore() + "\t" + accepted + "\t"
+				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
+				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
 				+ FRMT.format(s.getDescriptionScorePatternFactorWeight())
 				+ "\t" + FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
