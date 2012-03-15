@@ -154,23 +154,36 @@ public class TrainerTest {
 		getSettings().setTemperature(10000);
 		getSettings().setOptimizationAcceptanceProbabilityScalingFactor(
 				new Double(1500000));
-		this.trainer.initNeighbouringSettings();
-		getSettings().setAvgEvaluationScore(0.745);
-		assertTrue(
-				"Before calling trainer.acceptOrRejectParameters() accepted Parameters should NOT equal currently evaluated set of Parameters.",
-				!getSettings().getParameters().equals(
-						this.trainer.getAcceptedParameters()));
 		Set<Integer> as = new HashSet<Integer>();
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < 50; i++) {
+			this.trainer.getAcceptedParameters().setAvgEvaluationScore(0.75);
+			this.trainer.initNeighbouringSettings();
+			getSettings().setAvgEvaluationScore(0.74538);
+			assertTrue(
+					"Before calling trainer.acceptOrRejectParameters() accepted Parameters should NOT equal currently evaluated set of Parameters.",
+					!getSettings().getParameters().equals(
+							this.trainer.getAcceptedParameters()));
+			// Verify that we are dealing with the expected
+			// acceptance-probability: exp(-0.00462*1500000/10000) = 0.5000736
+			assertEquals(0.5, this.trainer.acceptanceProbability(), 0.0001);
 			as.add(this.trainer.acceptOrRejectParameters());
 		}
-		// 1000 iterations should have accepted or rejected at least once
+		// Assert, that we did never except a worse parameter set with
+		// probability 1.0, which is only applied to better performing
+		// parameter-sets!
+		String errMsg = "The probability of having only rejections or only acceptances in the"
+				+ "above 50 tries can be calculated with the binomial distribution"
+				+ "B(0|p=0.5,n=50) < 0.0000000000000009";
 		assertTrue(
-				"1000 iterations should have accepted worse performing settings least once",
-				as.contains(-1));
+				"A worse parameter set should have never be accpeted with probability 1.0, which is only applied to better performing parameter-sets",
+				!as.contains(1.0));
+		// 50 iterations should have accepted or rejected at least once
 		assertTrue(
-				"1000 iterations should have rejected worse performing settings least once",
-				as.contains(0));
+				"50 iterations should have accepted worse performing settings least once. - "
+						+ errMsg, as.contains(-1));
+		assertTrue(
+				"50 iterations should have rejected worse performing settings least once - "
+						+ errMsg, as.contains(0));
 	}
 
 	/**
