@@ -62,13 +62,18 @@ or just execute
 
 h3. 2.2.1 AHRD run using BLASTX results:
 
-In order to run AHRD on BLASTX results instead of BLASTP results you have to modify the following parameters in the ahrd_example_input.yml:
+In order to run AHRD on BLASTX results instead of BLASTP results you have to
+modify the following parameters in the ahrd_example_input.yml:
 <pre>token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2</pre>
 
-Since the algorithm is based on protein sequences and the BLASTX searches are based on nucleotide sequence there will be a problem calculating the overlap score of the blast result.
-To overcome this problem the token_score_overlap_score_weight has to be set to 0.0. Therefore the other two scores have to be raised. These three parameters have to sum up to 1. The resulting parameter configuration could look like this:
+Since the algorithm is based on protein sequences and the BLASTX searches are
+based on nucleotide sequence there will be a problem calculating the overlap
+score of the blast result.  To overcome this problem the
+token_score_overlap_score_weight has to be set to 0.0. Therefore the other two
+scores have to be raised. These three parameters have to sum up to 1. The
+resulting parameter configuration could look like this:
 <pre>token_score_bit_score_weight: 0.6
 token_score_database_score_weight: 0.4
 token_score_overlap_score_weight: 0.0</pre>
