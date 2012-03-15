@@ -56,14 +56,27 @@ public class TrainerOutputWriter {
 		this.pathBufWrtr.write(settingsRow(currentSettings, accepted, null));
 	}
 
+	/**
+	 * Writes out the final output and cleanes up both used buffered Writer.
+	 * 
+	 * @param acceptedSettings
+	 * @param avgMaxEvaluationScore
+	 * @throws IOException
+	 */
 	public void writeFinalOutput(Settings acceptedSettings,
 			Double avgMaxEvaluationScore) throws IOException {
+		// Clean up buffered Sim-Anneal-Path-Log-Writer:
+		this.pathBufWrtr.close();
+
+		// Write output about found best performing Parameters:
 		this.outBufWrtr = new BufferedWriter(new FileWriter(getSettings()
 				.getPathToOutput()));
 		// this.outBufWrtr.write("Found best scoring Parameters:\n");
 		this.outBufWrtr.write(generateHeader(true));
 		this.outBufWrtr.write(settingsRow(acceptedSettings, 1,
 				avgMaxEvaluationScore));
+
+		// Clean buffered Output-Writer:
 		this.outBufWrtr.close();
 	}
 
