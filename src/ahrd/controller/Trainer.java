@@ -16,6 +16,7 @@ public class Trainer extends Evaluator {
 
 	private Parameters acceptedParameters;
 	private Parameters bestParameters;
+	private Integer bestParametersFoundAtTemperature;
 	private TrainerOutputWriter outWriter;
 	private Set<Parameters> testedParameters;
 	/**
@@ -50,7 +51,8 @@ public class Trainer extends Evaluator {
 			Settings bestSettings = getSettings().clone();
 			bestSettings.setParameters(trainer.getBestParameters());
 			trainer.outWriter.writeFinalOutput(bestSettings,
-					trainer.getAvgMaxEvaluationScore());
+					trainer.getAvgMaxEvaluationScore(),
+					trainer.getBestParametersFoundAtTemperature());
 			System.out
 					.println("Logged path through parameter- and score-space into:\n"
 							+ getSettings()
@@ -135,8 +137,10 @@ public class Trainer extends Evaluator {
 	public void findBestSettings() {
 		if (getBestParameters() == null
 				|| getSettings().getAvgEvaluationScore() > getBestParameters()
-						.getAvgEvaluationScore())
+						.getAvgEvaluationScore()) {
 			setBestParameters(getSettings().getParameters().clone());
+			setBestParametersFoundAtTemperature(getSettings().getTemperature());
+		}
 	}
 
 	/**
@@ -314,6 +318,15 @@ public class Trainer extends Evaluator {
 
 	public void setAvgMaxEvaluationScore(Double avgMaxEvaluationScore) {
 		this.avgMaxEvaluationScore = avgMaxEvaluationScore;
+	}
+
+	public Integer getBestParametersFoundAtTemperature() {
+		return bestParametersFoundAtTemperature;
+	}
+
+	public void setBestParametersFoundAtTemperature(
+			Integer bestParametersFoundAtTemperature) {
+		this.bestParametersFoundAtTemperature = bestParametersFoundAtTemperature;
 	}
 
 }

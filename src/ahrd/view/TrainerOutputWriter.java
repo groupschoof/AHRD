@@ -38,11 +38,14 @@ public class TrainerOutputWriter {
 		this.pathBufWrtr.write(generateHeader(false));
 	}
 
-	public String generateHeader(boolean addAvgMaxEvaluationScoreCol) {
+	public String generateHeader(boolean isFinalOutput) {
 		String hdr = "Temperature\t";
-		if (addAvgMaxEvaluationScoreCol)
+		if (isFinalOutput)
 			hdr += "Average Maximum-Evaluation-Score\t";
-		hdr += "Average Evaluation-Score\tAccepted\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Pattern-Factor-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
+		hdr += "Average Evaluation-Score";
+		if (!isFinalOutput)
+			hdr += "\tAccepted";
+		hdr += "\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Pattern-Factor-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
 		for (String blastDb : this.sortedBlastDatabases) {
 			hdr += "\t" + blastDb + "-Weight";
 			hdr += "\t" + blastDb + "-Description-Score-Bit-Score-Weight";
@@ -53,7 +56,7 @@ public class TrainerOutputWriter {
 
 	public void writeIterationOutput(Settings currentSettings, int accepted)
 			throws IOException {
-		this.pathBufWrtr.write(settingsRow(currentSettings, accepted, null));
+		this.pathBufWrtr.write(settingsRow(currentSettings, accepted));
 	}
 
 	/**
@@ -64,7 +67,8 @@ public class TrainerOutputWriter {
 	 * @throws IOException
 	 */
 	public void writeFinalOutput(Settings acceptedSettings,
-			Double avgMaxEvaluationScore) throws IOException {
+			Double avgMaxEvaluationScore,
+			Integer acceptedSettingsFOundAtTemperature) throws IOException {
 		// Clean up buffered Sim-Anneal-Path-Log-Writer:
 		this.pathBufWrtr.close();
 
@@ -73,18 +77,37 @@ public class TrainerOutputWriter {
 				.getPathToOutput()));
 		// this.outBufWrtr.write("Found best scoring Parameters:\n");
 		this.outBufWrtr.write(generateHeader(true));
-		this.outBufWrtr.write(settingsRow(acceptedSettings, 1,
+		this.outBufWrtr.write(finalSettingsRow(acceptedSettings, 1,
 				avgMaxEvaluationScore));
 
 		// Clean buffered Output-Writer:
 		this.outBufWrtr.close();
 	}
 
-	public String settingsRow(Settings s, int accepted, Double avgMaxEvalScore) {
-		String col = s.getTemperature().toString() + "\t";
+	public String settingsRow(Settings s, int accepted) {
+		String col = s.getTemperature().toString() + "\t"
+				+ s.getAvgEvaluationScore() + "\t" + accepted + "\t"
+				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
+				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
+				+ FRMT.format(s.getDescriptionScorePatternFactorWeight())
+				+ "\t" + FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
+				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
+				+ FRMT.format(s.getTokenScoreOverlapScoreWeight());
+		for (String blastDb : this.sortedBlastDatabases) {
+			col += "\t" + FRMT.format(s.getBlastDbWeight(blastDb));
+			col += "\t"
+					+ FRMT.format(s.getDescriptionScoreBitScoreWeight(blastDb));
+		}
+		col += "\n";
+		return col;
+	}
+
+	public String finalSettingsRow(Settings s, Integer sFoundAtTemp,
+			Double avgMaxEvalScore) {
+		String col = sFoundAtTemp + "\t";
 		if (avgMaxEvalScore != null)
 			col += avgMaxEvalScore + "\t";
-		col += s.getAvgEvaluationScore() + "\t" + accepted + "\t"
+		col += s.getAvgEvaluationScore() + "\t"
 				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
 				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
 				+ FRMT.format(s.getDescriptionScorePatternFactorWeight())
