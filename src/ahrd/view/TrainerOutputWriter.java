@@ -68,7 +68,7 @@ public class TrainerOutputWriter {
 	 */
 	public void writeFinalOutput(Settings acceptedSettings,
 			Double avgMaxEvaluationScore,
-			Integer acceptedSettingsFOundAtTemperature) throws IOException {
+			Integer acceptedSettingsFoundAtTemperature) throws IOException {
 		// Clean up buffered Sim-Anneal-Path-Log-Writer:
 		this.pathBufWrtr.close();
 
@@ -77,8 +77,8 @@ public class TrainerOutputWriter {
 				.getPathToOutput()));
 		// this.outBufWrtr.write("Found best scoring Parameters:\n");
 		this.outBufWrtr.write(generateHeader(true));
-		this.outBufWrtr.write(finalSettingsRow(acceptedSettings, 1,
-				avgMaxEvaluationScore));
+		this.outBufWrtr.write(finalSettingsRow(acceptedSettings,
+				acceptedSettingsFoundAtTemperature, avgMaxEvaluationScore));
 
 		// Clean buffered Output-Writer:
 		this.outBufWrtr.close();
@@ -104,10 +104,8 @@ public class TrainerOutputWriter {
 
 	public String finalSettingsRow(Settings s, Integer sFoundAtTemp,
 			Double avgMaxEvalScore) {
-		String col = sFoundAtTemp + "\t";
-		if (avgMaxEvalScore != null)
-			col += avgMaxEvalScore + "\t";
-		col += s.getAvgEvaluationScore() + "\t"
+		String col = sFoundAtTemp + "\t" + avgMaxEvalScore + "\t"
+				+ s.getAvgEvaluationScore() + "\t"
 				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
 				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
 				+ FRMT.format(s.getDescriptionScorePatternFactorWeight())
