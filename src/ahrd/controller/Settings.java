@@ -49,6 +49,7 @@ public class Settings implements Cloneable {
 	public static final String INTERPRO_RESULT_KEY = "interpro_result";
 	public static final String GENE_ONTOLOGY_RESULT_KEY = "gene_ontology_result";
 	public static final String OUTPUT_KEY = "output";
+	public static final String SIMULATED_ANNEALING_PATH_LOG_KEY = "path_log";
 	public static final String WRITE_SCORES_TO_OUTPUT = "write_scores_to_output";
 	public static final String WRITE_BEST_BLAST_HITS_TO_OUTPUT = "write_best_blast_hits_to_output";
 	public static final String WRITE_TOKEN_SET_TO_OUTPUT = "write_token_set_to_output";
@@ -79,6 +80,10 @@ public class Settings implements Cloneable {
 	private String pathToInterproResults;
 	private String pathToGeneOntologyResults;
 	private String pathToOutput;
+	/**
+	 * Trainer logs path through parameter- and score-space into this file:
+	 */
+	private String pathToSimulatedAnnealingPathLog;
 	/**
 	 * Parameters representing weights and factors in the various formulas used
 	 * in AHRD. They are subject to optimization and can be set by the user.
@@ -169,6 +174,10 @@ public class Settings implements Cloneable {
 		setPathToGeneOntologyResults((String) input
 				.get(GENE_ONTOLOGY_RESULT_KEY));
 		setPathToOutput((String) input.get(OUTPUT_KEY));
+		// Trainer logs path through parameter-space here:
+		if (input.get(SIMULATED_ANNEALING_PATH_LOG_KEY) != null)
+			setPathToSimulatedAnnealingPathLog((String) input
+					.get(SIMULATED_ANNEALING_PATH_LOG_KEY));
 		setTokenScoreBitScoreWeight(Double.parseDouble((String) input
 				.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
 		setTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input
@@ -606,6 +615,15 @@ public class Settings implements Cloneable {
 	public void setOptimizationAcceptanceProbabilityScalingFactor(
 			Double optimizationAcceptanceProbabilityScalingFactor) {
 		this.optimizationAcceptanceProbabilityScalingFactor = optimizationAcceptanceProbabilityScalingFactor;
+	}
+
+	public String getPathToSimulatedAnnealingPathLog() {
+		return pathToSimulatedAnnealingPathLog;
+	}
+
+	public void setPathToSimulatedAnnealingPathLog(
+			String pathToSimulatedAnnealingPathLog) {
+		this.pathToSimulatedAnnealingPathLog = pathToSimulatedAnnealingPathLog;
 	}
 
 }

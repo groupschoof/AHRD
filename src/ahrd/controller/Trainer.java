@@ -18,6 +18,12 @@ public class Trainer extends Evaluator {
 	private Parameters bestParameters;
 	private TrainerOutputWriter outWriter;
 	private Set<Parameters> testedParameters;
+	/**
+	 * The average of AHRD's maximum evaluation score for each Protein. This is
+	 * the maximum of the evaluation scores calculated for all Descriptions of
+	 * each Protein. These maximums are then averaged.
+	 */
+	private Double avgMaxEvaluationScore = 0.0;
 
 	/**
 	 * @param args
@@ -36,11 +42,15 @@ public class Trainer extends Evaluator {
 
 			// Try to find optimal parameters heuristically:
 			trainer.train();
+			// Calculate the average maximum evaluation score AHRD could have
+			// possible achieved:
+			trainer.calcAvgMaxEvaluationScore();
 
 			// Write final output
 			Settings bestSettings = getSettings().clone();
 			bestSettings.setParameters(trainer.getBestParameters());
-			trainer.outWriter.writeFinalOutput(bestSettings);
+			trainer.outWriter.writeFinalOutput(bestSettings,
+					trainer.getAvgMaxEvaluationScore());
 			System.out.println("Written output into:\n"
 					+ getSettings().getPathToOutput());
 		} catch (Exception e) {
@@ -258,6 +268,22 @@ public class Trainer extends Evaluator {
 		return alreadyTested;
 	}
 
+	/**
+	 * This calculates the average maximum evaluation score AHRD could possibly
+	 * achieve.
+	 */
+	public void calcAvgMaxEvaluationScore() {
+		for (Protein prot : getProteins().values()) {
+			prot.getEvaluationScoreCalculator()
+					.findHighestPossibleEvaluationScore();
+			setAvgMaxEvaluationScore(getAvgMaxEvaluationScore()
+					+ prot.getEvaluationScoreCalculator()
+							.getHighestPossibleEvaluationScore());
+		}
+		setAvgMaxEvaluationScore(getAvgMaxEvaluationScore()
+				/ getProteins().size());
+	}
+
 	public Parameters getAcceptedParameters() {
 		return acceptedParameters;
 	}
@@ -277,4 +303,13 @@ public class Trainer extends Evaluator {
 	public Set<Parameters> getTestedParameters() {
 		return testedParameters;
 	}
+
+	public Double getAvgMaxEvaluationScore() {
+		return avgMaxEvaluationScore;
+	}
+
+	public void setAvgMaxEvaluationScore(Double avgMaxEvaluationScore) {
+		this.avgMaxEvaluationScore = avgMaxEvaluationScore;
+	}
+
 }

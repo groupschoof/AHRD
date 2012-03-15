@@ -79,6 +79,8 @@
 				<fileset dir="${classes}" includes="**/*Test.class" />
 			</batchtest>
 		</junit>
+		<delete file="test/ahrd_output.csv" />
+		<delete file="test/sim_anneal_path_log.csv" />
 	</target>
 
 	<target name="test.run" depends="compile.test">

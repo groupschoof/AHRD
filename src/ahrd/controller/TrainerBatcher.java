@@ -155,16 +155,18 @@ public class TrainerBatcher extends Batcher {
 		batchYml.put(Settings.GENE_ONTOLOGY_RESULT_KEY,
 				getInput().get(Settings.GENE_ONTOLOGY_RESULT_KEY));
 
-		// Output-File:
-		String outputFile = getInput().get(OUTPUT_DIR_KEY).toString();
-
-		if (!outputFile.endsWith("/"))
-			outputFile += "/";
-
-		outputFile += batchName.replaceAll("\\.\\S+$", "")
-				+ "_ahrd_trainer_out.csv";
-
+		// Output-File and Log of simulated annealing's path through parameter-
+		// and score-space:
+		String outputDir = getInput().get(OUTPUT_DIR_KEY).toString();
+		if (!outputDir.endsWith("/"))
+			outputDir += "/";
+		String batchFileName = batchName.replaceAll("\\.\\S+$", "");
+		String outputFile = outputDir + batchFileName + "_ahrd_trainer_out.csv";
 		batchYml.put(Settings.OUTPUT_KEY, outputFile);
+		String simAnnealPathLog = outputDir + batchFileName
+				+ "_sim_anneal_path_log.csv";
+		batchYml.put(Settings.SIMULATED_ANNEALING_PATH_LOG_KEY,
+				simAnnealPathLog);
 
 		// Append best BlastHits to output?:
 		String appendBestBlastHitsToOutput = (String) getInput().get(
