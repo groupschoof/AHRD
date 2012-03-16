@@ -1,10 +1,10 @@
 package ahrd.controller;
 
-import static ahrd.controller.Utils.roundToNDecimalPlaces;
+import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Utils.randomMultipleOfOneTenth;
 import static ahrd.controller.Utils.randomMultipleOfTen;
 import static ahrd.controller.Utils.randomSaveSubtract;
-import static ahrd.controller.Settings.getSettings;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -154,15 +154,12 @@ public class Parameters implements Cloneable {
 	 * they sum up to 1.0
 	 */
 	public void normalizeTokenScoreWeights() {
-		double s = roundToNDecimalPlaces(getTokenScoreBitScoreWeight()
+		double s = getTokenScoreBitScoreWeight()
 				+ getTokenScoreDatabaseScoreWeight()
-				+ getTokenScoreOverlapScoreWeight(), 4);
-		setTokenScoreBitScoreWeight(roundToNDecimalPlaces(
-				getTokenScoreBitScoreWeight() / s, 4));
-		setTokenScoreDatabaseScoreWeight(roundToNDecimalPlaces(
-				getTokenScoreDatabaseScoreWeight() / s, 4));
-		setTokenScoreOverlapScoreWeight(roundToNDecimalPlaces(
-				getTokenScoreOverlapScoreWeight() / s, 4));
+				+ getTokenScoreOverlapScoreWeight();
+		setTokenScoreBitScoreWeight(getTokenScoreBitScoreWeight() / s);
+		setTokenScoreDatabaseScoreWeight(getTokenScoreDatabaseScoreWeight() / s);
+		setTokenScoreOverlapScoreWeight(getTokenScoreOverlapScoreWeight() / s);
 	}
 
 	/**
