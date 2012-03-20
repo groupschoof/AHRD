@@ -1,7 +1,5 @@
 package ahrd.test;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertNotSame;
 import static ahrd.controller.Settings.getSettings;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -117,51 +115,6 @@ public class TrainerTest {
 		// exp(-(0.0000259*200,000,000)/10000) = 0.5957108
 		getSettings().setTemperature(10000);
 		assertEquals(0.5957108, trainer.acceptanceProbability(), 0.000001);
-	}
-
-	@Test
-	public void testFindBestSettings() {
-		Parameters o = getSettings().getParameters();
-		getSettings().setAvgEvaluationScore(0.5);
-		Parameters c = getSettings().getParameters().clone();
-		trainer.setAcceptedParameters(c);
-		getSettings().setAvgEvaluationScore(1.0);
-		// Assert Training accepts better performing parameters:
-		trainer.findBestSettings();
-		assertSame(
-				"Training should always accept better performing parameters.",
-				c, trainer.getAcceptedParameters());
-		assertEquals(
-				"Training should always accept better performing parameters.",
-				c, trainer.getAcceptedParameters());
-		// Ensure, we are dealing with two different Parameter-Sets:
-		assertNotSame(o, c);
-		assertNotSame(o, trainer.getAcceptedParameters());
-		// Worse performing settings should NOT be remembered as the so far
-		// found best!
-		o = getSettings().getParameters().clone();
-		o.setAvgEvaluationScore(1.0);
-		trainer.setAcceptedParameters(o);
-		c = o.clone();
-		c.setAvgEvaluationScore(0.5);
-		getSettings().setParameters(c);
-		trainer.findBestSettings();
-		assertSame(
-				"Worse performing settings should NOT be remembered as the so far found best.",
-				o, trainer.getAcceptedParameters());
-		assertNotSame(c, trainer.getAcceptedParameters());
-	}
-
-	@Test
-	public void testInitNeighbouringSettings() {
-		Parameters o = getSettings().getParameters();
-		trainer.setAcceptedParameters(o);
-		trainer.initNeighbouringSettings();
-		assertNotSame(
-				"Initialization of neighbouring parameters should initialize a new and thus distinct Instance of Parameters.",
-				o, getSettings().getParameters());
-		assertTrue("Neighbouring Parameter should differ from each other.",
-				!o.equals(getSettings().getParameters()));
 	}
 
 	@Test
