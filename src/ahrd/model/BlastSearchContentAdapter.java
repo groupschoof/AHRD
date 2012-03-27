@@ -40,8 +40,10 @@ public class BlastSearchContentAdapter extends SearchContentAdapter {
 				|| this.currentBlastResult.getBitScore() > this.bestScoringHSP
 						.getBitScore()) {
 			this.bestScoringHSP = this.currentBlastResult;
-			this.currentBlastResult = new BlastResult(this.currentBlastResult
-					.getAccession(), this.currentBlastResult.getDescription());
+			this.currentBlastResult = new BlastResult(
+					this.currentBlastResult.getBlastDatabaseName(),
+					this.currentBlastResult.getAccession(),
+					this.currentBlastResult.getDescription());
 		}
 	}
 

@@ -50,7 +50,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 */
 	private Double evaluationScore;
 	/**
-	 * Evaluation Tokens are <i>not</i> filtered with the TOKEN-BLACKLIST, as ee
+	 * Evaluation Tokens are <i>not</i> filtered with the TOKEN-BLACKLIST, as we
 	 * want to evaluate <i>all</i> tokens, that are printed out, too. This set
 	 * of evaluation-tokens is set if and only if, AHRD is run in Evaluator-Mode
 	 * and this BlastResult is the best scoring of the Blast-Search-Result, it
@@ -75,8 +75,9 @@ public class BlastResult implements Comparable<BlastResult> {
 		setBlastDatabaseName(blastDatabaseName);
 	}
 
-	public BlastResult(String accession, String description) {
+	public BlastResult(String blastDbName, String accession, String description) {
 		super();
+		setBlastDatabaseName(blastDbName);
 		setAccession(accession);
 		setDescription(description);
 	}
@@ -142,10 +143,11 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public void tokenize() {
+		System.out.println("Blast-DB-Name: " + getBlastDatabaseName());
 		List<String> tknBlackList = getSettings().getTokenBlackList(
 				getBlastDatabaseName());
-		for (String tokenCandidate : new HashSet<String>(Arrays
-				.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
+		for (String tokenCandidate : new HashSet<String>(
+				Arrays.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
 			tokenCandidate = tokenCandidate.toLowerCase();
 			if (passesBlacklist(tokenCandidate, tknBlackList))
 				getTokens().add(tokenCandidate);
@@ -273,6 +275,9 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public void setBlastDatabaseName(String blastDatabaseName) {
+		if (blastDatabaseName == null)
+			throw new IllegalArgumentException(
+					"Blast-Database-Name must not be NULL.");
 		this.blastDatabaseName = blastDatabaseName;
 	}
 
