@@ -143,7 +143,6 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public void tokenize() {
-		System.out.println("Blast-DB-Name: " + getBlastDatabaseName());
 		List<String> tknBlackList = getSettings().getTokenBlackList(
 				getBlastDatabaseName());
 		for (String tokenCandidate : new HashSet<String>(

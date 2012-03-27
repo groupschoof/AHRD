@@ -27,22 +27,14 @@ public class TokenScoreCalculator {
 
 	public static boolean passesBlacklist(String token, List<String> blacklist) {
 		// No Token passes being NULL or empty String
-		System.out.println("1");
 		boolean passed = (token != null && !token.equals(""));
-		System.out.println("2");
 		Iterator<String> i = blacklist.iterator();
-		System.out.println("3");
 		while (i.hasNext() && passed) {
-			System.out.println("4");
 			Pattern p = Pattern.compile(i.next());
-			System.out.println("5");
 			Matcher m = p.matcher(token);
-			System.out.println("6");
 			// A Match against a blacklisted RegExp lets the token fail:
 			passed = !m.find();
-			System.out.println("7");
 		}
-		System.out.println("8");
 		return passed;
 	}
 
