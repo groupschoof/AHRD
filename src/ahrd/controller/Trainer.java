@@ -149,7 +149,15 @@ public class Trainer extends Evaluator {
 	 * the euclidean distance in the parameter-space Instance.
 	 */
 	public void initNeighbouringSettings() {
-		getSettings().setParameters(getAcceptedParameters().neighbour());
+		getSettings().setParameters(
+				getAcceptedParameters().neighbour(
+						diffEvalScoreToLastEvaluatedParams()));
+	}
+
+	public Double diffEvalScoreToLastEvaluatedParams() {
+		return (getAcceptedParameters() != null) ? getSettings()
+				.getAvgEvaluationScore()
+				- getAcceptedParameters().getAvgEvaluationScore() : 0.0;
 	}
 
 	/**
@@ -170,8 +178,7 @@ public class Trainer extends Evaluator {
 		// If not, generate Acceptance-Probability based on Score-Difference and
 		// current Temperature:
 		if (getAcceptedParameters() != null
-				&& getSettings().getAvgEvaluationScore() < getAcceptedParameters()
-						.getAvgEvaluationScore()) {
+				&& diffEvalScoreToLastEvaluatedParams() < 0.0) {
 			double scoreDiff = getAcceptedParameters().getAvgEvaluationScore()
 					- getSettings().getAvgEvaluationScore();
 			p = Math.exp(-(scoreDiff * sf) / getSettings().getTemperature());

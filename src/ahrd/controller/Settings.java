@@ -6,6 +6,8 @@ import static ahrd.controller.Utils.readFile;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +70,7 @@ public class Settings implements Cloneable {
 	public static final String MUTATOR_DEVIATION_KEY = "mutator_deviation";
 	public static final String NO_START_POSITIONS_IN_PARAM_SPACE = "no_start_positions_in_parameter_space";
 	public static final String REMEMBER_SIMULATED_ANNEALING_PATH_KEY = "remember_simulated_annealing_path";
+	public static final String P_MUTATE_SAME_PARAMETER_SCALE_KEY = "p_mutate_same_parameter_scale";
 	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
 	public static final String OUTPUT_FASTA_KEY = "output_fasta";
 
@@ -97,6 +100,7 @@ public class Settings implements Cloneable {
 	 */
 	private Double fMeasureBetaParameter = 1.0;
 	private Map<String, Map<String, String>> blastDbSettings = new HashMap<String, Map<String, String>>();
+	private List<String> sortedBlastDatabaseNames;
 	private Map<String, List<String>> blastResultsBlacklists = new HashMap<String, List<String>>();
 	private Map<String, List<String>> blastResultsFilter = new HashMap<String, List<String>>();
 	private Map<String, List<String>> tokenBlacklists = new HashMap<String, List<String>>();
@@ -131,6 +135,16 @@ public class Settings implements Cloneable {
 	 * distributed and has the following standard deviation:
 	 */
 	private Double mutatorDeviation = 0.25;
+	/**
+	 * If the last optimization step was done with better performing parameters,
+	 * randomly decide to mutate the same Parameter to generate a new Neighbor
+	 * in Parameter-Space. By this simulated annealing walks more likely uphill
+	 * in Parameter-Score-Space. The probability P('Mutate same Parameter') :=
+	 * 0, if score was not increased, (exp(1-increase.score)+s)/(exp(0)+s) else
+	 * 
+	 * This is the scaling parameter s in above formula.
+	 */
+	private Double pMutateSameParameterScale = 0.7;
 	/**
 	 * Break with the classic simulated annealing approach and remember each
 	 * visited Parameter-Set and its score. This enables speeding up the
@@ -249,6 +263,9 @@ public class Settings implements Cloneable {
 				&& Boolean.parseBoolean(input.get(
 						REMEMBER_SIMULATED_ANNEALING_PATH_KEY).toString()))
 			this.rememberSimulatedAnnealingPath = true;
+		if (input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY) != null)
+			setpMutateSameParameterScale(Double.parseDouble((String) input
+					.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY)));
 		// Evaluation or Optimization might be interested in the highest
 		// possibly achievable evaluation-score:
 		if (input.get(FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY) != null
@@ -323,6 +340,20 @@ public class Settings implements Cloneable {
 	 */
 	public Set<String> getBlastDatabases() {
 		return this.blastDbSettings.keySet();
+	}
+
+	/**
+	 * @return List<String> - The alphabetically sorted List of
+	 *         Blast-Database-Names.
+	 */
+	public List<String> getSortedBlastDatabases() {
+		// Only sort ONCE:
+		if (this.sortedBlastDatabaseNames == null) {
+			this.sortedBlastDatabaseNames = new ArrayList<String>(
+					getBlastDatabases());
+			Collections.sort(this.sortedBlastDatabaseNames);
+		}
+		return this.sortedBlastDatabaseNames;
 	}
 
 	public Integer getBlastDbWeight(String blastDatabaseName) {
@@ -626,4 +657,11 @@ public class Settings implements Cloneable {
 		this.pathToSimulatedAnnealingPathLog = pathToSimulatedAnnealingPathLog;
 	}
 
+	public Double getpMutateSameParameterScale() {
+		return pMutateSameParameterScale;
+	}
+
+	public void setpMutateSameParameterScale(Double pMutateSameParameterScale) {
+		this.pMutateSameParameterScale = pMutateSameParameterScale;
+	}
 }

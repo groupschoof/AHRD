@@ -27,6 +27,32 @@ public class ParametersTest {
 	}
 
 	@Test
+	public void testPMutateSameParameter() {
+		assertEquals(0.7685474, Parameters.pMutateSameParameter(0.5), 0.000001);
+		assertEquals(0, Parameters.pMutateSameParameter(0.0), 0.0);
+		assertEquals(0, Parameters.pMutateSameParameter(-0.1), 0.0);
+	}
+
+	@Test
+	public void testParameterToMutateRandomIndex() {
+		Parameters p = getSettings().getParameters();
+		Set<Integer> inds = new HashSet<Integer>();
+		for (int i = 0; i < 300; i++) {
+			inds.add(p.parameterToMutateRandomIndex());
+		}
+		assertEquals(10, inds.size());
+		// Parameter-Indices: 0..3 + 2 * 3 (#Blast-Databases) = 10
+		// Indices 0 to 9 should all be present:
+		for (int r = 0; r < 10; r++) {
+			assertTrue(
+					"Parameter-Index "
+							+ r
+							+ " should be present in Set of randomly selected Parameter-Indices.",
+					inds.contains(r));
+		}
+	}
+
+	@Test
 	public void testNormalizeTokenScoreWeights() {
 		Parameters p = getSettings().getParameters();
 		p.setTokenScoreBitScoreWeight(0.5);
@@ -50,15 +76,14 @@ public class ParametersTest {
 					.put(blastDB, new Integer(p.getBlastDbWeight(blastDB)));
 		}
 		// test:
-		p.mutateBlastDatabaseWeight();
-		boolean oneMutated = false;
 		for (String blastDB : p.getBlastDatabases()) {
-			oneMutated = oneMutated
-					|| !origDbWeights.get(blastDB).equals(
-							p.getBlastDbWeight(blastDB));
+			p.mutateBlastDatabaseWeight(blastDB);
+			assertTrue(
+					"Blast-Database-Weights of Blast-Database " + blastDB
+							+ " should be mutated",
+					!origDbWeights.get(blastDB).equals(
+							p.getBlastDbWeight(blastDB)));
 		}
-		assertTrue("One of all Blast-Database-Weights should be mutated",
-				oneMutated);
 	}
 
 	@Test
@@ -88,16 +113,14 @@ public class ParametersTest {
 					new Double(p.getDescriptionScoreBitScoreWeight(blastDB)));
 		}
 		// test:
-		p.mutateDescriptionScoreBitScoreWeight();
-		boolean oneMutated = false;
 		for (String blastDB : p.getBlastDatabases()) {
-			oneMutated = oneMutated
-					|| !origDsBsWs.get(blastDB).equals(
-							p.getDescriptionScoreBitScoreWeight(blastDB));
+			p.mutateDescriptionScoreBitScoreWeight(blastDB);
+			assertTrue(
+					"Blast-Database-Description-Score-Bit-Score-Weights of Blast-DB "
+							+ blastDB + " should have been mutated.",
+					!origDsBsWs.get(blastDB).equals(
+							p.getDescriptionScoreBitScoreWeight(blastDB)));
 		}
-		assertTrue(
-				"One of all Blast-Database-Description-Score-Bit-Score-Weights should be mutated.",
-				oneMutated);
 	}
 
 	@Test
@@ -144,7 +167,7 @@ public class ParametersTest {
 				1.0,
 				p.getTokenScoreBitScoreWeight()
 						+ p.getTokenScoreDatabaseScoreWeight()
-						+ p.getTokenScoreOverlapScoreWeight(), 0.0001);
+						+ p.getTokenScoreOverlapScoreWeight(), 0.001);
 		assertTrue(
 				"All three Token-Score-Weights should have changed.",
 				!dbsw.equals(p.getTokenScoreDatabaseScoreWeight())
@@ -175,8 +198,8 @@ public class ParametersTest {
 	@Test
 	public void testNeighbour() {
 		// test
-		Parameters n = getSettings().getParameters().neighbour();
-		assertNotNull(n);
+		Parameters n = getSettings().getParameters().neighbour(0.0);
+		assertNotNull("The neighbor of current Settings mus not be NULL.", n);
 		assertTrue(
 				"The neighbour of current Settings must not be the same object as Settings. - Expecting a slightly changed CLONE!",
 				!n.equals(getSettings().getParameters()));
@@ -202,6 +225,55 @@ public class ParametersTest {
 						|| !n.getDescriptionScorePatternFactorWeight().equals(
 								s.getDescriptionScorePatternFactorWeight())
 						|| blastParamDiff);
+		// Extreme Score-Increase should result in mutation of the same
+		// parameter:
+		for (int paramInd = 0; paramInd < 10; paramInd++) {
+			n.setLastMutatedParameter(paramInd);
+			Parameters n2 = n.neighbour(1.0);
+			assertEquals(
+					"The neighbor must remember which Parameter has been mutated to evolve him from its parent.",
+					new Integer(paramInd), n2.getLastMutatedParameter());
+			if (paramInd == 0)
+				assertTrue(
+						"DescriptionScorePatternFactorWeight should have been mutated.",
+						!n.getDescriptionScorePatternFactorWeight().equals(
+								n2.getDescriptionScorePatternFactorWeight()));
+			else if (paramInd == 1)
+				assertTrue(
+						"TokenScoreBitScoreWeight should have been mutated.",
+						!n.getTokenScoreBitScoreWeight().equals(
+								n2.getTokenScoreBitScoreWeight()));
+			else if (paramInd == 2)
+				assertTrue(
+						"TokenScoreDatabaseScoreWeight should have been mutated.",
+						!n.getTokenScoreDatabaseScoreWeight().equals(
+								n2.getTokenScoreDatabaseScoreWeight()));
+			else if (paramInd == 3)
+				assertTrue(
+						"TokenScoreOverlapScoreWeight should have been mutated.",
+						!n.getTokenScoreOverlapScoreWeight().equals(
+								n2.getTokenScoreOverlapScoreWeight()));
+			else if (paramInd > 3) {
+				String blastDbName = getSettings().getSortedBlastDatabases()
+						.get((new Double(Math.floor((paramInd - 4) / 2.0)))
+								.intValue());
+				boolean mutatedBlastDbWeight = paramInd % 2 == 0;
+				if (mutatedBlastDbWeight)
+					assertTrue(
+							"BlastDatabaseWeight of db " + blastDbName
+									+ " should have been mutated.",
+							!n.getBlastDbWeight(blastDbName).equals(
+									n2.getBlastDbWeight(blastDbName)));
+				else
+					assertTrue(
+							"DescriptionScoreBitScoreWeight of db "
+									+ blastDbName
+									+ " should have been mutated.",
+							!n.getDescriptionScoreBitScoreWeight(blastDbName)
+									.equals(n2
+											.getDescriptionScoreBitScoreWeight(blastDbName)));
+			}
+		}
 	}
 
 	@Test

@@ -211,6 +211,11 @@ public class TrainerBatcher extends Batcher {
 		if (getInput().get(Settings.MUTATOR_DEVIATION_KEY) != null)
 			batchYml.put(Settings.MUTATOR_DEVIATION_KEY, (String) getInput()
 					.get(Settings.MUTATOR_DEVIATION_KEY));
+		if (getInput().get(Settings.P_MUTATE_SAME_PARAMETER_SCALE_KEY) != null)
+			batchYml.put(
+					Settings.P_MUTATE_SAME_PARAMETER_SCALE_KEY,
+					(String) getInput().get(
+							Settings.P_MUTATE_SAME_PARAMETER_SCALE_KEY));
 
 		// Path to Batch's YML-File:
 		batchYml.put(PATH_TO_BATCH_YML_KEY, generatePathToBatchYml(batchName));
