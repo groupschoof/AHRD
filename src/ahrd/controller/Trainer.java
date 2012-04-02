@@ -234,25 +234,33 @@ public class Trainer extends Evaluator {
 	 * @Note: Settings are cloned to avoid changing parameters, we want to
 	 *        remember unchanged!
 	 * 
-	 * @return int - 0, if current Settings were NOT accepted, 1, if they were
-	 *         better performing and therefore accepted, -1, if they performed
-	 *         worse than the currently accepted Settings, but were accepted in
-	 *         spite of this.
+	 * @return int -
+	 *         <ul>
+	 *         <li>0 Rejected worse performing parameters</li>
+	 *         <li>1 Accepted worse performing parameters</li>
+	 *         <li>2 Accepted equally well performing parameters</li>
+	 *         <li>3 Accepted better performing parameters</li>
+	 *         </ul>
 	 */
 	public int acceptOrRejectParameters() {
-		int accepted = 0;
+		int accepted = 0; // Rejected worse performing parameters
 		double acceptCurrSettingsProb = acceptanceProbability();
 		if (acceptCurrSettingsProb == 1.0) {
+			if (getAcceptedParameters() == null
+					|| getAcceptedParameters().getAvgEvaluationScore() < getSettings()
+							.getAvgEvaluationScore()) {
+				accepted = 3; // Accepted better performing parameters
+			} else {
+				accepted = 2; // Accepted equally well performing parameters
+			}
 			setAcceptedParameters(getSettings().getParameters().clone());
-			accepted = 1;
 		} else {
 			// Take random decision
 			Random r = Utils.random;
 			if (r.nextDouble() <= acceptCurrSettingsProb) {
 				setAcceptedParameters(getSettings().getParameters().clone());
-				accepted = -1;
-			} else
-				accepted = 0;
+				accepted = 1; // Accepted worse performing parameters
+			}
 			// else discard the current Settings and continue with the so far
 			// optimal ones.
 		}

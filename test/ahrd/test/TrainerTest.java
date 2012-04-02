@@ -134,8 +134,8 @@ public class TrainerTest {
 		assertEquals(getSettings().getParameters(),
 				this.trainer.getAcceptedParameters());
 		assertEquals(
-				"The currently evaluated Settings were the first and thus must have been accepted with probability 1.0. Returned int should thus be 1.",
-				1, a);
+				"The currently evaluated Settings were the first and thus must have been accepted with probability 1.0. Returned int should thus be 3.",
+				3, a);
 		this.trainer.initNeighbouringSettings();
 		getSettings().setAvgEvaluationScore(0.75);
 		assertTrue(
@@ -144,8 +144,8 @@ public class TrainerTest {
 						this.trainer.getAcceptedParameters()));
 		a = this.trainer.acceptOrRejectParameters();
 		assertEquals(
-				"The currently evaluated Settings were better than the currently accepted Settings and thus must have been accepted with probability 1.0. Returned int should thus be 1.",
-				1, a);
+				"The currently evaluated Settings were better than the currently accepted Settings and thus must have been accepted with probability 1.0. Returned int should thus be 3.",
+				3, a);
 		assertEquals(getSettings().getParameters(),
 				this.trainer.getAcceptedParameters());
 		// Verify, that some worse performing settings get sometimes accepted or
@@ -176,11 +176,11 @@ public class TrainerTest {
 				+ "B(0|p=0.5,n=50) < 0.0000000000000009";
 		assertTrue(
 				"A worse parameter set should have never be accpeted with probability 1.0, which is only applied to better performing parameter-sets",
-				!as.contains(1.0));
+				!as.contains(3.0) && !as.contains(2.0));
 		// 50 iterations should have accepted or rejected at least once
 		assertTrue(
 				"50 iterations should have accepted worse performing settings least once. - "
-						+ errMsg, as.contains(-1));
+						+ errMsg, as.contains(1));
 		assertTrue(
 				"50 iterations should have rejected worse performing settings least once - "
 						+ errMsg, as.contains(0));
