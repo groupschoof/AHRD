@@ -91,20 +91,19 @@ public class TokenScoreCalculatorTest {
 		assertEquals(88.0,
 				tsc.getCumulativeTokenBitScores().get("token_three"), 0);
 		// test cum.BlastDatabaseScore
-		assertEquals(150,
-				tsc.getCumulativeTokenBlastDatabaseScores().get("token_one"), 0);
-		assertEquals(60,
-				tsc.getCumulativeTokenBlastDatabaseScores().get("token_two"), 0);
-		assertEquals(10,
-				tsc.getCumulativeTokenBlastDatabaseScores().get("token_three"),
-				0);
+		assertEquals(150, tsc.getCumulativeTokenBlastDatabaseScores().get(
+				"token_one"), 0);
+		assertEquals(60, tsc.getCumulativeTokenBlastDatabaseScores().get(
+				"token_two"), 0);
+		assertEquals(10, tsc.getCumulativeTokenBlastDatabaseScores().get(
+				"token_three"), 0);
 		// test cum.OverlapScores:
-		assertEquals(0.425,
-				tsc.getCumulativeTokenOverlapScores().get("token_one"), 0);
+		assertEquals(0.425, tsc.getCumulativeTokenOverlapScores().get(
+				"token_one"), 0);
 		assertEquals(0.5800000000000001, tsc.getCumulativeTokenOverlapScores()
 				.get("token_two"), 0);
-		assertEquals(0.455,
-				tsc.getCumulativeTokenOverlapScores().get("token_three"), 0);
+		assertEquals(0.455, tsc.getCumulativeTokenOverlapScores().get(
+				"token_three"), 0);
 	}
 
 	@Test
@@ -150,12 +149,12 @@ public class TokenScoreCalculatorTest {
 		// Call method to test:
 		p.getTokenScoreCalculator().assignTokenScores();
 		// Assert expectations
-		assertTrue(p.getTokenScoreCalculator().getTokenScores()
-				.containsKey("one"));
-		assertTrue(p.getTokenScoreCalculator().getTokenScores()
-				.containsKey("two"));
-		assertTrue(p.getTokenScoreCalculator().getTokenScores()
-				.containsKey("three"));
+		assertTrue(p.getTokenScoreCalculator().getTokenScores().containsKey(
+				"one"));
+		assertTrue(p.getTokenScoreCalculator().getTokenScores().containsKey(
+				"two"));
+		assertTrue(p.getTokenScoreCalculator().getTokenScores().containsKey(
+				"three"));
 		assertTrue(p.getTokenScoreCalculator().getTokenHighScore() > 0);
 		assertEquals(0.22666666666666668, p.getTokenScoreCalculator()
 				.getTokenHighScore(), 0.0);
@@ -198,22 +197,27 @@ public class TokenScoreCalculatorTest {
 	public void testValidationOfTokenScoreWeights() {
 		Protein p = TestUtils.mockProtein();
 		TokenScoreCalculator tsc = p.getTokenScoreCalculator();
+		String token = "foo";
+		// Init cumulative scores:
+		tsc.getCumulativeTokenBitScores().put(token, 0.5);
+		tsc.getCumulativeTokenBlastDatabaseScores().put(token, 0.5);
+		tsc.getCumulativeTokenOverlapScores().put(token, 0.5);
+
 		getSettings().setTokenScoreBitScoreWeight(0.5);
 		getSettings().setTokenScoreDatabaseScoreWeight(0.5);
-		getSettings().setTokenScoreOverlapScoreWeight(0.00011);
-
+		getSettings().setTokenScoreOverlapScoreWeight(0.0011);
 		try {
 			tsc.tokenScore("foo", "swissprot");
-			fail("Validation of the three weights in the formula Token-Score failed. Their sum should be >= 0.999 and <= 1.0001");
+			fail("Validation of the three weights in the formula Token-Score failed. Their sum should be >= 0.999 and <= 1.001");
 		} catch (IllegalArgumentException expectedException) {
 		}
 
 		getSettings().setTokenScoreBitScoreWeight(0.5);
 		getSettings().setTokenScoreDatabaseScoreWeight(0.3);
-		getSettings().setTokenScoreOverlapScoreWeight(0.1998);
+		getSettings().setTokenScoreOverlapScoreWeight(0.198);
 		try {
-			tsc.tokenScore("foo", "swissprot");
-			fail("Validation of the three weights in the formula Token-Score failed. Their sum should be >= 0.999 and <= 1.0001");
+			tsc.tokenScore(token, "swissprot");
+			fail("Validation of the three weights in the formula Token-Score failed. Their sum should be >= 0.999 and <= 1.001");
 		} catch (IllegalArgumentException expectedException) {
 		}
 
@@ -224,20 +228,20 @@ public class TokenScoreCalculatorTest {
 
 		getSettings().setTokenScoreBitScoreWeight(0.5);
 		getSettings().setTokenScoreDatabaseScoreWeight(0.5);
-		getSettings().setTokenScoreOverlapScoreWeight(0.0001);
+		getSettings().setTokenScoreOverlapScoreWeight(0.001);
 		try {
-			tsc.tokenScore("foo", "swissprot");
+			tsc.tokenScore(token, "swissprot");
 		} catch (IllegalArgumentException expectedException) {
-			fail("Validation of the three weights in the formula Token-Score failed. It is too restrictive, a delta of 0.0001 has to be excepted.");
+			fail("Validation of the three weights in the formula Token-Score failed. It is too restrictive, a delta of 0.001 has to be excepted.");
 		}
 
 		getSettings().setTokenScoreBitScoreWeight(0.5);
 		getSettings().setTokenScoreDatabaseScoreWeight(0.3);
-		getSettings().setTokenScoreOverlapScoreWeight(0.1999);
+		getSettings().setTokenScoreOverlapScoreWeight(0.199);
 		try {
-			tsc.tokenScore("foo", "swissprot");
+			tsc.tokenScore(token, "swissprot");
 		} catch (IllegalArgumentException expectedException) {
-			fail("Validation of the three weights in the formula Token-Score failed. It is too restrictive, a delta of 0.0001 has to be excepted.");
+			fail("Validation of the three weights in the formula Token-Score failed. It is too restrictive, a delta of 0.001 has to be excepted.");
 		}
 	}
 }

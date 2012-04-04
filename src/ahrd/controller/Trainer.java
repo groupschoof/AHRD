@@ -180,9 +180,13 @@ public class Trainer extends Evaluator {
 		// current Temperature:
 		if (getAcceptedParameters() != null
 				&& diffEvalScoreToCurrentlyAcceptedParams() < 0.0) {
-			double scoreDiff = getAcceptedParameters().getAvgEvaluationScore()
-					- getSettings().getAvgEvaluationScore();
-			p = Math.exp(-(scoreDiff * sf) / getSettings().getTemperature());
+			// In this case the difference in avg. evaluation scores of current
+			// to accepted parameters is always NEGATIVE.
+			// Hence the following formula can be written as:
+			// p := exp(-(delta.scores*sf)/T.curr), where delta.score is a
+			// positive real value.
+			p = Math.exp(diffEvalScoreToCurrentlyAcceptedParams() * sf
+					/ getSettings().getTemperature());
 		}
 		return p;
 	}
