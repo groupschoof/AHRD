@@ -44,7 +44,7 @@ public class TrainerOutputWriter {
 			hdr += "Average Maximum-Evaluation-Score\t";
 		hdr += "Average Evaluation-Score";
 		if (!isFinalOutput)
-			hdr += "\tAccepted";
+			hdr += "\tDiff-to-curr-Accepted\tAccepted";
 		hdr += "\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Pattern-Factor-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
 		for (String blastDb : this.sortedBlastDatabases) {
 			hdr += "\t" + blastDb + "-Weight";
@@ -54,9 +54,11 @@ public class TrainerOutputWriter {
 		return hdr;
 	}
 
-	public void writeIterationOutput(Settings currentSettings, int accepted)
+	public void writeIterationOutput(Settings currentSettings,
+			double diffAvgEvalScoreToCurrAccepted, int accepted)
 			throws IOException {
-		this.pathBufWrtr.write(settingsRow(currentSettings, accepted));
+		this.pathBufWrtr.write(settingsRow(currentSettings,
+				diffAvgEvalScoreToCurrAccepted, accepted));
 	}
 
 	/**
@@ -84,9 +86,11 @@ public class TrainerOutputWriter {
 		this.outBufWrtr.close();
 	}
 
-	public String settingsRow(Settings s, int accepted) {
+	public String settingsRow(Settings s,
+			double diffAvgEvalScoreToCurrAccepted, int accepted) {
 		String col = s.getTemperature().toString() + "\t"
-				+ s.getAvgEvaluationScore() + "\t" + accepted + "\t"
+				+ s.getAvgEvaluationScore() + "\t"
+				+ diffAvgEvalScoreToCurrAccepted + "\t" + accepted + "\t"
 				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
 				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
 				+ FRMT.format(s.getDescriptionScorePatternFactorWeight())

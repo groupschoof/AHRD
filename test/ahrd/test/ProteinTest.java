@@ -68,8 +68,8 @@ public class ProteinTest {
 		assertEquals(
 				"Constructed protein should have it's Accession correctly set",
 				"MySequence", prot.getAccession());
-		assertEquals(((new Integer(sequence.length())).longValue()),
-				(prot.getSequenceLength().longValue()));
+		assertEquals(((new Integer(sequence.length())).longValue()), (prot
+				.getSequenceLength().longValue()));
 		// In order to save memory, when not writing output in fasta-format,
 		// ensure the AA-sequences are not held in memory:
 		assertNull(
@@ -101,16 +101,17 @@ public class ProteinTest {
 		assertEquals(
 				"Constructed protein should have it's Accession correctly set",
 				"MySequence", prot.getAccession());
-		assertEquals(((new Integer(sequence.length())).longValue()),
-				(prot.getSequenceLength().longValue()));
-		assertNotNull("Protein should have its AA-sequence set.",
-				prot.getSequence());
+		assertEquals(((new Integer(sequence.length())).longValue()), (prot
+				.getSequenceLength().longValue()));
+		assertNotNull("Protein should have its AA-sequence set.", prot
+				.getSequence());
 		assertEquals(
 				"The Protein's AA-Sequence mustn't be changed, except for stripped newlines.",
 				sequence, prot.getSequence());
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testInitialisationOfProteinsFromFasta() throws IOException,
 			MissingAccessionException {
 		TestUtils.initTestSettings();

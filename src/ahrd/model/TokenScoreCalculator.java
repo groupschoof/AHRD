@@ -124,8 +124,8 @@ public class TokenScoreCalculator {
 			Double overlapScore = TokenScoreCalculator.overlapScore(br
 					.getStart(), br.getEnd(), getProtein().getSequenceLength());
 			addCumulativeTokenBitScore(token, br.getBitScore());
-			addCumulativeTokenBlastDatabaseScore(token,
-					br.getBlastDatabaseName());
+			addCumulativeTokenBlastDatabaseScore(token, br
+					.getBlastDatabaseName());
 			addCumulativeTokenOverlapScore(token, overlapScore);
 		}
 	}
@@ -159,7 +159,8 @@ public class TokenScoreCalculator {
 				.getTokenScoreOverlapScoreWeight();
 		double validateSumToOne = roundToNDecimalPlaces(bitScoreWeight
 				+ databaseScoreWeight + overlapScoreWeight, 9);
-		if (!(validateSumToOne >= 0.9999 && validateSumToOne <= 1.0001))
+		// Tolerate rounding error <= 10^-3
+		if (!(validateSumToOne >= 0.999 && validateSumToOne <= 1.001))
 			throw new IllegalArgumentException(
 					"The three weights 'bitScoreWeight', 'databaseScoreWeight', and 'overlapScoreWeight' should sum up to 1, but actually sum up to: "
 							+ (bitScoreWeight + databaseScoreWeight + overlapScoreWeight));

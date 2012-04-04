@@ -50,9 +50,9 @@ public class Trainer extends Evaluator {
 			// Write final output
 			Settings bestSettings = getSettings().clone();
 			bestSettings.setParameters(trainer.getBestParameters());
-			trainer.outWriter.writeFinalOutput(bestSettings,
-					trainer.getAvgMaxEvaluationScore(),
-					trainer.getBestParametersFoundAtTemperature());
+			trainer.outWriter.writeFinalOutput(bestSettings, trainer
+					.getAvgMaxEvaluationScore(), trainer
+					.getBestParametersFoundAtTemperature());
 			System.out
 					.println("Logged path through parameter- and score-space into:\n"
 							+ getSettings()
@@ -121,6 +121,7 @@ public class Trainer extends Evaluator {
 			int acceptedCurrParameters = acceptOrRejectParameters();
 			// Write output of current iteration:
 			this.outWriter.writeIterationOutput(getSettings(),
+					diffEvalScoreToCurrentlyAcceptedParams(),
 					acceptedCurrParameters);
 			// Try a slightly changes set of Parameters:
 			initNeighbouringSettings();
@@ -151,10 +152,10 @@ public class Trainer extends Evaluator {
 	public void initNeighbouringSettings() {
 		getSettings().setParameters(
 				getAcceptedParameters().neighbour(
-						diffEvalScoreToLastEvaluatedParams()));
+						diffEvalScoreToCurrentlyAcceptedParams()));
 	}
 
-	public Double diffEvalScoreToLastEvaluatedParams() {
+	public Double diffEvalScoreToCurrentlyAcceptedParams() {
 		return (getAcceptedParameters() != null) ? getSettings()
 				.getAvgEvaluationScore()
 				- getAcceptedParameters().getAvgEvaluationScore() : 0.0;
@@ -178,7 +179,7 @@ public class Trainer extends Evaluator {
 		// If not, generate Acceptance-Probability based on Score-Difference and
 		// current Temperature:
 		if (getAcceptedParameters() != null
-				&& diffEvalScoreToLastEvaluatedParams() < 0.0) {
+				&& diffEvalScoreToCurrentlyAcceptedParams() < 0.0) {
 			double scoreDiff = getAcceptedParameters().getAvgEvaluationScore()
 					- getSettings().getAvgEvaluationScore();
 			p = Math.exp(-(scoreDiff * sf) / getSettings().getTemperature());

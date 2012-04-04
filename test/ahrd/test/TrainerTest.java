@@ -121,20 +121,20 @@ public class TrainerTest {
 	public void testDiffEvalScoreToLastEvaluatedParams() {
 		getSettings().setAvgEvaluationScore(0.5);
 		// test first iteration, when accepted Settings are null:
-		assertEquals(0.0, trainer.diffEvalScoreToLastEvaluatedParams(), 0.0);
+		assertEquals(0.0, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
 		// test current Settings equal well performing than accepted ones:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		assertEquals(0.0, trainer.diffEvalScoreToLastEvaluatedParams(), 0.0);
+		assertEquals(0.0, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
 		// test current Settings better than accepted:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
 		getSettings().setAvgEvaluationScore(1.0);
-		assertEquals(0.5, trainer.diffEvalScoreToLastEvaluatedParams(), 0.0);
+		assertEquals(0.5, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
 		// test current Settings worse than accepted ones:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
 		trainer.getAcceptedParameters().setAvgEvaluationScore(0.5);
 		getSettings().setAvgEvaluationScore(0.25);
 		// 0.25 - 0.5 = -0.25
-		assertEquals(-0.25, trainer.diffEvalScoreToLastEvaluatedParams(), 0.0);
+		assertEquals(-0.25, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
 	}
 
 	@Test
