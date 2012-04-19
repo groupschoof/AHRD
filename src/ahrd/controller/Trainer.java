@@ -115,13 +115,15 @@ public class Trainer extends Evaluator {
 			if (getSettings().rememberSimulatedAnnealingPath())
 				getTestedParameters()
 						.add(getSettings().getParameters().clone());
+			// Remember difference in avg. evaluation-scores, *before* accepting
+			// or rejecting current Parameters:
+			Double diffScores = diffEvalScoreToCurrentlyAcceptedParams();
 			// Initialize the next iteration.
 			// Find locally optimal (according to objective function)
 			// Parameters:
 			int acceptedCurrParameters = acceptOrRejectParameters();
 			// Write output of current iteration:
-			this.outWriter.writeIterationOutput(getSettings(),
-					diffEvalScoreToCurrentlyAcceptedParams(),
+			this.outWriter.writeIterationOutput(getSettings(), diffScores,
 					acceptedCurrParameters);
 			// Try a slightly changes set of Parameters:
 			initNeighbouringSettings();
