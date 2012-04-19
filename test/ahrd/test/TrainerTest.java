@@ -118,7 +118,7 @@ public class TrainerTest {
 	}
 
 	@Test
-	public void testDiffEvalScoreToLastEvaluatedParams() {
+	public void testDiffEvalScoreToCurrentlyAcceptedParams() {
 		getSettings().setAvgEvaluationScore(0.5);
 		// test first iteration, when accepted Settings are null:
 		assertEquals(0.0, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
