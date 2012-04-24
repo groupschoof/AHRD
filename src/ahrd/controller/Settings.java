@@ -55,6 +55,7 @@ public class Settings implements Cloneable {
 	public static final String WRITE_SCORES_TO_OUTPUT = "write_scores_to_output";
 	public static final String WRITE_BEST_BLAST_HITS_TO_OUTPUT = "write_best_blast_hits_to_output";
 	public static final String WRITE_TOKEN_SET_TO_OUTPUT = "write_token_set_to_output";
+	public static final String HRD_SCORES_OUTPUT_PATH = "hrd_scores_output";
 	public static final String TOKEN_SCORE_BIT_SCORE_WEIGHT = "token_score_bit_score_weight";
 	public static final String TOKEN_SCORE_DATABASE_SCORE_WEIGHT = "token_score_database_score_weight";
 	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT = "token_score_overlap_score_weight";
@@ -84,6 +85,11 @@ public class Settings implements Cloneable {
 	private String pathToGeneOntologyResults;
 	private String pathToOutput;
 	/**
+	 * File to write the AHRD-Scores of each BlastHit's Description into, if
+	 * requested.
+	 */
+	private String pathToHRDScoresOutput;
+	/**
 	 * Trainer logs path through parameter- and score-space into this file:
 	 */
 	private String pathToSimulatedAnnealingPathLog;
@@ -94,6 +100,10 @@ public class Settings implements Cloneable {
 	private Parameters parameters = new Parameters();
 	private Boolean writeTokenSetToOutput;
 	private Boolean writeBestBlastHitsToOutput;
+	/**
+	 * Forces AHRD to write out all internal scores (Sum(Token-Scores),
+	 * Description- and Lexical-Scores, etc.
+	 */
 	private Boolean writeScoresToOutput;
 	/**
 	 * F-Measure's Beta-Parameter as set in the input.yml or default 1.0
@@ -188,6 +198,9 @@ public class Settings implements Cloneable {
 		setPathToGeneOntologyResults((String) input
 				.get(GENE_ONTOLOGY_RESULT_KEY));
 		setPathToOutput((String) input.get(OUTPUT_KEY));
+		if (input.get(HRD_SCORES_OUTPUT_PATH) != null
+				&& !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
+			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH));
 		// Trainer logs path through parameter-space here:
 		if (input.get(SIMULATED_ANNEALING_PATH_LOG_KEY) != null)
 			setPathToSimulatedAnnealingPathLog((String) input
@@ -213,7 +226,8 @@ public class Settings implements Cloneable {
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
 			this.blastResultsBlacklists
-					.put(blastDatabaseName,
+					.put(
+							blastDatabaseName,
 							fromFile(getPathToBlastResultsBlackList(blastDatabaseName)));
 			this.blastResultsFilter.put(blastDatabaseName,
 					fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
@@ -664,4 +678,18 @@ public class Settings implements Cloneable {
 	public void setpMutateSameParameterScale(Double pMutateSameParameterScale) {
 		this.pMutateSameParameterScale = pMutateSameParameterScale;
 	}
+
+	public String getPathToHRDScoresOutput() {
+		return pathToHRDScoresOutput;
+	}
+
+	public void setPathToHRDScoresOutput(String pathToHRDScoresOutput) {
+		this.pathToHRDScoresOutput = pathToHRDScoresOutput;
+	}
+
+	public Boolean doWriteHRDScoresToOutput() {
+		return getPathToHRDScoresOutput() != null
+				&& !getPathToHRDScoresOutput().equals("");
+	}
+
 }

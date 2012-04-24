@@ -15,6 +15,8 @@ import ahrd.model.Protein;
 
 public class OutputWriter extends AbstractOutputWriter {
 
+	protected BufferedWriter hrdScoresWriter;
+
 	public OutputWriter(Collection<Protein> proteins) {
 		super(proteins);
 	}
@@ -22,14 +24,18 @@ public class OutputWriter extends AbstractOutputWriter {
 	public void writeOutput() throws IOException {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(getSettings()
 				.getPathToOutput()));
+		if (getSettings().doWriteHRDScoresToOutput())
+			writeHRDScoresOutputHeader();
 
 		// Column-Names:
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
-		bw.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
+		bw
+				.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
 
 		if (getSettings().isInTrainingMode()) {
-			bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+			bw
+					.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
@@ -38,11 +44,13 @@ public class OutputWriter extends AbstractOutputWriter {
 			bw.write("\t\"Tokens (tkn->score)\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
-			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
+			bw
+					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
-			bw.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
+			bw
+					.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
 		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
 			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
@@ -80,9 +88,53 @@ public class OutputWriter extends AbstractOutputWriter {
 			// Write row to CSV:
 			csvRow += "\n";
 			bw.write(csvRow);
+
+			// If AHRD is requested to write out the AHRD-Score of each
+			// BlastHit's Description, do so into another file:
+			if (getSettings().doWriteHRDScoresToOutput())
+				writeHrdScoresOutput(prot);
 		}
 
+		// CLEAN UP:
 		bw.close();
+		if (getSettings().doWriteHRDScoresToOutput())
+			this.hrdScoresWriter.close();
+	}
+
+	/**
+	 * AHRD can be requested to log all final AHRD-Scores of each BlastHit's
+	 * Description. This is needed for fitting a generalized extreme value
+	 * distribution to the AHRD-Scores. The fitted gevd can later be used to
+	 * calculate P-Values for the AHRD-Scores assigned to each BlastHit's
+	 * Description. This method initializes the OutputWriter for the above
+	 * scores.
+	 */
+	public void writeHRDScoresOutputHeader() throws IOException {
+		// Initialize OutputWriter:
+		hrdScoresWriter = new BufferedWriter(new FileWriter(getSettings()
+				.getPathToHRDScoresOutput()));
+		hrdScoresWriter
+				.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Score\n");
+	}
+
+	/**
+	 * AHRD can be requested to log all final AHRD-Scores of each BlastHit's
+	 * Description. This is needed for fitting a generalized extreme value
+	 * distribution to the AHRD-Scores. The fitted gevd can later be used to
+	 * calculate P-Values for the AHRD-Scores assigned to each BlastHit's
+	 * Description. This method writes the above scores for the argument
+	 * protein.
+	 * 
+	 * @throws IOException
+	 */
+	public void writeHrdScoresOutput(Protein prot) throws IOException {
+		for (String blastDatabaseName : prot.getBlastResults().keySet()) {
+			for (BlastResult br : prot.getBlastResults().get(blastDatabaseName)) {
+				this.hrdScoresWriter.write(prot.getAccession() + "\t"
+						+ br.getAccession() + "\t" + br.getDescriptionScore()
+						+ "\n");
+			}
+		}
 	}
 
 	public String buildHighestPossibleEvaluationScoreColumn(Protein prot) {
@@ -192,8 +244,8 @@ public class OutputWriter extends AbstractOutputWriter {
 							.relativeBlastScore(hsbr));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
-							.getDescLinePatternFrequencies()
-							.get(hsbr.patternize()));
+							.getDescLinePatternFrequencies().get(
+									hsbr.patternize()));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
 							.getMaxDescriptionLineFrequency());
