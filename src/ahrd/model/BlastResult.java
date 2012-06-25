@@ -35,7 +35,13 @@ public class BlastResult implements Comparable<BlastResult> {
 	private String accession;
 	private Double eValue;
 	private String description;
+	/**
+	 * Query's start position in local alignment
+	 */
 	private Integer start;
+	/**
+	 * Query's stop position in local alignment
+	 */
 	private Integer end;
 	private Double bitScore;
 	private String blastDatabaseName;

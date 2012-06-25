@@ -167,9 +167,9 @@ public class BlastSearchContentAdapter extends SearchContentAdapter {
 		} else if (theKey.equals("expectValue")) {
 			currentBlastResult.setEValue(Double
 					.valueOf(validateDouble(theValue)));
-		} else if (theKey.equals("subjectSequenceStart")) {
+		} else if (theKey.equals("querySequenceStart")) {
 			currentBlastResult.setStart(Integer.parseInt(theValue));
-		} else if (theKey.equals("subjectSequenceEnd")) {
+		} else if (theKey.equals("querySequenceEnd")) {
 			currentBlastResult.setEnd(Integer.parseInt(theValue));
 		}
 	}

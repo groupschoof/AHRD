@@ -84,7 +84,7 @@ public class BlastResultTest {
 		assertEquals(0.0, br.getEValue(), 0.0);
 		assertEquals(1095, br.getBitScore(), 0.0);
 		assertEquals(30.0, br.getStart(), 0.0);
-		assertEquals(895.0, br.getEnd(), 0.0);
+		assertEquals(828.0, br.getEnd(), 0.0);
 		assertEquals("Receptor-like protein kinase FERONIA",
 				br.getDescription());
 		// While parsing the BlastResults for a Protein, the

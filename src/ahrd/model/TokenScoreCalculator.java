@@ -38,9 +38,16 @@ public class TokenScoreCalculator {
 		return passed;
 	}
 
-	public static double overlapScore(double subjectStart, double subjectEnd,
+	/**
+	 * @param queryStart
+	 * @param queryEnd
+	 * @param queryLength
+	 * @return The proportion of the query-sequence, that is covered by the
+	 *         significant local alignment with the Blast-Hit's subject.
+	 */
+	public static double overlapScore(double queryStart, double queryEnd,
 			double queryLength) {
-		return (subjectEnd - subjectStart + 1.0) / queryLength;
+		return (queryEnd - queryStart + 1.0) / queryLength;
 	}
 
 	public TokenScoreCalculator(Protein protein) {
@@ -124,8 +131,8 @@ public class TokenScoreCalculator {
 			Double overlapScore = TokenScoreCalculator.overlapScore(br
 					.getStart(), br.getEnd(), getProtein().getSequenceLength());
 			addCumulativeTokenBitScore(token, br.getBitScore());
-			addCumulativeTokenBlastDatabaseScore(token, br
-					.getBlastDatabaseName());
+			addCumulativeTokenBlastDatabaseScore(token,
+					br.getBlastDatabaseName());
 			addCumulativeTokenOverlapScore(token, overlapScore);
 		}
 	}
