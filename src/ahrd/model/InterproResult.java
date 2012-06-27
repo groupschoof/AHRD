@@ -149,19 +149,12 @@ public class InterproResult implements Comparable<InterproResult> {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				new FileInputStream(getSettings()
 						.getPathToDomainWeightsDatabase())));
-		// int count = 0;
 		String iprID;
 		for (String line; (line = reader.readLine()) != null;) {
 			String[] entry = line.split("\t");
-			// Split each line with tab
 			iprID = entry[0];
-			// Read first entry as Interpro-ID
 			InterproResult interproEntry = getInterproDb().get(iprID);
-			// myinterproentry = getInterproDb().get(above id)
-
 			interproEntry.setDomainWeight(Double.parseDouble(entry[7]));
-			// myinterproentry.setweight(8th column from above split)
-
 		}
 	}
 
