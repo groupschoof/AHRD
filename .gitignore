@@ -23,3 +23,6 @@ test/sim_anneal_path_log.csv
 
 # Ignore VIM's Swap-Files
 *.swp
+
+# Ignore result-file of awk-script for SIMAP-Files
+IDmapping.txt
