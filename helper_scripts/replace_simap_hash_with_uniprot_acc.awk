@@ -1,3 +1,5 @@
+# USAGE: In the project's root directory execute
+# awk -f helper_scripts/replace_simap_hash_with_uniprot_acc.awk test/resources/simap_iprscn_result.txt > path/2/outputfile.txt
 BEGIN{
   FS="\t"
 	while((getline < "./test/resources/simap_hash_to_uniprot_accessions.txt") > 0){
