@@ -111,6 +111,7 @@ public class ProteinTest {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testInitialisationOfProteinsFromFasta() throws IOException,
 			MissingAccessionException {
 		TestUtils.initTestSettings();

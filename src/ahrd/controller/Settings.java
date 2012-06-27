@@ -50,6 +50,7 @@ public class Settings implements Cloneable {
 	public static final String INTERPRO_DATABASE_KEY = "interpro_database";
 	public static final String INTERPRO_RESULT_KEY = "interpro_result";
 	public static final String DOMAIN_WEIGHTS_DATABASE = "domain_weights_database";
+	public static final String INTERPRO_RESULTS_4_BLASTHITS = "interpro_results_of_blast_hits";
 	public static final String GENE_ONTOLOGY_RESULT_KEY = "gene_ontology_result";
 	public static final String OUTPUT_KEY = "output";
 	public static final String SIMULATED_ANNEALING_PATH_LOG_KEY = "path_log";
@@ -176,6 +177,11 @@ public class Settings implements Cloneable {
 	 * http://pat.kobic.re.kr/wdac/data/domain_scores.gz
 	 */
 	private String pathToDomainWeightsDatabase;
+	/**
+	 * Path to interproscan results of the Proteins referenced in the BlastHits.
+	 * This data is needed for the Domain-Scoring.
+	 */
+	private String pathToInterproResults4BlastHits;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -203,6 +209,8 @@ public class Settings implements Cloneable {
 		setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
 		setPathToDomainWeightsDatabase((String) input
 				.get(DOMAIN_WEIGHTS_DATABASE));
+		setPathToInterproResults4BlastHits((String) input
+				.get(INTERPRO_RESULTS_4_BLASTHITS));
 		setPathToGeneOntologyResults((String) input
 				.get(GENE_ONTOLOGY_RESULT_KEY));
 		setPathToOutput((String) input.get(OUTPUT_KEY));
@@ -234,7 +242,8 @@ public class Settings implements Cloneable {
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
 			this.blastResultsBlacklists
-					.put(blastDatabaseName,
+					.put(
+							blastDatabaseName,
 							fromFile(getPathToBlastResultsBlackList(blastDatabaseName)));
 			this.blastResultsFilter.put(blastDatabaseName,
 					fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
@@ -706,6 +715,15 @@ public class Settings implements Cloneable {
 	public void setPathToDomainWeightsDatabase(
 			String pathToDomainWeightsDatabase) {
 		this.pathToDomainWeightsDatabase = pathToDomainWeightsDatabase;
+	}
+
+	public String getPathToInterproResults4BlastHits() {
+		return pathToInterproResults4BlastHits;
+	}
+
+	public void setPathToInterproResults4BlastHits(
+			String pathToInterproResults4BlastHits) {
+		this.pathToInterproResults4BlastHits = pathToInterproResults4BlastHits;
 	}
 
 }

@@ -158,7 +158,7 @@ public class InterproResult implements Comparable<InterproResult> {
 			interproEntry.setDomainWeight(Double.parseDouble(entry[7]));
 		}
 	}
-
+	
 	/**
 	 * Reads in a raw Interpro-Result-File and assigns iteratively
 	 * InterproResult-instances to the Proteins, specified by their
