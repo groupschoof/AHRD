@@ -1,12 +1,14 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,9 +22,8 @@ import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Nodes;
 import nu.xom.ParsingException;
-
-import ahrd.exception.MissingProteinException;
 import ahrd.exception.MissingInterproResultException;
+import ahrd.exception.MissingProteinException;
 
 /**
  * Representation of a Interpro-Entity of any type Domain, Family, etc.
@@ -37,6 +38,22 @@ public class InterproResult implements Comparable<InterproResult> {
 	private String type;
 	private String parentId;
 	private Set<String> contains = new HashSet<String>();
+	/**
+	 * The Domain-Weight is defined as the product of the two following factors.
+	 * 
+	 * <ul>
+	 * <li>The first factor going into the similarity measurement of
+	 * Domain-Architecture between two proteins. IAF is defined as :=
+	 * log2(number of total proteins / number of proteins containing this
+	 * domain)</li>
+	 * <li>The second factor going into the similarity measurement of
+	 * Domain-Architecture between two proteins. IV is defined as the number of
+	 * distinct domain families adjacent to this domain.</li>
+	 * </ul>
+	 * 
+	 * @note: see http://www.biomedcentral.com/1471-2105/10/S15/S5
+	 */
+	private Double domainWeight;
 
 	private static Map<String, InterproResult> interproDb = new HashMap<String, InterproResult>();
 
@@ -116,6 +133,39 @@ public class InterproResult implements Comparable<InterproResult> {
 	}
 
 	/**
+	 * Assigns each Interpro-Domain in the memory-database its domain-weight as
+	 * defined above. See mentioned article for details. This method has to be
+	 * called after the memory Interpro-Database has been initialized.
+	 * 
+	 * @throws IOException
+	 * @throws NumberFormatException
+	 * @note: The input file is defined in Settings and expected to be a
+	 *        tab-delimited file, in which the first column holds the
+	 *        Interpro-ID and the eight column holds the domain-weight for
+	 *        Eukaryotes.
+	 */
+	public static void parseDomainWeights() throws NumberFormatException,
+			IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(
+				new FileInputStream(getSettings()
+						.getPathToDomainWeightsDatabase())));
+		// int count = 0;
+		String iprID;
+		for (String line; (line = reader.readLine()) != null;) {
+			String[] entry = line.split("\t");
+			// Split each line with tab
+			iprID = entry[0];
+			// Read first entry as Interpro-ID
+			InterproResult interproEntry = getInterproDb().get(iprID);
+			// myinterproentry = getInterproDb().get(above id)
+
+			interproEntry.setDomainWeight(Double.parseDouble(entry[7]));
+			// myinterproentry.setweight(8th column from above split)
+
+		}
+	}
+
+	/**
 	 * Reads in a raw Interpro-Result-File and assigns iteratively
 	 * InterproResult-instances to the Proteins, specified by their
 	 * Gene-Accessions.
@@ -175,11 +225,11 @@ public class InterproResult implements Comparable<InterproResult> {
 	 */
 	public static void filterForMostInforming(Protein p)
 			throws MissingInterproResultException {
-		Set<InterproResult> mostInformatives = new HashSet<InterproResult>(p
-				.getInterproResults());
+		Set<InterproResult> mostInformatives = new HashSet<InterproResult>(
+				p.getInterproResults());
 		for (InterproResult iprToValidate : p.getInterproResults()) {
-			Set<InterproResult> iprsToCompare = new HashSet<InterproResult>(p
-					.getInterproResults());
+			Set<InterproResult> iprsToCompare = new HashSet<InterproResult>(
+					p.getInterproResults());
 			iprsToCompare.remove(iprToValidate);
 			for (InterproResult iprToCompare : iprsToCompare) {
 				if (iprToValidate.isParent(iprToCompare)
@@ -355,4 +405,13 @@ public class InterproResult implements Comparable<InterproResult> {
 	public void setContains(Set<String> contains) {
 		this.contains = contains;
 	}
+
+	public Double getDomainWeight() {
+		return domainWeight;
+	}
+
+	public void setDomainWeight(Double domainWeight) {
+		this.domainWeight = domainWeight;
+	}
+
 }

@@ -82,14 +82,14 @@ public class InterproResultTest {
 		assertEquals(2, proteinDb.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getInterproResults().size());
 		assertTrue(proteinDb.get("gene:chr01.502:mRNA:chr01.502")
-				.getInterproResults().contains(
-						InterproResult.getInterproDb().get("IPR000535")));
+				.getInterproResults()
+				.contains(InterproResult.getInterproDb().get("IPR000535")));
 		assertTrue(proteinDb.get("gene:chr01.1056:mRNA:chr01.1056")
-				.getInterproResults().contains(
-						InterproResult.getInterproDb().get("IPR000006")));
+				.getInterproResults()
+				.contains(InterproResult.getInterproDb().get("IPR000006")));
 		assertTrue(proteinDb.get("gene:chr01.1056:mRNA:chr01.1056")
-				.getInterproResults().contains(
-						InterproResult.getInterproDb().get("IPR000536")));
+				.getInterproResults()
+				.contains(InterproResult.getInterproDb().get("IPR000536")));
 	}
 
 	@Test
@@ -140,5 +140,17 @@ public class InterproResultTest {
 		assertEquals(2, p.getInterproResults().size());
 		assertTrue(p.getInterproResults().contains(ipr1));
 		assertTrue(p.getInterproResults().contains(ipr2));
+	}
+
+	@Test
+	public void testParseDomainWeights() throws NumberFormatException, IOException {
+		// Because the above @Before has initialized the Settings and the memory
+		// Interpro-Database, we have it here, already.
+		InterproResult.parseDomainWeights();
+		// Assure that InterproDomains IPR000535 IPR000536 IPR000006 have their appropriate weights!
+		System.out.println(InterproResult.getInterproDb().get("IPR000535").getShortName());
+		assertEquals(InterproResult.getInterproDb().get("IPR000535").getDomainWeight(), 213.0, 0.0);
+		assertEquals(InterproResult.getInterproDb().get("IPR000536").getDomainWeight(), 121.3, 0.0);
+		assertEquals(InterproResult.getInterproDb().get("IPR000006").getDomainWeight(), 87.2, 0.0);
 	}
 }
