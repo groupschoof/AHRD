@@ -150,8 +150,9 @@ public class InterproResult implements Comparable<InterproResult> {
 				new FileInputStream(getSettings()
 						.getPathToDomainWeightsDatabase())));
 		String iprID;
+		String [] entry = null;
 		for (String line; (line = reader.readLine()) != null;) {
-			String[] entry = line.split("\t");
+			entry = line.split("\t");
 			iprID = entry[0];
 			InterproResult interproEntry = getInterproDb().get(iprID);
 			interproEntry.setDomainWeight(Double.parseDouble(entry[7]));
