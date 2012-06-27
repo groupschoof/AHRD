@@ -28,7 +28,7 @@ blast_dbs:
 interpro_database: ./test/resources/interpro_31.xml
 interpro_result: ./test/resources/interpro_result.raw
 domain_weights_database: ./test/resources/domain_weights_database.txt
-interpro_results_of_blast_hits: ./test/resources/simap_iprscn_results.txt
+interpro_results_of_blast_hits: ./test/resources/simap_iprscn_result_replaced_hashes.txt
 gene_ontology_result: ./test/resources/go_results.csv
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
