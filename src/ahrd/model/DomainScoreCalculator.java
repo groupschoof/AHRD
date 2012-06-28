@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * We estimate protein similarity based on the formulae given in the article
@@ -34,6 +36,11 @@ public class DomainScoreCalculator {
 
 	public static Map<String, Set<String>> getBlastResultAccessionsToInterproIds() {
 		return blastResultAccessionsToInterproIds;
+	}
+
+	public static void setBlastResultAccessionsToInterproIds(
+			Map<String, Set<String>> blastResultAccessionsToInterproIds) {
+		DomainScoreCalculator.blastResultAccessionsToInterproIds = blastResultAccessionsToInterproIds;
 	}
 
 	public static void initializeBlastResultAccessionsToInterproIds()
@@ -63,8 +70,8 @@ public class DomainScoreCalculator {
 	public static Double calculateDomainScore(Protein prot) {
 		// 1.) Construct the template for the Vector of domain-weights!
 		// Copy the Protein's domains into a new Set:
-		Set<InterproResult> domains = new HashSet<InterproResult>(prot
-				.getInterproResults());
+		Set<InterproResult> domains = new HashSet<InterproResult>(
+				prot.getInterproResults());
 		// Add all BlastResults' domains to above Set, but discard double
 		// entries:
 		for (String blastDb : prot.getBlastResults().keySet()) {
@@ -73,6 +80,21 @@ public class DomainScoreCalculator {
 			}
 		}
 		return 0.0;
+	}
+
+	/**
+	 * Gathers all distinct InterproIDs assigned to the Protein and its
+	 * BlastResults, than constructs a sorted Set of them to be used as a
+	 * definition for the vector space model.
+	 * 
+	 * @param prot
+	 * @return SortedSet<String> of the respective InterproIDs in their natural
+	 *         order
+	 */
+	public static SortedSet<String> constructVectorSpaceModel(Protein prot) {
+		SortedSet<String> vectorSpaceModel = new TreeSet<String>();
+
+		return vectorSpaceModel;
 	}
 
 	public DomainScoreCalculator(Protein protein) {

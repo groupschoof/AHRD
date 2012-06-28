@@ -148,7 +148,6 @@ public class InterproResultTest {
 		// Interpro-Database, we have it here, already.
 		InterproResult.parseDomainWeights();
 		// Assure that InterproDomains IPR000535 IPR000536 IPR000006 have their appropriate weights!
-		System.out.println(InterproResult.getInterproDb().get("IPR000535").getShortName());
 		assertEquals(InterproResult.getInterproDb().get("IPR000535").getDomainWeight(), 213.0, 0.0);
 		assertEquals(InterproResult.getInterproDb().get("IPR000536").getDomainWeight(), 121.3, 0.0);
 		assertEquals(InterproResult.getInterproDb().get("IPR000006").getDomainWeight(), 87.2, 0.0);
