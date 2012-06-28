@@ -64,6 +64,12 @@ public class InterproResult implements Comparable<InterproResult> {
 		setType(type);
 	}
 
+	public InterproResult(String id, String shortName, String type,
+			Double domainWeight) {
+		this(id, shortName, type);
+		setDomainWeight(domainWeight);
+	}
+
 	private static String getAttributeValue(Element element,
 			String attributeName) {
 		String attrVal = "";
@@ -150,7 +156,7 @@ public class InterproResult implements Comparable<InterproResult> {
 				new FileInputStream(getSettings()
 						.getPathToDomainWeightsDatabase())));
 		String iprID;
-		String [] entry = null;
+		String[] entry = null;
 		for (String line; (line = reader.readLine()) != null;) {
 			entry = line.split("\t");
 			iprID = entry[0];
@@ -158,7 +164,7 @@ public class InterproResult implements Comparable<InterproResult> {
 			interproEntry.setDomainWeight(Double.parseDouble(entry[7]));
 		}
 	}
-	
+
 	/**
 	 * Reads in a raw Interpro-Result-File and assigns iteratively
 	 * InterproResult-instances to the Proteins, specified by their

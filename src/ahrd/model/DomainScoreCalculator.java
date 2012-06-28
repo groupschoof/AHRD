@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -67,19 +68,38 @@ public class DomainScoreCalculator {
 
 	private Protein protein;
 
-	public static Double calculateDomainScore(Protein prot) {
-		// 1.) Construct the template for the Vector of domain-weights!
-		// Copy the Protein's domains into a new Set:
-		Set<InterproResult> domains = new HashSet<InterproResult>(
-				prot.getInterproResults());
-		// Add all BlastResults' domains to above Set, but discard double
-		// entries:
-		for (String blastDb : prot.getBlastResults().keySet()) {
-			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
+	public static void constructDomainWeightVectors(Protein prot) {
+		// 1.) Construct the vector space model for the Protein and its
+		// BlastResults
+		// 2.) Construct the domain-weights vector for the Protein itself
+		// 3.) ...and all of its BlastResults
+		// - Remarks: Save the above domain-weight vectors in both the Protein
+		// and all BlastResults. Look at the Protein and BlastResult classes,
+		// they both have a List 'domainWeights', that has to be filled with
+		// instances of class Double. Do not forget to initialize those Lists
+		// with new Vector() before trying to add the weights, you will generate
+		// NullPointerExceptions this way. Also keep in mind, that the
+		// domain-weight vectors of BlastResults, whose accession does not
+		// appear in the memory database 'BlastResultAccessionsToInterproIds'
+		// should be initialized to the ZERO vector, where the ZERO vector is
+		// (0.0, 0.0, 0.0, ... , 0.0).
+	}
 
-			}
-		}
-		return 0.0;
+	/**
+	 * Calculates the cosine of angle between the two argument vectors as a
+	 * measure of their similarity: sim(x,y) = dot-product(x,y) / (||x||*||y||)
+	 * 
+	 * @param x
+	 * @param y
+	 * @return sim(x,y)
+	 */
+	public static Double domainWeightSimilarity(List<Double> x, List<Double> y) {
+		// According to the above mentioned article, calculate the cosine of the
+		// angle between between the two argument vectors, using the dot-product
+		// in the numerator and the product of euclidean lengths as the
+		// denominator.
+		return null; // Just to enable compilation for now. ToDo: Return correct
+						// value!
 	}
 
 	/**
@@ -93,7 +113,19 @@ public class DomainScoreCalculator {
 	 */
 	public static SortedSet<String> constructVectorSpaceModel(Protein prot) {
 		SortedSet<String> vectorSpaceModel = new TreeSet<String>();
-
+		// 1.) Construct the template for the Vector of domain-weights!
+		for (InterproResult ir : prot.getInterproResults()) {
+			vectorSpaceModel.add(ir.getId());
+		}
+		// For each BlastResult, check, if there's an entry in the memory
+		// database 'BlastResultAccessionsToInterproIds' using the BlastResult's
+		// Accession as lookup key. Add all found assigned Interpro-Ids to the
+		// vector space model.
+		for (String blastDb : prot.getBlastResults().keySet()) {
+			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
+				br.getAccession();
+			}
+		}
 		return vectorSpaceModel;
 	}
 

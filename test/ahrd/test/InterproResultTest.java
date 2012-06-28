@@ -143,13 +143,29 @@ public class InterproResultTest {
 	}
 
 	@Test
-	public void testParseDomainWeights() throws NumberFormatException, IOException {
+	public void testParseDomainWeights() throws NumberFormatException,
+			IOException {
 		// Because the above @Before has initialized the Settings and the memory
 		// Interpro-Database, we have it here, already.
 		InterproResult.parseDomainWeights();
-		// Assure that InterproDomains IPR000535 IPR000536 IPR000006 have their appropriate weights!
-		assertEquals(InterproResult.getInterproDb().get("IPR000535").getDomainWeight(), 213.0, 0.0);
-		assertEquals(InterproResult.getInterproDb().get("IPR000536").getDomainWeight(), 121.3, 0.0);
-		assertEquals(InterproResult.getInterproDb().get("IPR000006").getDomainWeight(), 87.2, 0.0);
+		// Assure that InterproDomains IPR000535 IPR000536 IPR000006 have their
+		// appropriate weights!
+		assertEquals(InterproResult.getInterproDb().get("IPR000535")
+				.getDomainWeight(), 213.0, 0.0);
+		assertEquals(InterproResult.getInterproDb().get("IPR000536")
+				.getDomainWeight(), 121.3, 0.0);
+		assertEquals(InterproResult.getInterproDb().get("IPR000006")
+				.getDomainWeight(), 87.2, 0.0);
+	}
+
+	@Test
+	public void testConstructorWithDomainWeight() {
+		InterproResult ir = new InterproResult("IPR000666", "short name",
+				"Domain", 0.666);
+		assertNotNull(ir);
+		assertEquals("IPR000666", ir.getId());
+		assertEquals("short name", ir.getShortName());
+		assertEquals("Domain", ir.getType());
+		assertEquals(0.666, ir.getDomainWeight(), 0.0);
 	}
 }

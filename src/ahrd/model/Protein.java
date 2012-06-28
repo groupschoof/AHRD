@@ -1,6 +1,7 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ public class Protein {
 	private LexicalScoreCalculator lexicalScoreCalculator;
 	private DescriptionScoreCalculator descriptionScoreCalculator;
 	private EvaluationScoreCalculator evaluationScoreCalculator;
+	private List<Double> domainWeights;
 
 	public Protein(String accession, Integer sequenceLength) {
 		super();
@@ -242,5 +244,13 @@ public class Protein {
 
 	public void setSequence(String sequence) {
 		this.sequence = sequence;
+	}
+
+	public List<Double> getDomainWeights() {
+		return domainWeights;
+	}
+
+	public void setDomainWeights(List<Double> domainWeights) {
+		this.domainWeights = domainWeights;
 	}
 }

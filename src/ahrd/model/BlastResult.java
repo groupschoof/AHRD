@@ -1,8 +1,9 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.getSettings;
 import static ahrd.model.ReferenceDescription.tokenizeDescription;
 import static ahrd.model.TokenScoreCalculator.passesBlacklist;
-import static ahrd.controller.Settings.getSettings;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +64,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * is obtained from.
 	 */
 	private Set<String> evaluationTokens;
+	private List<Double> domainWeights;
 
 	public BlastResult(String blastDatabaseName) {
 		super();
@@ -300,5 +302,13 @@ public class BlastResult implements Comparable<BlastResult> {
 
 	public void setEvaluationTokens(Set<String> evaluationTokens) {
 		this.evaluationTokens = evaluationTokens;
+	}
+
+	public List<Double> getDomainWeights() {
+		return domainWeights;
+	}
+
+	public void setDomainWeights(List<Double> domainWeights) {
+		this.domainWeights = domainWeights;
 	}
 }
