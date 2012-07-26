@@ -107,7 +107,7 @@ public class DomainScoreCalculator {
 		// getBlastResultAccessionsToInterproIds();
 
 		List<Double> prVec = new Vector<Double>();
-		
+
 		SortedSet<String> vsm = constructVectorSpaceModel(prot);
 		for (Iterator<String> it = vsm.iterator(); it.hasNext();) {
 			String ipr = it.next();
@@ -140,6 +140,13 @@ public class DomainScoreCalculator {
 							brVec.add(weight);
 						} else
 							brVec.add(0.0);
+					}
+					// Fill up domain weights with 0.0 to equal size as Vector
+					// Space Model:
+					if (brVec.size() < vsm.size()) {
+						for (int i = 0; i <= (vsm.size() - brVec.size()); i++) {
+							brVec.add(0.0);
+						}
 					}
 				}
 				if (!getBlastResultAccessionsToInterproIds().containsKey(

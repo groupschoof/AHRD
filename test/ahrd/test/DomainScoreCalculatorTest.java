@@ -42,7 +42,7 @@ public class DomainScoreCalculatorTest {
 		brAccs2iprIds.put(
 				"accession_1",
 				new HashSet<String>(Arrays.asList(new String[] {
-						interpro1.getId(), interpro2.getId() })));
+						interpro2.getId(), interpro1.getId() })));
 		brAccs2iprIds.put(
 				"accession_2",
 				new HashSet<String>(Arrays.asList(new String[] {
@@ -102,7 +102,7 @@ public class DomainScoreCalculatorTest {
 	public void testInitializeBlastResultAccessionsToInterproIds()
 			throws IOException {
 		DomainScoreCalculator.initializeBlastResultAccessionsToInterproIds();
-		
+
 		assertNotNull(DomainScoreCalculator
 				.getBlastResultAccessionsToInterproIds());
 		assertNotNull(DomainScoreCalculator
@@ -120,7 +120,7 @@ public class DomainScoreCalculatorTest {
 		assertTrue("IPR020139 should be assigned to DCL2_ARATH",
 				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
 						.get("DCL2_ARATH").contains("IPR020139"));
-		
+
 	}
 
 	@Test
@@ -139,7 +139,7 @@ public class DomainScoreCalculatorTest {
 		assertEquals(
 				"Construction of vector space model should return the following dimension in their alphabetical order: IPR00000X, X=1,2,...,6",
 				vectorSpaceModelExpected, vectorSpaceModelToTest);
-		
+
 	}
 
 	@Test
@@ -194,7 +194,7 @@ public class DomainScoreCalculatorTest {
 				prot.getBlastResults().get("swissprot").get(0)
 						.getDomainWeights());
 		System.out.println("Test8");
-		
+
 	}
 
 	@Test
@@ -212,6 +212,6 @@ public class DomainScoreCalculatorTest {
 		Double dws = DomainScoreCalculator.domainWeightSimilarity(x, y);
 		assertNotNull(dws);
 		assertEquals(0.9958408, dws, 0.000001);
-		
+
 	}
 }
