@@ -154,47 +154,37 @@ public class DomainScoreCalculatorTest {
 		// BlastResults:
 		DomainScoreCalculator.constructDomainWeightVectors(prot);
 		// Assure that above vectors have been constructed correctly:
-		System.out.println("Test0");
 		assertNotNull(prot.getDomainWeights());
-		System.out.println("Test1");
 		assertEquals(
 				"The proteins domain-weight vector is not as expected.",
 				new Vector<Double>(Arrays.asList(new Double[] { 0.1, 0.2, 0.3,
 						0.0, 0.0, 0.0 })), prot.getDomainWeights());
-		System.out.println("Test2");
 		// Just test one Swissprot BlastResult, 'accession_1':
 		assertNotNull(prot.getBlastResults().get("swissprot").get(0)
 				.getDomainWeights());
-		System.out.println("Test3");
 		assertEquals(
 				"The domain-weight vector of BlastResult 'accession_1' is not as expected.",
 				new Vector<Double>(Arrays.asList(new Double[] { 0.1, 0.2, 0.0,
 						0.0, 0.0, 0.0 })),
 				prot.getBlastResults().get("swissprot").get(0)
 						.getDomainWeights());
-		System.out.println("Test4");
 		// ... and the unique TAIR BlastResult, 'accession_6':
 		assertNotNull(prot.getBlastResults().get("tair").get(0)
 				.getDomainWeights());
-		System.out.println("Test5");
 		assertEquals(
 				"The domain-weight vector of BlastResult 'accession_6' is not as expected.",
 				new Vector<Double>(Arrays.asList(new Double[] { 0.1, 0.2, 0.0,
 						0.0, 0.0, 0.6 })), prot.getBlastResults().get("tair")
 						.get(0).getDomainWeights());
-		System.out.println("Test6");
 		// BlastResult 'accession_5' should have the ZERO-Vector:
 		assertNotNull(prot.getBlastResults().get("swissprot").get(4)
 				.getDomainWeights());
-		System.out.println("Test7");
 		assertEquals(
 				"The domain-weight vector of BlastResult 'accession_5' is not as expected.",
 				new Vector<Double>(Arrays.asList(new Double[] { 0.0, 0.0, 0.0,
 						0.0, 0.0, 0.0 })),
-				prot.getBlastResults().get("swissprot").get(0)
+				prot.getBlastResults().get("swissprot").get(4)
 						.getDomainWeights());
-		System.out.println("Test8");
-
 	}
 
 	@Test

@@ -1,10 +1,11 @@
 package ahrd.test;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,6 +80,14 @@ public class UtilsTest {
 			assertTrue("Random Multiple-Of-One-Tenth should contain " + d,
 					distRands.contains(d));
 		}
+	}
+
+	@Test
+	public void testZeroList() {
+		assertEquals(Arrays.asList(new Double[] {}), Utils.zeroList(0));
+		assertEquals(Arrays.asList(new Double[] { 0.0 }), Utils.zeroList(1));
+		assertEquals(Arrays.asList(new Double[] { 0.0, 0.0, 0.0 }),
+				Utils.zeroList(3));
 	}
 
 }

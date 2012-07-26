@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
 /**
  * Provides globally used utility-methods. E.g. for reading files or creating
@@ -98,6 +99,14 @@ public class Utils {
 				fromFile.add(lineContent);
 		}
 		return fromFile;
+	}
+
+	public static List<Double> zeroList(int size) {
+		List<Double> l = new Vector<Double>(size);
+		for (int i = 0; i < size; i++) {
+			l.add(0.0);
+		}
+		return l;
 	}
 
 }

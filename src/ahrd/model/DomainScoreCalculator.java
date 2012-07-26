@@ -1,12 +1,12 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.controller.Utils.zeroList;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,8 +39,6 @@ public class DomainScoreCalculator {
 	 * @note: See awk-scripts in directory helper_scripts.
 	 */
 	private static Map<String, Set<String>> blastResultAccessionsToInterproIds;
-	private static int dotProduct;
-	private static int magnitude;
 
 	public static Map<String, Set<String>> getBlastResultAccessionsToInterproIds() {
 		return blastResultAccessionsToInterproIds;
@@ -67,12 +65,6 @@ public class DomainScoreCalculator {
 				accession = mr.group(1);
 				interproId = mr.group(2);
 
-				// Parse lines exactly like in method
-				// InterproResult.parseInterproResult(Map<String, Protein>)
-				// You should extract two values: Protein-Accession and
-				// Interpro-ID
-				// put those results in Map 'blastResultAccessionsToInterproIds'
-
 				if (!getBlastResultAccessionsToInterproIds().containsKey(
 						accession)) {
 					getBlastResultAccessionsToInterproIds().put(accession,
@@ -87,28 +79,20 @@ public class DomainScoreCalculator {
 
 	private Protein protein;
 
+	/**
+	 * 
+	 * 1.) Construct the vector space model for the Protein and its BlastResults
+	 * 2.) Construct the domain-weights vector for the Protein itself 3.) ...and
+	 * all of its BlastResults
+	 * 
+	 * @param prot
+	 */
 	public static void constructDomainWeightVectors(Protein prot) {
-		// 1.) Construct the vector space model for the Protein and its
-		// BlastResults
-		// 2.) Construct the domain-weights vector for the Protein itself
-		// 3.) ...and all of its BlastResults
-		// - Remarks: Save the above domain-weight vectors in both the Protein
-		// and all BlastResults. Look at the Protein and BlastResult classes,
-		// they both have a List 'domainWeights', that has to be filled with
-		// instances of class Double. Do not forget to initialize those Lists
-		// with new Vector() before trying to add the weights, you will generate
-		// NullPointerExceptions this way. Also keep in mind, that the
-		// domain-weight vectors of BlastResults, whose accession does not
-		// appear in the memory database 'BlastResultAccessionsToInterproIds'
-		// should be initialized to the ZERO vector, where the ZERO vector is
-		// (0.0, 0.0, 0.0, ... , 0.0).
-
-		// Map<String, Set<String>> blastToIPR =
-		// getBlastResultAccessionsToInterproIds();
-
-		List<Double> prVec = new Vector<Double>();
-
+		// Vector Space Model of all distinct annotated Interpro-Entities:
 		SortedSet<String> vsm = constructVectorSpaceModel(prot);
+
+		// Domain-Weight Vector for the Protein itself:
+		List<Double> prVec = new Vector<Double>();
 		for (Iterator<String> it = vsm.iterator(); it.hasNext();) {
 			String ipr = it.next();
 			InterproResult interproEntry = InterproResult.getInterproDb().get(
@@ -122,37 +106,22 @@ public class DomainScoreCalculator {
 		}
 		prot.setDomainWeights(prVec);
 
+		// Domain-Weight Vector for all Protein's BlastResults:
 		for (String blastDb : prot.getBlastResults().keySet()) {
 			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
-				List<Double> brVec = new Vector<Double>();
-				Set<String> iprSet = getBlastResultAccessionsToInterproIds()
+				List<Double> brVec = zeroList(vsm.size());
+				Set<String> brIprAnnotations = getBlastResultAccessionsToInterproIds()
 						.get(br.getAccession());
-
-				if (iprSet != null && iprSet.size() > 0) {
-					for (Iterator<String> it2 = iprSet.iterator(); it2
-							.hasNext();) {
-						String ipr = it2.next();
-						InterproResult interproEntry = InterproResult
-								.getInterproDb().get(ipr);
-						double weight = interproEntry.getDomainWeight();
-
-						if (vsm.contains(interproEntry.getId())) {
-							brVec.add(weight);
-						} else
-							brVec.add(0.0);
-					}
-					// Fill up domain weights with 0.0 to equal size as Vector
-					// Space Model:
-					if (brVec.size() < vsm.size()) {
-						for (int i = 0; i <= (vsm.size() - brVec.size()); i++) {
-							brVec.add(0.0);
+				if (brIprAnnotations != null && brIprAnnotations.size() > 0) {
+					int index = 0;
+					for (String iprId : vsm) {
+						InterproResult ipr = InterproResult.getInterproDb()
+								.get(iprId);
+						if (brIprAnnotations.contains(iprId) && ipr != null) {
+							brVec.set(index, ipr.getDomainWeight());
 						}
+						index++;
 					}
-				}
-				if (!getBlastResultAccessionsToInterproIds().containsKey(
-						br.getAccession())) {
-					brVec = new Vector<Double>(Arrays.asList(0.0, 0.0, 0.0,
-							0.0, 0.0, 0.0));
 				}
 				br.setDomainWeights(brVec);
 			}
@@ -167,7 +136,6 @@ public class DomainScoreCalculator {
 	 * @param y
 	 * @return sim(x,y)
 	 */
-
 	public static Double domainWeightSimilarity(List<Double> prVec,
 			List<Double> brVec) {
 
