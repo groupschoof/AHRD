@@ -6,13 +6,19 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /**
  * We estimate protein similarity based on the formulae given in the article
@@ -27,13 +33,15 @@ import java.util.TreeSet;
 public class DomainScoreCalculator {
 
 	/**
-	 * Result from parsing SIMAP's concatonated and preprocessed feature-files.
+	 * Result from parsing SIMAP's concatenated and preprocessed feature-files.
 	 * Preprocessing involves substitution of SIMAP-Hashes with the original
 	 * Protein-Accessions.
 	 * 
 	 * @note: See awk-scripts in directory helper_scripts.
 	 */
 	private static Map<String, Set<String>> blastResultAccessionsToInterproIds;
+	private static int dotProduct;
+	private static int magnitude;
 
 	public static Map<String, Set<String>> getBlastResultAccessionsToInterproIds() {
 		return blastResultAccessionsToInterproIds;
@@ -52,21 +60,32 @@ public class DomainScoreCalculator {
 						.getPathToInterproResults4BlastHits())));
 		String accession = "";
 		String interproId = "";
-		for (String line; (line = reader.readLine()) != null;) {
-			// Parse lines exactly like in method
-			// InterproResult.parseInterproResult(Map<String, Protein>)
-			// You should extract two values: Protein-Accession and Interpro-ID
-			// put those results in Map 'blastResultAccessionsToInterproIds'
-			if (!getBlastResultAccessionsToInterproIds().containsKey(accession)) {
-				getBlastResultAccessionsToInterproIds().put(accession,
-						new HashSet<String>());
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			Pattern pn = Pattern.compile ("(\\S+)\\s+.*\\s(IPR\\d{6})\\s.*");
+			Matcher mr = pn.matcher(line);
+			if (mr.matches()){
+				accession = mr.group(1);
+				interproId = mr.group(2);
+				
+				// Parse lines exactly like in method
+				// InterproResult.parseInterproResult(Map<String, Protein>)
+				// You should extract two values: Protein-Accession and Interpro-ID
+				// put those results in Map 'blastResultAccessionsToInterproIds'
+
+				if (!getBlastResultAccessionsToInterproIds().containsKey(accession)) {
+					getBlastResultAccessionsToInterproIds().put(accession,
+							new HashSet<String>());
+				}
+				getBlastResultAccessionsToInterproIds().get(accession).add(
+						interproId);
 			}
-			getBlastResultAccessionsToInterproIds().get(accession).add(
-					interproId);
 		}
+		reader.close();
 	}
 
 	private Protein protein;
+	
 
 	public static void constructDomainWeightVectors(Protein prot) {
 		// 1.) Construct the vector space model for the Protein and its
@@ -83,7 +102,58 @@ public class DomainScoreCalculator {
 		// appear in the memory database 'BlastResultAccessionsToInterproIds'
 		// should be initialized to the ZERO vector, where the ZERO vector is
 		// (0.0, 0.0, 0.0, ... , 0.0).
+		
+		//Map<String, Set<String>> blastToIPR = getBlastResultAccessionsToInterproIds();
+
+		List<Double>prVec = new Vector <Double>();
+		List<Double>brVec = new Vector <Double>();
+
+		SortedSet<String> vsm = constructVectorSpaceModel(prot);
+		for(Iterator<String> it = vsm.iterator(); it.hasNext();) {
+			String ipr = it.next();
+
+			InterproResult interproEntry = InterproResult.getInterproDb().get(ipr);
+			double weight = interproEntry.getDomainWeight();
+
+			if(prot.getInterproResults().contains(interproEntry)){
+				prVec.add(weight);
+			}
+			else prVec.add(0.0);
+			//			System.out.print(ipr + ": ");
+			//			System.out.println(weight + "\n");
+		}
+		prot.setDomainWeights(prVec);
+
+		for (String blastDb : prot.getBlastResults().keySet()) {
+			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
+				Set<String> iprSet = getBlastResultAccessionsToInterproIds().get(br.getAccession());
+				
+
+					for (Iterator<String> it2 = iprSet.iterator(); it2.hasNext();) {
+						String ipr = it2.next();
+						InterproResult interproEntry = InterproResult.getInterproDb().get(ipr);
+						double weight = interproEntry.getDomainWeight();
+
+						if(vsm.contains(interproEntry)){
+							brVec.add(weight);
+						}
+						else brVec.add(0.0);
+					}
+					if (!getBlastResultAccessionsToInterproIds().containsKey(br.getAccession())) {
+						brVec = new Vector<Double>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0)); 
+				}
+					br.setDomainWeights(brVec);
+			}
+		
+		}
+
+		
 	}
+
+
+
+
+
 
 	/**
 	 * Calculates the cosine of angle between the two argument vectors as a
@@ -93,16 +163,34 @@ public class DomainScoreCalculator {
 	 * @param y
 	 * @return sim(x,y)
 	 */
-	public static Double domainWeightSimilarity(List<Double> x, List<Double> y) {
+	
+	public static Double domainWeightSimilarity(List<Double>prVec, List<Double>brVec) {
+
 		// According to the above mentioned article, calculate the cosine of the
 		// angle between between the two argument vectors, using the dot-product
 		// in the numerator and the product of euclidean lengths as the
 		// denominator.
-		return null; // Just to enable compilation for now. ToDo: Return correct
-						// value!
+		Double dotProduct = 0.0;
+		for (int i=0;i<prVec.size();i++){
+			dotProduct+= (prVec.get(i) * brVec.get(i));
+		}
+		
+		Double magPr=0.0;
+		Double magBr=0.0;
+		for (int i=0;i<prVec.size();i++){
+			magPr +=Math.pow(prVec.get(i),2);
+			magBr +=Math.pow(brVec.get(i),2);
+		}
+		Double magnitude = Math.sqrt(magPr) * Math.sqrt(magBr);
+		
+		
+		Double dws = dotProduct / magnitude ;
+		return dws; 
 	}
 
+
 	/**
+	 * 
 	 * Gathers all distinct InterproIDs assigned to the Protein and its
 	 * BlastResults, than constructs a sorted Set of them to be used as a
 	 * definition for the vector space model.
@@ -124,7 +212,11 @@ public class DomainScoreCalculator {
 		for (String blastDb : prot.getBlastResults().keySet()) {
 			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
 				br.getAccession();
+				if (getBlastResultAccessionsToInterproIds().containsKey(br.getAccession())) {
+					vectorSpaceModel.addAll(blastResultAccessionsToInterproIds.get(br.getAccession()));
+				}
 			}
+			
 		}
 		return vectorSpaceModel;
 	}
@@ -141,5 +233,5 @@ public class DomainScoreCalculator {
 	public void setProtein(Protein protein) {
 		this.protein = protein;
 	}
-
+	
 }
