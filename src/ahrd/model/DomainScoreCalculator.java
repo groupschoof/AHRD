@@ -107,8 +107,7 @@ public class DomainScoreCalculator {
 		// getBlastResultAccessionsToInterproIds();
 
 		List<Double> prVec = new Vector<Double>();
-		List<Double> brVec = new Vector<Double>();
-
+		
 		SortedSet<String> vsm = constructVectorSpaceModel(prot);
 		for (Iterator<String> it = vsm.iterator(); it.hasNext();) {
 			String ipr = it.next();
@@ -125,6 +124,7 @@ public class DomainScoreCalculator {
 
 		for (String blastDb : prot.getBlastResults().keySet()) {
 			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
+				List<Double> brVec = new Vector<Double>();
 				Set<String> iprSet = getBlastResultAccessionsToInterproIds()
 						.get(br.getAccession());
 
