@@ -17,9 +17,11 @@ public class TokenScoreCalculator {
 	private Map<String, Double> cumulativeTokenBitScores = new HashMap<String, Double>();
 	private Map<String, Double> cumulativeTokenBlastDatabaseScores = new HashMap<String, Double>();
 	private Map<String, Double> cumulativeTokenOverlapScores = new HashMap<String, Double>();
+	private Map<String, Double> cumulativeTokenDomainSimilarityScores = new HashMap<String, Double>();
 	private double totalTokenBitScore = 0;
 	private double totalTokenBlastDatabaseScore = 0;
 	private double totalTokenOverlapScore = 0;
+	private double totalTokenDomainSimilarityScore = 0;
 	private Map<String, Double> tokenScores = new HashMap<String, Double>();
 	private Protein protein;
 	// Please enter your initials ___
@@ -68,7 +70,7 @@ public class TokenScoreCalculator {
 
 	/**
 	 * Assigns each Token in each BlastResult it's TokenScore and stores it in
-	 * the Map 'tokenScores' key is Token and value is it's TokenScore.
+	 * the Map 'tokenScores' key is Token and value is its TokenScore.
 	 */
 	public void assignTokenScores() {
 		// iterate through blast databases having BlastResults
@@ -121,7 +123,8 @@ public class TokenScoreCalculator {
 
 	/**
 	 * Once per BlastResult's unique token the following <em>cumulative</em>
-	 * scores are measured: 1. BitScore 2. DatabaseScore 3. OverlapScore
+	 * scores are measured: 1. BitScore 2. DatabaseScore 3. OverlapScore 4.
+	 * DomainSimilarityScore
 	 * 
 	 * @param BlastResult
 	 *            br
@@ -131,9 +134,11 @@ public class TokenScoreCalculator {
 			Double overlapScore = TokenScoreCalculator.overlapScore(br
 					.getStart(), br.getEnd(), getProtein().getSequenceLength());
 			addCumulativeTokenBitScore(token, br.getBitScore());
-			addCumulativeTokenBlastDatabaseScore(token,
-					br.getBlastDatabaseName());
+			addCumulativeTokenBlastDatabaseScore(token, br
+					.getBlastDatabaseName());
 			addCumulativeTokenOverlapScore(token, overlapScore);
+			addCumulativeTokenDomainSimilarityScore(token, br
+					.getDomainSimilarityScore());
 		}
 	}
 
@@ -151,6 +156,7 @@ public class TokenScoreCalculator {
 				+ getSettings().getBlastDbWeight(br.getBlastDatabaseName()));
 		setTotalTokenOverlapScore(getTotalTokenOverlapScore() + overlapScore);
 		setTotalTokenBitScore(getTotalTokenBitScore() + br.getBitScore());
+		// measure also the total domain similarity score
 	}
 
 	/**
@@ -214,6 +220,20 @@ public class TokenScoreCalculator {
 					new Double(blastDatabaseWeight
 							+ getCumulativeTokenBlastDatabaseScores()
 									.get(token)));
+	}
+
+	public void addCumulativeTokenDomainSimilarityScore(String token, Double dss) {
+		if (dss != null && dss > 0.0) {
+			if (!getCumulativeTokenDomainSimilarityScores().containsKey(token)) {
+				getCumulativeTokenDomainSimilarityScores().put(token, dss);
+			} else {
+				getCumulativeTokenDomainSimilarityScores().put(
+						token,
+						dss
+								+ getCumulativeTokenDomainSimilarityScores()
+										.get(token));
+			}
+		}
 	}
 
 	public double sumOfAllTokenScores(BlastResult blastResult) {
@@ -321,4 +341,23 @@ public class TokenScoreCalculator {
 	public void setTokenScores(Map<String, Double> tokenScores) {
 		this.tokenScores = tokenScores;
 	}
+
+	public Map<String, Double> getCumulativeTokenDomainSimilarityScores() {
+		return cumulativeTokenDomainSimilarityScores;
+	}
+
+	public void setCumulativeTokenDomainSimilarityScores(
+			Map<String, Double> cumulativeTokenDomainSimilarityScores) {
+		this.cumulativeTokenDomainSimilarityScores = cumulativeTokenDomainSimilarityScores;
+	}
+
+	public double getTotalTokenDomainSimilarityScore() {
+		return totalTokenDomainSimilarityScore;
+	}
+
+	public void setTotalTokenDomainSimilarityScore(
+			double totalTokenDomainSimilarityScore) {
+		this.totalTokenDomainSimilarityScore = totalTokenDomainSimilarityScore;
+	}
+
 }

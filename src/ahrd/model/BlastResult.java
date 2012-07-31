@@ -65,6 +65,17 @@ public class BlastResult implements Comparable<BlastResult> {
 	 */
 	private Set<String> evaluationTokens;
 	private List<Double> domainWeights;
+	/**
+	 * Based on the algorithm proposed in
+	 * "Protein comparison at the domain architecture level" by Lee and Lee
+	 * (http://www.biomedcentral.com/1471-2105/10/S15/S5) we compute the
+	 * BlastResult's domain similarity score as the similarity of its domain
+	 * architecture to the query protein's.
+	 * 
+	 * @Note: The score ranges from 0.0 to 1.0 and is the higher the more
+	 *        similar the two domain architectures are.
+	 */
+	private Double domainSimilarityScore;
 
 	public BlastResult(String blastDatabaseName) {
 		super();
@@ -153,8 +164,8 @@ public class BlastResult implements Comparable<BlastResult> {
 	public void tokenize() {
 		List<String> tknBlackList = getSettings().getTokenBlackList(
 				getBlastDatabaseName());
-		for (String tokenCandidate : new HashSet<String>(
-				Arrays.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
+		for (String tokenCandidate : new HashSet<String>(Arrays
+				.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
 			tokenCandidate = tokenCandidate.toLowerCase();
 			if (passesBlacklist(tokenCandidate, tknBlackList))
 				getTokens().add(tokenCandidate);
@@ -311,4 +322,13 @@ public class BlastResult implements Comparable<BlastResult> {
 	public void setDomainWeights(List<Double> domainWeights) {
 		this.domainWeights = domainWeights;
 	}
+
+	public Double getDomainSimilarityScore() {
+		return domainSimilarityScore;
+	}
+
+	public void setDomainSimilarityScore(Double domainSimilarityScore) {
+		this.domainSimilarityScore = domainSimilarityScore;
+	}
+
 }

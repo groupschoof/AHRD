@@ -19,6 +19,7 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
+import ahrd.model.DomainScoreCalculator;
 import ahrd.model.GeneOntologyResult;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
@@ -112,9 +113,6 @@ public class AHRD {
 	public void parseBlastResults() throws IOException,
 			MissingProteinException, SAXException {
 		for (String blastDatabase : getSettings().getBlastDatabases()) {
-			// Last Argument 'false' means that the best scoring BlastHits are
-			// not remembered to be compared with the AHRD-Result, as would be
-			// done for training the algorithm:
 			BlastResult.parseBlastResults(getProteins(), blastDatabase);
 		}
 	}
@@ -139,6 +137,15 @@ public class AHRD {
 	public void parseGeneOntologyResult() throws IOException {
 		if (getSettings().hasGeneOntologyAnnotations()) {
 			GeneOntologyResult.parseGeneOntologyResult(getProteins());
+		}
+	}
+
+	public void parseInterproResultsForBlastHits() throws IOException {
+		if (getSettings().getPathToInterproResults4BlastHits() != null
+				&& !getSettings().getPathToInterproResults4BlastHits().equals(
+						"")) {
+			DomainScoreCalculator
+					.initializeBlastResultAccessionsToInterproIds();
 		}
 	}
 
@@ -197,6 +204,12 @@ public class AHRD {
 					+ takeTime() + "sec, currently occupying "
 					+ takeMemoryUsage() + " MB");
 
+		// one single BlastResult accessions to interpro-id mapping file:
+		parseInterproResultsForBlastHits();
+		if (writeLogMsgs)
+			System.out.println("...parsed Interpro Results for Blast-Hits in "
+					+ takeTime() + "sec, currently occupying "
+					+ takeMemoryUsage() + " MB");
 	}
 
 	/**

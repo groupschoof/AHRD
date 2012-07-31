@@ -58,7 +58,7 @@ public class AhrdTest {
 		Protein p = ahrd.getProteins().get("gene:chr01.502:mRNA:chr01.502");
 		BlastResult br = p.getBlastResults().get("swissprot").get(0);
 		assertEquals(2.0, br.getTokens().size(), 0.0);
-		// test measurement of cumulative token-scores was triggered:		
+		// test measurement of cumulative token-scores was triggered:
 		assertTrue(p.getTokenScoreCalculator().getCumulativeTokenBitScores()
 				.containsKey("dicer"));
 		assertTrue(p.getTokenScoreCalculator()
