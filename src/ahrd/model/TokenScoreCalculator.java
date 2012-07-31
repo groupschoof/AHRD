@@ -156,7 +156,9 @@ public class TokenScoreCalculator {
 				+ getSettings().getBlastDbWeight(br.getBlastDatabaseName()));
 		setTotalTokenOverlapScore(getTotalTokenOverlapScore() + overlapScore);
 		setTotalTokenBitScore(getTotalTokenBitScore() + br.getBitScore());
-		// measure also the total domain similarity score
+		if (br.getDomainSimilarityScore() != null)
+			setTotalTokenDomainSimilarityScore(getTotalTokenDomainSimilarityScore()
+					+ br.getDomainSimilarityScore());
 	}
 
 	/**
