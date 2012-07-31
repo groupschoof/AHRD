@@ -130,7 +130,10 @@ public class DomainScoreCalculator {
 
 	/**
 	 * Calculates the cosine of angle between the two argument vectors as a
-	 * measure of their similarity: sim(x,y) = dot-product(x,y) / (||x||*||y||)
+	 * measure of their similarity: sim(x,y) = dot-product(x,y) / (||x||*||y||).
+	 * 
+	 * For any or both vectors equaling the origin, this function returns not
+	 * NaN, but zero.
 	 * 
 	 * @param x
 	 * @param y
@@ -155,8 +158,11 @@ public class DomainScoreCalculator {
 			magBr += Math.pow(brVec.get(i), 2);
 		}
 		Double magnitude = Math.sqrt(magPr) * Math.sqrt(magBr);
-
 		Double dws = dotProduct / magnitude;
+
+		if (dws.equals(Double.NaN))
+			dws = 0.0;
+
 		return dws;
 	}
 

@@ -17,6 +17,7 @@ import java.util.Vector;
 import org.junit.Before;
 import org.junit.Test;
 
+import ahrd.controller.Utils;
 import ahrd.model.BlastResult;
 import ahrd.model.DomainScoreCalculator;
 import ahrd.model.InterproResult;
@@ -39,28 +40,22 @@ public class DomainScoreCalculatorTest {
 
 	protected void mockBlastResultAccessionsToInterproIds() {
 		Map<String, Set<String>> brAccs2iprIds = new HashMap<String, Set<String>>();
-		brAccs2iprIds.put(
-				"accession_1",
-				new HashSet<String>(Arrays.asList(new String[] {
-						interpro2.getId(), interpro1.getId() })));
-		brAccs2iprIds.put(
-				"accession_2",
-				new HashSet<String>(Arrays.asList(new String[] {
-						interpro1.getId(), interpro3.getId() })));
-		brAccs2iprIds.put(
-				"accession_3",
-				new HashSet<String>(Arrays.asList(new String[] { interpro4
-						.getId() })));
-		brAccs2iprIds.put(
-				"accession_4",
-				new HashSet<String>(Arrays.asList(new String[] { interpro5
-						.getId() })));
+		brAccs2iprIds
+				.put("accession_1", new HashSet<String>(Arrays
+						.asList(new String[] { interpro2.getId(),
+								interpro1.getId() })));
+		brAccs2iprIds
+				.put("accession_2", new HashSet<String>(Arrays
+						.asList(new String[] { interpro1.getId(),
+								interpro3.getId() })));
+		brAccs2iprIds.put("accession_3", new HashSet<String>(Arrays
+				.asList(new String[] { interpro4.getId() })));
+		brAccs2iprIds.put("accession_4", new HashSet<String>(Arrays
+				.asList(new String[] { interpro5.getId() })));
 		// accession_5 has no InterproIDs assigned!
-		brAccs2iprIds.put(
-				"accession_6",
-				new HashSet<String>(
-						Arrays.asList(new String[] { interpro1.getId(),
-								interpro2.getId(), interpro6.getId() })));
+		brAccs2iprIds.put("accession_6", new HashSet<String>(Arrays
+				.asList(new String[] { interpro1.getId(), interpro2.getId(),
+						interpro6.getId() })));
 		DomainScoreCalculator
 				.setBlastResultAccessionsToInterproIds(brAccs2iprIds);
 	}
@@ -76,8 +71,10 @@ public class DomainScoreCalculatorTest {
 		prot.getBlastResults().put("swissprot", TestUtils.mockBlastResults());
 		// A single hit in TAIR:
 		List<BlastResult> tairHits = new ArrayList<BlastResult>();
-		tairHits.add(TestUtils.mockBlastResult("accession_6", 0.001,
-				"description six", 1, 20, 100.0, "tair", new HashSet<String>()));
+		tairHits
+				.add(TestUtils.mockBlastResult("accession_6", 0.001,
+						"description six", 1, 20, 100.0, "tair",
+						new HashSet<String>()));
 		prot.getBlastResults().put("tair", tairHits);
 		return prot;
 	}
@@ -132,10 +129,10 @@ public class DomainScoreCalculatorTest {
 		// Test the construction of the vector space model:
 		SortedSet<String> vectorSpaceModelToTest = DomainScoreCalculator
 				.constructVectorSpaceModel(prot);
-		SortedSet<String> vectorSpaceModelExpected = new TreeSet<String>(
-				Arrays.asList(new String[] { interpro1.getId(),
-						interpro2.getId(), interpro3.getId(),
-						interpro4.getId(), interpro5.getId(), interpro6.getId() }));
+		SortedSet<String> vectorSpaceModelExpected = new TreeSet<String>(Arrays
+				.asList(new String[] { interpro1.getId(), interpro2.getId(),
+						interpro3.getId(), interpro4.getId(),
+						interpro5.getId(), interpro6.getId() }));
 		assertEquals(
 				"Construction of vector space model should return the following dimension in their alphabetical order: IPR00000X, X=1,2,...,6",
 				vectorSpaceModelExpected, vectorSpaceModelToTest);
@@ -155,8 +152,7 @@ public class DomainScoreCalculatorTest {
 		DomainScoreCalculator.constructDomainWeightVectors(prot);
 		// Assure that above vectors have been constructed correctly:
 		assertNotNull(prot.getDomainWeights());
-		assertEquals(
-				"The proteins domain-weight vector is not as expected.",
+		assertEquals("The proteins domain-weight vector is not as expected.",
 				new Vector<Double>(Arrays.asList(new Double[] { 0.1, 0.2, 0.3,
 						0.0, 0.0, 0.0 })), prot.getDomainWeights());
 		// Just test one Swissprot BlastResult, 'accession_1':
@@ -165,9 +161,8 @@ public class DomainScoreCalculatorTest {
 		assertEquals(
 				"The domain-weight vector of BlastResult 'accession_1' is not as expected.",
 				new Vector<Double>(Arrays.asList(new Double[] { 0.1, 0.2, 0.0,
-						0.0, 0.0, 0.0 })),
-				prot.getBlastResults().get("swissprot").get(0)
-						.getDomainWeights());
+						0.0, 0.0, 0.0 })), prot.getBlastResults().get(
+						"swissprot").get(0).getDomainWeights());
 		// ... and the unique TAIR BlastResult, 'accession_6':
 		assertNotNull(prot.getBlastResults().get("tair").get(0)
 				.getDomainWeights());
@@ -182,9 +177,8 @@ public class DomainScoreCalculatorTest {
 		assertEquals(
 				"The domain-weight vector of BlastResult 'accession_5' is not as expected.",
 				new Vector<Double>(Arrays.asList(new Double[] { 0.0, 0.0, 0.0,
-						0.0, 0.0, 0.0 })),
-				prot.getBlastResults().get("swissprot").get(4)
-						.getDomainWeights());
+						0.0, 0.0, 0.0 })), prot.getBlastResults().get(
+						"swissprot").get(4).getDomainWeights());
 	}
 
 	@Test
@@ -203,5 +197,11 @@ public class DomainScoreCalculatorTest {
 		assertNotNull(dws);
 		assertEquals(0.9958408, dws, 0.000001);
 
+		// Verify that any prtoein without domain annotation results in zero
+		// similarity:
+		x = Utils.zeroList(6);
+		dws = DomainScoreCalculator.domainWeightSimilarity(x, y);
+		assertNotNull(dws);
+		assertEquals(0.0, dws, 0.0);
 	}
 }
