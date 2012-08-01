@@ -83,12 +83,13 @@ public class DescriptionScoreCalculator {
 	 * @return Double
 	 */
 	public Double domainSimilarityScore(BlastResult br) {
-		// (1) Instantiate a dss with value zero.
-		// (2) if and only if the BlastResult has a non null domain similarity score
-		// multiply it with the configurable weight
-		// 'descriptionScoreDomainSimilarityWeight'
-		// return result
-		return null;
+		Double dss = 0.0;
+		if (br.getDomainSimilarityScore() != null
+				&& br.getDomainSimilarityScore() > 0.0) {
+			dss = getSettings().getDescriptionScoreDomainSimilarityWeight()
+					* br.getDomainSimilarityScore();
+		}
+		return dss;
 	}
 
 	public void measureMaxBitScore(double bitScore) {
