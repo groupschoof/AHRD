@@ -275,7 +275,7 @@ public class TokenScoreCalculatorTest {
 		getSettings().setTokenScoreDomainSimilarityWeight(0.0);
 		// 0.5 * 0.1 + 0.3 * 0.2 + 0.2 * 0.3 = 0.17
 		assertEquals(0.17, tsc.tokenScore("goat"), 0.0001);
-		
+
 		// TEST WITH USAGE OF DOMAIN-SIMILARITY-SCORE
 		// Mock weights:
 		getSettings().setTokenScoreBitScoreWeight(0.3);
@@ -284,5 +284,39 @@ public class TokenScoreCalculatorTest {
 		getSettings().setTokenScoreDomainSimilarityWeight(0.1);
 		// 0.3 * (0.1 + 0.2 + 0.3) + 0.1 * 0.4 = 0.22
 		assertEquals(0.22, tsc.tokenScore("sheep"), 0.0001);
+	}
+
+	@Test
+	public void testMeasureCumulativeDomainSimilarityScores() {
+		// Test subjects:
+		Protein p = TestUtils.mockProtein();
+		TokenScoreCalculator tsc = p.getTokenScoreCalculator();
+
+		// br1 has only token 'token_one'
+		tsc.measureCumulativeDomainSimilarityScores(br1);
+		assertTrue(
+				"A cumululative domain similarity score should have been computed, but none found!",
+				!tsc.getCumulativeTokenDomainSimilarityScores().isEmpty());
+		assertEquals(1.0, tsc.getCumulativeTokenDomainSimilarityScores().get(
+				"token_one"), 0.0);
+		// br2 has token 'token_one' and 'token_two'
+		tsc.measureCumulativeDomainSimilarityScores(br2);
+		assertEquals(1.75, tsc.getCumulativeTokenDomainSimilarityScores().get(
+				"token_one"), 0.0);
+		assertEquals(0.75, tsc.getCumulativeTokenDomainSimilarityScores().get(
+				"token_two"), 0.0);
+	}
+
+	@Test
+	public void testMeasureTotalDomainSimilarityScore() {
+		// Test subjects:
+		Protein p = TestUtils.mockProtein();
+		TokenScoreCalculator tsc = p.getTokenScoreCalculator();
+
+		assertEquals(0.0, tsc.getTotalTokenDomainSimilarityScore(), 0.0);
+		tsc.measureTotalDomainSimilarityScore(br1);
+		assertEquals(1.0, tsc.getTotalTokenDomainSimilarityScore(), 0.0);
+		tsc.measureTotalDomainSimilarityScore(br2);
+		assertEquals(1.75, tsc.getTotalTokenDomainSimilarityScore(), 0.0);
 	}
 }
