@@ -68,7 +68,9 @@ public class DescriptionScoreCalculator {
 		// Do use the method domainSimilarityFactor(BlastResult br) for this!
 		blastResult.setDescriptionScore(getProtein()
 				.getLexicalScoreCalculator().lexicalScore(blastResult)
-				+ relativeBlastScore(blastResult) + patternFactor(blastResult));
+				+ relativeBlastScore(blastResult)
+				+ patternFactor(blastResult)
+				+ domainSimilarityFactor(blastResult));
 	}
 
 	/**
@@ -85,8 +87,14 @@ public class DescriptionScoreCalculator {
 	 */
 	public double domainSimilarityFactor(BlastResult br) {
 		// Use: getSettings().getDescriptionScoreDomainSimilarityWeight()
-		// and getMaxDomainSimilarityScore()		
-		return 0.0;
+		// and getMaxDomainSimilarityScore()
+		double dsf = 0.0;
+		if (br.getDomainSimilarityScore() != null
+				&& getMaxDomainSimilarityScore() > 0.0)
+			dsf = getSettings().getDescriptionScoreDomainSimilarityWeight()
+					* (br.getDomainSimilarityScore())
+					/ getMaxDomainSimilarityScore();
+		return dsf;
 	}
 
 	/**
