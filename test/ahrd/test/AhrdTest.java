@@ -14,7 +14,6 @@ import ahrd.controller.AHRD;
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
-import ahrd.model.DomainScoreCalculator;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 
@@ -23,7 +22,6 @@ public class AhrdTest {
 	private AHRD ahrd;
 
 	public AhrdTest() {
-		super();
 	}
 
 	@Before
