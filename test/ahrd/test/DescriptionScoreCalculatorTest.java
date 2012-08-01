@@ -76,6 +76,15 @@ public class DescriptionScoreCalculatorTest {
 		// PatternFactor(10/10) + 0.2 * BitScore(30/30)
 		p.getDescriptionScoreCalculator().calcDescriptionScore(br);
 		assertEquals(1.5, br.getDescriptionScore(), 0.0);
+
+		// Test Description-Score with Interpro annotations, that is including a
+		// non zero domain similarity score:
+		getSettings().setDescriptionScoreDomainSimilarityWeight(0.3);
+		br.setDomainSimilarityScore(0.9);
+		p.getDescriptionScoreCalculator().calcDescriptionScore(br);
+		assertEquals(
+				"Having a domain similarity score set for the BlastResult its description score should include it.",
+				1.8, br.getDescriptionScore(), 0.0);
 	}
 
 	@Test

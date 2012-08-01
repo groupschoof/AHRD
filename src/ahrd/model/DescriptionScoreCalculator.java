@@ -10,6 +10,7 @@ public class DescriptionScoreCalculator {
 
 	private Protein protein;
 	private double maxBitScore = 0.0;
+	private double maxDomainSimilarityScore = 0.0;
 	private BlastResult highestScoringBlastResult;
 	private Double descriptionHighScore;
 	private Map<String, Integer> descLinePatternFrequencies = new HashMap<String, Integer>();
@@ -46,10 +47,46 @@ public class DescriptionScoreCalculator {
 		setHighestScoringBlastResult(bestScoringBr);
 	}
 
+	/**
+	 * Implementation of the description score formula as given in our article
+	 * and the documentation. The description score actually is the
+	 * BlastResult's final score and used to select the highest scoring
+	 * candidate as the query protein's human readable description. The
+	 * resulting score is stored in the candidate instance (BlastResult) itself.
+	 * 
+	 * @Note: ds(br) := lexical-score(br) + weight_1 *
+	 *        bit-score(br)/max(bit-score(all brs)) + weight_2 *
+	 *        #occurrences(pattern(br))/max(#occurences(all patterns)) +
+	 *        weight_3 *
+	 *        domain-similarity-score(br)/max(domain-similarity-score(all brs))
+	 * 
+	 * @param blastResult
+	 */
 	public void calcDescriptionScore(BlastResult blastResult) {
+		// Please, insert above last summand the fraction of the blastResult's
+		// domain similarity score of the maximum found domain similarity score.
+		// Do use the method domainSimilarityFactor(BlastResult br) for this!
 		blastResult.setDescriptionScore(getProtein()
 				.getLexicalScoreCalculator().lexicalScore(blastResult)
 				+ relativeBlastScore(blastResult) + patternFactor(blastResult));
+	}
+
+	/**
+	 * Computes the fraction of the argument BlastResult's domain similarity
+	 * score of the maximum found domain similarity score: <br />
+	 * dsf(br) := configureable_weight * domain-similarity-score(br) /
+	 * max(domain-similarity-score(all BlastResults))
+	 * 
+	 * @Note: Above formula returns zero in case the dsf(br) is actually not a
+	 *        number, i.e. when the maximum found domain similarity is zero.
+	 * 
+	 * @param br
+	 * @return double
+	 */
+	public double domainSimilarityFactor(BlastResult br) {
+		// Use: getSettings().getDescriptionScoreDomainSimilarityWeight()
+		// and getMaxDomainSimilarityScore()		
+		return 0.0;
 	}
 
 	/**
@@ -84,7 +121,8 @@ public class DescriptionScoreCalculator {
 	 */
 	public Double domainSimilarityScore(BlastResult br) {
 		// (1) Instantiate a dss with value zero.
-		// (2) if and only if the BlastResult has a non null domain similarity score
+		// (2) if and only if the BlastResult has a non null domain similarity
+		// score
 		// multiply it with the configurable weight
 		// 'descriptionScoreDomainSimilarityWeight'
 		// return result
@@ -104,6 +142,19 @@ public class DescriptionScoreCalculator {
 		// Measure maxDescriptionLineFrequency:
 		if (currentFrequency > getMaxDescriptionLineFrequency())
 			setMaxDescriptionLineFrequency(currentFrequency);
+	}
+
+	/**
+	 * Implements memorization of the maximum found domain similarity score,
+	 * which is stored as this instance's <em>maxDomainSimilarityScore</em>.
+	 * 
+	 * @param BlastResult
+	 *            br
+	 */
+	public void measureMaxDomainSimilarityScore(BlastResult br) {
+		if (br.getDomainSimilarityScore() != null
+				&& br.getDomainSimilarityScore() > getMaxDomainSimilarityScore())
+			setMaxDomainSimilarityScore(br.getDomainSimilarityScore());
 	}
 
 	/**
@@ -187,6 +238,14 @@ public class DescriptionScoreCalculator {
 	 */
 	public void setMaxDescriptionLineFrequency(int maxDescriptionLineFrequency) {
 		this.maxDescriptionLineFrequency = maxDescriptionLineFrequency;
+	}
+
+	public double getMaxDomainSimilarityScore() {
+		return maxDomainSimilarityScore;
+	}
+
+	public void setMaxDomainSimilarityScore(double maxDomainSimilarityScore) {
+		this.maxDomainSimilarityScore = maxDomainSimilarityScore;
 	}
 
 }

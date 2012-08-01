@@ -216,6 +216,7 @@ public class DomainScoreCalculator {
 	 * <li>Trigger computation of cumulative token domain similarity scores and
 	 * total token domain similarity score in the query protein's
 	 * TokenScoreCalculator</li>
+	 * <li>Trigger memorization off the maximum found domain similarity score</li>
 	 * </ul>
 	 * 
 	 * @param Protein
@@ -232,6 +233,8 @@ public class DomainScoreCalculator {
 						.measureCumulativeDomainSimilarityScores(br);
 				getProtein().getTokenScoreCalculator()
 						.measureTotalDomainSimilarityScore(br);
+				getProtein().getDescriptionScoreCalculator()
+						.measureMaxDomainSimilarityScore(br);
 			}
 		}
 	}
