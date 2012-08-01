@@ -188,12 +188,12 @@ public class Settings implements Cloneable {
 	 * The configurable weight for the fraction a BlastResult's domain weight
 	 * similarity score is going to assume in the final token score.
 	 */
-	private Double tokenScoreDomainSimilarityWeight;
+	private Double tokenScoreDomainSimilarityWeight = 0.0;
 	/**
 	 * The configurable weight for the fraction a BlastResult's domain weight
 	 * similarity score is going to assume in the final description score.
 	 */
-	private Double descriptionScoreDomainSimilarityWeight;
+	private Double descriptionScoreDomainSimilarityWeight = 0.0;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -605,9 +605,8 @@ public class Settings implements Cloneable {
 	 */
 	public boolean isToComputeDomainSimilarities() {
 		return (hasInterproAnnotations()
-				&& getPathToDomainWeightsDatabase() != null
-				&& !getPathToDomainWeightsDatabase().equals("")
-				&& getTokenScoreDomainSimilarityWeight() != null && getDescriptionScoreDomainSimilarityWeight() != null);
+				&& getPathToDomainWeightsDatabase() != null && !getPathToDomainWeightsDatabase()
+				.equals(""));
 	}
 
 	/**

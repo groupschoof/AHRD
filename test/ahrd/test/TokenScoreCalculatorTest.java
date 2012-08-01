@@ -210,7 +210,7 @@ public class TokenScoreCalculatorTest {
 		getSettings().setTokenScoreDatabaseScoreWeight(0.5);
 		getSettings().setTokenScoreOverlapScoreWeight(0.0011);
 		try {
-			tsc.tokenScore("foo", "swissprot");
+			tsc.tokenScore("foo");
 			fail("Validation of the three weights in the formula Token-Score failed. Their sum should be >= 0.999 and <= 1.001");
 		} catch (IllegalArgumentException expectedException) {
 		}
@@ -219,7 +219,7 @@ public class TokenScoreCalculatorTest {
 		getSettings().setTokenScoreDatabaseScoreWeight(0.3);
 		getSettings().setTokenScoreOverlapScoreWeight(0.198);
 		try {
-			tsc.tokenScore(token, "swissprot");
+			tsc.tokenScore(token);
 			fail("Validation of the three weights in the formula Token-Score failed. Their sum should be >= 0.999 and <= 1.001");
 		} catch (IllegalArgumentException expectedException) {
 		}
@@ -233,7 +233,7 @@ public class TokenScoreCalculatorTest {
 		getSettings().setTokenScoreDatabaseScoreWeight(0.5);
 		getSettings().setTokenScoreOverlapScoreWeight(0.001);
 		try {
-			tsc.tokenScore(token, "swissprot");
+			tsc.tokenScore(token);
 		} catch (IllegalArgumentException expectedException) {
 			fail("Validation of the three weights in the formula Token-Score failed. It is too restrictive, a delta of 0.001 has to be excepted.");
 		}
@@ -242,9 +242,47 @@ public class TokenScoreCalculatorTest {
 		getSettings().setTokenScoreDatabaseScoreWeight(0.3);
 		getSettings().setTokenScoreOverlapScoreWeight(0.199);
 		try {
-			tsc.tokenScore(token, "swissprot");
+			tsc.tokenScore(token);
 		} catch (IllegalArgumentException expectedException) {
 			fail("Validation of the three weights in the formula Token-Score failed. It is too restrictive, a delta of 0.001 has to be excepted.");
 		}
+	}
+
+	@Test
+	public void testTokenScore() {
+		// Test subjects:
+		Protein p = TestUtils.mockProtein();
+		TokenScoreCalculator tsc = p.getTokenScoreCalculator();
+		// Mock cumulative scores:
+		for (String token : (new String[] { "sheep", "goat" })) {
+			tsc.getCumulativeTokenBitScores().put(token, 0.1);
+			tsc.getCumulativeTokenBlastDatabaseScores().put(token, 0.2);
+			tsc.getCumulativeTokenOverlapScores().put(token, 0.3);
+			if (token.equals("sheep"))
+				tsc.getCumulativeTokenDomainSimilarityScores().put(token, 0.4);
+		}
+		// Mock total scores:
+		tsc.setTotalTokenBitScore(1.0);
+		tsc.setTotalTokenBlastDatabaseScore(1.0);
+		tsc.setTotalTokenDomainSimilarityScore(1.0);
+		tsc.setTotalTokenOverlapScore(1.0);
+
+		// TEST WITHOUT USAGE OF DOMAIN-SIMILARITY-SCORE
+		// Mock weights:
+		getSettings().setTokenScoreBitScoreWeight(0.5);
+		getSettings().setTokenScoreDatabaseScoreWeight(0.3);
+		getSettings().setTokenScoreOverlapScoreWeight(0.2);
+		getSettings().setTokenScoreDomainSimilarityWeight(0.0);
+		// 0.5 * 0.1 + 0.3 * 0.2 + 0.2 * 0.3 = 0.17
+		assertEquals(0.17, tsc.tokenScore("goat"), 0.0001);
+		
+		// TEST WITH USAGE OF DOMAIN-SIMILARITY-SCORE
+		// Mock weights:
+		getSettings().setTokenScoreBitScoreWeight(0.3);
+		getSettings().setTokenScoreDatabaseScoreWeight(0.3);
+		getSettings().setTokenScoreOverlapScoreWeight(0.3);
+		getSettings().setTokenScoreDomainSimilarityWeight(0.1);
+		// 0.3 * (0.1 + 0.2 + 0.3) + 0.1 * 0.4 = 0.22
+		assertEquals(0.22, tsc.tokenScore("sheep"), 0.0001);
 	}
 }

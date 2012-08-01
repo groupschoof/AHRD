@@ -83,7 +83,7 @@ public class TokenScoreCalculator {
 				// iterate through tokens in different blast result desc-lines
 				for (String token : iterResult.getTokens()) {
 					if (!(getTokenScores().containsKey(token))) {
-						double tokenscore = tokenScore(token, iterBlastDb);
+						double tokenscore = tokenScore(token);
 						getTokenScores().put(token, new Double(tokenscore));
 						// remember highest token score
 						if (tokenscore > getTokenHighScore()) {
@@ -212,20 +212,23 @@ public class TokenScoreCalculator {
 	 * @param token
 	 * @return token-score
 	 */
-	public double tokenScore(String token, String blastDatabaseName) {
+	public double tokenScore(String token) {
 		// Validate:
 		Double bitScoreWeight = getSettings().getTokenScoreBitScoreWeight();
 		Double databaseScoreWeight = getSettings()
 				.getTokenScoreDatabaseScoreWeight();
 		Double overlapScoreWeight = getSettings()
 				.getTokenScoreOverlapScoreWeight();
-		double validateSumToOne = roundToNDecimalPlaces(bitScoreWeight
-				+ databaseScoreWeight + overlapScoreWeight, 9);
+		Double domainSimilarityWeight = getSettings()
+				.getTokenScoreDomainSimilarityWeight();
+		Double validateSumToOne = roundToNDecimalPlaces(bitScoreWeight
+				+ databaseScoreWeight + overlapScoreWeight
+				+ domainSimilarityWeight, 9);
 		// Tolerate rounding error <= 10^-3
 		if (!(validateSumToOne >= 0.999 && validateSumToOne <= 1.001))
 			throw new IllegalArgumentException(
-					"The three weights 'bitScoreWeight', 'databaseScoreWeight', and 'overlapScoreWeight' should sum up to 1, but actually sum up to: "
-							+ (bitScoreWeight + databaseScoreWeight + overlapScoreWeight));
+					"The four weights 'bitScoreWeight', 'databaseScoreWeight', 'overlapScoreWeight' and 'domainSimilarityScoreWeight' should sum up to 1.0, but actually sum up to: "
+							+ (bitScoreWeight + databaseScoreWeight + overlapScoreWeight + domainSimilarityWeight));
 		// Calculate Token-Score:
 		return (bitScoreWeight * getCumulativeTokenBitScores().get(token)
 				/ getTotalTokenBitScore() + databaseScoreWeight
