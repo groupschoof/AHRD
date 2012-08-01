@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import sun.applet.GetMemberPluginCallRequest;
+
 /**
  * Functions calculating Token-Scores.
  */
@@ -228,14 +230,25 @@ public class TokenScoreCalculator {
 		if (!(validateSumToOne >= 0.999 && validateSumToOne <= 1.001))
 			throw new IllegalArgumentException(
 					"The four weights 'bitScoreWeight', 'databaseScoreWeight', 'overlapScoreWeight' and 'domainSimilarityScoreWeight' should sum up to 1.0, but actually sum up to: "
-							+ (bitScoreWeight + databaseScoreWeight + overlapScoreWeight + domainSimilarityWeight));
+							+ (bitScoreWeight + databaseScoreWeight
+									+ overlapScoreWeight + domainSimilarityWeight));
 		// Calculate Token-Score:
 		return (bitScoreWeight * getCumulativeTokenBitScores().get(token)
 				/ getTotalTokenBitScore() + databaseScoreWeight
 				* getCumulativeTokenBlastDatabaseScores().get(token)
 				/ getTotalTokenBlastDatabaseScore() + overlapScoreWeight
 				* getCumulativeTokenOverlapScores().get(token)
-				/ getTotalTokenOverlapScore());
+				/ getTotalTokenOverlapScore() + domainSimilarityFraction(token));
+	}
+
+	public double domainSimilarityFraction(String token) {
+		double dsf = 0.0;
+		if (getTotalTokenDomainSimilarityScore() > 0
+				&& getCumulativeTokenDomainSimilarityScores().get(token) != null)
+			dsf = getSettings().getTokenScoreDomainSimilarityWeight()
+					* getCumulativeTokenDomainSimilarityScores().get(token)
+					/ getTotalTokenDomainSimilarityScore();
+		return dsf;
 	}
 
 	public void addCumulativeTokenBitScore(String token, double bitScore) {
