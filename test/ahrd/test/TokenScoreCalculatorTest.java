@@ -70,7 +70,6 @@ public class TokenScoreCalculatorTest {
 		assertEquals(203.5, tsc.getTotalTokenBitScore(), 0.0);
 		assertEquals(160.0, tsc.getTotalTokenBlastDatabaseScore(), 0.0);
 		assertEquals(0.88, tsc.getTotalTokenOverlapScore(), 0.0);
-		assertEquals(1.95, tsc.getTotalTokenDomainSimilarityScore(), 0.0);
 	}
 
 	@Test
@@ -87,7 +86,6 @@ public class TokenScoreCalculatorTest {
 		assertEquals(3, tsc.getCumulativeTokenBitScores().size());
 		assertEquals(3, tsc.getCumulativeTokenOverlapScores().size());
 		assertEquals(3, tsc.getCumulativeTokenBlastDatabaseScores().size());
-		assertEquals(3, tsc.getCumulativeTokenDomainSimilarityScores().size());
 		// test cum.BitScores
 		assertEquals(115.5, tsc.getCumulativeTokenBitScores().get("token_one"),
 				0);
@@ -109,13 +107,6 @@ public class TokenScoreCalculatorTest {
 				.get("token_two"), 0);
 		assertEquals(0.455, tsc.getCumulativeTokenOverlapScores().get(
 				"token_three"), 0);
-		// test cum.DomainSimilarityScore
-		assertEquals(1.75, tsc.getCumulativeTokenDomainSimilarityScores().get(
-				"token_one"), 0.0);
-		assertEquals(0.95, tsc.getCumulativeTokenDomainSimilarityScores().get(
-				"token_two"), 0.0);
-		assertEquals(0.2, tsc.getCumulativeTokenDomainSimilarityScores().get(
-				"token_three"), 0.0);
 	}
 
 	@Test

@@ -14,6 +14,7 @@ import ahrd.controller.AHRD;
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
+import ahrd.model.DomainScoreCalculator;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 
@@ -44,8 +45,10 @@ public class AhrdTest {
 	@Test
 	public void testAhrdParsesBlast() throws IOException,
 			MissingProteinException, SAXException, MissingAccessionException {
+		// Start Setup the test!
 		// We need the test-protein-Database in memory:
 		ahrd.setProteins(TestUtils.mockProteinDb());
+		// now, we can parse the BlastResults:
 		ahrd.parseBlastResults();
 		for (String iterProtAcc : ahrd.getProteins().keySet()) {
 			Protein protein = ahrd.getProteins().get(iterProtAcc);
@@ -54,6 +57,7 @@ public class AhrdTest {
 			assertTrue(protein.getBlastResults().containsKey("tair"));
 			assertTrue(protein.getBlastResults().containsKey("trembl"));
 		}
+		// Start the actual test:
 		// test number of tokens:
 		Protein p = ahrd.getProteins().get("gene:chr01.502:mRNA:chr01.502");
 		BlastResult br = p.getBlastResults().get("swissprot").get(0);

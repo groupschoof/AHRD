@@ -1,7 +1,8 @@
 package ahrd.model;
 
-import static ahrd.controller.Utils.roundToNDecimalPlaces;
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.controller.Utils.roundToNDecimalPlaces;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -137,9 +138,58 @@ public class TokenScoreCalculator {
 			addCumulativeTokenBlastDatabaseScore(token, br
 					.getBlastDatabaseName());
 			addCumulativeTokenOverlapScore(token, overlapScore);
-			addCumulativeTokenDomainSimilarityScore(token, br
-					.getDomainSimilarityScore());
 		}
+	}
+
+	/**
+	 * 
+	 * Iteratively measures the cumulative domain similarity score for each
+	 * token in the argument set.
+	 * 
+	 * @Note: Only after the Interpro annotations for the BlastResults are
+	 *        initialized and the <em>complete</em> set of description
+	 *        candidates (BlastResults) has been constructed, the domain
+	 *        similarity scores can be calculated. Hence this method is invoked
+	 *        <em>after</em> all BlastResults have been parsed.
+	 * 
+	 * @param BlastResult
+	 *            br
+	 */
+	public void measureCumulativeDomainSimilarityScores(BlastResult br) {
+		Double dss = br.getDomainSimilarityScore();
+		if (dss != null && dss > 0.0) {
+			for (String token : br.getTokens()) {
+				if (!getCumulativeTokenDomainSimilarityScores().containsKey(
+						token)) {
+					getCumulativeTokenDomainSimilarityScores().put(token, dss);
+				} else {
+					getCumulativeTokenDomainSimilarityScores()
+							.put(
+									token,
+									dss
+											+ getCumulativeTokenDomainSimilarityScores()
+													.get(token));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Iteratively computes the total domain similarity score.
+	 * 
+	 * @Note: Only after the Interpro annotations for the BlastResults are
+	 *        initialized and the <em>complete</em> set of description
+	 *        candidates (BlastResults) has been constructed, the domain
+	 *        similarity scores can be calculated. Hence this method is invoked
+	 *        <em>after</em> all BlastResults have been parsed.
+	 * 
+	 * @param BlastResult
+	 *            br
+	 */
+	public void measureTotalDomainSimilarityScore(BlastResult br) {
+		if (br.getDomainSimilarityScore() != null)
+			setTotalTokenDomainSimilarityScore(getTotalTokenDomainSimilarityScore()
+					+ br.getDomainSimilarityScore());
 	}
 
 	/**
@@ -156,9 +206,6 @@ public class TokenScoreCalculator {
 				+ getSettings().getBlastDbWeight(br.getBlastDatabaseName()));
 		setTotalTokenOverlapScore(getTotalTokenOverlapScore() + overlapScore);
 		setTotalTokenBitScore(getTotalTokenBitScore() + br.getBitScore());
-		if (br.getDomainSimilarityScore() != null)
-			setTotalTokenDomainSimilarityScore(getTotalTokenDomainSimilarityScore()
-					+ br.getDomainSimilarityScore());
 	}
 
 	/**
@@ -222,20 +269,6 @@ public class TokenScoreCalculator {
 					new Double(blastDatabaseWeight
 							+ getCumulativeTokenBlastDatabaseScores()
 									.get(token)));
-	}
-
-	public void addCumulativeTokenDomainSimilarityScore(String token, Double dss) {
-		if (dss != null && dss > 0.0) {
-			if (!getCumulativeTokenDomainSimilarityScores().containsKey(token)) {
-				getCumulativeTokenDomainSimilarityScores().put(token, dss);
-			} else {
-				getCumulativeTokenDomainSimilarityScores().put(
-						token,
-						dss
-								+ getCumulativeTokenDomainSimilarityScores()
-										.get(token));
-			}
-		}
 	}
 
 	public double sumOfAllTokenScores(BlastResult blastResult) {

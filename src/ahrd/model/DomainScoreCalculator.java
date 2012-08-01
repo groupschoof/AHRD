@@ -78,6 +78,9 @@ public class DomainScoreCalculator {
 	}
 
 	private Protein protein;
+	private SortedSet<String> vectorSpaceModel;
+	private Map<String, Double> cumulativeTokenDomainSimilarityScores = new HashMap<String, Double>();
+	private Double totalTokenDomainSimilarityScore = 0.0;
 
 	/**
 	 * 
@@ -88,6 +91,7 @@ public class DomainScoreCalculator {
 	 * @param prot
 	 */
 	public static void constructDomainWeightVectors(Protein prot) {
+
 		// Vector Space Model of all distinct annotated Interpro-Entities:
 		SortedSet<String> vsm = constructVectorSpaceModel(prot);
 
@@ -167,28 +171,22 @@ public class DomainScoreCalculator {
 	}
 
 	/**
-	 * 
 	 * Gathers all distinct InterproIDs assigned to the Protein and its
 	 * BlastResults, than constructs a sorted Set of them to be used as a
 	 * definition for the vector space model.
 	 * 
-	 * @param prot
+	 * @param Protein
+	 *            prot
 	 * @return SortedSet<String> of the respective InterproIDs in their natural
 	 *         order
 	 */
 	public static SortedSet<String> constructVectorSpaceModel(Protein prot) {
 		SortedSet<String> vectorSpaceModel = new TreeSet<String>();
-		// 1.) Construct the template for the Vector of domain-weights!
 		for (InterproResult ir : prot.getInterproResults()) {
 			vectorSpaceModel.add(ir.getId());
 		}
-		// For each BlastResult, check, if there's an entry in the memory
-		// database 'BlastResultAccessionsToInterproIds' using the BlastResult's
-		// Accession as lookup key. Add all found assigned Interpro-Ids to the
-		// vector space model.
 		for (String blastDb : prot.getBlastResults().keySet()) {
 			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
-				br.getAccession();
 				if (getBlastResultAccessionsToInterproIds().containsKey(
 						br.getAccession())) {
 					vectorSpaceModel.addAll(blastResultAccessionsToInterproIds
@@ -205,12 +203,71 @@ public class DomainScoreCalculator {
 		setProtein(protein);
 	}
 
+	/**
+	 * After initialization of BlastResults Interpro-Annotations and having
+	 * selected all BlastResults to be description candidates, now the
+	 * DomainSimilarityScores can be computed.
+	 * <ul>
+	 * <li>Generate the vector space model (VSM)</li>
+	 * <li>For the query protein itself and each BlastResult (Description
+	 * Candidate) compute its Domain Weigths Vector</li>
+	 * <li>Finally for each BlastResult compute its DomainSimilarityScore as
+	 * sim(query-protein, blast-result)</li>
+	 * <li>Trigger computation of cumulative token domain similarity scores and
+	 * total token domain similarity score in the query protein's
+	 * TokenScoreCalculator</li>
+	 * </ul>
+	 * 
+	 * @param Protein
+	 *            prot
+	 */
+	public void computeDomainSimilarityScores() {
+		setVectorSpaceModel(constructVectorSpaceModel(getProtein()));
+		constructDomainWeightVectors(getProtein());
+		for (String blastDb : getProtein().getBlastResults().keySet()) {
+			for (BlastResult br : getProtein().getBlastResults().get(blastDb)) {
+				br.setDomainSimilarityScore(domainWeightSimilarity(getProtein()
+						.getDomainWeights(), br.getDomainWeights()));
+				getProtein().getTokenScoreCalculator()
+						.measureCumulativeDomainSimilarityScores(br);
+				getProtein().getTokenScoreCalculator()
+						.measureTotalDomainSimilarityScore(br);
+			}
+		}
+	}
+
 	public Protein getProtein() {
 		return protein;
 	}
 
 	public void setProtein(Protein protein) {
 		this.protein = protein;
+	}
+
+	public SortedSet<String> getVectorSpaceModel() {
+		return vectorSpaceModel;
+	}
+
+	public void setVectorSpaceModel(SortedSet<String> vectorSpaceModel) {
+		this.vectorSpaceModel = vectorSpaceModel;
+	}
+
+	public Map<String, Double> getCumulativeTokenDomainSimilarityScores() {
+		return cumulativeTokenDomainSimilarityScores;
+	}
+
+	public void setCumulativeTokenDomainSimilarityScores(
+			Map<String, Double> cumulativeTokenDomainSimilarityScores) {
+		this.cumulativeTokenDomainSimilarityScores = cumulativeTokenDomainSimilarityScores;
+	}
+
+	public Double getTotalTokenDomainSimilarityScore() {
+		return totalTokenDomainSimilarityScore;
+	}
+
+	public void setTotalTokenDomainSimilarityScore(
+			Double totalTokenDomainSimilarityScore) {
+		this.totalTokenDomainSimilarityScore = totalTokenDomainSimilarityScore;
 	}
 
 }

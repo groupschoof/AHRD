@@ -76,6 +76,8 @@ public class Settings implements Cloneable {
 	public static final String P_MUTATE_SAME_PARAMETER_SCALE_KEY = "p_mutate_same_parameter_scale";
 	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
 	public static final String OUTPUT_FASTA_KEY = "output_fasta";
+	public static final String DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "descriptionScoreDomainSimilarityWeight";
+	public static final String TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "tokenScoreDomainSimilarityWeight";
 
 	/**
 	 * Fields:
@@ -182,6 +184,16 @@ public class Settings implements Cloneable {
 	 * This data is needed for the Domain-Scoring.
 	 */
 	private String pathToInterproResults4BlastHits;
+	/**
+	 * The configurable weight for the fraction a BlastResult's domain weight
+	 * similarity score is going to assume in the final token score.
+	 */
+	private Double tokenScoreDomainSimilarityWeight;
+	/**
+	 * The configurable weight for the fraction a BlastResult's domain weight
+	 * similarity score is going to assume in the final description score.
+	 */
+	private Double descriptionScoreDomainSimilarityWeight;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -211,6 +223,14 @@ public class Settings implements Cloneable {
 				.get(DOMAIN_WEIGHTS_DATABASE));
 		setPathToInterproResults4BlastHits((String) input
 				.get(INTERPRO_RESULTS_4_BLASTHITS));
+		if (input.get(TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null)
+			setTokenScoreDomainSimilarityWeight(Double
+					.parseDouble((String) input
+							.get(TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY)));
+		if (input.get(DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null)
+			setDescriptionScoreDomainSimilarityWeight(Double
+					.parseDouble((String) input
+							.get(DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY)));
 		setPathToGeneOntologyResults((String) input
 				.get(GENE_ONTOLOGY_RESULT_KEY));
 		setPathToOutput((String) input.get(OUTPUT_KEY));
@@ -578,6 +598,19 @@ public class Settings implements Cloneable {
 	}
 
 	/**
+	 * Only compute domain similarity scores, if and only if all required input
+	 * data is present.
+	 * 
+	 * @return boolean
+	 */
+	public boolean isToComputeDomainSimilarities() {
+		return (hasInterproAnnotations()
+				&& getPathToDomainWeightsDatabase() != null
+				&& !getPathToDomainWeightsDatabase().equals("")
+				&& getTokenScoreDomainSimilarityWeight() != null && getDescriptionScoreDomainSimilarityWeight() != null);
+	}
+
+	/**
 	 * Evaluation or Optimization might be interested in the highest possibly
 	 * achievable evaluation-score.
 	 */
@@ -724,6 +757,24 @@ public class Settings implements Cloneable {
 	public void setPathToInterproResults4BlastHits(
 			String pathToInterproResults4BlastHits) {
 		this.pathToInterproResults4BlastHits = pathToInterproResults4BlastHits;
+	}
+
+	public Double getTokenScoreDomainSimilarityWeight() {
+		return tokenScoreDomainSimilarityWeight;
+	}
+
+	public void setTokenScoreDomainSimilarityWeight(
+			Double tokenScoreDomainSimilarityWeight) {
+		this.tokenScoreDomainSimilarityWeight = tokenScoreDomainSimilarityWeight;
+	}
+
+	public Double getDescriptionScoreDomainSimilarityWeight() {
+		return descriptionScoreDomainSimilarityWeight;
+	}
+
+	public void setDescriptionScoreDomainSimilarityWeight(
+			Double descriptionScoreDomainSimilarityWeight) {
+		this.descriptionScoreDomainSimilarityWeight = descriptionScoreDomainSimilarityWeight;
 	}
 
 }

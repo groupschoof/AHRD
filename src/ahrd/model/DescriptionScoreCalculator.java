@@ -70,6 +70,27 @@ public class DescriptionScoreCalculator {
 				* br.getBitScore() / getMaxBitScore();
 	}
 
+	/**
+	 * Computes argument BlastResult's 'domain similarity score' times the
+	 * configurable weight. Always returns a valid real number, even if the
+	 * BlastResult does not have a domain similarity score assigned. The latter
+	 * is the case if there are no Interpro annotations available for either the
+	 * query protein or the BlastResult itself or AHRD was launched without any
+	 * Interpro annotations at all.
+	 * 
+	 * @param BlastResult
+	 *            br
+	 * @return Double
+	 */
+	public Double domainSimilarityScore(BlastResult br) {
+		// (1) Instantiate a dss with value zero.
+		// (2) if and only if the BlastResult has a non null domain similarity score
+		// multiply it with the configurable weight
+		// 'descriptionScoreDomainSimilarityWeight'
+		// return result
+		return null;
+	}
+
 	public void measureMaxBitScore(double bitScore) {
 		if (bitScore > getMaxBitScore())
 			setMaxBitScore(bitScore);

@@ -20,6 +20,7 @@ public class Protein {
 	private Set<InterproResult> interproResults = new HashSet<InterproResult>();
 	private Set<GeneOntologyResult> goResults = new HashSet<GeneOntologyResult>();
 	private TokenScoreCalculator tokenScoreCalculator;
+	private DomainScoreCalculator domainScoreCalculator;
 	private LexicalScoreCalculator lexicalScoreCalculator;
 	private DescriptionScoreCalculator descriptionScoreCalculator;
 	private EvaluationScoreCalculator evaluationScoreCalculator;
@@ -31,6 +32,7 @@ public class Protein {
 		setSequenceLength(sequenceLength);
 		setBlastResults(new HashMap<String, List<BlastResult>>());
 		setTokenScoreCalculator(new TokenScoreCalculator(this));
+		setDomainScoreCalculator(new DomainScoreCalculator(this));
 		setLexicalScoreCalculator(new LexicalScoreCalculator(this));
 		setDescriptionScoreCalculator(new DescriptionScoreCalculator(this));
 		// If current Settings require evaluation of AHRD's performance or are
@@ -108,7 +110,8 @@ public class Protein {
 	 * total scores later needed to calculate the Token-Scores. Also finds the
 	 * highest BitScore and Description-Line-Frequency. The argument BlastResult
 	 * is expected to have passed Blacklist and Filter and is expected to have
-	 * been token- and patternized.
+	 * been token- and patternized. The computation of the BlastResult's
+	 * DomainSimilarityScore is also triggered here.
 	 * 
 	 * @param BlastResult
 	 */
@@ -253,4 +256,14 @@ public class Protein {
 	public void setDomainWeights(List<Double> domainWeights) {
 		this.domainWeights = domainWeights;
 	}
+
+	public DomainScoreCalculator getDomainScoreCalculator() {
+		return domainScoreCalculator;
+	}
+
+	public void setDomainScoreCalculator(
+			DomainScoreCalculator domainScoreCalculator) {
+		this.domainScoreCalculator = domainScoreCalculator;
+	}
+
 }

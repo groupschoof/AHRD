@@ -203,5 +203,6 @@ public class DomainScoreCalculatorTest {
 		dws = DomainScoreCalculator.domainWeightSimilarity(x, y);
 		assertNotNull(dws);
 		assertEquals(0.0, dws, 0.0);
-	}
+	}	
+	
 }

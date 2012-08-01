@@ -1,6 +1,8 @@
 package ahrd.test;
 
+import static ahrd.controller.Settings.getSettings;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -106,5 +108,21 @@ public class DescriptionScoreCalculatorTest {
 		assertEquals("description_5 Fly-Wing formation", p
 				.getDescriptionScoreCalculator().getHighestScoringBlastResult()
 				.getDescription());
+	}
+
+	@Test
+	public void testDomainSimilarityScore() {
+		Protein p = TestUtils.mockProtein();
+		BlastResult br = new BlastResult("accession_1", 0.0000001,
+				"Description One", 10, 100, 696.0, "swissprot");
+		br.setDomainSimilarityScore(0.9);
+		getSettings().setDescriptionScoreDomainSimilarityWeight(0.5);
+
+		Double dss = p.getDescriptionScoreCalculator()
+				.domainSimilarityScore(br);
+		assertNotNull(
+				"The description score domain similarity score should have been calculated.",
+				dss);
+		assertEquals(0.45, dss, 0.001);
 	}
 }

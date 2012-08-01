@@ -141,9 +141,7 @@ public class AHRD {
 	}
 
 	public void parseInterproResultsForBlastHits() throws IOException {
-		if (getSettings().getPathToInterproResults4BlastHits() != null
-				&& !getSettings().getPathToInterproResults4BlastHits().equals(
-						"")) {
+		if (getSettings().isToComputeDomainSimilarities()) {
 			DomainScoreCalculator
 					.initializeBlastResultAccessionsToInterproIds();
 		}
@@ -181,6 +179,14 @@ public class AHRD {
 			System.out.println("...initialised proteins in " + takeTime()
 					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
 
+		// one single BlastResult accessions to interpro-id mapping file:
+		parseInterproResultsForBlastHits();
+		if (writeLogMsgs)
+			System.out
+					.println("...parsed 'Interpro Results for Blast-Hits' in "
+							+ takeTime() + "sec, currently occupying "
+							+ takeMemoryUsage() + " MB");
+
 		// multiple blast-results against different Blast-Databases
 		parseBlastResults();
 		if (writeLogMsgs)
@@ -204,12 +210,6 @@ public class AHRD {
 					+ takeTime() + "sec, currently occupying "
 					+ takeMemoryUsage() + " MB");
 
-		// one single BlastResult accessions to interpro-id mapping file:
-		parseInterproResultsForBlastHits();
-		if (writeLogMsgs)
-			System.out.println("...parsed Interpro Results for Blast-Hits in "
-					+ takeTime() + "sec, currently occupying "
-					+ takeMemoryUsage() + " MB");
 	}
 
 	/**
@@ -224,6 +224,13 @@ public class AHRD {
 			Protein prot = getProteins().get(protAcc);
 			// Find best scoring Blast-Hit's Description-Line (based on evalue):
 			filterBestScoringBlastResults(prot);
+			// Having selected those BlastResults to be description candidates,
+			// now is the moment for computation of the domain similarity
+			// scores:
+			if (getSettings().isToComputeDomainSimilarities()
+					&& !prot.getInterproResults().isEmpty()) {
+				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
+			}
 			// Tokenize each BlastResult's Description-Line and
 			// assign the Tokens their Scores:
 			// tokenizeBlastResultDescriptionLines(prot);
