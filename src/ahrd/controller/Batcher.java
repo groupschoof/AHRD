@@ -209,6 +209,25 @@ public class Batcher {
 				batchYml.put(Settings.DOMAIN_WEIGHTS_DATABASE,
 						getInput().get(Settings.DOMAIN_WEIGHTS_DATABASE));
 			}
+			if (getInput().get(Settings.INTERPRO_RESULTS_4_BLASTHITS) != null) {
+				batchYml.put(Settings.INTERPRO_RESULTS_4_BLASTHITS, getInput()
+						.get(Settings.INTERPRO_RESULTS_4_BLASTHITS));
+			}
+			if (getInput().get(
+					Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null) {
+				batchYml.put(
+						Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY,
+						getInput()
+								.get(Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY));
+			}
+			if (getInput().get(
+					Settings.DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null) {
+				batchYml.put(
+						Settings.DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY,
+						getInput()
+								.get(Settings.DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY));
+			}
+			// End Domain-Architecture related data.
 		}
 
 		// Gene-Ontology-Result, if given:

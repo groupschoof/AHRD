@@ -1,6 +1,8 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.controller.Utils.getXmlAttributeValue;
+import static ahrd.controller.Utils.retrieveContentOfFirstXmlChildElement;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -70,30 +72,6 @@ public class InterproResult implements Comparable<InterproResult> {
 		setDomainWeight(domainWeight);
 	}
 
-	private static String getAttributeValue(Element element,
-			String attributeName) {
-		String attrVal = "";
-		Attribute attr = element.getAttribute(attributeName);
-		if (attr != null)
-			attrVal = attr.getValue();
-		// else
-		// element.getLocalName() +
-		// "' does not have Attribute '" +
-		// attributeName + "'!"
-		// );
-		return attrVal;
-	}
-
-	private static String retrieveContentOfFirstChildElement(Element element,
-			String xpathQuery) {
-		String res = null;
-		Nodes resultNodes = element.query(xpathQuery);
-		if (resultNodes.size() > 0) {
-			res = resultNodes.get(0).getValue();
-		}
-		return res;
-	}
-
 	public static void initialiseInterproDb() throws IOException,
 			ParsingException {
 		Builder parser = new Builder();
@@ -103,10 +81,10 @@ public class InterproResult implements Comparable<InterproResult> {
 		Nodes ipr_nodes = doc.query("//interpro");
 		for (int i = 0; i < ipr_nodes.size(); i++) {
 			Element ipr_el = (Element) ipr_nodes.get(i);
-			InterproResult ipr = new InterproResult(getAttributeValue(ipr_el,
-					"id"), getAttributeValue(ipr_el, "short_name"),
-					getAttributeValue(ipr_el, "type"));
-			ipr.setName(retrieveContentOfFirstChildElement(ipr_el, "name"));
+			InterproResult ipr = new InterproResult(getXmlAttributeValue(
+					ipr_el, "id"), getXmlAttributeValue(ipr_el, "short_name"),
+					getXmlAttributeValue(ipr_el, "type"));
+			ipr.setName(retrieveContentOfFirstXmlChildElement(ipr_el, "name"));
 			// Retrieve Parent-Id:
 			Nodes resultNodes = ipr_el.query("parent_list");
 			if (resultNodes.size() > 0) {

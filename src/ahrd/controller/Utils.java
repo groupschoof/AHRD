@@ -7,9 +7,16 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.Vector;
+
+import nu.xom.Attribute;
+import nu.xom.Element;
+import nu.xom.Nodes;
+import nu.xom.XPathContext;
 
 /**
  * Provides globally used utility-methods. E.g. for reading files or creating
@@ -109,4 +116,105 @@ public class Utils {
 		return l;
 	}
 
+	/**
+	 * Returns the value XML attribute 'attributeName' of 'element'. Returns
+	 * EMPTY String in case the attribute can't be found.
+	 * 
+	 * @param element
+	 * @param attributeName
+	 * @return String
+	 */
+	public static String getXmlAttributeValue(Element element,
+			String attributeName) {
+		String attrVal = "";
+		Attribute attr = element.getAttribute(attributeName);
+		if (attr != null)
+			attrVal = attr.getValue();
+		return attrVal;
+	}
+
+	/**
+	 * Returns the content of the <em>first</em> XML child of the argument
+	 * element.
+	 * 
+	 * @param element
+	 * @param xpathQuery
+	 * @return String
+	 */
+	public static String retrieveContentOfFirstXmlChildElement(Element element,
+			String xpathQuery) {
+		String res = null;
+		Nodes resultNodes = element.query(xpathQuery);
+		if (resultNodes.size() > 0) {
+			res = resultNodes.get(0).getValue();
+		}
+		return res;
+	}
+
+	/**
+	 * Returns the content of the <em>first</em> XML child of the argument
+	 * element. Uses provided argument name space.
+	 * 
+	 * @param element
+	 * @param xpathQuery
+	 * @param context
+	 * @return String
+	 */
+	public static String retrieveContentOfFirstXmlChildElement(Element element,
+			String xpathQuery, XPathContext context) {
+		String res = null;
+		Nodes resultNodes = element.query(xpathQuery, context);
+		if (resultNodes.size() > 0) {
+			res = resultNodes.get(0).getValue();
+		}
+		return res;
+	}
+
+	/**
+	 * Returns all values of attributes matching argument name found in the
+	 * children of argument XML element.
+	 * 
+	 * @param element
+	 * @param xpathQuery
+	 * @param attributeName
+	 * @return Set<String>
+	 */
+	public static Set<String> retrieveAttribteValuesOfXmlChildrenElements(
+			Element element, String xpathQuery, String attributeName) {
+		Set<String> res = null;
+		Nodes resultNodes = element.query(xpathQuery);
+		if (resultNodes.size() > 0) {
+			res = new HashSet<String>();
+			for (int i = 0; i < resultNodes.size(); i++) {
+				res.add(getXmlAttributeValue((Element) resultNodes.get(i),
+						attributeName));
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * Returns all values of attributes matching argument name found in the
+	 * children of argument XML element. Uses provided argument name space.
+	 * 
+	 * @param element
+	 * @param xpathQuery
+	 * @param attributeName
+	 * @param context
+	 * @return Set<String>
+	 */
+	public static Set<String> retrieveAttribteValuesOfXmlChildrenElements(
+			Element element, String xpathQuery, String attributeName,
+			XPathContext context) {
+		Set<String> res = null;
+		Nodes resultNodes = element.query(xpathQuery, context);
+		if (resultNodes.size() > 0) {
+			res = new HashSet<String>();
+			for (int i = 0; i < resultNodes.size(); i++) {
+				res.add(getXmlAttributeValue((Element) resultNodes.get(i),
+						attributeName));
+			}
+		}
+		return res;
+	}
 }
