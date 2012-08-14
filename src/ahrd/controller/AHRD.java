@@ -205,12 +205,15 @@ public class AHRD {
 					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
 
 		// one single BlastResult accessions to interpro-id mapping file:
-		parseInterproResultsForBlastHits();
-		if (writeLogMsgs)
-			System.out
-					.println("...parsed 'Interpro Results for Blast-Hits' in "
-							+ takeTime() + "sec, currently occupying "
-							+ takeMemoryUsage() + " MB");
+		if (false) {
+			parseInterproResultsForBlastHits();
+			if (writeLogMsgs)
+				System.out
+						.println("...parsed 'Interpro Results for Blast-Hits' in "
+								+ takeTime()
+								+ "sec, currently occupying "
+								+ takeMemoryUsage() + " MB");
+		}
 
 		// multiple blast-results against different Blast-Databases
 		parseBlastResults();
