@@ -4,12 +4,16 @@ import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Settings.setSettings;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import nu.xom.ParsingException;
 
@@ -23,6 +27,7 @@ import ahrd.model.DomainScoreCalculator;
 import ahrd.model.GeneOntologyResult;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
+import ahrd.model.UniprotKBEntry;
 import ahrd.view.FastaOutputWriter;
 import ahrd.view.IOutputWriter;
 import ahrd.view.OutputWriter;
@@ -154,6 +159,26 @@ public class AHRD {
 					BlastResult.filterBestScoringBlastResults(prot
 							.getBlastResults().get(blastDatabaseName), 200));
 		}
+	}
+
+	/**
+	 * Accesses the RESTful service of UniprotKB to download all domain
+	 * annotation available for the BlastResults. In order to speed things up,
+	 * this is done in parallel.
+	 * 
+	 * @throws InterruptedException
+	 */
+	public void loadBlastResultDomainAnnotationFromUniprotKB(Protein prot)
+			throws InterruptedException {
+		ExecutorService threadPool = Executors.newFixedThreadPool(50);
+		Collection<Callable<Boolean>> uniprotLoaders = new ArrayList<Callable<Boolean>>();
+		for (String blastDb : prot.getBlastResults().keySet()) {
+			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
+				uniprotLoaders.add(new UniprotKBEntry.ParallelLoader(br
+						.getAccession()));
+			}
+		}
+		threadPool.invokeAll(uniprotLoaders);
 	}
 
 	/**

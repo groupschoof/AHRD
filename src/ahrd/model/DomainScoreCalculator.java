@@ -38,7 +38,7 @@ public class DomainScoreCalculator {
 	 * 
 	 * @note: See awk-scripts in directory helper_scripts.
 	 */
-	private static Map<String, Set<String>> blastResultAccessionsToInterproIds;
+	private static Map<String, Set<String>> blastResultAccessionsToInterproIds = new HashMap<String, Set<String>>();
 
 	public static Map<String, Set<String>> getBlastResultAccessionsToInterproIds() {
 		return blastResultAccessionsToInterproIds;
@@ -47,6 +47,22 @@ public class DomainScoreCalculator {
 	public static void setBlastResultAccessionsToInterproIds(
 			Map<String, Set<String>> blastResultAccessionsToInterproIds) {
 		DomainScoreCalculator.blastResultAccessionsToInterproIds = blastResultAccessionsToInterproIds;
+	}
+
+	/**
+	 * To enable calculation of domain-architecture scores, we need to know the
+	 * concrete architecture of proteins of significant similarity (BLAST
+	 * results). In this memory database we store the Pfam domains.
+	 */
+	private static Map<String, Set<String>> blastResultAccessionsToPfamIds = new HashMap<String, Set<String>>();
+
+	public static Map<String, Set<String>> getBlastResultAccessionsToPfamIds() {
+		return blastResultAccessionsToPfamIds;
+	}
+
+	public static void setBlastResultAccessionsToPfamIds(
+			Map<String, Set<String>> blastResultAccessionsToPfamIds) {
+		DomainScoreCalculator.blastResultAccessionsToPfamIds = blastResultAccessionsToPfamIds;
 	}
 
 	public static void initializeBlastResultAccessionsToInterproIds()

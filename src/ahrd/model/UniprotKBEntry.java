@@ -6,6 +6,7 @@ import static ahrd.controller.Utils.retrieveContentOfFirstXmlChildElement;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -18,12 +19,12 @@ import nu.xom.XPathContext;
 public class UniprotKBEntry {
 
 	/**
-	 * In order to speed up loading of UniprotKBEntries from the RESTful
-	 * service, do it in parallel.
+	 * In order to speed up loading of UniprotKBEntries from the RESTful service
+	 * do it in parallel.
 	 * 
-	 * @author Asis Hallab
+	 * @author Asis Hallab, Mythri Bangalore
 	 */
-	public class ParallelLoader implements Runnable {
+	public static class ParallelLoader implements Callable<Boolean> {
 
 		private String accession;
 
@@ -32,18 +33,33 @@ public class UniprotKBEntry {
 			this.accession = accession;
 		}
 
-		public void run() {
+		public Boolean call() {
+			Boolean completed = true;
 			if (!DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
-					.containsKey(this.accession)) {
+					.containsKey(this.accession)
+					&& !DomainScoreCalculator
+							.getBlastResultAccessionsToPfamIds().containsKey(
+									this.accession)) {
+				String url = "NOT INITIALIZED";
 				try {
-					UniprotKBEntry result = UniprotKBEntry
-							.fromUrl(this.accession);
-					// todo
-
+					url = UniprotKBEntry.url(this.accession);
+					UniprotKBEntry result = UniprotKBEntry.fromUrl(url);
+					DomainScoreCalculator
+							.getBlastResultAccessionsToInterproIds().put(
+									result.getAccession(),
+									result.getIprAnnotations());
+					DomainScoreCalculator.getBlastResultAccessionsToPfamIds()
+							.put(result.getAccession(),
+									result.getPfamAnnotations());
 				} catch (Exception e) {
+					System.err
+							.println("WARNING: Could not fetch UniprotKB-Entry using RESTful URL '"
+									+ url + "'.");
 					e.printStackTrace(System.err);
+					completed = false;
 				}
 			}
+			return completed;
 		}
 	}
 
@@ -72,11 +88,14 @@ public class UniprotKBEntry {
 			if (accession != null && !accession.equals("")) {
 				result = new UniprotKBEntry(accession);
 				// Add Interpro-Annotations
-				result.setIprAnnotations(retrieveAttribteValuesOfXmlChildrenElements(
-						uni, "xmlns:dbReference[@type='InterPro']", "id", c));
+				result
+						.setIprAnnotations(retrieveAttribteValuesOfXmlChildrenElements(
+								uni, "xmlns:dbReference[@type='InterPro']",
+								"id", c));
 				// Add PFAM-Annotations
-				result.setPfamAnnotations(retrieveAttribteValuesOfXmlChildrenElements(
-						uni, "xmlns:dbReference[@type='Pfam']", "id", c));
+				result
+						.setPfamAnnotations(retrieveAttribteValuesOfXmlChildrenElements(
+								uni, "xmlns:dbReference[@type='Pfam']", "id", c));
 			}
 		}
 		return result;
