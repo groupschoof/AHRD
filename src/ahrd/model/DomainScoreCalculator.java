@@ -4,7 +4,9 @@ import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Utils.zeroList;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -18,6 +20,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import ahrd.exception.MissingProteinException;
 
 /**
  * We estimate protein similarity based on the formulae given in the article
@@ -40,15 +44,6 @@ public class DomainScoreCalculator {
 	 */
 	private static Map<String, Set<String>> blastResultAccessionsToInterproIds = new HashMap<String, Set<String>>();
 
-	public static Map<String, Set<String>> getBlastResultAccessionsToInterproIds() {
-		return blastResultAccessionsToInterproIds;
-	}
-
-	public static void setBlastResultAccessionsToInterproIds(
-			Map<String, Set<String>> blastResultAccessionsToInterproIds) {
-		DomainScoreCalculator.blastResultAccessionsToInterproIds = blastResultAccessionsToInterproIds;
-	}
-
 	/**
 	 * To enable calculation of domain-architecture scores, we need to know the
 	 * concrete architecture of proteins of significant similarity (BLAST
@@ -56,18 +51,10 @@ public class DomainScoreCalculator {
 	 */
 	private static Map<String, Set<String>> blastResultAccessionsToPfamIds = new HashMap<String, Set<String>>();
 
-	public static Map<String, Set<String>> getBlastResultAccessionsToPfamIds() {
-		return blastResultAccessionsToPfamIds;
-	}
-
-	public static void setBlastResultAccessionsToPfamIds(
-			Map<String, Set<String>> blastResultAccessionsToPfamIds) {
-		DomainScoreCalculator.blastResultAccessionsToPfamIds = blastResultAccessionsToPfamIds;
-	}
-
 	public static void initializeBlastResultAccessionsToInterproIds()
 			throws IOException {
-		blastResultAccessionsToInterproIds = new HashMap<String, Set<String>>();
+		// blastResultAccessionsToInterproIds = new HashMap<String,
+		// Set<String>>();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				new FileInputStream(getSettings()
 						.getPathToInterproResults4BlastHits())));
@@ -90,7 +77,7 @@ public class DomainScoreCalculator {
 						interproId);
 			}
 		}
-		reader.close();
+
 	}
 
 	private Protein protein;
@@ -161,11 +148,6 @@ public class DomainScoreCalculator {
 	 */
 	public static Double domainWeightSimilarity(List<Double> prVec,
 			List<Double> brVec) {
-
-		// According to the above mentioned article, calculate the cosine of the
-		// angle between between the two argument vectors, using the dot-product
-		// in the numerator and the product of euclidean lengths as the
-		// denominator.
 		Double dotProduct = 0.0;
 		for (int i = 0; i < prVec.size(); i++) {
 			dotProduct += (prVec.get(i) * brVec.get(i));
@@ -289,4 +271,21 @@ public class DomainScoreCalculator {
 		this.totalTokenDomainSimilarityScore = totalTokenDomainSimilarityScore;
 	}
 
+	public static Map<String, Set<String>> getBlastResultAccessionsToInterproIds() {
+		return blastResultAccessionsToInterproIds;
+	}
+
+	public static void setBlastResultAccessionsToInterproIds(
+			Map<String, Set<String>> blastResultAccessionsToInterproIds) {
+		DomainScoreCalculator.blastResultAccessionsToInterproIds = blastResultAccessionsToInterproIds;
+	}
+
+	public static Map<String, Set<String>> getBlastResultAccessionsToPfamIds() {
+		return blastResultAccessionsToPfamIds;
+	}
+
+	public static void setBlastResultAccessionsToPfamIds(
+			Map<String, Set<String>> blastResultAccessionsToPfamIds) {
+		DomainScoreCalculator.blastResultAccessionsToPfamIds = blastResultAccessionsToPfamIds;
+	}
 }

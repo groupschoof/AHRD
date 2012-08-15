@@ -19,6 +19,9 @@ public class Protein {
 	private Map<String, List<BlastResult>> blastResults;
 	private Set<InterproResult> interproResults = new HashSet<InterproResult>();
 	private Set<GeneOntologyResult> goResults = new HashSet<GeneOntologyResult>();
+	private Set<String> pfamResults = new HashSet<String>();
+	
+
 	private TokenScoreCalculator tokenScoreCalculator;
 	private DomainScoreCalculator domainScoreCalculator;
 	private LexicalScoreCalculator lexicalScoreCalculator;
@@ -164,6 +167,14 @@ public class Protein {
 		this.goResults = goResults;
 	}
 
+	public Set<String> getPfamResults() {
+		return pfamResults;
+	}
+
+	public void setPfamResults(Set<String> pfamResults) {
+		this.pfamResults = pfamResults;
+	}
+	
 	public TokenScoreCalculator getTokenScoreCalculator() {
 		return tokenScoreCalculator;
 	}

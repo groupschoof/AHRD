@@ -39,6 +39,7 @@ public class InterproResult implements Comparable<InterproResult> {
 	private String name;
 	private String type;
 	private String parentId;
+	private String pfamId;
 	private Set<String> contains = new HashSet<String>();
 	/**
 	 * The Domain-Weight is defined as the product of the two following factors.
@@ -181,13 +182,86 @@ public class InterproResult implements Comparable<InterproResult> {
 					}
 				}
 			}
+			Pattern pn = Pattern.compile("(\\S+)\\s+.*\\s(HMMPfam\\d{5})\\s.*");
+			Matcher ma = pn.matcher(iterLine);
+			if (ma.matches()) {
+				String protAcc = ma.group(1);
+				String pfamId = ma.group(2);
+				if (protAcc != null && pfamId != null && !protAcc.equals("")
+						&& !pfamId.equals("")) {
+					if (proteinDb.containsKey(protAcc)) {
+						Protein prot = proteinDb.get(protAcc);
+						InterproResult pfam = null;
+						if (getInterproDb().containsKey(pfamId))
+							pfam = getInterproDb().get(pfamId);
+						/*
+						 * else missingPfamIds.add(pfamId);
+						 */
+						if (prot != null && pfam != null) {
+							prot.getInterproResults().add(pfam);
+						}
+
+					}
+					if (missingInterproIds.size() > 0)
+						System.err
+								.println("Could not find the following Interpro_IDs in Database:\n"
+										+ missingInterproIds);
+				}
+			}
 		}
-		if (missingInterproIds.size() > 0)
-			System.err
-					.println("Could not find the following Interpro_IDs in Database:\n"
-							+ missingInterproIds);
 	}
 
+	
+	/*public static void parsePfamResult(Map<String, Protein> proteinDb)
+			throws IOException, MissingProteinException {
+		//Set<String> missingPfamIds = new HashSet<String>();
+
+		BufferedReader bre = new BufferedReader(new FileReader(new File(
+				getSettings().getPathToPfamResults())));
+		String iterateLine = null;
+		while ((iterateLine = bre.readLine()) != null) {
+			Pattern pn = Pattern.compile("(\\S+)\\s+.*\\s(HMMPfam\\d{5})\\s.*");
+			Matcher ma = pn.matcher(iterateLine);
+			if (ma.matches()) {
+				String protAcc = ma.group(1);
+				String pfamId = ma.group(2);
+				if (protAcc != null && pfamId != null && !protAcc.equals("")
+						&& !pfamId.equals("")) {
+					if (proteinDb.containsKey(protAcc)) {
+						Protein prot = proteinDb.get(protAcc);
+						InterproResult pfam = null;
+						// WARN, if an Interpro-Result is not found in the
+						// memory-database:
+						if (getInterproDb().containsKey(pfamId))
+							pfam = getInterproDb().get(pfamId);
+						else
+							missingPfamIds.add(pfamId);
+						if (prot != null && pfam != null) {
+							prot.getInterproResults().add(pfam);
+						}
+
+						
+				if (!getBlastResultAccessionsToPfamIds().containsKey(
+						protAcc)) {
+					getBlastResultAccessionsToPfamIds().put(protAcc,
+							new HashSet<String>());
+				}
+				getBlastResultAccessionsToPfamIds().get(protAcc).add(
+						pfamId);
+						 
+
+					}
+				}
+			}
+
+			if (missingPfamIds.size() > 0)
+				System.err
+				.println("Could not find the following Pfam_IDs in Database:\n"
+						+ missingPfamIds);
+		}
+	}*/
+
+	
 	public static Map<String, InterproResult> getInterproDb() {
 		return interproDb;
 	}
@@ -363,6 +437,14 @@ public class InterproResult implements Comparable<InterproResult> {
 	 */
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
+	}
+	
+	public String getPfamId() {
+		return pfamId;
+	}
+
+	public void setPfamId(String pfamId) {
+		this.pfamId = pfamId;
 	}
 
 	/**

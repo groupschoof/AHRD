@@ -41,6 +41,7 @@ public class InterproResultTest {
 				.getShortName());
 		assertEquals("Family", ipr.getType());
 		assertEquals("Retinoid X receptor", ipr.getName());
+		
 		assertTrue(InterproResult.getInterproDb().containsKey("IPR000535"));
 		assertTrue(InterproResult.getInterproDb().containsKey("IPR000536"));
 	}
@@ -90,6 +91,13 @@ public class InterproResultTest {
 		assertTrue(proteinDb.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getInterproResults()
 				.contains(InterproResult.getInterproDb().get("IPR000536")));
+		
+		//assertEquals(1, proteinDb.get("gene:chr01.502:mRNA:chr01.502")
+			//	.getPfamResults().size());
+		assertTrue(proteinDb.get("gene:chr01.502:mRNA:chr01.502")
+				.getPfamResults()
+				.contains(InterproResult.getInterproDb().get("PF00560")));
+		
 	}
 
 	@Test

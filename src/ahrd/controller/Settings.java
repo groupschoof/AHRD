@@ -86,6 +86,7 @@ public class Settings implements Cloneable {
 	private String pathToReferencesFasta;
 	private String pathToInterproDatabase;
 	private String pathToInterproResults;
+	private String pathToPfamResults;
 	private String pathToGeneOntologyResults;
 	private String pathToOutput;
 	/**
@@ -185,6 +186,12 @@ public class Settings implements Cloneable {
 	 */
 	private String pathToInterproResults4BlastHits;
 	/**
+	 * Path to Pfam results of the Proteins ireferenced in BlastHts. 
+	 * This data is needed for the Domain-Scoring.
+	 */
+	private String pathToPfamResults4BlastHits;
+	
+	/**
 	 * The configurable weight for the fraction a BlastResult's domain weight
 	 * similarity score is going to assume in the final token score.
 	 */
@@ -194,6 +201,7 @@ public class Settings implements Cloneable {
 	 * similarity score is going to assume in the final description score.
 	 */
 	private Double descriptionScoreDomainSimilarityWeight = 0.0;
+	
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -495,7 +503,7 @@ public class Settings implements Cloneable {
 	public void setPathToInterproResults(String pathToInterproResults) {
 		this.pathToInterproResults = pathToInterproResults;
 	}
-
+	
 	public String getPathToGeneOntologyResults() {
 		return pathToGeneOntologyResults;
 	}
@@ -509,6 +517,14 @@ public class Settings implements Cloneable {
 		this.pathToGeneOntologyResults = pathToGeneOntologyResults;
 	}
 
+	public String getPathToPfamResults() {
+		return pathToPfamResults;
+	}
+
+	public void setPathToPfamResults(String pathToPfamResults) {
+		this.pathToPfamResults = pathToPfamResults;
+	}
+	
 	public String getPathToOutput() {
 		return pathToOutput;
 	}
@@ -758,6 +774,12 @@ public class Settings implements Cloneable {
 		this.pathToInterproResults4BlastHits = pathToInterproResults4BlastHits;
 	}
 
+	public String getPathToPfamResults4BlastHits() {
+		return pathToPfamResults4BlastHits ;
+	}
+	public void setPathToPfamResults4BlastHits(String pathToPfamResults4BlastHits) {
+		this.pathToPfamResults4BlastHits = pathToPfamResults4BlastHits;
+	}
 	public Double getTokenScoreDomainSimilarityWeight() {
 		return tokenScoreDomainSimilarityWeight;
 	}
@@ -775,5 +797,8 @@ public class Settings implements Cloneable {
 			Double descriptionScoreDomainSimilarityWeight) {
 		this.descriptionScoreDomainSimilarityWeight = descriptionScoreDomainSimilarityWeight;
 	}
+
+	
+
 
 }
