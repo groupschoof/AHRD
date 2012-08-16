@@ -19,6 +19,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ahrd.exception.MissingInterproResultException;
+
 /**
  * We estimate protein similarity based on the formulae given in the article
  * "Protein comparison at the domain architecture level" by Lee and Lee
@@ -88,8 +90,10 @@ public class DomainScoreCalculator {
 	 * all of its BlastResults
 	 * 
 	 * @param prot
+	 * @throws MissingInterproResultException
 	 */
-	public static void constructDomainWeightVectors(Protein prot) {
+	public static void constructDomainWeightVectors(Protein prot)
+			throws MissingInterproResultException {
 
 		// Vector Space Model of all distinct annotated Interpro-Entities:
 		SortedSet<String> vsm = constructVectorSpaceModel(prot);
@@ -97,35 +101,20 @@ public class DomainScoreCalculator {
 		// Domain-Weight Vector for the Protein itself:
 		List<Double> prVec = new Vector<Double>();
 		for (Iterator<String> it = vsm.iterator(); it.hasNext();) {
-			String ipr = it.next();
-			InterproResult interproEntry = InterproResult.getInterproDb().get(
-					ipr);
-			double weight = interproEntry.getDomainWeight();
-
-			if (prot.getInterproResults().contains(interproEntry)) {
-				prVec.add(weight);
-			} else
-				prVec.add(0.0);
+			String domainAccession = it.next();
+			prVec.add(getDomainWeight(prot, domainAccession));
 		}
+		// Set the results:
 		prot.setDomainWeights(prVec);
 
 		// Domain-Weight Vector for all Protein's BlastResults:
 		for (String blastDb : prot.getBlastResults().keySet()) {
 			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
 				List<Double> brVec = zeroList(vsm.size());
-				Set<String> brIprAnnotations = getBlastResultAccessionsToInterproIds()
-						.get(br.getAccession());
-				if (brIprAnnotations != null && brIprAnnotations.size() > 0) {
-					int index = 0;
-					for (String iprId : vsm) {
-						InterproResult ipr = InterproResult.getInterproDb()
-								.get(iprId);
-						if (brIprAnnotations.contains(iprId) && ipr != null) {
-							brVec.set(index, ipr.getDomainWeight());
-						}
-						index++;
-					}
+				for (String domainAccession : vsm) {
+					getDomainWeight(br, domainAccession);
 				}
+				// Set the results:
 				br.setDomainWeights(brVec);
 			}
 		}
@@ -235,6 +224,86 @@ public class DomainScoreCalculator {
 		return domainAnnotation;
 	}
 
+	/**
+	 * Reads out the domain weight appropriate for the argument. This is either
+	 * the domain weight recorded for the conserved protein domain or zero if
+	 * this domain has not been annotated for the argument protein.
+	 * 
+	 * @TODO: Refactor to Interface with method getDomainWeight implemented by
+	 *        both classes BlastResult and Protein.
+	 * 
+	 * @param br
+	 * @param domainAccession
+	 * @return Double
+	 * @throws MissingInterproResultException
+	 */
+	public static Double getDomainWeight(Protein prot, String domainAccession)
+			throws MissingInterproResultException {
+		Double dw = 0.0;
+		if (getSettings()
+				.isDomainArchitectureSimilarityBasedOnPfamAnnotations()
+				&& prot.getPfamResults().contains(domainAccession)) {
+			dw = InterproResult.getPfamDomainWeights().get(domainAccession);
+			if (dw == null)
+				throw new MissingInterproResultException(
+						"Could not find domain weight for Pfam Entry '"
+								+ domainAccession + "'in memory database.");
+		} else {
+			InterproResult ipr = InterproResult.getInterproDb().get(
+					domainAccession);
+			if (ipr == null)
+				throw new MissingInterproResultException(
+						"Could not find Interpro-Entry '" + domainAccession
+								+ "' in memory database.");
+			if (prot.getInterproResults().contains(ipr))
+				dw = ipr.getDomainWeight();
+		}
+		return dw;
+	}
+
+	/**
+	 * Reads out the domain weight appropriate for the argument. This is either
+	 * the domain weight recorded for the conserved protein domain or zero if
+	 * this domain has not been annotated for the argument protein.
+	 * 
+	 * @TODO: Refactor to Interface with method getDomainWeight implemented by
+	 *        both classes BlastResult and Protein.
+	 * 
+	 * @param br
+	 * @param domainAccession
+	 * @return Double
+	 * @throws MissingInterproResultException
+	 */
+	public static Double getDomainWeight(BlastResult br, String domainAccession)
+			throws MissingInterproResultException {
+		Double dw = 0.0;
+		if (getSettings()
+				.isDomainArchitectureSimilarityBasedOnPfamAnnotations()
+				&& getBlastResultAccessionsToPfamIds().containsKey(
+						br.getAccession())
+				&& getBlastResultAccessionsToPfamIds().get(br.getAccession())
+						.contains(domainAccession)) {
+			dw = InterproResult.getPfamDomainWeights().get(domainAccession);
+			if (dw == null)
+				throw new MissingInterproResultException(
+						"Could not find domain weight for Pfam Entry '"
+								+ domainAccession + "'in memory database.");
+		} else {
+			InterproResult ipr = InterproResult.getInterproDb().get(
+					domainAccession);
+			if (ipr == null)
+				throw new MissingInterproResultException(
+						"Could not find Interpro-Entry '" + domainAccession
+								+ "' in memory database.");
+			if (getBlastResultAccessionsToInterproIds().containsKey(
+					br.getAccession())
+					&& getBlastResultAccessionsToInterproIds().get(
+							br.getAccession()).contains(domainAccession))
+				dw = ipr.getDomainWeight();
+		}
+		return dw;
+	}
+
 	public DomainScoreCalculator(Protein protein) {
 		super();
 		setProtein(protein);
@@ -258,8 +327,9 @@ public class DomainScoreCalculator {
 	 * 
 	 * @param Protein
 	 *            prot
+	 * @throws MissingInterproResultException 
 	 */
-	public void computeDomainSimilarityScores() {
+	public void computeDomainSimilarityScores() throws MissingInterproResultException {
 		setVectorSpaceModel(constructVectorSpaceModel(getProtein()));
 		constructDomainWeightVectors(getProtein());
 		for (String blastDb : getProtein().getBlastResults().keySet()) {

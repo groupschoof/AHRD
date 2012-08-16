@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ahrd.controller.Utils;
+import ahrd.exception.MissingInterproResultException;
 import ahrd.model.BlastResult;
 import ahrd.model.DomainScoreCalculator;
 import ahrd.model.InterproResult;
@@ -140,7 +141,8 @@ public class DomainScoreCalculatorTest {
 	}
 
 	@Test
-	public void testConstructDomainWeightVectors() {
+	public void testConstructDomainWeightVectors()
+			throws MissingInterproResultException {
 		// Protein to be tested:
 		Protein prot = mockProteinWithBlastAndInterpoResults();
 		// Setup memory database 'BlastResultAccessionsToInterproIds'
@@ -203,6 +205,6 @@ public class DomainScoreCalculatorTest {
 		dws = DomainScoreCalculator.domainWeightSimilarity(x, y);
 		assertNotNull(dws);
 		assertEquals(0.0, dws, 0.0);
-	}	
-	
+	}
+
 }
