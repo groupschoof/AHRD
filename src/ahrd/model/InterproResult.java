@@ -3,6 +3,7 @@ package ahrd.model;
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Utils.getXmlAttributeValue;
 import static ahrd.controller.Utils.retrieveContentOfFirstXmlChildElement;
+import static ahrd.controller.Utils.getProteinFromMemoryDatabase;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -151,117 +152,82 @@ public class InterproResult implements Comparable<InterproResult> {
 	 * 
 	 * @param proteinDb
 	 * @throws IOException
+	 * @throws MissingProteinException
 	 */
 	public static void parseInterproResult(Map<String, Protein> proteinDb)
 			throws IOException, MissingProteinException {
 		Set<String> missingInterproIds = new HashSet<String>();
-
 		BufferedReader br = new BufferedReader(new FileReader(new File(
 				getSettings().getPathToInterproResults())));
 		String iterLine = null;
 		while ((iterLine = br.readLine()) != null) {
-			Pattern p = Pattern.compile("(\\S+)\\s+.*\\s(IPR\\d{6})\\s.*");
-			Matcher m = p.matcher(iterLine);
-			if (m.matches()) {
-				String geneAcc = m.group(1);
-				String iprId = m.group(2);
-				if (geneAcc != null && iprId != null && !geneAcc.equals("")
-						&& !iprId.equals("")) {
-					if (proteinDb.containsKey(geneAcc)) {
-						Protein prot = proteinDb.get(geneAcc);
-						InterproResult ipr = null;
-						// WARN, if an Interpro-Result is not found in the
-						// memory-database:
-						if (getInterproDb().containsKey(iprId))
-							ipr = getInterproDb().get(iprId);
-						else
-							missingInterproIds.add(iprId);
-						if (prot != null && ipr != null) {
-							prot.getInterproResults().add(ipr);
-						}
-					}
+			if (getSettings().isToComputeDomainSimilarities()
+					&& getSettings().getComputeDomainSimilarityOn() != null
+					&& getSettings().getComputeDomainSimilarityOn().equals(
+							"pfam")) {
+				String pfamRegEx = "(\\S+)\\s+.*\\s(PF\\d{5})\\s.*";
+				String[] annotation = parseDomainAnnotation(iterLine, pfamRegEx);
+				if (annotation.length == 2) {
+					getProteinFromMemoryDatabase(annotation[0], proteinDb)
+							.getPfamResults().add(annotation[1]);
 				}
-			}
-			Pattern pn = Pattern.compile("(\\S+)\\s+.*\\s(HMMPfam\\d{5})\\s.*");
-			Matcher ma = pn.matcher(iterLine);
-			if (ma.matches()) {
-				String protAcc = ma.group(1);
-				String pfamId = ma.group(2);
-				if (protAcc != null && pfamId != null && !protAcc.equals("")
-						&& !pfamId.equals("")) {
-					if (proteinDb.containsKey(protAcc)) {
-						Protein prot = proteinDb.get(protAcc);
-						InterproResult pfam = null;
-						if (getInterproDb().containsKey(pfamId))
-							pfam = getInterproDb().get(pfamId);
-						/*
-						 * else missingPfamIds.add(pfamId);
-						 */
-						if (prot != null && pfam != null) {
-							prot.getInterproResults().add(pfam);
-						}
-
+			} else {
+				String iprRegEx = "(\\S+)\\s+.*\\s(IPR\\d{6})\\s.*";
+				String[] annotation = parseDomainAnnotation(iterLine, iprRegEx);
+				if (annotation.length == 2) {
+					Protein prot = getProteinFromMemoryDatabase(annotation[0],
+							proteinDb);
+					InterproResult ipr = null;
+					// WARN, if an Interpro-Result is not found in the
+					// memory-database:
+					if (getInterproDb().containsKey(annotation[1])) {
+						ipr = getInterproDb().get(annotation[1]);
+					} else {
+						missingInterproIds.add(annotation[1]);
 					}
-					if (missingInterproIds.size() > 0)
-						System.err
-								.println("Could not find the following Interpro_IDs in Database:\n"
-										+ missingInterproIds);
+					if (prot != null && ipr != null) {
+						prot.getInterproResults().add(ipr);
+					}
 				}
 			}
 		}
+		if (missingInterproIds.size() > 0)
+			System.err
+					.println("Could not find the following Interpro-IDs in Database:\n"
+							+ missingInterproIds);
 	}
 
-	
-	/*public static void parsePfamResult(Map<String, Protein> proteinDb)
-			throws IOException, MissingProteinException {
-		//Set<String> missingPfamIds = new HashSet<String>();
-
-		BufferedReader bre = new BufferedReader(new FileReader(new File(
-				getSettings().getPathToPfamResults())));
-		String iterateLine = null;
-		while ((iterateLine = bre.readLine()) != null) {
-			Pattern pn = Pattern.compile("(\\S+)\\s+.*\\s(HMMPfam\\d{5})\\s.*");
-			Matcher ma = pn.matcher(iterateLine);
-			if (ma.matches()) {
-				String protAcc = ma.group(1);
-				String pfamId = ma.group(2);
-				if (protAcc != null && pfamId != null && !protAcc.equals("")
-						&& !pfamId.equals("")) {
-					if (proteinDb.containsKey(protAcc)) {
-						Protein prot = proteinDb.get(protAcc);
-						InterproResult pfam = null;
-						// WARN, if an Interpro-Result is not found in the
-						// memory-database:
-						if (getInterproDb().containsKey(pfamId))
-							pfam = getInterproDb().get(pfamId);
-						else
-							missingPfamIds.add(pfamId);
-						if (prot != null && pfam != null) {
-							prot.getInterproResults().add(pfam);
-						}
-
-						
-				if (!getBlastResultAccessionsToPfamIds().containsKey(
-						protAcc)) {
-					getBlastResultAccessionsToPfamIds().put(protAcc,
-							new HashSet<String>());
-				}
-				getBlastResultAccessionsToPfamIds().get(protAcc).add(
-						pfamId);
-						 
-
-					}
-				}
+	/**
+	 * Parses a single line from an Interpro-Scan result file extracting both
+	 * the annotated protein's accession and the Interpro or Pfam identifier it
+	 * has been annotated with. Which is extracted depends on the argument
+	 * regex.
+	 * 
+	 * @Note: The argument regex should define two match groups. The first one
+	 *        should match the query protein's accession and the second one the
+	 *        conserved domain's identifier (Pfam or InterPro).
+	 * 
+	 * @param lineFromIprScanResult
+	 * @return String[], in which the first element is the Protein-Accession and
+	 *         the second is the Pfam-ID. Returns an <em>EMPTY</em> String
+	 *         array, if line does not match expected format.
+	 */
+	public static String[] parseDomainAnnotation(String lineFromIprScanResult,
+			String regex) {
+		String[] result = new String[] {};
+		Pattern pn = Pattern.compile(regex);
+		Matcher ma = pn.matcher(lineFromIprScanResult);
+		if (ma.matches()) {
+			String protAcc = ma.group(1);
+			String domainId = ma.group(2);
+			if (protAcc != null && domainId != null && !protAcc.equals("")
+					&& !domainId.equals("")) {
+				result = new String[] { protAcc, domainId };
 			}
-
-			if (missingPfamIds.size() > 0)
-				System.err
-				.println("Could not find the following Pfam_IDs in Database:\n"
-						+ missingPfamIds);
 		}
-	}*/
+		return result;
+	}
 
-	
 	public static Map<String, InterproResult> getInterproDb() {
 		return interproDb;
 	}
@@ -277,11 +243,11 @@ public class InterproResult implements Comparable<InterproResult> {
 	 */
 	public static void filterForMostInforming(Protein p)
 			throws MissingInterproResultException {
-		Set<InterproResult> mostInformatives = new HashSet<InterproResult>(
-				p.getInterproResults());
+		Set<InterproResult> mostInformatives = new HashSet<InterproResult>(p
+				.getInterproResults());
 		for (InterproResult iprToValidate : p.getInterproResults()) {
-			Set<InterproResult> iprsToCompare = new HashSet<InterproResult>(
-					p.getInterproResults());
+			Set<InterproResult> iprsToCompare = new HashSet<InterproResult>(p
+					.getInterproResults());
 			iprsToCompare.remove(iprToValidate);
 			for (InterproResult iprToCompare : iprsToCompare) {
 				if (iprToValidate.isParent(iprToCompare)
@@ -438,7 +404,7 @@ public class InterproResult implements Comparable<InterproResult> {
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
 	}
-	
+
 	public String getPfamId() {
 		return pfamId;
 	}

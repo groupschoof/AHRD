@@ -50,6 +50,7 @@ public class Settings implements Cloneable {
 	public static final String INTERPRO_DATABASE_KEY = "interpro_database";
 	public static final String INTERPRO_RESULT_KEY = "interpro_result";
 	public static final String DOMAIN_WEIGHTS_DATABASE = "domain_weights_database";
+	public static final String COMPUTE_DOMAIN_SIMILARITY_ON_KEY = "compute_domain_similarity_on";
 	public static final String INTERPRO_RESULTS_4_BLASTHITS = "interpro_results_of_blast_hits";
 	public static final String GENE_ONTOLOGY_RESULT_KEY = "gene_ontology_result";
 	public static final String OUTPUT_KEY = "output";
@@ -186,11 +187,11 @@ public class Settings implements Cloneable {
 	 */
 	private String pathToInterproResults4BlastHits;
 	/**
-	 * Path to Pfam results of the Proteins ireferenced in BlastHts. 
-	 * This data is needed for the Domain-Scoring.
+	 * Path to Pfam results of the Proteins ireferenced in BlastHts. This data
+	 * is needed for the Domain-Scoring.
 	 */
 	private String pathToPfamResults4BlastHits;
-	
+
 	/**
 	 * The configurable weight for the fraction a BlastResult's domain weight
 	 * similarity score is going to assume in the final token score.
@@ -201,7 +202,11 @@ public class Settings implements Cloneable {
 	 * similarity score is going to assume in the final description score.
 	 */
 	private Double descriptionScoreDomainSimilarityWeight = 0.0;
-	
+	/**
+	 * If AHRD is to consider similarity of domain architectures it needs to
+	 * know, if to base this scoring on annotated Pfam or InterPro domains.
+	 */
+	private String computeDomainSimilarityOn = null;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -231,6 +236,8 @@ public class Settings implements Cloneable {
 				.get(DOMAIN_WEIGHTS_DATABASE));
 		setPathToInterproResults4BlastHits((String) input
 				.get(INTERPRO_RESULTS_4_BLASTHITS));
+		setComputeDomainSimilarityOn((String) input
+				.get(COMPUTE_DOMAIN_SIMILARITY_ON_KEY));
 		if (input.get(TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null)
 			setTokenScoreDomainSimilarityWeight(Double
 					.parseDouble((String) input
@@ -330,6 +337,8 @@ public class Settings implements Cloneable {
 				&& Boolean.parseBoolean(input.get(
 						FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY).toString()))
 			this.findHighestPossibleEvaluationScore = true;
+		// Validate input parameters:
+		validateComputeDomainSimilarityOn();
 	}
 
 	/**
@@ -371,6 +380,31 @@ public class Settings implements Cloneable {
 		File iprRes = new File(getPathToInterproResults());
 		return (iprDb.canRead() && iprDb.length() > 0 && iprRes.canRead() && iprRes
 				.length() > 0);
+	}
+
+	/**
+	 * Validates field <em>computeDomainSimilarityOn</em> is one of the
+	 * following:
+	 * <ul>
+	 * <li>NULL</li>
+	 * <li>interpro</li>
+	 * <li>pfam</li>
+	 * </ul>
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if field is invalid.
+	 */
+	public void validateComputeDomainSimilarityOn() {
+		if (getComputeDomainSimilarityOn() != null
+				&& (!getComputeDomainSimilarityOn()
+						.equalsIgnoreCase("interpro") || !getComputeDomainSimilarityOn()
+						.equalsIgnoreCase("pfam"))) {
+			throw new IllegalArgumentException(
+					"Input parameter '"
+							+ COMPUTE_DOMAIN_SIMILARITY_ON_KEY
+							+ "' has to be one of the following: NULL, 'interpro' or 'pfam', but was: "
+							+ getComputeDomainSimilarityOn());
+		}
 	}
 
 	/**
@@ -503,7 +537,7 @@ public class Settings implements Cloneable {
 	public void setPathToInterproResults(String pathToInterproResults) {
 		this.pathToInterproResults = pathToInterproResults;
 	}
-	
+
 	public String getPathToGeneOntologyResults() {
 		return pathToGeneOntologyResults;
 	}
@@ -524,7 +558,7 @@ public class Settings implements Cloneable {
 	public void setPathToPfamResults(String pathToPfamResults) {
 		this.pathToPfamResults = pathToPfamResults;
 	}
-	
+
 	public String getPathToOutput() {
 		return pathToOutput;
 	}
@@ -775,11 +809,14 @@ public class Settings implements Cloneable {
 	}
 
 	public String getPathToPfamResults4BlastHits() {
-		return pathToPfamResults4BlastHits ;
+		return pathToPfamResults4BlastHits;
 	}
-	public void setPathToPfamResults4BlastHits(String pathToPfamResults4BlastHits) {
+
+	public void setPathToPfamResults4BlastHits(
+			String pathToPfamResults4BlastHits) {
 		this.pathToPfamResults4BlastHits = pathToPfamResults4BlastHits;
 	}
+
 	public Double getTokenScoreDomainSimilarityWeight() {
 		return tokenScoreDomainSimilarityWeight;
 	}
@@ -798,7 +835,14 @@ public class Settings implements Cloneable {
 		this.descriptionScoreDomainSimilarityWeight = descriptionScoreDomainSimilarityWeight;
 	}
 
-	
+	public String getComputeDomainSimilarityOn() {
+		return computeDomainSimilarityOn;
+	}
 
+	public void setComputeDomainSimilarityOn(String computeDomainSimilarityOn) {
+		if (computeDomainSimilarityOn != null)
+			computeDomainSimilarityOn = computeDomainSimilarityOn.toLowerCase();
+		this.computeDomainSimilarityOn = computeDomainSimilarityOn;
+	}
 
 }

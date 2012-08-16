@@ -4,9 +4,7 @@ import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Utils.zeroList;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -20,8 +18,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import ahrd.exception.MissingProteinException;
 
 /**
  * We estimate protein similarity based on the formulae given in the article

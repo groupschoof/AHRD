@@ -9,9 +9,13 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
+
+import ahrd.exception.MissingProteinException;
+import ahrd.model.Protein;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -47,8 +51,8 @@ public class Utils {
 		FileInputStream stream = new FileInputStream(new File(path));
 		try {
 			FileChannel fc = stream.getChannel();
-			MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0,
-					fc.size());
+			MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc
+					.size());
 			/* Instead of using default, pass in a decoder. */
 			return Charset.defaultCharset().decode(bb).toString();
 		} finally {
@@ -216,5 +220,24 @@ public class Utils {
 			}
 		}
 		return res;
+	}
+
+	/**
+	 * Handy access method to any memory database (Map) that throws a
+	 * MissingProteinException, if the argument proteinAccession is not found in
+	 * the Map.
+	 * 
+	 * @param proteinAccession
+	 * @param memoryDatabase
+	 * @return Protein
+	 * @throws MissingProteinException
+	 */
+	public static Protein getProteinFromMemoryDatabase(String proteinAccession,
+			Map<String, Protein> memoryDatabase) throws MissingProteinException {
+		Protein prot = memoryDatabase.get(proteinAccession);
+		if (prot == null)
+			throw new MissingProteinException("Could not find Protein '"
+					+ proteinAccession + "' in Memory Database.");
+		return prot;
 	}
 }
