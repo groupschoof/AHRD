@@ -153,6 +153,7 @@ public class InterproResultTest {
 	@Test
 	public void testParseDomainWeights() throws NumberFormatException,
 			IOException {
+		// 1.) TEST parsing of domain weights for InterPro domains:
 		// Because the above @Before has initialized the Settings and the memory
 		// Interpro-Database, we have it here, already.
 		InterproResult.parseDomainWeights();
@@ -164,6 +165,17 @@ public class InterproResultTest {
 				.getDomainWeight(), 121.3, 0.0);
 		assertEquals(InterproResult.getInterproDb().get("IPR000006")
 				.getDomainWeight(), 87.2, 0.0);
+		// 2.) TEST parsing of domain weights for Pfam domains:
+		getSettings().setComputeDomainSimilarityOn("pfam");
+		getSettings().setPathToDomainWeightsDatabase(
+				"./test/resources/domain_weights_database_pfam.txt");
+		InterproResult.parseDomainWeights();
+		assertEquals(InterproResult.getPfamDomainWeights().get("PF00535"),
+				213.0, 0.0);
+		assertEquals(InterproResult.getPfamDomainWeights().get("PF00536"),
+				121.3, 0.0);
+		assertEquals(InterproResult.getPfamDomainWeights().get("PF00006"),
+				87.2, 0.0);
 	}
 
 	@Test
