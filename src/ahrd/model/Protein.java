@@ -20,7 +20,6 @@ public class Protein {
 	private Set<InterproResult> interproResults = new HashSet<InterproResult>();
 	private Set<GeneOntologyResult> goResults = new HashSet<GeneOntologyResult>();
 	private Set<String> pfamResults = new HashSet<String>();
-	
 
 	private TokenScoreCalculator tokenScoreCalculator;
 	private DomainScoreCalculator domainScoreCalculator;
@@ -135,6 +134,14 @@ public class Protein {
 				br.patternize());
 	}
 
+	/**
+	 * @return boolean - <em>TRUE</em> if and only if at least one type of
+	 *         domain annotation is present. Either 'InterPro' or 'Pfam'.
+	 */
+	public boolean hasDomainAnnotation() {
+		return (!getInterproResults().isEmpty() || !getPfamResults().isEmpty());
+	}
+
 	public String getAccession() {
 		return accession;
 	}
@@ -174,7 +181,7 @@ public class Protein {
 	public void setPfamResults(Set<String> pfamResults) {
 		this.pfamResults = pfamResults;
 	}
-	
+
 	public TokenScoreCalculator getTokenScoreCalculator() {
 		return tokenScoreCalculator;
 	}

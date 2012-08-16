@@ -256,7 +256,7 @@ public class AHRD {
 			// now is the moment for computation of the domain similarity
 			// scores:
 			if (getSettings().isToComputeDomainSimilarities()
-					&& !prot.getInterproResults().isEmpty()) {
+					&& prot.hasDomainAnnotation()) {
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
 			}
 			// Tokenize each BlastResult's Description-Line and

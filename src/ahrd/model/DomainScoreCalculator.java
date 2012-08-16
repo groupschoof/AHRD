@@ -169,27 +169,70 @@ public class DomainScoreCalculator {
 	 * BlastResults, than constructs a sorted Set of them to be used as a
 	 * definition for the vector space model.
 	 * 
+	 * @Note: Depending on AHRD's input, it either bases the vector space model
+	 *        on InterPro or Pfam annotations.
+	 * 
 	 * @param Protein
 	 *            prot
-	 * @return SortedSet<String> of the respective InterproIDs in their natural
-	 *         order
+	 * @return SortedSet<String> of the respective InterPro or Pfam identifiers
+	 *         in their natural order
 	 */
 	public static SortedSet<String> constructVectorSpaceModel(Protein prot) {
 		SortedSet<String> vectorSpaceModel = new TreeSet<String>();
-		for (InterproResult ir : prot.getInterproResults()) {
-			vectorSpaceModel.add(ir.getId());
-		}
+		// Add all Protein's domain annotation:
+		vectorSpaceModel.addAll(getDomainAnnotation(prot));
+		// Add all domain annotation of all Protein's BlastResults:
 		for (String blastDb : prot.getBlastResults().keySet()) {
 			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
-				if (getBlastResultAccessionsToInterproIds().containsKey(
-						br.getAccession())) {
-					vectorSpaceModel.addAll(blastResultAccessionsToInterproIds
-							.get(br.getAccession()));
-				}
+				vectorSpaceModel.addAll(getDomainAnnotation(br));
 			}
-
 		}
 		return vectorSpaceModel;
+	}
+
+	/**
+	 * Extracts either the Pfam or the InterPro annotations from the argument,
+	 * depending which is set to be used in AHRD's input.
+	 * 
+	 * @param Protein
+	 *            prot
+	 * @return Set<String> domain annotation
+	 */
+	public static Set<String> getDomainAnnotation(Protein prot) {
+		Set<String> domainAnnotation = new HashSet<String>();
+		if (getSettings().getComputeDomainSimilarityOn() != null
+				&& getSettings().getComputeDomainSimilarityOn().equals("pfam"))
+			domainAnnotation = prot.getPfamResults();
+		else
+			for (InterproResult ipr : prot.getInterproResults()) {
+				domainAnnotation.add(ipr.getId());
+			}
+		return domainAnnotation;
+	}
+
+	/**
+	 * Extracts either the Pfam or the InterPro annotations from the argument,
+	 * depending which is set to be used in AHRD's input.
+	 * 
+	 * @param Protein
+	 *            prot
+	 * @return Set<String> domain annotation, <em>empty</em> if none found.
+	 */
+	public static Set<String> getDomainAnnotation(BlastResult blastResult) {
+		Set<String> domainAnnotation = new HashSet<String>();
+		Set<String> blastResultAnnotation = null;
+		if (getSettings().getComputeDomainSimilarityOn() != null
+				&& getSettings().getComputeDomainSimilarityOn().equals("pfam"))
+			blastResultAnnotation = getBlastResultAccessionsToPfamIds().get(
+					blastResult.getAccession());
+		else
+			blastResultAnnotation = getBlastResultAccessionsToInterproIds()
+					.get(blastResult.getAccession());
+		// Validate:
+		if (blastResultAnnotation != null && !blastResultAnnotation.isEmpty())
+			domainAnnotation = blastResultAnnotation;
+
+		return domainAnnotation;
 	}
 
 	public DomainScoreCalculator(Protein protein) {
