@@ -146,7 +146,7 @@ public class InterproResult implements Comparable<InterproResult> {
 	}
 
 	/**
-	 * Reads in a raw Interpro-Result-File and assigns iteratively
+	 * Reads in a raw Interpro-Scan result file and assigns iteratively
 	 * InterproResult-instances to the Proteins, specified by their
 	 * Gene-Accessions.
 	 * 
@@ -161,6 +161,8 @@ public class InterproResult implements Comparable<InterproResult> {
 				getSettings().getPathToInterproResults())));
 		String iterLine = null;
 		while ((iterLine = br.readLine()) != null) {
+			// In case domain architecture similarities are computed based on
+			// Pfam annotations parse those:
 			if (getSettings().isToComputeDomainSimilarities()
 					&& getSettings().getComputeDomainSimilarityOn() != null
 					&& getSettings().getComputeDomainSimilarityOn().equals(
@@ -171,25 +173,28 @@ public class InterproResult implements Comparable<InterproResult> {
 					getProteinFromMemoryDatabase(annotation[0], proteinDb)
 							.getPfamResults().add(annotation[1]);
 				}
-			} else {
-				String iprRegEx = "(\\S+)\\s+.*\\s(IPR\\d{6})\\s.*";
-				String[] annotation = parseDomainAnnotation(iterLine, iprRegEx);
-				if (annotation.length == 2) {
-					Protein prot = getProteinFromMemoryDatabase(annotation[0],
-							proteinDb);
-					InterproResult ipr = null;
-					// WARN, if an Interpro-Result is not found in the
-					// memory-database:
-					if (getInterproDb().containsKey(annotation[1])) {
-						ipr = getInterproDb().get(annotation[1]);
-					} else {
-						missingInterproIds.add(annotation[1]);
-					}
-					if (prot != null && ipr != null) {
-						prot.getInterproResults().add(ipr);
-					}
+			}
+			// In order to print out conserved protein domains for the query
+			// proteins, we need the InterPro annotations even in case we use
+			// the Pfam annotations to compute domain architecture similarities.
+			String iprRegEx = "(\\S+)\\s+.*\\s(IPR\\d{6})\\s.*";
+			String[] annotation = parseDomainAnnotation(iterLine, iprRegEx);
+			if (annotation.length == 2) {
+				Protein prot = getProteinFromMemoryDatabase(annotation[0],
+						proteinDb);
+				InterproResult ipr = null;
+				// WARN, if an Interpro-Result is not found in the
+				// memory-database:
+				if (getInterproDb().containsKey(annotation[1])) {
+					ipr = getInterproDb().get(annotation[1]);
+				} else {
+					missingInterproIds.add(annotation[1]);
+				}
+				if (prot != null && ipr != null) {
+					prot.getInterproResults().add(ipr);
 				}
 			}
+
 		}
 		if (missingInterproIds.size() > 0)
 			System.err
