@@ -200,8 +200,8 @@ public class DomainScoreCalculator {
 	 */
 	public static Set<String> getDomainAnnotation(Protein prot) {
 		Set<String> domainAnnotation = new HashSet<String>();
-		if (getSettings().getComputeDomainSimilarityOn() != null
-				&& getSettings().getComputeDomainSimilarityOn().equals("pfam"))
+		if (getSettings()
+				.isDomainArchitectureSimilarityBasedOnPfamAnnotations())
 			domainAnnotation = prot.getPfamResults();
 		else
 			for (InterproResult ipr : prot.getInterproResults()) {
@@ -221,8 +221,8 @@ public class DomainScoreCalculator {
 	public static Set<String> getDomainAnnotation(BlastResult blastResult) {
 		Set<String> domainAnnotation = new HashSet<String>();
 		Set<String> blastResultAnnotation = null;
-		if (getSettings().getComputeDomainSimilarityOn() != null
-				&& getSettings().getComputeDomainSimilarityOn().equals("pfam"))
+		if (getSettings()
+				.isDomainArchitectureSimilarityBasedOnPfamAnnotations())
 			blastResultAnnotation = getBlastResultAccessionsToPfamIds().get(
 					blastResult.getAccession());
 		else

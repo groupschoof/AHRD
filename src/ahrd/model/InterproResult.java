@@ -60,6 +60,7 @@ public class InterproResult implements Comparable<InterproResult> {
 	private Double domainWeight;
 
 	private static Map<String, InterproResult> interproDb = new HashMap<String, InterproResult>();
+	private static Map<String, Double> pfamDomainWeights = new HashMap<String, Double>();
 
 	public InterproResult(String id, String shortName, String type) {
 		super();
@@ -119,29 +120,37 @@ public class InterproResult implements Comparable<InterproResult> {
 	}
 
 	/**
-	 * Assigns each Interpro-Domain in the memory-database its domain-weight as
-	 * defined above. See mentioned article for details. This method has to be
-	 * called after the memory Interpro-Database has been initialized.
+	 * Assigns each conserved protein domain in the memory-database its
+	 * domain-weight as defined above. See mentioned article for details.
+	 * Depending on AHRD's input this is done for either Pfam or InterPro
+	 * domains. In the latter case this method has to be called after the memory
+	 * Interpro-Database has been initialized, of course.
 	 * 
 	 * @throws IOException
 	 * @throws NumberFormatException
-	 * @note: The input file is defined in Settings and expected to be a
+	 * @Note: The input file is defined in Settings and expected to be a
 	 *        tab-delimited file, in which the first column holds the
-	 *        Interpro-ID and the eight column holds the domain-weight for
-	 *        Eukaryotes.
+	 *        [Interpro|Pfam]-ID and the eighth column holds the domain-weight
+	 *        for Eukaryotes.
 	 */
 	public static void parseDomainWeights() throws NumberFormatException,
 			IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				new FileInputStream(getSettings()
 						.getPathToDomainWeightsDatabase())));
-		String iprID;
+		String domainId;
 		String[] entry = null;
 		for (String line; (line = reader.readLine()) != null;) {
 			entry = line.split("\t");
-			iprID = entry[0];
-			InterproResult interproEntry = getInterproDb().get(iprID);
-			interproEntry.setDomainWeight(Double.parseDouble(entry[7]));
+			domainId = entry[0];
+			Double domainWeight = Double.parseDouble(entry[7]);
+			if (getSettings()
+					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
+				getPfamDomainWeights().put(domainId, domainWeight);
+			} else {
+				InterproResult interproEntry = getInterproDb().get(domainId);
+				interproEntry.setDomainWeight(domainWeight);
+			}
 		}
 	}
 
@@ -443,6 +452,15 @@ public class InterproResult implements Comparable<InterproResult> {
 
 	public void setDomainWeight(Double domainWeight) {
 		this.domainWeight = domainWeight;
+	}
+
+	public static Map<String, Double> getPfamDomainWeights() {
+		return pfamDomainWeights;
+	}
+
+	public static void setPfamDomainWeights(
+			Map<String, Double> pfamDomainWeights) {
+		InterproResult.pfamDomainWeights = pfamDomainWeights;
 	}
 
 }

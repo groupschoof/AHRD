@@ -845,4 +845,9 @@ public class Settings implements Cloneable {
 		this.computeDomainSimilarityOn = computeDomainSimilarityOn;
 	}
 
+	public boolean isDomainArchitectureSimilarityBasedOnPfamAnnotations() {
+		return (getComputeDomainSimilarityOn() != null && getComputeDomainSimilarityOn()
+				.equals("pfam"));
+	}
+
 }
