@@ -1,7 +1,6 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
-import static ahrd.controller.Utils.zeroList;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -51,8 +50,6 @@ public class DomainScoreCalculator {
 
 	public static void initializeBlastResultAccessionsToInterproIds()
 			throws IOException {
-		// blastResultAccessionsToInterproIds = new HashMap<String,
-		// Set<String>>();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(
 				new FileInputStream(getSettings()
 						.getPathToInterproResults4BlastHits())));
@@ -110,9 +107,9 @@ public class DomainScoreCalculator {
 		// Domain-Weight Vector for all Protein's BlastResults:
 		for (String blastDb : prot.getBlastResults().keySet()) {
 			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
-				List<Double> brVec = zeroList(vsm.size());
+				List<Double> brVec = new Vector<Double>();
 				for (String domainAccession : vsm) {
-					getDomainWeight(br, domainAccession);
+					brVec.add(getDomainWeight(br, domainAccession));
 				}
 				// Set the results:
 				br.setDomainWeights(brVec);
