@@ -395,8 +395,8 @@ public class Settings implements Cloneable {
 	 */
 	public void validateComputeDomainSimilarityOn() {
 		if (getComputeDomainSimilarityOn() != null
-				&& (!getComputeDomainSimilarityOn()
-						.equalsIgnoreCase("interpro") || !getComputeDomainSimilarityOn()
+				&& !(getComputeDomainSimilarityOn()
+						.equalsIgnoreCase("interpro") || getComputeDomainSimilarityOn()
 						.equalsIgnoreCase("pfam"))) {
 			throw new IllegalArgumentException(
 					"Input parameter '"
