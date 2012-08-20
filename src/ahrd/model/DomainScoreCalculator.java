@@ -2,10 +2,6 @@ package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,8 +11,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import ahrd.exception.MissingInterproResultException;
 
@@ -47,33 +41,6 @@ public class DomainScoreCalculator {
 	 * results). In this memory database we store the Pfam domains.
 	 */
 	private static Map<String, Set<String>> blastResultAccessionsToPfamIds = new HashMap<String, Set<String>>();
-
-	public static void initializeBlastResultAccessionsToInterproIds()
-			throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				new FileInputStream(getSettings()
-						.getPathToInterproResults4BlastHits())));
-		String accession = "";
-		String interproId = "";
-		String line = null;
-		while ((line = reader.readLine()) != null) {
-			Pattern pn = Pattern.compile("(\\S+)\\s+.*\\s(IPR\\d{6})\\s.*");
-			Matcher mr = pn.matcher(line);
-			if (mr.matches()) {
-				accession = mr.group(1);
-				interproId = mr.group(2);
-
-				if (!getBlastResultAccessionsToInterproIds().containsKey(
-						accession)) {
-					getBlastResultAccessionsToInterproIds().put(accession,
-							new HashSet<String>());
-				}
-				getBlastResultAccessionsToInterproIds().get(accession).add(
-						interproId);
-			}
-		}
-
-	}
 
 	private Protein protein;
 	private SortedSet<String> vectorSpaceModel;

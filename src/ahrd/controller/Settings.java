@@ -87,7 +87,6 @@ public class Settings implements Cloneable {
 	private String pathToReferencesFasta;
 	private String pathToInterproDatabase;
 	private String pathToInterproResults;
-	private String pathToPfamResults;
 	private String pathToGeneOntologyResults;
 	private String pathToOutput;
 	/**
@@ -549,14 +548,6 @@ public class Settings implements Cloneable {
 
 	public void setPathToGeneOntologyResults(String pathToGeneOntologyResults) {
 		this.pathToGeneOntologyResults = pathToGeneOntologyResults;
-	}
-
-	public String getPathToPfamResults() {
-		return pathToPfamResults;
-	}
-
-	public void setPathToPfamResults(String pathToPfamResults) {
-		this.pathToPfamResults = pathToPfamResults;
 	}
 
 	public String getPathToOutput() {

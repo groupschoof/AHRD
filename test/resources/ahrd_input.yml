@@ -28,11 +28,13 @@ blast_dbs:
 interpro_database: ./test/resources/interpro_31.xml
 interpro_result: ./test/resources/interpro_result.raw
 domain_weights_database: ./test/resources/domain_weights_database.txt
-interpro_results_of_blast_hits: ./test/resources/simap_iprscn_result_replaced_hashes.txt
+compute_domain_similarity_on: pfam
+descriptionScoreDomainSimilarityWeight: 0.2 
 gene_ontology_result: ./test/resources/go_results.csv
-token_score_bit_score_weight: 0.5
+token_score_bit_score_weight: 0.3
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
+tokenScoreDomainSimilarityWeight: 0.2
 description_score_relative_description_frequency_weight: 0.6
 write_token_set_to_output: false
 write_best_blast_hits_to_output: true
