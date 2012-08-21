@@ -80,7 +80,10 @@ token_score_overlap_score_weight: 0.0</pre>
 
 h3. 2.2.2 Running AHRD considering domain architecture similarities:
 
-AHRD can take domain architecture of similar proteins into account to assign human readable descriptions of candidates not also of high sequence similarity and frequently appearing words in their descriptions but especially having a domain architecture like the one of the query protein. 
+AHRD can take domain architecture of similar proteins into account to assign
+human readable descriptions of candidates not also of high sequence similarity
+and frequently appearing words in their descriptions but especially having a
+domain architecture like the one of the query protein. 
 
 To do so, provide InterPro-Scan results for the query proteins with input parameter:
 <pre>interpro_result: query_proteins_iprscn.tsv</pre>
@@ -92,12 +95,20 @@ token_score_domain_similarity_weight: 0.2</pre>
 
 _Important note:_ Remember to adjust all token_score_x_weights to sum up to 1.0!
 
-AHRD assigns domain architecture similarity scores based on the formulae as described in this article: 
-??Lee, Byungwook, and Doheon Lee. ÒProtein Comparison at the Domain Architecture Level.Ó BMC Bioinformatics 10, no. Suppl 15 (December 3, 2009): S5.??
-The following parameter decides how AHRD should compute domain architecture similarity. Based on Pfam or InterPro annotations:<pre>compute_domain_similarity_on: pfam</pre>
-If you want o use either domain annotation please remember to provide the respective _domain weights database_.
+AHRD assigns domain architecture similarity scores based on the formulae as
+described in this article: ??Lee, Byungwook, and Doheon Lee. ÒProtein
+Comparison at the Domain Architecture Level.Ó BMC Bioinformatics 10, no. Suppl
+15 (December 3, 2009): S5.??  The following parameter decides how AHRD should
+compute domain architecture similarity. Based on Pfam or InterPro
+annotations:<pre>compute_domain_similarity_on: pfam</pre> If you want o use
+either domain annotation please remember to provide the respective _domain
+weights database_.
 
-In order to retrieve Pfam or InterPro annotations for the description candidates (Blast results) AHRD queries the RESTful UniprotKB web service. Hence, running AHRD in this mode, you require Internet access. This is done in parallel in order to speed this process up, but still it significantly increases AHRD's run time by 5 to 15 seconds per query protein approximately. 
+In order to retrieve Pfam or InterPro annotations for the description
+candidates (Blast results) AHRD queries the RESTful UniprotKB web service.
+Hence, running AHRD in this mode, you require Internet access. This is done in
+parallel in order to speed this process up, but still it significantly
+increases AHRD's run time by 5 to 15 seconds per query protein approximately. 
 
 h3. 2.2.2.1 Example AHRD input. Template for AHRD run including domain architecture similarity scoring.
 
