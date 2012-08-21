@@ -77,8 +77,8 @@ public class Settings implements Cloneable {
 	public static final String P_MUTATE_SAME_PARAMETER_SCALE_KEY = "p_mutate_same_parameter_scale";
 	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
 	public static final String OUTPUT_FASTA_KEY = "output_fasta";
-	public static final String DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "descriptionScoreDomainSimilarityWeight";
-	public static final String TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "tokenScoreDomainSimilarityWeight";
+	public static final String DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "description_score_domain_similarity_weight";
+	public static final String TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "token_score_domain_similarity_weight";
 
 	/**
 	 * Fields:
