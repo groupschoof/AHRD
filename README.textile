@@ -96,11 +96,14 @@ token_score_domain_similarity_weight: 0.2</pre>
 _Important note:_ Remember to adjust all token_score_x_weights to sum up to 1.0!
 
 AHRD assigns domain architecture similarity scores based on the formulae as
-described in this article: ??Lee, Byungwook, and Doheon Lee. ÒProtein
-Comparison at the Domain Architecture Level.Ó BMC Bioinformatics 10, no. Suppl
-15 (December 3, 2009): S5.??  The following parameter decides how AHRD should
+described in this article: 
+
+bq. Lee, Byungwook, and Doheon Lee. "Protein Comparison at the Domain Architecture Level." 
+BMC Bioinformatics 10, no. Suppl 15 (December 3, 2009): S5.
+
+The following parameter decides how AHRD should
 compute domain architecture similarity. Based on Pfam or InterPro
-annotations:<pre>compute_domain_similarity_on: pfam</pre> If you want o use
+annotations:@compute_domain_similarity_on: pfam@ If you want o use
 either domain annotation please remember to provide the respective _domain
 weights database_.
 
