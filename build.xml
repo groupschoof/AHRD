@@ -89,6 +89,7 @@
 			<formatter type="plain" usefile="false" />
 			<test name="ahrd.test.AhrdTestRun" />
 		</junit>
+		<delete file="ahrd_output.csv" />
 	</target>
 
 	<target name="test.regexs" depends="compile.test">
