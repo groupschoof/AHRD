@@ -36,7 +36,7 @@ public class OutputWriter extends AbstractOutputWriter {
 			bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
 		}
 		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
-			bw.write("\tProtein's-Domain-Weight-Vector");
+			bw.write("\tProtein-Domain-Weight-Vector");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
@@ -278,12 +278,12 @@ public class OutputWriter extends AbstractOutputWriter {
 		String hdr = "";
 		for (String blastDb : getSettings().getBlastDatabases()) {
 			if (blastDb != null && !blastDb.equals(""))
-				hdr += ("\tBest BlastHit (BH) against '" + blastDb + "'");
+				hdr += ("\tBest BlastHit (BH) against " + blastDb);
 			if (getSettings().isInTrainingMode())
 				hdr += "\tLength\tEvaluation-Score";
 			if (getSettings()
 					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
-				hdr += "\tBH's-Domain-Weight-Vector\tBH's-Domain-Architecture-Similarity-Score";
+				hdr += "\tBH-Domain-Weight-Vector\tBH-Domain-Architecture-Similarity-Score";
 			}
 		}
 		return hdr;
@@ -291,7 +291,6 @@ public class OutputWriter extends AbstractOutputWriter {
 
 	public String buildBestBlastHitsColumns(Protein prot) {
 		String csvRow = "";
-
 		for (String blastDb : getSettings().getBlastDatabases()) {
 			if (prot.getEvaluationScoreCalculator().getUnchangedBlastResults()
 					.get(blastDb) != null) {
@@ -299,21 +298,26 @@ public class OutputWriter extends AbstractOutputWriter {
 						.getUnchangedBlastResults().get(blastDb);
 				csvRow += "\t\"" + bestBr.getAccession() + " "
 						+ bestBr.getDescription() + "\"";
-				if (bestBr.getEvaluationScore() != null)
+				if (bestBr.getEvaluationScore() != null) {
 					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"
 							+ FRMT.format(bestBr.getEvaluationScore());
+				}
 				if (getSettings()
-						.isDomainArchitectureSimilarityBasedOnPfamAnnotations()
-						&& !bestBr.getDomainWeights().isEmpty()
-						&& bestBr.getDomainSimilarityScore() != null) {
-					csvRow += "\t" + bestBr.getDomainWeights().toString()
-							+ "\t"
-							+ FRMT.format(bestBr.getDomainSimilarityScore());
+						.isWriteDomainArchitectureSimilarityScoresToOutput()) {
+					if (bestBr.getDomainWeights() != null
+							&& bestBr.getDomainSimilarityScore() != null)
+						csvRow += "\t"
+								+ bestBr.getDomainWeights().toString()
+								+ "\t"
+								+ FRMT.format(bestBr.getDomainSimilarityScore());
+					else
+						csvRow += "\t\t";
 				}
 			} else {
 				csvRow += "\t";
-				if (getSettings().isInTrainingMode())
+				if (getSettings().isInTrainingMode()) {
 					csvRow += "\t0\t0.0";
+				}
 			}
 		}
 		return csvRow;

@@ -39,6 +39,6 @@ write_token_set_to_output: true
 write_best_blast_hits_to_output: true
 write_scores_to_output: true
 write_domain_architecture_similarity_scores_to_output: true
-output: ./ahrd_output.csv
+output: ./ahrd_evaluator_output.csv
 references_fasta: ./test/resources/references.fasta
 blast2go: ./test/resources/blast2go_out.annot
