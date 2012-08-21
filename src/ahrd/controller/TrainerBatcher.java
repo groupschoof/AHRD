@@ -156,10 +156,6 @@ public class TrainerBatcher extends Batcher {
 			batchYml.put(Settings.DOMAIN_WEIGHTS_DATABASE,
 					getInput().get(Settings.DOMAIN_WEIGHTS_DATABASE));
 		}
-		if (getInput().get(Settings.INTERPRO_RESULTS_4_BLASTHITS) != null) {
-			batchYml.put(Settings.INTERPRO_RESULTS_4_BLASTHITS,
-					getInput().get(Settings.INTERPRO_RESULTS_4_BLASTHITS));
-		}
 		if (getInput().get(Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null) {
 			batchYml.put(
 					Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY,
@@ -172,6 +168,13 @@ public class TrainerBatcher extends Batcher {
 					Settings.DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY,
 					getInput()
 							.get(Settings.DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY));
+		}
+		if (getInput().get(
+				Settings.WRITE_DOMAIN_ARCHITECTURE_SIMILARITY_SCORES_TO_OUTPUT) != null) {
+			batchYml.put(
+					Settings.WRITE_DOMAIN_ARCHITECTURE_SIMILARITY_SCORES_TO_OUTPUT,
+					getInput()
+							.get(Settings.WRITE_DOMAIN_ARCHITECTURE_SIMILARITY_SCORES_TO_OUTPUT));
 		}
 		// END: Domain Similarity related data.
 

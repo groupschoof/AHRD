@@ -51,7 +51,6 @@ public class Settings implements Cloneable {
 	public static final String INTERPRO_RESULT_KEY = "interpro_result";
 	public static final String DOMAIN_WEIGHTS_DATABASE = "domain_weights_database";
 	public static final String COMPUTE_DOMAIN_SIMILARITY_ON_KEY = "compute_domain_similarity_on";
-	public static final String INTERPRO_RESULTS_4_BLASTHITS = "interpro_results_of_blast_hits";
 	public static final String GENE_ONTOLOGY_RESULT_KEY = "gene_ontology_result";
 	public static final String OUTPUT_KEY = "output";
 	public static final String SIMULATED_ANNEALING_PATH_LOG_KEY = "path_log";
@@ -79,6 +78,7 @@ public class Settings implements Cloneable {
 	public static final String OUTPUT_FASTA_KEY = "output_fasta";
 	public static final String DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "description_score_domain_similarity_weight";
 	public static final String TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "token_score_domain_similarity_weight";
+	public static final String WRITE_DOMAIN_ARCHITECTURE_SIMILARITY_SCORES_TO_OUTPUT = "write_domain_architecture_similarity_scores_to_output";
 
 	/**
 	 * Fields:
@@ -206,6 +206,11 @@ public class Settings implements Cloneable {
 	 * know, if to base this scoring on annotated Pfam or InterPro domains.
 	 */
 	private String computeDomainSimilarityOn = null;
+	/**
+	 * AHRD run in domain_architecture_similarity mode can be asked to append
+	 * those scores to the output.
+	 */
+	private boolean writeDomainArchitectureSimilarityScoresToOutput = false;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -233,8 +238,6 @@ public class Settings implements Cloneable {
 		setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
 		setPathToDomainWeightsDatabase((String) input
 				.get(DOMAIN_WEIGHTS_DATABASE));
-		setPathToInterproResults4BlastHits((String) input
-				.get(INTERPRO_RESULTS_4_BLASTHITS));
 		setComputeDomainSimilarityOn((String) input
 				.get(COMPUTE_DOMAIN_SIMILARITY_ON_KEY));
 		if (input.get(TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null)
@@ -270,14 +273,16 @@ public class Settings implements Cloneable {
 				.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
 		setWriteScoresToOutput(Boolean.parseBoolean((String) input
 				.get(WRITE_SCORES_TO_OUTPUT)));
+		setWriteDomainArchitectureSimilarityScoresToOutput(Boolean
+				.parseBoolean((String) input
+						.get(WRITE_DOMAIN_ARCHITECTURE_SIMILARITY_SCORES_TO_OUTPUT)));
 		setOutputFasta(Boolean.parseBoolean((String) input
 				.get(OUTPUT_FASTA_KEY)));
 		// Generate the Blacklists and Filters for each Blast-Database from
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
 			this.blastResultsBlacklists
-					.put(
-							blastDatabaseName,
+					.put(blastDatabaseName,
 							fromFile(getPathToBlastResultsBlackList(blastDatabaseName)));
 			this.blastResultsFilter.put(blastDatabaseName,
 					fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
@@ -839,6 +844,15 @@ public class Settings implements Cloneable {
 	public boolean isDomainArchitectureSimilarityBasedOnPfamAnnotations() {
 		return (getComputeDomainSimilarityOn() != null && getComputeDomainSimilarityOn()
 				.equals("pfam"));
+	}
+
+	public boolean isWriteDomainArchitectureSimilarityScoresToOutput() {
+		return writeDomainArchitectureSimilarityScoresToOutput;
+	}
+
+	public void setWriteDomainArchitectureSimilarityScoresToOutput(
+			boolean writeDomainArchitectureSimilarityScoresToOutput) {
+		this.writeDomainArchitectureSimilarityScoresToOutput = writeDomainArchitectureSimilarityScoresToOutput;
 	}
 
 }

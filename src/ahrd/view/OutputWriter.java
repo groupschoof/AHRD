@@ -30,12 +30,13 @@ public class OutputWriter extends AbstractOutputWriter {
 		// Column-Names:
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
-		bw
-				.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
+		bw.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
 
 		if (getSettings().isInTrainingMode()) {
-			bw
-					.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+			bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+		}
+		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
+			bw.write("\tProtein's-Domain-Weight-Vector");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
@@ -44,13 +45,11 @@ public class OutputWriter extends AbstractOutputWriter {
 			bw.write("\t\"Tokens (tkn->score)\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
-			bw
-					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
+			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
-			bw
-					.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
+			bw.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
 		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
 			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
@@ -68,6 +67,10 @@ public class OutputWriter extends AbstractOutputWriter {
 				csvRow += buildTrainerColumns(prot);
 			}
 			// Append further information, if requested:
+			if (getSettings()
+					.isWriteDomainArchitectureSimilarityScoresToOutput()) {
+				csvRow += "\t" + prot.getDomainWeights().toString();
+			}
 			if (getSettings().getWriteBestBlastHitsToOutput()) {
 				csvRow += buildBestBlastHitsColumns(prot);
 			}
@@ -114,7 +117,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		hrdScoresWriter = new BufferedWriter(new FileWriter(getSettings()
 				.getPathToHRDScoresOutput()));
 		hrdScoresWriter
-				.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Score\n");
+				.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Score\n");
 	}
 
 	/**
@@ -244,8 +247,8 @@ public class OutputWriter extends AbstractOutputWriter {
 							.relativeBlastScore(hsbr));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
-							.getDescLinePatternFrequencies().get(
-									hsbr.patternize()));
+							.getDescLinePatternFrequencies()
+							.get(hsbr.patternize()));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
 							.getMaxDescriptionLineFrequency());
@@ -275,9 +278,13 @@ public class OutputWriter extends AbstractOutputWriter {
 		String hdr = "";
 		for (String blastDb : getSettings().getBlastDatabases()) {
 			if (blastDb != null && !blastDb.equals(""))
-				hdr += ("\tBest BlastHit against '" + blastDb + "'");
+				hdr += ("\tBest BlastHit (BH) against '" + blastDb + "'");
 			if (getSettings().isInTrainingMode())
 				hdr += "\tLength\tEvaluation-Score";
+			if (getSettings()
+					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
+				hdr += "\tBH's-Domain-Weight-Vector\tBH's-Domain-Architecture-Similarity-Score";
+			}
 		}
 		return hdr;
 	}
@@ -295,6 +302,14 @@ public class OutputWriter extends AbstractOutputWriter {
 				if (bestBr.getEvaluationScore() != null)
 					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"
 							+ FRMT.format(bestBr.getEvaluationScore());
+				if (getSettings()
+						.isDomainArchitectureSimilarityBasedOnPfamAnnotations()
+						&& !bestBr.getDomainWeights().isEmpty()
+						&& bestBr.getDomainSimilarityScore() != null) {
+					csvRow += "\t" + bestBr.getDomainWeights().toString()
+							+ "\t"
+							+ FRMT.format(bestBr.getDomainSimilarityScore());
+				}
 			} else {
 				csvRow += "\t";
 				if (getSettings().isInTrainingMode())
