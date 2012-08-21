@@ -39,6 +39,7 @@ description_score_relative_description_frequency_weight: 0.6
 write_token_set_to_output: false
 write_best_blast_hits_to_output: true
 write_scores_to_output: false
+write_domain_architecture_similarity_scores_to_output: false
 output: ./ahrd_output.csv
 references_fasta: ./test/resources/references.fasta
 blast2go: ./test/resources/blast2go_out.annot
