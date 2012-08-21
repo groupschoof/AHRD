@@ -27,6 +27,8 @@ public class InterproResultTest {
 	public void initialiseInterproDb() throws IOException, ParsingException {
 		TestUtils.initTestSettings();
 		InterproResult.initialiseInterproDb();
+		getSettings().setPathToDomainWeightsDatabase(
+				"./test/resources/domain_weights_database.txt");
 	}
 
 	@Test
@@ -82,14 +84,14 @@ public class InterproResultTest {
 		assertEquals(2, proteinDb.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getInterproResults().size());
 		assertTrue(proteinDb.get("gene:chr01.502:mRNA:chr01.502")
-				.getInterproResults().contains(
-						InterproResult.getInterproDb().get("IPR000535")));
+				.getInterproResults()
+				.contains(InterproResult.getInterproDb().get("IPR000535")));
 		assertTrue(proteinDb.get("gene:chr01.1056:mRNA:chr01.1056")
-				.getInterproResults().contains(
-						InterproResult.getInterproDb().get("IPR000006")));
+				.getInterproResults()
+				.contains(InterproResult.getInterproDb().get("IPR000006")));
 		assertTrue(proteinDb.get("gene:chr01.1056:mRNA:chr01.1056")
-				.getInterproResults().contains(
-						InterproResult.getInterproDb().get("IPR000536")));
+				.getInterproResults()
+				.contains(InterproResult.getInterproDb().get("IPR000536")));
 
 		// Test using Pfam identifiers:
 		getSettings().setComputeDomainSimilarityOn("pfam");
@@ -156,6 +158,7 @@ public class InterproResultTest {
 		// 1.) TEST parsing of domain weights for InterPro domains:
 		// Because the above @Before has initialized the Settings and the memory
 		// Interpro-Database, we have it here, already.
+
 		InterproResult.parseDomainWeights();
 		// Assure that InterproDomains IPR000535 IPR000536 IPR000006 have their
 		// appropriate weights!
