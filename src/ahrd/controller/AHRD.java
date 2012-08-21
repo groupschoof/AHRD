@@ -202,6 +202,16 @@ public class AHRD {
 			System.out.println("...parsed blast results in " + takeTime()
 					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
 
+		// parse domain weights database, if AHRD is run considering domain
+		// architecture similarity scoring
+		if (getSettings().isToComputeDomainSimilarities()) {
+			InterproResult.parseDomainWeights();
+			if (writeLogMsgs)
+				System.out.println("...parsed domain weights database in "
+						+ takeTime() + "sec, currently occupying "
+						+ takeMemoryUsage() + " MB");
+		}
+
 		// one single InterproResult-File
 		if (getSettings().hasValidInterproDatabaseAndResultFile()) {
 			InterproResult.initialiseInterproDb();

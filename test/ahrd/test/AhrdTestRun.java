@@ -17,4 +17,12 @@ public class AhrdTestRun {
 		// No error?, then we are happy..
 		assertTrue(true);
 	}
+	
+	@Test
+	public void testRunWithDomainArchitectureSimilarityScoring() throws Exception {
+		String[] args = {"./test/resources/ahrd_dom_arch_sim_input.yml"};
+		AHRD.main(args);
+		// No error?, then we are happy..
+		assertTrue(true);
+	}
 }
