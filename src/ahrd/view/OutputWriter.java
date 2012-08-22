@@ -69,7 +69,7 @@ public class OutputWriter extends AbstractOutputWriter {
 			// Append further information, if requested:
 			if (getSettings()
 					.isWriteDomainArchitectureSimilarityScoresToOutput()) {
-				csvRow += "\t" + prot.getDomainWeights().toString();
+				csvRow += buildDomainWeightColumn(prot);
 			}
 			if (getSettings().getWriteBestBlastHitsToOutput()) {
 				csvRow += buildBestBlastHitsColumns(prot);
@@ -144,6 +144,24 @@ public class OutputWriter extends AbstractOutputWriter {
 		return "\t"
 				+ FRMT.format(prot.getEvaluationScoreCalculator()
 						.getHighestPossibleEvaluationScore());
+	}
+
+	public String buildDomainWeightColumn(Protein prot) {
+		String dwc = "\t";
+		if (prot.getDomainWeights() != null
+				&& !prot.getDomainWeights().isEmpty())
+			dwc += prot.getDomainWeights();
+		return dwc;
+	}
+
+	public String buildDomainWeightColumn(BlastResult br) {
+		String dwc = "\t";
+		if (br.getDomainWeights() != null && !br.getDomainWeights().isEmpty())
+			dwc += br.getDomainWeights().toString();
+		dwc += "\t";
+		if (br.getDomainSimilarityScore() != null)
+			dwc += FRMT.format(br.getDomainSimilarityScore());
+		return dwc;
 	}
 
 	public String buildBlast2GoColumns(Protein prot) {
@@ -304,14 +322,7 @@ public class OutputWriter extends AbstractOutputWriter {
 				}
 				if (getSettings()
 						.isWriteDomainArchitectureSimilarityScoresToOutput()) {
-					if (bestBr.getDomainWeights() != null
-							&& bestBr.getDomainSimilarityScore() != null)
-						csvRow += "\t"
-								+ bestBr.getDomainWeights().toString()
-								+ "\t"
-								+ FRMT.format(bestBr.getDomainSimilarityScore());
-					else
-						csvRow += "\t\t";
+					csvRow += buildDomainWeightColumn(bestBr);
 				}
 			} else {
 				csvRow += "\t";
