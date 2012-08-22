@@ -12,8 +12,10 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -140,6 +142,7 @@ public class InterproResult implements Comparable<InterproResult> {
 						.getPathToDomainWeightsDatabase())));
 		String domainId;
 		String[] entry = null;
+		List<String> notFoundIprIds = new ArrayList<String>();
 		for (String line; (line = reader.readLine()) != null;) {
 			entry = line.split("\t");
 			domainId = entry[0];
@@ -149,9 +152,19 @@ public class InterproResult implements Comparable<InterproResult> {
 				getPfamDomainWeights().put(domainId, domainWeight);
 			} else {
 				InterproResult interproEntry = getInterproDb().get(domainId);
-				interproEntry.setDomainWeight(domainWeight);
+				if (interproEntry != null) {
+					interproEntry.setDomainWeight(domainWeight);
+				} else {
+					notFoundIprIds.add(domainId);
+				}
 			}
 		}
+		// Warn, if some InterproResults could not be found in the memory
+		// database:
+		if (!notFoundIprIds.isEmpty())
+			System.err
+					.println("WARNING: Could not find InterPro-Entries with the following IDs in the memory databse:\n"
+							+ notFoundIprIds);
 	}
 
 	/**
@@ -257,11 +270,11 @@ public class InterproResult implements Comparable<InterproResult> {
 	 */
 	public static void filterForMostInforming(Protein p)
 			throws MissingInterproResultException {
-		Set<InterproResult> mostInformatives = new HashSet<InterproResult>(p
-				.getInterproResults());
+		Set<InterproResult> mostInformatives = new HashSet<InterproResult>(
+				p.getInterproResults());
 		for (InterproResult iprToValidate : p.getInterproResults()) {
-			Set<InterproResult> iprsToCompare = new HashSet<InterproResult>(p
-					.getInterproResults());
+			Set<InterproResult> iprsToCompare = new HashSet<InterproResult>(
+					p.getInterproResults());
 			iprsToCompare.remove(iprToValidate);
 			for (InterproResult iprToCompare : iprsToCompare) {
 				if (iprToValidate.isParent(iprToCompare)

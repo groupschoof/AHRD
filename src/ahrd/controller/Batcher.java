@@ -223,6 +223,12 @@ public class Batcher {
 						getInput()
 								.get(Settings.DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY));
 			}
+			if (getInput().get(Settings.COMPUTE_DOMAIN_SIMILARITY_ON_KEY) != null) {
+				batchYml.put(
+						Settings.COMPUTE_DOMAIN_SIMILARITY_ON_KEY,
+						getInput().get(
+								Settings.COMPUTE_DOMAIN_SIMILARITY_ON_KEY));
+			}
 			if (getInput()
 					.get(Settings.WRITE_DOMAIN_ARCHITECTURE_SIMILARITY_SCORES_TO_OUTPUT) != null) {
 				batchYml.put(
