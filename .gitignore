@@ -20,3 +20,6 @@ test/sim_anneal_path_log.csv
 
 # Ignore Mac OS X related files:
 .DS_Store
+
+# Ignore junit file generated, when JUnit is interrupted with Ctrl-C
+junitvmwatcher*

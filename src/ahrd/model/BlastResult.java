@@ -38,11 +38,23 @@ public class BlastResult implements Comparable<BlastResult> {
 	/**
 	 * Query's start position in local alignment
 	 */
-	private Integer start;
+	private Integer queryStart;
 	/**
 	 * Query's stop position in local alignment
 	 */
-	private Integer end;
+	private Integer queryEnd;
+	/**
+	 * Subject's start position in local alignment
+	 */
+	private Integer subjectStart;
+	/**
+	 * Subject's stop position in local alignment
+	 */
+	private Integer subjectEnd;
+	/**
+	 * Length of subject's amino acid sequence.
+	 */
+	private Integer subjectLength;
 	private Double bitScore;
 	private String blastDatabaseName;
 	/**
@@ -70,13 +82,17 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public BlastResult(String accession, double eValue, String description,
-			int start, int end, double bitScore, String blastDatabaseName) {
+			int queryStart, int queryEnd, int subjectStart, int subjectEnd,
+			int subjectLength, double bitScore, String blastDatabaseName) {
 		super();
 		setAccession(accession);
 		setEValue(eValue);
 		setDescription(description);
-		setStart(start);
-		setEnd(end);
+		setQueryStart(queryStart);
+		setQueryEnd(queryEnd);
+		setSubjectStart(subjectStart);
+		setSubjectEnd(subjectEnd);
+		setSubjectLength(subjectLength);
 		setBitScore(bitScore);
 		setBlastDatabaseName(blastDatabaseName);
 	}
@@ -176,11 +192,13 @@ public class BlastResult implements Comparable<BlastResult> {
 	public boolean isValid() {
 		return (getAccession() != null && (!getAccession().equals(""))
 				&& getBitScore() != null && getDescription() != null
-				&& (!getDescription().equals("")) && getEnd() != null
-				&& getStart() != null && (getStart() < getEnd())
-				&& getEValue() != null && getTokens() != null
-				&& getTokens().size() > 0 && getSettings().getBlastDatabases()
-				.contains(getBlastDatabaseName()));
+				&& (!getDescription().equals("")) && getQueryEnd() != null
+				&& getQueryStart() != null && (getQueryStart() < getQueryEnd())
+				&& getSubjectEnd() != null && getSubjectStart() != null
+				&& (getSubjectEnd() > getSubjectStart())
+				&& getSubjectLength() != null && getEValue() != null
+				&& getTokens() != null && getTokens().size() > 0 && getSettings()
+				.getBlastDatabases().contains(getBlastDatabaseName()));
 	}
 
 	/**
@@ -198,9 +216,10 @@ public class BlastResult implements Comparable<BlastResult> {
 	 */
 	public BlastResult clone() {
 		return new BlastResult(new String(this.getAccession()), new Double(
-				eValue), new String(description), new Integer(start),
-				new Integer(end), new Double(bitScore), new String(
-						blastDatabaseName));
+				eValue), new String(description), new Integer(queryStart),
+				new Integer(queryEnd), new Integer(subjectStart), new Integer(
+						subjectEnd), new Integer(subjectLength), new Double(
+						bitScore), new String(blastDatabaseName));
 	}
 
 	public String getAccession() {
@@ -227,20 +246,20 @@ public class BlastResult implements Comparable<BlastResult> {
 		this.description = description;
 	}
 
-	public Integer getStart() {
-		return start;
+	public Integer getQueryStart() {
+		return queryStart;
 	}
 
-	public void setStart(Integer start) {
-		this.start = start;
+	public void setQueryStart(Integer start) {
+		this.queryStart = start;
 	}
 
-	public Integer getEnd() {
-		return end;
+	public Integer getQueryEnd() {
+		return queryEnd;
 	}
 
-	public void setEnd(Integer end) {
-		this.end = end;
+	public void setQueryEnd(Integer end) {
+		this.queryEnd = end;
 	}
 
 	public Double getBitScore() {
@@ -265,14 +284,6 @@ public class BlastResult implements Comparable<BlastResult> {
 
 	public void setDescriptionScore(Double descriptionScore) {
 		this.descriptionScore = descriptionScore;
-	}
-
-	public Double geteValue() {
-		return eValue;
-	}
-
-	public void seteValue(Double eValue) {
-		this.eValue = eValue;
 	}
 
 	public String getBlastDatabaseName() {
@@ -300,5 +311,29 @@ public class BlastResult implements Comparable<BlastResult> {
 
 	public void setEvaluationTokens(Set<String> evaluationTokens) {
 		this.evaluationTokens = evaluationTokens;
+	}
+
+	public Integer getSubjectStart() {
+		return subjectStart;
+	}
+
+	public void setSubjectStart(Integer subjectStart) {
+		this.subjectStart = subjectStart;
+	}
+
+	public Integer getSubjectEnd() {
+		return subjectEnd;
+	}
+
+	public void setSubjectEnd(Integer subjectEnd) {
+		this.subjectEnd = subjectEnd;
+	}
+
+	public Integer getSubjectLength() {
+		return subjectLength;
+	}
+
+	public void setSubjectLength(Integer subjectLength) {
+		this.subjectLength = subjectLength;
 	}
 }

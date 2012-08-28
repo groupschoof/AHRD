@@ -39,15 +39,24 @@ public class TokenScoreCalculator {
 	}
 
 	/**
+	 * Computes the quality of the local sequence alignment between the Query
+	 * and a Subject (see BLAST for details). This quality is assessed as the
+	 * proportion of the sum of aligned residues divided by the cumulative
+	 * sequence length.
+	 * 
 	 * @param queryStart
 	 * @param queryEnd
 	 * @param queryLength
-	 * @return The proportion of the query-sequence, that is covered by the
-	 *         significant local alignment with the Blast-Hit's subject.
+	 * @param subjectStart
+	 * @param subjectEnd
+	 * @param subjectLength
+	 * @return double
 	 */
 	public static double overlapScore(double queryStart, double queryEnd,
-			double queryLength) {
-		return (queryEnd - queryStart + 1.0) / queryLength;
+			double queryLength, double subjectStart, double subjectEnd,
+			double subjectLength) {
+		return ((queryEnd - queryStart + 1.0) + (subjectEnd - subjectStart + 1.0))
+				/ (queryLength + subjectLength);
 	}
 
 	public TokenScoreCalculator(Protein protein) {
@@ -129,7 +138,9 @@ public class TokenScoreCalculator {
 	public void measureCumulativeScores(BlastResult br) {
 		for (String token : br.getTokens()) {
 			Double overlapScore = TokenScoreCalculator.overlapScore(br
-					.getStart(), br.getEnd(), getProtein().getSequenceLength());
+					.getQueryStart(), br.getQueryEnd(), getProtein()
+					.getSequenceLength(), br.getSubjectStart(), br
+					.getSubjectEnd(), br.getSubjectLength());
 			addCumulativeTokenBitScore(token, br.getBitScore());
 			addCumulativeTokenBlastDatabaseScore(token,
 					br.getBlastDatabaseName());
@@ -145,8 +156,10 @@ public class TokenScoreCalculator {
 	 *            br
 	 */
 	public void measureTotalScores(BlastResult br) {
-		Double overlapScore = TokenScoreCalculator.overlapScore(br.getStart(),
-				br.getEnd(), getProtein().getSequenceLength());
+		Double overlapScore = TokenScoreCalculator.overlapScore(br
+				.getQueryStart(), br.getQueryEnd(), getProtein()
+				.getSequenceLength(), br.getSubjectStart(), br.getSubjectEnd(),
+				br.getSubjectLength());
 		setTotalTokenBlastDatabaseScore(getTotalTokenBlastDatabaseScore()
 				+ getSettings().getBlastDbWeight(br.getBlastDatabaseName()));
 		setTotalTokenOverlapScore(getTotalTokenOverlapScore() + overlapScore);

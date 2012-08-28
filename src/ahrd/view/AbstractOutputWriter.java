@@ -92,8 +92,10 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 		// Position 1
 		qc += (hsbr.getBitScore() > 50.0 && hsbr.getEValue() < 0.1) ? "*" : "-";
 		// Position 2
-		qc += (TokenScoreCalculator.overlapScore(hsbr.getStart(),
-				hsbr.getEnd(), p.getSequenceLength()) > 0.6) ? "*" : "-";
+		qc += (TokenScoreCalculator.overlapScore(hsbr.getQueryStart(),
+				hsbr.getQueryEnd(), p.getSequenceLength(),
+				hsbr.getSubjectStart(), hsbr.getSubjectEnd(),
+				hsbr.getSubjectLength()) > 0.6) ? "*" : "-";
 		// Position 3
 		qc += (p.getDescriptionScoreCalculator().getDescriptionHighScore() >= 0.5) ? "*"
 				: "-";

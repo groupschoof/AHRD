@@ -153,6 +153,8 @@ public class BlastSearchContentAdapter extends SearchContentAdapter {
 			currentBlastResult.setAccession(theValue);
 		} else if (theKey.equals("subjectDescription")) {
 			currentBlastResult.setDescription(theValue);
+		} else if (theKey.equals("subjectSequenceLength")) {
+			currentBlastResult.setSubjectLength(Integer.parseInt(theValue));
 		}
 	}
 
@@ -168,9 +170,13 @@ public class BlastSearchContentAdapter extends SearchContentAdapter {
 			currentBlastResult.setEValue(Double
 					.valueOf(validateDouble(theValue)));
 		} else if (theKey.equals("querySequenceStart")) {
-			currentBlastResult.setStart(Integer.parseInt(theValue));
+			currentBlastResult.setQueryStart(Integer.parseInt(theValue));
 		} else if (theKey.equals("querySequenceEnd")) {
-			currentBlastResult.setEnd(Integer.parseInt(theValue));
+			currentBlastResult.setQueryEnd(Integer.parseInt(theValue));
+		} else if (theKey.equals("subjectSequenceStart")) {
+			currentBlastResult.setSubjectStart(Integer.parseInt(theValue));
+		} else if (theKey.equals("subjectSequenceEnd")) {
+			currentBlastResult.setSubjectEnd(Integer.parseInt(theValue));
 		}
 	}
 
