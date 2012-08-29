@@ -30,10 +30,12 @@ public class OutputWriter extends AbstractOutputWriter {
 		// Column-Names:
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
-		bw.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
+		bw
+				.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
 
 		if (getSettings().isInTrainingMode()) {
-			bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+			bw
+					.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
 		}
 		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
 			bw.write("\tProtein-Domain-Weight-Vector");
@@ -45,11 +47,13 @@ public class OutputWriter extends AbstractOutputWriter {
 			bw.write("\t\"Tokens (tkn->score)\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
-			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
+			bw
+					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
-			bw.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
+			bw
+					.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
 		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
 			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
@@ -156,10 +160,11 @@ public class OutputWriter extends AbstractOutputWriter {
 
 	public String buildDomainWeightColumn(BlastResult br) {
 		String dwc = "\t";
-		if (br.getDomainWeights() != null && !br.getDomainWeights().isEmpty())
+		if (br != null && br.getDomainWeights() != null
+				&& !br.getDomainWeights().isEmpty())
 			dwc += br.getDomainWeights().toString();
 		dwc += "\t";
-		if (br.getDomainSimilarityScore() != null)
+		if (br != null && br.getDomainSimilarityScore() != null)
 			dwc += FRMT.format(br.getDomainSimilarityScore());
 		return dwc;
 	}
@@ -265,8 +270,8 @@ public class OutputWriter extends AbstractOutputWriter {
 							.relativeBlastScore(hsbr));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
-							.getDescLinePatternFrequencies()
-							.get(hsbr.patternize()));
+							.getDescLinePatternFrequencies().get(
+									hsbr.patternize()));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
 							.getMaxDescriptionLineFrequency());
@@ -310,9 +315,10 @@ public class OutputWriter extends AbstractOutputWriter {
 	public String buildBestBlastHitsColumns(Protein prot) {
 		String csvRow = "";
 		for (String blastDb : getSettings().getBlastDatabases()) {
+			BlastResult bestBr = null;
 			if (prot.getEvaluationScoreCalculator().getUnchangedBlastResults()
 					.get(blastDb) != null) {
-				BlastResult bestBr = prot.getEvaluationScoreCalculator()
+				bestBr = prot.getEvaluationScoreCalculator()
 						.getUnchangedBlastResults().get(blastDb);
 				csvRow += "\t\"" + bestBr.getAccession() + " "
 						+ bestBr.getDescription() + "\"";
@@ -320,15 +326,15 @@ public class OutputWriter extends AbstractOutputWriter {
 					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"
 							+ FRMT.format(bestBr.getEvaluationScore());
 				}
-				if (getSettings()
-						.isWriteDomainArchitectureSimilarityScoresToOutput()) {
-					csvRow += buildDomainWeightColumn(bestBr);
-				}
 			} else {
 				csvRow += "\t";
 				if (getSettings().isInTrainingMode()) {
 					csvRow += "\t0\t0.0";
 				}
+			}
+			if (getSettings()
+					.isWriteDomainArchitectureSimilarityScoresToOutput()) {
+				csvRow += buildDomainWeightColumn(bestBr);
 			}
 		}
 		return csvRow;
