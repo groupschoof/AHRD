@@ -31,32 +31,32 @@ public class OutputWriter extends AbstractOutputWriter {
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
 		bw
-				.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
+				.write("1-Protein-Accession\2-tBlast-Hit-Accession\3-tAHRD-Quality-Code\4-tHuman-Readable-Description\5-tInterpro-ID (Description)\6-tGene-Ontology-ID (Name)");
 
 		if (getSettings().isInTrainingMode()) {
 			bw
-					.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+					.write("\tHRD-Length-7\tReference-Description-8\tRef-Length-9\10-tEvaluation-Score\11-tDiff-to-bestCompetitor\12-tTPR\13-tFPR");
 		}
 		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
-			bw.write("\tProtein-Domain-Weight-Vector");
+			bw.write("\tProtein-Domain-Weight-Vector-14");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
 		}
 		if (getSettings().getWriteTokenSetToOutput()) {
-			bw.write("\t\"Tokens (tkn->score)\"");
+			bw.write("\t\"Tokens (tkn->score)-15\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
 			bw
-					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
+					.write("\tSum(Token-Scores)-16\tTokenHighScore-17\tCorrection-Factor-18\tGO-Score-19\tLexical-Score-20\tRelativeBitScore-21\tDescriptionLineFrequency-22\tMax(DescLineFreq)-23\tPattern-Factor-24");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
 			bw
-					.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
+					.write("\tBlast2GO-Annotation-25\tBlast2GO-Length-26\tBlast2GO-Evaluation-Score-27");
 		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
-			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
+			bw.write("\tHighest-Blast-Hit-Evaluation-Score-28");
 		}
 
 		bw.write("\n");
@@ -301,12 +301,12 @@ public class OutputWriter extends AbstractOutputWriter {
 		String hdr = "";
 		for (String blastDb : getSettings().getBlastDatabases()) {
 			if (blastDb != null && !blastDb.equals(""))
-				hdr += ("\tBest BlastHit (BH) against " + blastDb);
+				hdr += ("\tBest BlastHit (BH) against-29 " + blastDb);
 			if (getSettings().isInTrainingMode())
-				hdr += "\tLength\tEvaluation-Score";
+				hdr += "\tLength\tEvaluation-Score-30";
 			if (getSettings()
 					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
-				hdr += "\tBH-Domain-Weight-Vector\tBH-Domain-Architecture-Similarity-Score";
+				hdr += "\tBH-Domain-Weight-Vector-31\tBH-Domain-Architecture-Similarity-Score-32";
 			}
 		}
 		return hdr;
