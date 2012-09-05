@@ -31,11 +31,11 @@ public class OutputWriter extends AbstractOutputWriter {
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
 		bw
-				.write("1-Protein-Accession\2-tBlast-Hit-Accession\3-tAHRD-Quality-Code\4-tHuman-Readable-Description\5-tInterpro-ID (Description)\6-tGene-Ontology-ID (Name)");
+				.write("Protein-Accession-1\tBlast-Hit-Accession-2\tAHRD-Quality-Code-3\tHuman-Readable-Description-4\tInterpro-ID (Description)-5\tGene-Ontology-ID (Name)-6");
 
 		if (getSettings().isInTrainingMode()) {
 			bw
-					.write("\tHRD-Length-7\tReference-Description-8\tRef-Length-9\10-tEvaluation-Score\11-tDiff-to-bestCompetitor\12-tTPR\13-tFPR");
+					.write("\tHRD-Length-7\tReference-Description-8\tRef-Length-9\tEvaluation-Score-10\tDiff-to-bestCompetitor-11\tTPR-12\tFPR-13");
 		}
 		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
 			bw.write("\tProtein-Domain-Weight-Vector-14");
@@ -163,6 +163,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (br != null && br.getDomainWeights() != null
 				&& !br.getDomainWeights().isEmpty())
 			dwc += br.getDomainWeights().toString();
+		else
 		dwc += "\t";
 		if (br != null && br.getDomainSimilarityScore() != null)
 			dwc += FRMT.format(br.getDomainSimilarityScore());
@@ -193,7 +194,7 @@ public class OutputWriter extends AbstractOutputWriter {
 	 */
 	public String buildTrainerColumns(Protein prot) {
 		// HEADER:
-		// \tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor
+		// \tHRD-Length\tReference-Description\tRef-Length\tEvaluation-Score\tDiff-to-bestCompetitor
 		String csvCells = "";
 		// HRD-Length reference and AHRD's performance:
 		if (prot.getEvaluationScoreCalculator().getEvalutionScore() != null) {
@@ -327,7 +328,7 @@ public class OutputWriter extends AbstractOutputWriter {
 							+ FRMT.format(bestBr.getEvaluationScore());
 				}
 			} else {
-				csvRow += "\t";
+				csvRow += "\t\t";
 				if (getSettings().isInTrainingMode()) {
 					csvRow += "\t0\t0.0";
 				}
