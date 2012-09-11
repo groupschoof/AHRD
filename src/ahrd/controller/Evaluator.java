@@ -14,6 +14,7 @@ public class Evaluator extends AHRD {
 
 	public Evaluator(String pathToInputYml) throws IOException {
 		super(pathToInputYml);
+		getSettings().setInEvaluationMode(true);
 	}
 
 	public void setupReferences() throws IOException, MissingAccessionException {

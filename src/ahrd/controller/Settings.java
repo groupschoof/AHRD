@@ -211,6 +211,10 @@ public class Settings implements Cloneable {
 	 * those scores to the output.
 	 */
 	private boolean writeDomainArchitectureSimilarityScoresToOutput = false;
+	/**
+	 * Evaluation Mode is running, when Main-Class is Evaluator.
+	 */
+	private boolean isInEvaluationMode = false;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -853,6 +857,14 @@ public class Settings implements Cloneable {
 	public void setWriteDomainArchitectureSimilarityScoresToOutput(
 			boolean writeDomainArchitectureSimilarityScoresToOutput) {
 		this.writeDomainArchitectureSimilarityScoresToOutput = writeDomainArchitectureSimilarityScoresToOutput;
+	}
+
+	public boolean isInEvaluationMode() {
+		return isInEvaluationMode;
+	}
+
+	public void setInEvaluationMode(boolean isInEvaluationMode) {
+		this.isInEvaluationMode = isInEvaluationMode;
 	}
 
 }

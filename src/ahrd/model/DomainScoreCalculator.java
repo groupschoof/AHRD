@@ -285,7 +285,7 @@ public class DomainScoreCalculator {
 	 * <ul>
 	 * <li>Generate the vector space model (VSM)</li>
 	 * <li>For the query protein itself and each BlastResult (Description
-	 * Candidate) compute its Domain Weigths Vector</li>
+	 * Candidate) compute its Domain Weights Vector</li>
 	 * <li>Finally for each BlastResult compute its DomainSimilarityScore as
 	 * sim(query-protein, blast-result)</li>
 	 * <li>Trigger computation of cumulative token domain similarity scores and

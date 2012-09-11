@@ -44,19 +44,19 @@ public class OutputWriter extends AbstractOutputWriter {
 			bw.write(buildBestBlastHitsHeader());
 		}
 		if (getSettings().getWriteTokenSetToOutput()) {
-			bw.write("\t\"Tokens (tkn->score)-15\"");
+			bw.write("\t\"Tokens (tkn->score)-30\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
 			bw
-					.write("\tSum(Token-Scores)-16\tTokenHighScore-17\tCorrection-Factor-18\tGO-Score-19\tLexical-Score-20\tRelativeBitScore-21\tDescriptionLineFrequency-22\tMax(DescLineFreq)-23\tPattern-Factor-24");
+					.write("\tSum(Token-Scores)-31\tTokenHighScore-32\tCorrection-Factor-33\tGO-Score-34\tLexical-Score-35\tRelativeBitScore-36\tDescriptionLineFrequency-37\tMax(DescLineFreq)-38\tPattern-Factor-39");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
 			bw
-					.write("\tBlast2GO-Annotation-25\tBlast2GO-Length-26\tBlast2GO-Evaluation-Score-27");
+					.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
 		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
-			bw.write("\tHighest-Blast-Hit-Evaluation-Score-28");
+			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
 		}
 
 		bw.write("\n");
@@ -71,10 +71,12 @@ public class OutputWriter extends AbstractOutputWriter {
 				csvRow += buildTrainerColumns(prot);
 			}
 			// Append further information, if requested:
+
 			if (getSettings()
 					.isWriteDomainArchitectureSimilarityScoresToOutput()) {
 				csvRow += buildDomainWeightColumn(prot);
 			}
+
 			if (getSettings().getWriteBestBlastHitsToOutput()) {
 				csvRow += buildBestBlastHitsColumns(prot);
 			}
@@ -154,7 +156,9 @@ public class OutputWriter extends AbstractOutputWriter {
 		String dwc = "\t";
 		if (prot.getDomainWeights() != null
 				&& !prot.getDomainWeights().isEmpty())
-			dwc += prot.getDomainWeights();
+			dwc += prot.getDomainWeights().toString();
+		else
+			dwc += "NA-14";
 		return dwc;
 	}
 
@@ -164,9 +168,13 @@ public class OutputWriter extends AbstractOutputWriter {
 				&& !br.getDomainWeights().isEmpty())
 			dwc += br.getDomainWeights().toString();
 		else
+			dwc += "NA-bdw";
 		dwc += "\t";
 		if (br != null && br.getDomainSimilarityScore() != null)
 			dwc += FRMT.format(br.getDomainSimilarityScore());
+		else
+			dwc += "NA-bdss";
+		dwc += "\t";
 		return dwc;
 	}
 
@@ -226,7 +234,7 @@ public class OutputWriter extends AbstractOutputWriter {
 					+ FRMT.format(prot.getEvaluationScoreCalculator()
 							.getFalsePositivesRate());
 		} else
-			csvCells = "\t\t\t\t\t\t\t";
+			csvCells = "\t\t8\t9\t10\t11\t12\t13";
 		return csvCells;
 	}
 
@@ -247,7 +255,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		String csvCells = "";
 		// Found a high scoring description?
 		if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() == null) {
-			csvCells = "\t\t\t\t\t\t\t\t";
+			csvCells = "\t32\t33\t34\t35\t36\t37\t38\t39";
 		} else {
 			BlastResult hsbr = prot.getDescriptionScoreCalculator()
 					.getHighestScoringBlastResult();
@@ -302,12 +310,13 @@ public class OutputWriter extends AbstractOutputWriter {
 		String hdr = "";
 		for (String blastDb : getSettings().getBlastDatabases()) {
 			if (blastDb != null && !blastDb.equals(""))
-				hdr += ("\tBest BlastHit (BH) against-29 " + blastDb);
+				hdr += ("\tBest BlastHit (BH) against " + blastDb);
 			if (getSettings().isInTrainingMode())
-				hdr += "\tLength\tEvaluation-Score-30";
-			if (getSettings()
-					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
-				hdr += "\tBH-Domain-Weight-Vector-31\tBH-Domain-Architecture-Similarity-Score-32";
+				hdr += ("\tLength-" + blastDb)
+						+ ("\tEvaluation-Score-" + blastDb);
+			if (getSettings().isToComputeDomainSimilarities()) {
+				hdr += ("\tBH-Domain-Weight-Vector-" + blastDb)
+						+ ("\tBH-Domain-Architecture-Similarity-Score-" + blastDb);
 			}
 		}
 		return hdr;
@@ -326,11 +335,16 @@ public class OutputWriter extends AbstractOutputWriter {
 				if (bestBr.getEvaluationScore() != null) {
 					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"
 							+ FRMT.format(bestBr.getEvaluationScore());
-				}
+				} else
+					System.out.println("MISSING Eval-Score for '"
+							+ bestBr.getAccession() + "'");
 			} else {
-				csvRow += "\t\t";
+				csvRow += "\tblhit";
+				if (getSettings().isInEvaluationMode()) {
+					csvRow += "\t";
+				}
 				if (getSettings().isInTrainingMode()) {
-					csvRow += "\t0\t0.0";
+					csvRow += "\t0bllth\t0.0blevsc";
 				}
 			}
 			if (getSettings()
