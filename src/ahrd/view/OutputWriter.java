@@ -174,7 +174,7 @@ public class OutputWriter extends AbstractOutputWriter {
 			dwc += FRMT.format(br.getDomainSimilarityScore());
 		else
 			dwc += "NA-bdss";
-		dwc += "\t";
+		//dwc += "\t";
 		return dwc;
 	}
 
@@ -339,12 +339,12 @@ public class OutputWriter extends AbstractOutputWriter {
 					System.out.println("MISSING Eval-Score for '"
 							+ bestBr.getAccession() + "'");
 			} else {
-				csvRow += "\tblhit";
+				csvRow += "blhit\t";
 				if (getSettings().isInEvaluationMode()) {
 					csvRow += "\t";
 				}
 				if (getSettings().isInTrainingMode()) {
-					csvRow += "\t0bllth\t0.0blevsc";
+					csvRow += "bllth\t0blevsc\t0.0";
 				}
 			}
 			if (getSettings()
