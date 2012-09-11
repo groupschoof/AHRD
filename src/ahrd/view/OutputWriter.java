@@ -340,9 +340,9 @@ public class OutputWriter extends AbstractOutputWriter {
 							+ bestBr.getAccession() + "'");
 			} else {
 				csvRow += "\tblhit";
-				if (getSettings().isInEvaluationMode()) {
-					csvRow += "\t";
-				}
+//				if (getSettings().isInEvaluationMode()) {
+//					csvRow += "\t";
+//				}
 				if (getSettings().isInTrainingMode()) {
 					csvRow += "\tbllth0\tblevsc0.0";
 				}
