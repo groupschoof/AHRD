@@ -339,12 +339,12 @@ public class OutputWriter extends AbstractOutputWriter {
 					System.out.println("MISSING Eval-Score for '"
 							+ bestBr.getAccession() + "'");
 			} else {
-				csvRow += "blhit\t";
+				csvRow += "\tblhit";
 				if (getSettings().isInEvaluationMode()) {
 					csvRow += "\t";
 				}
 				if (getSettings().isInTrainingMode()) {
-					csvRow += "bllth\t0blevsc\t0.0";
+					csvRow += "\tbllth0\tblevsc0.0";
 				}
 			}
 			if (getSettings()
