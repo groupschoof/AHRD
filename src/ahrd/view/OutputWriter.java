@@ -31,24 +31,24 @@ public class OutputWriter extends AbstractOutputWriter {
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
 		bw
-				.write("Protein-Accession-1\tBlast-Hit-Accession-2\tAHRD-Quality-Code-3\tHuman-Readable-Description-4\tInterpro-ID (Description)-5\tGene-Ontology-ID (Name)-6");
+				.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
 
 		if (getSettings().isInTrainingMode()) {
 			bw
-					.write("\tHRD-Length-7\tReference-Description-8\tRef-Length-9\tEvaluation-Score-10\tDiff-to-bestCompetitor-11\tTPR-12\tFPR-13");
+					.write("\tHRD-Length\tReference-Description\tRef-Length\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
 		}
 		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
-			bw.write("\tProtein-Domain-Weight-Vector-14");
+			bw.write("\tProtein-Domain-Weight-Vector");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
 		}
 		if (getSettings().getWriteTokenSetToOutput()) {
-			bw.write("\t\"Tokens (tkn->score)-30\"");
+			bw.write("\t\"Tokens (tkn->score)\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
 			bw
-					.write("\tSum(Token-Scores)-31\tTokenHighScore-32\tCorrection-Factor-33\tGO-Score-34\tLexical-Score-35\tRelativeBitScore-36\tDescriptionLineFrequency-37\tMax(DescLineFreq)-38\tPattern-Factor-39");
+					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
@@ -157,8 +157,8 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (prot.getDomainWeights() != null
 				&& !prot.getDomainWeights().isEmpty())
 			dwc += prot.getDomainWeights().toString();
-		else
-			dwc += "NA-14";
+//		else
+//			dwc += "NA-14";
 		return dwc;
 	}
 
@@ -167,13 +167,13 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (br != null && br.getDomainWeights() != null
 				&& !br.getDomainWeights().isEmpty())
 			dwc += br.getDomainWeights().toString();
-		else
-			dwc += "NA-bdw";
+//		else
+//			dwc += "NA-bdw";
 		dwc += "\t";
 		if (br != null && br.getDomainSimilarityScore() != null)
 			dwc += FRMT.format(br.getDomainSimilarityScore());
-		else
-			dwc += "NA-bdss";
+//		else
+//			dwc += "NA-bdss";
 		//dwc += "\t";
 		return dwc;
 	}
