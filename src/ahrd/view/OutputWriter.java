@@ -157,8 +157,6 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (prot.getDomainWeights() != null
 				&& !prot.getDomainWeights().isEmpty())
 			dwc += prot.getDomainWeights().toString();
-//		else
-//			dwc += "NA-14";
 		return dwc;
 	}
 
@@ -167,14 +165,9 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (br != null && br.getDomainWeights() != null
 				&& !br.getDomainWeights().isEmpty())
 			dwc += br.getDomainWeights().toString();
-//		else
-//			dwc += "NA-bdw";
 		dwc += "\t";
 		if (br != null && br.getDomainSimilarityScore() != null)
 			dwc += FRMT.format(br.getDomainSimilarityScore());
-//		else
-//			dwc += "NA-bdss";
-		//dwc += "\t";
 		return dwc;
 	}
 
@@ -234,7 +227,7 @@ public class OutputWriter extends AbstractOutputWriter {
 					+ FRMT.format(prot.getEvaluationScoreCalculator()
 							.getFalsePositivesRate());
 		} else
-			csvCells = "\t\t8\t9\t10\t11\t12\t13";
+			csvCells = "\t\t\t\t\t\t\t";
 		return csvCells;
 	}
 
@@ -255,7 +248,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		String csvCells = "";
 		// Found a high scoring description?
 		if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() == null) {
-			csvCells = "\t32\t33\t34\t35\t36\t37\t38\t39";
+			csvCells = "\t\t\t\t\t\t\t\t";
 		} else {
 			BlastResult hsbr = prot.getDescriptionScoreCalculator()
 					.getHighestScoringBlastResult();
@@ -339,12 +332,9 @@ public class OutputWriter extends AbstractOutputWriter {
 					System.out.println("MISSING Eval-Score for '"
 							+ bestBr.getAccession() + "'");
 			} else {
-				csvRow += "\tblhit";
-//				if (getSettings().isInEvaluationMode()) {
-//					csvRow += "\t";
-//				}
+				csvRow += "\t";
 				if (getSettings().isInTrainingMode()) {
-					csvRow += "\tbllth0\tblevsc0.0";
+					csvRow += "\t0\t0.0";
 				}
 			}
 			if (getSettings()
