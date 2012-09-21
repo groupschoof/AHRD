@@ -80,7 +80,8 @@ public class DomainScoreCalculatorTest {
 		// A single hit in TAIR:
 		List<BlastResult> tairHits = new ArrayList<BlastResult>();
 		tairHits.add(TestUtils.mockBlastResult("accession_6", 0.001,
-				"description six", 1, 20, 100.0, "tair", new HashSet<String>()));
+				"description six", 1, 20, 1, 20, 200, 100.0, "tair",
+				new HashSet<String>()));
 		prot.getBlastResults().put("tair", tairHits);
 		return prot;
 	}

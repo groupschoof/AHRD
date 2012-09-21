@@ -28,3 +28,6 @@ ahrd_evaluator_output.csv
 
 # Ignore result-file of awk-script for SIMAP-Files
 IDmapping.txt
+
+# Ignore junit file generated, when JUnit is interrupted with Ctrl-C
+junitvmwatcher*

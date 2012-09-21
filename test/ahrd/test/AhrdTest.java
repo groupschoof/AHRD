@@ -95,8 +95,9 @@ public class AhrdTest {
 		ahrd.parseGeneOntologyResult();
 		assertEquals(1, ahrd.getProteins().get("gene:chr01.502:mRNA:chr01.502")
 				.getGoResults().size());
-		assertEquals(2, ahrd.getProteins().get(
-				"gene:chr01.1056:mRNA:chr01.1056").getGoResults().size());
+		assertEquals(2,
+				ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
+						.getGoResults().size());
 	}
 
 	@Test
@@ -212,8 +213,8 @@ public class AhrdTest {
 				"B4TD71", "B4TR72", "B5F171", "B5FQI8", "B5R558", "B5RCW8",
 				"C0PYR0", "Q57LL3", "Q7CQ21", "Q8XEQ0", "B5BB08", "Q5PL41",
 				"O86235", "A8AD95", "Q6D7R8", "Q7N3G5", "A7ML17", "P77546" }) {
-			brs.add(new BlastResult(accession, 0.01, "description", 10, 20,
-					10.0, "swissprot"));
+			brs.add(new BlastResult(accession, 0.01, "description", 10, 20, 10,
+					20, 200, 10.0, "swissprot"));
 		}
 		p.getBlastResults().put("swissprot", brs);
 

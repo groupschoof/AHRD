@@ -29,17 +29,17 @@ public class TokenScoreCalculatorTest {
 	@Before
 	public void setup() throws IOException {
 		TestUtils.initTestSettings();
-		br1 = new BlastResult("accession_1", 1.0, "description_1", 40, 99,
-				69.96, "swissprot");
+		br1 = new BlastResult("accession_1", 1.0, "description_1", 40, 99, 40,
+				99, 200, 69.96, "swissprot");
 		br1.getTokens().add("token_one");
 		// ensure double tokens have no effect:
 		br1.getTokens().add("token_one");
-		br2 = new BlastResult("accession_2", 2.0, "description_2", 45, 69,
-				45.54, "tair");
+		br2 = new BlastResult("accession_2", 2.0, "description_2", 45, 69, 45,
+				69, 200, 45.54, "tair");
 		br2.getTokens().add("token_one");
 		br2.getTokens().add("token_two");
-		br3 = new BlastResult("accession_3", 2.0, "description_3", 35, 125,
-				88.0, "trembl");
+		br3 = new BlastResult("accession_3", 2.0, "description_3", 35, 125, 35,
+				125, 200, 88.0, "trembl");
 		br3.getTokens().add("token_two");
 		br3.getTokens().add("token_three");
 		// Mock Domain Similarity Scores:
@@ -50,11 +50,17 @@ public class TokenScoreCalculatorTest {
 
 	@Test
 	public void testOverlapScore() {
-		int subjectEnd = 99;
-		int subjectStart = 40;
-		int queryLength = 180;
-		assertEquals(0.333333333333333, TokenScoreCalculator.overlapScore(
-				subjectStart, subjectEnd, queryLength), 0.0000001);
+		double subjectEnd = 100;
+		double subjectStart = 10;
+		double subjectLength = 200;
+		double queryEnd = 190;
+		double queryStart = 110;
+		double queryLength = 200;
+		// (100 - 10 + 190 - 110 + 2) / 400 = 0.43
+		assertEquals(0.43,
+				TokenScoreCalculator.overlapScore(queryStart, queryEnd,
+						queryLength, subjectStart, subjectEnd, subjectLength),
+				0.0000001);
 	}
 
 	@Test
@@ -94,28 +100,29 @@ public class TokenScoreCalculatorTest {
 		assertEquals(88.0,
 				tsc.getCumulativeTokenBitScores().get("token_three"), 0);
 		// test cum.BlastDatabaseScore
-		assertEquals(150, tsc.getCumulativeTokenBlastDatabaseScores().get(
-				"token_one"), 0);
-		assertEquals(60, tsc.getCumulativeTokenBlastDatabaseScores().get(
-				"token_two"), 0);
-		assertEquals(10, tsc.getCumulativeTokenBlastDatabaseScores().get(
-				"token_three"), 0);
+		assertEquals(150,
+				tsc.getCumulativeTokenBlastDatabaseScores().get("token_one"), 0);
+		assertEquals(60,
+				tsc.getCumulativeTokenBlastDatabaseScores().get("token_two"), 0);
+		assertEquals(10,
+				tsc.getCumulativeTokenBlastDatabaseScores().get("token_three"),
+				0);
 		// test cum.OverlapScores:
-		assertEquals(0.425, tsc.getCumulativeTokenOverlapScores().get(
-				"token_one"), 0);
+		assertEquals(0.425,
+				tsc.getCumulativeTokenOverlapScores().get("token_one"), 0);
 		assertEquals(0.5800000000000001, tsc.getCumulativeTokenOverlapScores()
 				.get("token_two"), 0);
-		assertEquals(0.455, tsc.getCumulativeTokenOverlapScores().get(
-				"token_three"), 0);
+		assertEquals(0.455,
+				tsc.getCumulativeTokenOverlapScores().get("token_three"), 0);
 	}
 
 	@Test
 	public void testSumOfAllTokenScores() {
 		Protein p = TestUtils.mockProtein();
 		BlastResult one = new BlastResult("accession_1", 1.0, "first", 40, 99,
-				69.96, "swissprot");
+				40, 99, 200, 69.96, "swissprot");
 		BlastResult two = new BlastResult("accession_2", 2.0, "first second",
-				45, 69, 45.54, "tair");
+				45, 69, 45, 69, 200, 45.54, "tair");
 		one.getTokens().add("first");
 		two.getTokens().add("first");
 		two.getTokens().add("second");
@@ -152,12 +159,12 @@ public class TokenScoreCalculatorTest {
 		// Call method to test:
 		p.getTokenScoreCalculator().assignTokenScores();
 		// Assert expectations
-		assertTrue(p.getTokenScoreCalculator().getTokenScores().containsKey(
-				"one"));
-		assertTrue(p.getTokenScoreCalculator().getTokenScores().containsKey(
-				"two"));
-		assertTrue(p.getTokenScoreCalculator().getTokenScores().containsKey(
-				"three"));
+		assertTrue(p.getTokenScoreCalculator().getTokenScores()
+				.containsKey("one"));
+		assertTrue(p.getTokenScoreCalculator().getTokenScores()
+				.containsKey("two"));
+		assertTrue(p.getTokenScoreCalculator().getTokenScores()
+				.containsKey("three"));
 		assertTrue(p.getTokenScoreCalculator().getTokenHighScore() > 0);
 		assertEquals(0.22666666666666668, p.getTokenScoreCalculator()
 				.getTokenHighScore(), 0.0);

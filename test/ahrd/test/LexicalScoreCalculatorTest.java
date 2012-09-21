@@ -59,7 +59,7 @@ public class LexicalScoreCalculatorTest {
 		// Mock test-data
 		Protein p = TestUtils.mockProtein();
 		BlastResult br = new BlastResult("accession", 1.0, "goat sheep wool",
-				10, 20, 30, "swissprot");
+				10, 20, 10, 20, 200, 30, "swissprot");
 		br.getTokens().add("sheep");
 		br.getTokens().add("goats");
 		br.getTokens().add("wool");
@@ -85,9 +85,8 @@ public class LexicalScoreCalculatorTest {
 		BlastResult br = TestUtils.mockBlastResult();
 		brs.add(br);
 		// GeneOntologyScore is always 1.11
-		p
-				.setLexicalScoreCalculator(new TestUtils.LexicalScoreCalculatorFixedGoScoreMock(
-						p));
+		p.setLexicalScoreCalculator(new TestUtils.LexicalScoreCalculatorFixedGoScoreMock(
+				p));
 		// Mocked BlastResult has Tokens one, two, three
 		p.getBlastResults().put("swissprot", TestUtils.mockBlastResults());
 		// Note: Token-Scores are NOT filtered in this test!
