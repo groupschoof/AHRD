@@ -855,4 +855,6 @@ public class Settings implements Cloneable {
 		this.writeDomainArchitectureSimilarityScoresToOutput = writeDomainArchitectureSimilarityScoresToOutput;
 	}
 
+	
+
 }

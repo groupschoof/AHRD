@@ -35,7 +35,7 @@ public class OutputWriter extends AbstractOutputWriter {
 
 		if (getSettings().isInTrainingMode()) {
 			bw
-					.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+					.write("\tHRD-Length\tReference-Description\tRef-Length\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
 		}
 		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
 			bw.write("\tProtein-Domain-Weight-Vector");
@@ -71,10 +71,12 @@ public class OutputWriter extends AbstractOutputWriter {
 				csvRow += buildTrainerColumns(prot);
 			}
 			// Append further information, if requested:
+
 			if (getSettings()
 					.isWriteDomainArchitectureSimilarityScoresToOutput()) {
 				csvRow += buildDomainWeightColumn(prot);
 			}
+
 			if (getSettings().getWriteBestBlastHitsToOutput()) {
 				csvRow += buildBestBlastHitsColumns(prot);
 			}
@@ -154,7 +156,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		String dwc = "\t";
 		if (prot.getDomainWeights() != null
 				&& !prot.getDomainWeights().isEmpty())
-			dwc += prot.getDomainWeights();
+			dwc += prot.getDomainWeights().toString();
 		return dwc;
 	}
 
@@ -193,7 +195,7 @@ public class OutputWriter extends AbstractOutputWriter {
 	 */
 	public String buildTrainerColumns(Protein prot) {
 		// HEADER:
-		// \tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor
+		// \tHRD-Length\tReference-Description\tRef-Length\tEvaluation-Score\tDiff-to-bestCompetitor
 		String csvCells = "";
 		// HRD-Length reference and AHRD's performance:
 		if (prot.getEvaluationScoreCalculator().getEvalutionScore() != null) {
@@ -303,10 +305,11 @@ public class OutputWriter extends AbstractOutputWriter {
 			if (blastDb != null && !blastDb.equals(""))
 				hdr += ("\tBest BlastHit (BH) against " + blastDb);
 			if (getSettings().isInTrainingMode())
-				hdr += "\tLength\tEvaluation-Score";
-			if (getSettings()
-					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
-				hdr += "\tBH-Domain-Weight-Vector\tBH-Domain-Architecture-Similarity-Score";
+				hdr += ("\tLength-" + blastDb)
+						+ ("\tEvaluation-Score-" + blastDb);
+			if (getSettings().isToComputeDomainSimilarities()) {
+				hdr += ("\tBH-Domain-Weight-Vector-" + blastDb)
+						+ ("\tBH-Domain-Architecture-Similarity-Score-" + blastDb);
 			}
 		}
 		return hdr;
@@ -325,7 +328,9 @@ public class OutputWriter extends AbstractOutputWriter {
 				if (bestBr.getEvaluationScore() != null) {
 					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"
 							+ FRMT.format(bestBr.getEvaluationScore());
-				}
+				} else
+					System.out.println("MISSING Eval-Score for '"
+							+ bestBr.getAccession() + "'");
 			} else {
 				csvRow += "\t";
 				if (getSettings().isInTrainingMode()) {
