@@ -156,6 +156,11 @@ public class TrainerBatcher extends Batcher {
 			batchYml.put(Settings.DOMAIN_WEIGHTS_DATABASE,
 					getInput().get(Settings.DOMAIN_WEIGHTS_DATABASE));
 		}
+		// Position of domain weight in tab delimited table
+		if (getInput().get(Settings.DOMAIN_WEIGHTS_POSITION_KEY) != null) {
+			batchYml.put(Settings.DOMAIN_WEIGHTS_POSITION_KEY,
+					getInput().get(Settings.DOMAIN_WEIGHTS_POSITION_KEY));
+		}
 		if (getInput().get(Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null) {
 			batchYml.put(
 					Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY,
