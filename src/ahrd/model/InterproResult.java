@@ -146,7 +146,8 @@ public class InterproResult implements Comparable<InterproResult> {
 		for (String line; (line = reader.readLine()) != null;) {
 			entry = line.split("\t");
 			domainId = entry[0];
-			Double domainWeight = Double.parseDouble(entry[7]);
+			Double domainWeight = Double.parseDouble(entry[getSettings()
+					.getDomainWeightTablePosition()]);
 			if (getSettings()
 					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
 				getPfamDomainWeights().put(domainId, domainWeight);
