@@ -164,7 +164,7 @@ public class InterproResult implements Comparable<InterproResult> {
 		// database:
 		if (!notFoundIprIds.isEmpty())
 			System.err
-					.println("WARNING: Could not find InterPro-Entries with the following IDs in the memory databse:\n"
+					.println("WARNING: Could not find InterPro-Entries with the following IDs in the memory database:\n"
 							+ notFoundIprIds);
 	}
 
