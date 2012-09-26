@@ -59,7 +59,7 @@ public class InterproResult implements Comparable<InterproResult> {
 	 * 
 	 * @note: see http://www.biomedcentral.com/1471-2105/10/S15/S5
 	 */
-	private Double domainWeight;
+	private Double domainWeight = 0.0;
 
 	private static Map<String, InterproResult> interproDb = new HashMap<String, InterproResult>();
 	private static Map<String, Double> pfamDomainWeights = new HashMap<String, Double>();

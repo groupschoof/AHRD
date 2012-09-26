@@ -198,7 +198,9 @@ public class DomainScoreCalculator {
 	 * 
 	 * @param br
 	 * @param domainAccession
-	 * @return Double
+	 * @return Double - 0.0 is returned to avoid NullPointerExceptions, in case
+	 *         the InterPro Entry could be found, but it had a NULL domain
+	 *         weight.
 	 * @throws MissingInterproResultException
 	 */
 	public static Double getDomainWeight(Protein prot, String domainAccession)
@@ -236,7 +238,9 @@ public class DomainScoreCalculator {
 	 * 
 	 * @param br
 	 * @param domainAccession
-	 * @return Double
+	 * @return Double - 0.0 is returned to avoid NullPointerExceptions, in case
+	 *         the InterPro Entry could be found, but it had a NULL domain
+	 *         weight.
 	 * @throws MissingInterproResultException
 	 */
 	public static Double getDomainWeight(BlastResult br, String domainAccession)

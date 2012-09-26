@@ -24,7 +24,7 @@ blast_dbs:
     token_blacklist: ./test/resources/blacklist_token.txt
     description_score_bit_score_weight: 0.4
 
-interpro_database: ./test/resources/interpro_31.xml
+interpro_database: ./test/resources/interpro_31_dom_arch_sim.xml
 interpro_result: ./test/resources/interpro_result_dom_arch_sim.raw
 domain_weights_database: ./test/resources/domain_weights_database_interpro_test.txt
 domain_weights_table_position: 1
