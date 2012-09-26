@@ -114,6 +114,26 @@ public class RunAhrdWithDomainArchitectureTest {
 		// Expect Description Score to be equal to score calculated as without
 		// domain annotations:
 		assertEquals(2.947, bestBr1.getDescriptionScore(), 0.001);
+
+		Protein p2 = ahrd.getProteins().get("Solyc11g030630.1.1");
+		BlastResult bestBr2 = p2.getDescriptionScoreCalculator()
+				.getHighestScoringBlastResult();
+		Double descScore2 = bestBr2.getDescriptionScore();
+		assertNotNull(
+				"Description Score of Blast Hit 'sp|Q3EBC8|DCL2_ARATH' should not be NULL!",
+				descScore2);
+		assertNotNull(
+				"Protein 'Solyc11g030630.1.1' should have a vector in domain architecture space.",
+				p2.getDomainWeights());
+		assertNotNull(
+				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' should have a vector in domain architecture space.",
+				bestBr2.getDomainWeights());
+		assertNotNull(
+				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' should have a computed Domain Architecture Similarity Score.",
+				bestBr2.getDomainSimilarityScore());
+		assertEquals(0.0, bestBr2.getDomainSimilarityScore(), 0.0);
+		assertEquals(2.947, bestBr2.getDescriptionScore(), 0.001);
+	
 	}
 
 }
