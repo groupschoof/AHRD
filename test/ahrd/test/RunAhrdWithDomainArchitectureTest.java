@@ -6,12 +6,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import ahrd.controller.AHRD;
 import ahrd.model.BlastResult;
+import ahrd.model.DomainScoreCalculator;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 
@@ -89,7 +91,7 @@ public class RunAhrdWithDomainArchitectureTest {
 				"InterPro Entry 'IPR000001' has no Domain Weight assigned!", dw);
 		assertEquals(0.189433136086726, dw, 0.0);
 
-		// Test AHRD Scores:
+		// Test AHRD:
 		ahrd.assignHumanReadableDescriptions();
 
 		// With InterPro domain annotations:
@@ -116,8 +118,21 @@ public class RunAhrdWithDomainArchitectureTest {
 		assertEquals(2.947, bestBr1.getDescriptionScore(), 0.001);
 
 		Protein p2 = ahrd.getProteins().get("Solyc11g030630.1.1");
+		assertNotNull(
+				"Protein 'Solyc11g030630.1.1' should have Domain Annotations.",
+				p2.getInterproResults());
+		assertEquals(6, p2.getInterproResults().size());
 		BlastResult bestBr2 = p2.getDescriptionScoreCalculator()
 				.getHighestScoringBlastResult();
+		Set<String> bestBr2IprAnnos = DomainScoreCalculator
+				.getBlastResultAccessionsToInterproIds().get(
+						bestBr2.getAccession());
+		assertTrue(
+				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' should have more than six Domain Annotations.",
+				bestBr2IprAnnos.size() > 6);
+		assertTrue(
+				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' and Query Protein '' should share at least a single Domain Annotation.",
+				bestBr2IprAnnos.contains(p2.getInterproResults().toArray()[0]));
 		Double descScore2 = bestBr2.getDescriptionScore();
 		assertNotNull(
 				"Description Score of Blast Hit 'sp|Q3EBC8|DCL2_ARATH' should not be NULL!",
@@ -133,7 +148,6 @@ public class RunAhrdWithDomainArchitectureTest {
 				bestBr2.getDomainSimilarityScore());
 		assertEquals(0.0, bestBr2.getDomainSimilarityScore(), 0.0);
 		assertEquals(2.947, bestBr2.getDescriptionScore(), 0.001);
-	
-	}
 
+	}
 }

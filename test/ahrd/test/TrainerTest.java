@@ -78,7 +78,8 @@ public class TrainerTest {
 
 	@Test
 	public void testRememberSimulatedAnnealingPath()
-			throws MissingInterproResultException, IOException {
+			throws MissingInterproResultException, IOException,
+			InterruptedException {
 		// Just do two cycles:
 		getSettings().setTemperature(2);
 		Parameters p = getSettings().getParameters().clone();

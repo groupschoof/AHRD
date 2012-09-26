@@ -236,9 +236,11 @@ public class AHRD {
 	 * 
 	 * @throws MissingInterproResultException
 	 * @throws IOException
+	 * @throws InterruptedException
 	 */
 	public void assignHumanReadableDescriptions()
-			throws MissingInterproResultException, IOException {
+			throws MissingInterproResultException, IOException,
+			InterruptedException {
 		for (String protAcc : getProteins().keySet()) {
 			Protein prot = getProteins().get(protAcc);
 			// Find best scoring Blast-Hit's Description-Line (based on evalue):
@@ -248,6 +250,8 @@ public class AHRD {
 			// scores:
 			if (getSettings().isToComputeDomainSimilarities()
 					&& prot.hasDomainAnnotation()) {
+				// Load Domain Annotations for the BlastResults:
+				loadBlastResultDomainAnnotationFromUniprotKB(prot);
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
 			}
 			// Tokenize each BlastResult's Description-Line and

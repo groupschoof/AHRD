@@ -253,9 +253,6 @@ public class DomainScoreCalculator {
 					&& getBlastResultAccessionsToPfamIds().get(
 							br.getAccession()).contains(domainAccession)) {
 				dw = InterproResult.getPfamDomainWeights().get(domainAccession);
-				System.out.println("BlastResult: " + br.getAccession()
-						+ ", DomainWeights-Db: "
-						+ InterproResult.getPfamDomainWeights());
 				if (dw == null)
 					throw new MissingInterproResultException(
 							"Could not find domain weight for Pfam Entry '"

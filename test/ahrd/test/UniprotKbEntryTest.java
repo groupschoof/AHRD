@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -19,10 +20,13 @@ public class UniprotKbEntryTest {
 	private static final String ACCESSION = "Q0KFR8";
 
 	@Test
-	public void testUrl() {
+	public void testUrl() throws UnsupportedEncodingException {
 		assertEquals(
 				"http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/Q0KFR8/xml",
 				UniprotKBEntry.url(ACCESSION));
+		assertEquals(
+				"http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/sp%7CP34529%7CDCR1_CAEEL/xml",
+				UniprotKBEntry.url("sp|P34529|DCR1_CAEEL"));
 	}
 
 	@Test
