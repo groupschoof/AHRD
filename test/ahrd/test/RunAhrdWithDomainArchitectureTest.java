@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 
 import org.junit.Before;
@@ -140,14 +141,46 @@ public class RunAhrdWithDomainArchitectureTest {
 		assertNotNull(
 				"Protein 'Solyc11g030630.1.1' should have a vector in domain architecture space.",
 				p2.getDomainWeights());
+		// 'ps' has the following Domain Annotations:
+		// IPR000999, IPR001159, IPR001650, IPR003100, IPR005034, IPR011545
+		assertEquals(
+				Arrays.asList(new Double[] { 5.05047155114809,
+						0.230164198497054, 0.0244178837367414,
+						0.33175852306605, 1.6165065434774, 0.173963313549586 }),
+				p2.getDomainWeights());
+		// bestBr2 has the following Domain Annotations:
+		// IPR000999, IPR001159, IPR001650, IPR003100, IPR005034, IPR011545,
+		// IPR014001
 		assertNotNull(
 				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' should have a vector in domain architecture space.",
 				bestBr2.getDomainWeights());
+		assertEquals(
+				Arrays.asList(new Double[] { 5.05047155114809,
+						0.230164198497054, 0.0244178837367414,
+						0.33175852306605, 1.6165065434774, 0.173963313549586,
+						0.0 }), bestBr2.getDomainWeights());
+		// Hence the Vector Space Model should be the sorted List of bestBrs'
+		// Domain Annotations!
+		assertNotNull(
+				"The Protein's DomainScoreCalculator should have been assigned a Vector Space Model of all distinct annotated domains.",
+				p2.getDomainScoreCalculator().getVectorSpaceModel());
+		assertEquals(
+				Arrays.asList(new String[] { "IPR000999", "IPR001159",
+						"IPR001650", "IPR003100", "IPR005034", "IPR011545",
+						"IPR014001" }), p2.getDomainScoreCalculator()
+						.getVectorSpaceModel());
+		// As the only domain bestBr2 has annotated and p2 hasn't and this
+		// domain does not appear in the domain weights db, it should receive a
+		// weight of 0.0:
+		assertEquals(0.0, InterproResult.getInterproDb().get("IPR014001")
+				.getDomainWeight(), 0.0);
+		// ... and hence the Domain Architecture Similarity Score should be
+		// maximal:
 		assertNotNull(
 				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' should have a computed Domain Architecture Similarity Score.",
 				bestBr2.getDomainSimilarityScore());
-		assertEquals(0.0, bestBr2.getDomainSimilarityScore(), 0.0);
+		assertEquals(0.0, bestBr2.getDomainSimilarityScore(), 1.0);
+		// ToDo: Compute the actually correct final AHRD-Score and check it:
 		assertEquals(2.947, bestBr2.getDescriptionScore(), 0.001);
-
 	}
 }
