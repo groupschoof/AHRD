@@ -88,18 +88,21 @@ public class RunAhrdWithDomainArchitectureTest {
 		// Domain Weights Database has to have been parsed:
 		InterproResult ipr = InterproResult.getInterproDb().get("IPR000001");
 		Double dw = ipr.getDomainWeight();
+		System.out.println("1");
 		assertNotNull(
 				"InterPro Entry 'IPR000001' has no Domain Weight assigned!", dw);
 		assertEquals(0.189433136086726, dw, 0.0);
 
 		// Test AHRD:
 		ahrd.assignHumanReadableDescriptions();
+		System.out.println("2");
 
 		// With InterPro domain annotations:
 		Protein p1 = ahrd.getProteins().get("gene:chr01.502:mRNA:chr01.502");
 		BlastResult bestBr1 = p1.getDescriptionScoreCalculator()
 				.getHighestScoringBlastResult();
 		Double descScore1 = bestBr1.getDescriptionScore();
+		System.out.println("3");
 		assertNotNull(
 				"Description Score of Blast Hit 'sp|Q3EBC8|DCL2_ARATH' should not be NULL!",
 				descScore1);
@@ -128,6 +131,7 @@ public class RunAhrdWithDomainArchitectureTest {
 		Set<String> bestBr2IprAnnos = DomainScoreCalculator
 				.getBlastResultAccessionsToInterproIds().get(
 						bestBr2.getAccession());
+		System.out.println("4");
 		assertTrue(
 				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' should have more than six Domain Annotations.",
 				bestBr2IprAnnos.size() > 6);
@@ -148,6 +152,7 @@ public class RunAhrdWithDomainArchitectureTest {
 						0.230164198497054, 0.0244178837367414,
 						0.33175852306605, 1.6165065434774, 0.173963313549586 }),
 				p2.getDomainWeights());
+		System.out.println("5");
 		// bestBr2 has the following Domain Annotations:
 		// IPR000999, IPR001159, IPR001650, IPR003100, IPR005034, IPR011545,
 		// IPR014001
@@ -159,6 +164,7 @@ public class RunAhrdWithDomainArchitectureTest {
 						0.230164198497054, 0.0244178837367414,
 						0.33175852306605, 1.6165065434774, 0.173963313549586,
 						0.0 }), bestBr2.getDomainWeights());
+		System.out.println("6");
 		// Hence the Vector Space Model should be the sorted List of bestBrs'
 		// Domain Annotations!
 		assertNotNull(
@@ -169,6 +175,7 @@ public class RunAhrdWithDomainArchitectureTest {
 						"IPR001650", "IPR003100", "IPR005034", "IPR011545",
 						"IPR014001" }), p2.getDomainScoreCalculator()
 						.getVectorSpaceModel());
+		System.out.println("7");
 		// As the only domain bestBr2 has annotated and p2 hasn't and this
 		// domain does not appear in the domain weights db, it should receive a
 		// weight of 0.0:
