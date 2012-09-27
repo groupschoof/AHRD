@@ -28,7 +28,7 @@ public class InterproResultTest {
 		TestUtils.initTestSettings();
 		InterproResult.initialiseInterproDb();
 		getSettings().setPathToDomainWeightsDatabase(
-				"./test/resources/domain_weights_database.txt");
+				"./test/resources/domain_weights_database_interpro_test.txt");
 	}
 
 	@Test
