@@ -102,7 +102,7 @@ public class AhrdTest {
 						.getGoResults().size());
 	}
 
-	@Test
+	//@Test
 	public void testLoadBlastResultDomainAnnotationFromUniprotKB()
 			throws InterruptedException {
 		Protein p = TestUtils.mockProtein();
