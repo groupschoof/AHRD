@@ -159,6 +159,7 @@ public class InterproResultTest {
 		// Because the above @Before has initialized the Settings and the memory
 		// Interpro-Database, we have it here, already.
 		System.out.println("1");
+		System.out.println(getSettings().getPathToDomainWeightsDatabase());
 		InterproResult.parseDomainWeights();
 		System.out.println("2");
 		// Assure that InterproDomains IPR000535 IPR000536 IPR000006 have their
