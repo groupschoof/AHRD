@@ -26,9 +26,9 @@ blast_dbs:
 
 interpro_database: ./test/resources/interpro_31_dom_arch_sim.xml
 interpro_result: ./test/resources/interpro_result_dom_arch_sim.raw
-domain_weights_database: ./test/resources/domain_weights_database_interpro_test.txt
+domain_weights_database: ./test/resources/domain_weights_database_pfam.txt
 domain_weights_table_position: 1
-compute_domain_similarity_on: interpro
+compute_domain_similarity_on: pfam
 description_score_domain_similarity_weight: 0.2 
 gene_ontology_result: ./test/resources/go_results.csv
 token_score_bit_score_weight: 0.5
