@@ -6,7 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -100,10 +102,14 @@ public class AhrdTest {
 						.getGoResults().size());
 	}
 
-	//@Test
+	@Test
 	public void testLoadBlastResultDomainAnnotationFromUniprotKB()
 			throws InterruptedException {
 		Protein p = TestUtils.mockProtein();
+		// p needs some InterPro results, otherwise AHRD won't download
+		// annotations for its BlastResults:
+		p.getInterproResults().add(
+				new InterproResult("IPR000999", "Fake 999 domain", "domain"));
 		List<BlastResult> brs = new ArrayList<BlastResult>();
 		for (String accession : new String[] { "B5YXA4", "Q8XBZ3", "A7ZTQ8",
 				"A8A6G3", "B1LL27", "B6I3T5", "B7L846", "B7M553", "B7MGC3",
@@ -212,16 +218,41 @@ public class AhrdTest {
 				"A7FG40", "A9QZX0", "Q8ZCC1", "A9MHP3", "A9N2Y3", "B4T0M5",
 				"B4TD71", "B4TR72", "B5F171", "B5FQI8", "B5R558", "B5RCW8",
 				"C0PYR0", "Q57LL3", "Q7CQ21", "Q8XEQ0", "B5BB08", "Q5PL41",
-				"O86235", "A8AD95", "Q6D7R8", "Q7N3G5", "A7ML17", "P77546" }) {
+				"O86235", "A8AD95", "Q6D7R8", "Q7N3G5", "A7ML17", "P77546",
+				"sp|Q3EBC8|DCL2_ARATH" }) {
 			brs.add(new BlastResult(accession, 0.01, "description", 10, 20, 10,
 					20, 200, 10.0, "swissprot"));
 		}
 		p.getBlastResults().put("swissprot", brs);
 
 		// Test:
-		this.ahrd.loadBlastResultDomainAnnotationFromUniprotKB(p);
+		Map<String, Protein> prots = new HashMap<String, Protein>();
+		prots.put(p.getAccession(), p);
+		this.ahrd.setProteins(prots);
+		this.ahrd.loadBlastResultDomainAnnotationFromUniprotKB();
+		assertNotNull(
+				"The memory database 'BlastResultAccessionsToInterproIds' should not be null.",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds());
+		assertNotNull(
+				"The collection of InterPro annotations for Uniprot accession 'B5YXA4' should not be NULL.",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.get("B5YXA4"));
 		assertEquals(8, DomainScoreCalculator
 				.getBlastResultAccessionsToInterproIds().get("B5YXA4").size());
+		assertTrue(
+				"Uniprot Protein 'B5YXA4' should have been assigned the InterPro ID 'IPR003593'",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.get("B5YXA4").contains("IPR003593"));
+		assertNotNull(
+				"Uniprot Protein identified by its complete name 'sp|Q3EBC8|DCL2_ARATH' should have been assigned its domain annotations as stored in Uniprot under accession 'Q3EBC8'.",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.get("sp|Q3EBC8|DCL2_ARATH"));
+		assertEquals(7,
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.get("sp|Q3EBC8|DCL2_ARATH").size());
+		assertTrue(
+				"Uniprot Protein 'sp|Q3EBC8|DCL2_ARATH' should have been assigned the InterPro ID 'IPR005034'",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.get("sp|Q3EBC8|DCL2_ARATH").contains("IPR005034"));
 	}
-
 }

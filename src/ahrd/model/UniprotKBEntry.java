@@ -1,7 +1,6 @@
 package ahrd.model;
 
 import static ahrd.controller.Utils.retrieveAttribteValuesOfXmlChildrenElements;
-import static ahrd.controller.Utils.retrieveContentOfFirstXmlChildElement;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -45,7 +44,8 @@ public class UniprotKBEntry {
 				String url = "NOT INITIALIZED";
 				try {
 					url = UniprotKBEntry.url(this.accession);
-					UniprotKBEntry result = UniprotKBEntry.fromUrl(url);
+					UniprotKBEntry result = UniprotKBEntry.fromUrl(url,
+							this.accession);
 					DomainScoreCalculator
 							.getBlastResultAccessionsToInterproIds().put(
 									result.getAccession(),
@@ -76,8 +76,19 @@ public class UniprotKBEntry {
 				URLEncoder.encode(accession, "UTF-8"));
 	}
 
-	public static UniprotKBEntry fromUrl(String url) throws IOException,
-			ValidityException, ParsingException {
+	/**
+	 * @param url
+	 * @param accession
+	 *            - Provided as argument to store the accession used in the
+	 *            context of this Program, which might differ from Uniprot's
+	 *            latest accession.
+	 * @return UniprotKBEntry as instantiated from the downloaded content.
+	 * @throws IOException
+	 * @throws ValidityException
+	 * @throws ParsingException
+	 */
+	public static UniprotKBEntry fromUrl(String url, String accession)
+			throws IOException, ValidityException, ParsingException {
 		UniprotKBEntry result = null;
 		Builder parser = new Builder();
 		XPathContext c = new XPathContext("xmlns", "http://uniprot.org/uniprot");
@@ -85,8 +96,6 @@ public class UniprotKBEntry {
 		Nodes nds = doc.query("//xmlns:entry", c);
 		if (nds.size() > 0) {
 			Element uni = (Element) nds.get(0);
-			String accession = retrieveContentOfFirstXmlChildElement(uni,
-					"xmlns:accession", c);
 			// Instantiate new UniprotKBEntry, if and only if we find a valid
 			// accession:
 			if (accession != null && !accession.equals("")) {

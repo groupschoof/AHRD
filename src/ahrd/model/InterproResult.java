@@ -144,7 +144,7 @@ public class InterproResult implements Comparable<InterproResult> {
 		String[] entry = null;
 		List<String> notFoundIprIds = new ArrayList<String>();
 		for (String line; (line = reader.readLine()) != null;) {
-			entry = line.split("\t");
+			entry = line.split("\\s+");
 			domainId = entry[0];
 			Double domainWeight = Double.parseDouble(entry[getSettings()
 					.getDomainWeightTablePosition()]);

@@ -28,7 +28,7 @@ public class InterproResultTest {
 		TestUtils.initTestSettings();
 		InterproResult.initialiseInterproDb();
 		getSettings().setPathToDomainWeightsDatabase(
-				"./test/resources/domain_weights_database_interpro_test.txt");
+				"./test/resources/domain_weights_database.txt");
 	}
 
 	@Test
@@ -158,9 +158,7 @@ public class InterproResultTest {
 		// 1.) TEST parsing of domain weights for InterPro domains:
 		// Because the above @Before has initialized the Settings and the memory
 		// Interpro-Database, we have it here, already.
-		System.out.println("1");
 		InterproResult.parseDomainWeights();
-		System.out.println("2");
 		// Assure that InterproDomains IPR000535 IPR000536 IPR000006 have their
 		// appropriate weights!
 		assertNotNull(InterproResult.getInterproDb().get("IPR000535")
@@ -173,12 +171,9 @@ public class InterproResultTest {
 				.getDomainWeight(), 87.2, 0.0);
 		// 2.) TEST parsing of domain weights for Pfam domains:
 		getSettings().setComputeDomainSimilarityOn("pfam");
-		System.out.println("3");
 		getSettings().setPathToDomainWeightsDatabase(
 				"./test/resources/domain_weights_database_pfam.txt");
-		System.out.println("4");
 		InterproResult.parseDomainWeights();
-		System.out.println("5");
 		assertEquals(InterproResult.getPfamDomainWeights().get("PF00535"),
 				213.0, 0.0);
 		assertEquals(InterproResult.getPfamDomainWeights().get("PF00536"),

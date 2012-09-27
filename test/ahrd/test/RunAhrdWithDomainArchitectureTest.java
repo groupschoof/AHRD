@@ -132,15 +132,26 @@ public class RunAhrdWithDomainArchitectureTest {
 				.getBlastResultAccessionsToInterproIds().get(
 						bestBr2.getAccession());
 		System.out.println("4");
+		assertNotNull(
+				"BlastResult '"
+						+ bestBr2.getAccession()
+						+ "' should have been assigned InterPro Annotations from Uniprot.",
+				bestBr2IprAnnos);
 		assertTrue(
-				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' should have more than six Domain Annotations.",
+				"BlastResult '"
+						+ bestBr2.getAccession()
+						+ "' should have more than six Domain Annotations.",
 				bestBr2IprAnnos.size() > 6);
 		assertTrue(
-				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' and Query Protein '' should share at least a single Domain Annotation.",
+				"BlastResult '"
+						+ bestBr2.getAccession()
+						+ "' and Query Protein '' should share at least a single Domain Annotation.",
 				bestBr2IprAnnos.contains(p2.getInterproResults().toArray()[0]));
 		Double descScore2 = bestBr2.getDescriptionScore();
 		assertNotNull(
-				"Description Score of Blast Hit 'sp|Q3EBC8|DCL2_ARATH' should not be NULL!",
+				"Description Score of Blast Hit '"
+						+ bestBr2.getAccession()
+						+ "' should not be NULL!",
 				descScore2);
 		assertNotNull(
 				"Protein 'Solyc11g030630.1.1' should have a vector in domain architecture space.",
@@ -157,7 +168,9 @@ public class RunAhrdWithDomainArchitectureTest {
 		// IPR000999, IPR001159, IPR001650, IPR003100, IPR005034, IPR011545,
 		// IPR014001
 		assertNotNull(
-				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' should have a vector in domain architecture space.",
+				"BlastResult '"
+						+ bestBr2.getAccession()
+						+ "' should have a vector in domain architecture space.",
 				bestBr2.getDomainWeights());
 		assertEquals(
 				Arrays.asList(new Double[] { 5.05047155114809,
@@ -184,7 +197,9 @@ public class RunAhrdWithDomainArchitectureTest {
 		// ... and hence the Domain Architecture Similarity Score should be
 		// maximal:
 		assertNotNull(
-				"BlastResult 'sp|Q3EBC8|DCL2_ARATH' should have a computed Domain Architecture Similarity Score.",
+				"BlastResult '"
+						+ bestBr2.getAccession()
+						+ "' should have a computed Domain Architecture Similarity Score.",
 				bestBr2.getDomainSimilarityScore());
 		assertEquals(0.0, bestBr2.getDomainSimilarityScore(), 1.0);
 		// ToDo: Compute the actually correct final AHRD-Score and check it:

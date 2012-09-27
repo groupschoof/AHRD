@@ -18,6 +18,7 @@ import ahrd.model.UniprotKBEntry;
 public class UniprotKbEntryTest {
 
 	private static final String ACCESSION = "Q0KFR8";
+	private static final String COMPLETE_NAME = "sp|Q0KFR8|DNAA_CUPNH";
 
 	@Test
 	public void testUrl() throws UnsupportedEncodingException {
@@ -32,10 +33,20 @@ public class UniprotKbEntryTest {
 	@Test
 	public void testFromUrl() throws IOException, ValidityException,
 			ParsingException {
-		UniprotKBEntry u = UniprotKBEntry
-				.fromUrl(UniprotKBEntry.url(ACCESSION));
+		// Test for above Uniprot protein accession:
+		UniprotKBEntry u = UniprotKBEntry.fromUrl(
+				UniprotKBEntry.url(ACCESSION), ACCESSION);
+		testDownloadedData(u, ACCESSION);
+		// Ensure it works also for the complete name as it appears in the Blast
+		// result files:
+		UniprotKBEntry u2 = UniprotKBEntry.fromUrl(
+				UniprotKBEntry.url(COMPLETE_NAME), COMPLETE_NAME);
+		testDownloadedData(u2, COMPLETE_NAME);
+	}
+
+	private void testDownloadedData(UniprotKBEntry u, String accession) {
 		assertNotNull("Expected an instance of UniprotKBEntry but got NULL.", u);
-		assertEquals(ACCESSION, u.getAccession());
+		assertEquals(accession, u.getAccession());
 		assertEquals(
 				new HashSet<String>(Arrays.asList(new String[] { "IPR020591",
 						"IPR013159", "IPR024633", "IPR010921", "IPR003593",

@@ -29,7 +29,7 @@ public class TrainerTest {
 
 	@Before
 	public void setUp() throws IOException, MissingAccessionException,
-			MissingProteinException, SAXException, ParsingException {
+			MissingProteinException, SAXException, ParsingException, InterruptedException {
 		trainer = new Trainer("./test/resources/trainer_input.yml");
 		trainer.setup(false); // false -> Don't log memory and time-usages
 		trainer.setupReferences();
@@ -217,11 +217,12 @@ public class TrainerTest {
 	 * @throws MissingProteinException
 	 * @throws MissingAccessionException
 	 * @throws IOException
+	 * @throws InterruptedException
 	 */
 	@Test
 	public void testEvalScoreWithNoCompetitors() throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
-			ParsingException {
+			ParsingException, InterruptedException {
 		// Default should be FALSE
 		assertTrue(!getSettings().getWriteBestBlastHitsToOutput());
 		// After setup the competitor annotations
