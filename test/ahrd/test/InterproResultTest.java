@@ -158,6 +158,7 @@ public class InterproResultTest {
 		// 1.) TEST parsing of domain weights for InterPro domains:
 		// Because the above @Before has initialized the Settings and the memory
 		// Interpro-Database, we have it here, already.
+		System.out.println("1");
 		InterproResult.parseDomainWeights();
 		// Assure that InterproDomains IPR000535 IPR000536 IPR000006 have their
 		// appropriate weights!
