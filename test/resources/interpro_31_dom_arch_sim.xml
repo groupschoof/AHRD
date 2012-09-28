@@ -6507,7 +6507,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR000152" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD Seventeen</name>
     <abstract>
@@ -6616,7 +6615,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR000719" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD Eighteen</name>
     <abstract>
@@ -6723,8 +6721,7 @@
       <taxon_data name="Metazoa" proteins_count="354"/>
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
-    </taxonomy_distribution>
-  </interpro>
+    </taxonomy_distribution>  
   </interpro>
   <interpro id="IPR000742" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD Nineteen</name>
@@ -6832,8 +6829,7 @@
       <taxon_data name="Metazoa" proteins_count="354"/>
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
-    </taxonomy_distribution>
-  </interpro>
+    </taxonomy_distribution>  
   </interpro>
   <interpro id="IPR000858" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD Twenty</name>
@@ -6943,7 +6939,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR000999" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD TwentyOne</name>
     <abstract>
@@ -7051,7 +7046,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR001159" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD TwentyTwo</name>
@@ -7161,7 +7155,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR001220" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD TwentyThree</name>
     <abstract>
@@ -7269,7 +7262,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR000152" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD TwentyFour</name>
@@ -7379,7 +7371,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR001245" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD TwentyFive</name>
     <abstract>
@@ -7487,7 +7478,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR001368" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD TwentySix</name>
@@ -7597,7 +7587,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR001480" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD TwentySeven</name>
     <abstract>
@@ -7705,7 +7694,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR001611" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD TwentyEight</name>
@@ -7815,7 +7803,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR001650" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD TwentyNine</name>
     <abstract>
@@ -7923,7 +7910,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR001881" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD Thirty</name>
@@ -8033,7 +8019,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR002902" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD ThirtyOne</name>
     <abstract>
@@ -8141,7 +8126,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR003014" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD ThirtyTwo</name>
@@ -8251,7 +8235,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR003100" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD ThirtyThree</name>
     <abstract>
@@ -8359,7 +8342,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR003591" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD ThirtyFour</name>
@@ -8469,7 +8451,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR003609" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD ThirtyFive</name>
     <abstract>
@@ -8577,7 +8558,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR003882" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD ThirtySix</name>
@@ -8687,7 +8667,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR005034" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD ThirtySeven</name>
     <abstract>
@@ -8795,7 +8774,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR006210" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD ThirtyEight</name>
@@ -8905,7 +8883,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR008266" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD ThirtyNine</name>
     <abstract>
@@ -9013,7 +8990,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR008271" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD Forty</name>
@@ -9123,7 +9099,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR008985" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FortyOne</name>
     <abstract>
@@ -9231,7 +9206,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR009091" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FortyTwo</name>
@@ -9341,7 +9315,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR011009" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FortyThree</name>
     <abstract>
@@ -9449,7 +9422,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR011545" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FortyFour</name>
@@ -9559,7 +9531,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR013032" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FortyFive</name>
     <abstract>
@@ -9667,7 +9638,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR013210" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FortySix</name>
@@ -9777,7 +9747,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR013227" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FortySeven</name>
     <abstract>
@@ -9885,7 +9854,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR013320" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FortyEight</name>
@@ -9995,7 +9963,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR013695" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FortyNine</name>
     <abstract>
@@ -10103,7 +10070,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR014001" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD Fifty</name>
@@ -10213,7 +10179,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR014720" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FiftyOne</name>
     <abstract>
@@ -10321,7 +10286,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR014729" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FiftyTwo</name>
@@ -10431,7 +10395,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR017441" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FiftyThree</name>
     <abstract>
@@ -10539,7 +10502,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR018097" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FiftyFour</name>
@@ -10649,7 +10611,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR019825" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FiftyFive</name>
     <abstract>
@@ -10757,7 +10718,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR021720" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FiftySix</name>
@@ -10867,7 +10827,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR021820" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FiftySeven</name>
     <abstract>
@@ -10975,7 +10934,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR024171" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FiftyEight</name>
@@ -11085,7 +11043,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR024788" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD FiftyNine</name>
     <abstract>
@@ -11194,7 +11151,6 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
-  </interpro>
   <interpro id="IPR025287" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD Sixty</name>
     <abstract>
@@ -11302,7 +11258,6 @@
       <taxon_data name="Chordata" proteins_count="261"/>
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
-  </interpro>
   </interpro>
   <interpro id="IPR025875" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
     <name>Invented test domain for AHRD SixtyOne</name>
