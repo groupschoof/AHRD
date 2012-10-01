@@ -183,7 +183,7 @@ public class DomainScoreCalculatorTest {
 		assertNotNull(dws);
 		assertEquals(0.9958408, dws, 0.000001);
 
-		// Verify that any prtoein without domain annotation results in zero
+		// Verify that any protein without domain annotation results in zero
 		// similarity:
 		x = Utils.zeroList(6);
 		dws = DomainScoreCalculator.domainWeightSimilarity(x, y);

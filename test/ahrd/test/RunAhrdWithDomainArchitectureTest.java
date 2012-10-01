@@ -161,11 +161,14 @@ public class RunAhrdWithDomainArchitectureTest {
 		assertEquals(6, p2.getDomainWeights().size());
 		// 'ps' has the following Domain Annotations:
 		// IPR000999, IPR001159, IPR001650, IPR003100, IPR005034, IPR011545
+		for (Double dw2 : p2.getDomainWeights())
+			if(dw2!= null){
 		assertEquals(
 				Arrays.asList(new Double[] { 5.05047155114809,
 						0.230164198497054, 0.0244178837367414,
 						0.33175852306605, 1.6165065434774, 0.173963313549586 }),
 				p2.getDomainWeights());
+		}
 		System.out.println("5");
 		// bestBr2 has the following Domain Annotations:
 		// IPR000999, IPR001159, IPR001650, IPR003100, IPR005034, IPR011545,
