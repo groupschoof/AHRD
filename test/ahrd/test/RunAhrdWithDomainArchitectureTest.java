@@ -125,7 +125,7 @@ public class RunAhrdWithDomainArchitectureTest {
 		assertNotNull(
 				"Protein 'Solyc11g030630.1.1' should have Domain Annotations.",
 				p2.getInterproResults());
-		System.out.println(p2.getInterproResults());
+		System.out.println(p2.getInterproResults().toArray()[0]);
 		assertEquals(6, p2.getInterproResults().size());
 		BlastResult bestBr2 = p2.getDescriptionScoreCalculator()
 				.getHighestScoringBlastResult();
@@ -148,7 +148,7 @@ public class RunAhrdWithDomainArchitectureTest {
 				"BlastResult '"
 						+ bestBr2.getAccession()
 						+ "' and Query Protein '' should share at least a single Domain Annotation.",
-				bestBr2IprAnnos.contains(p2.getInterproResults().toArray()[0]));
+				bestBr2IprAnnos.contains(((InterproResult)p2.getInterproResults().toArray()[0]).getId()));
 		Double descScore2 = bestBr2.getDescriptionScore();
 		assertNotNull(
 				"Description Score of Blast Hit '"
