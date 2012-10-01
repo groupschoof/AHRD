@@ -158,6 +158,7 @@ public class RunAhrdWithDomainArchitectureTest {
 		assertNotNull(
 				"Protein 'Solyc11g030630.1.1' should have a vector in domain architecture space.",
 				p2.getDomainWeights());
+		System.out.println(p2.getDomainWeights());
 		// 'ps' has the following Domain Annotations:
 		// IPR000999, IPR001159, IPR001650, IPR003100, IPR005034, IPR011545
 		assertEquals(
