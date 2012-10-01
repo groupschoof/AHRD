@@ -124,8 +124,7 @@ public class RunAhrdWithDomainArchitectureTest {
 		Protein p2 = ahrd.getProteins().get("Solyc11g030630.1.1");
 		assertNotNull(
 				"Protein 'Solyc11g030630.1.1' should have Domain Annotations.",
-				p2.getInterproResults().toString());
-		System.out.println(p2.getInterproResults().toString());
+				p2.getInterproResults());
 		assertEquals(6, p2.getInterproResults().size());
 		BlastResult bestBr2 = p2.getDescriptionScoreCalculator()
 				.getHighestScoringBlastResult();
@@ -159,6 +158,7 @@ public class RunAhrdWithDomainArchitectureTest {
 				"Protein 'Solyc11g030630.1.1' should have a vector in domain architecture space.",
 				p2.getDomainWeights());
 		System.out.println(p2.getDomainWeights());
+		assertEquals(6, p2.getDomainWeights().size());
 		// 'ps' has the following Domain Annotations:
 		// IPR000999, IPR001159, IPR001650, IPR003100, IPR005034, IPR011545
 		assertEquals(
