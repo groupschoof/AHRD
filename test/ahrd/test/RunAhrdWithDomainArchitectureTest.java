@@ -124,7 +124,7 @@ public class RunAhrdWithDomainArchitectureTest {
 		Protein p2 = ahrd.getProteins().get("Solyc11g030630.1.1");
 		assertNotNull(
 				"Protein 'Solyc11g030630.1.1' should have Domain Annotations.",
-				p2.getInterproResults());
+				p2.getInterproResults().toString());
 		System.out.println(p2.getInterproResults());
 		assertEquals(6, p2.getInterproResults().size());
 		BlastResult bestBr2 = p2.getDescriptionScoreCalculator()
