@@ -12,10 +12,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import nu.xom.ParsingException;
 
@@ -190,15 +188,10 @@ public class AHRD {
 		for (String accession : accessions) {
 			uniprotLoaders.add(new UniprotKBEntry.ParallelLoader(accession));
 		}
-		Collection<Future<Boolean>> jobs = threadPool.invokeAll(uniprotLoaders);
-		// Collect any exceptions, if something went wrong:
-		for (Future<Boolean> f : jobs) {
-			try {
-				f.get();
-			} catch (ExecutionException e) {
-				e.printStackTrace(System.err);
-			}
-		}
+		// Do all jobs
+		threadPool.invokeAll(uniprotLoaders);
+		// Shutdown jobs
+		threadPool.shutdown();
 	}
 
 	/**
