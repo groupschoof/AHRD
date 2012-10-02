@@ -187,7 +187,6 @@ public class AHRD {
 		Collection<Callable<Boolean>> uniprotLoaders = new ArrayList<Callable<Boolean>>();
 		for (String accession : accessions) {
 			uniprotLoaders.add(new UniprotKBEntry.ParallelLoader(accession));
-
 		}
 		threadPool.invokeAll(uniprotLoaders);
 	}
