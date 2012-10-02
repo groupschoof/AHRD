@@ -102,7 +102,7 @@ public class AhrdTest {
 						.getGoResults().size());
 	}
 
-	//@Test
+	// @Test
 	public void testLoadBlastResultDomainAnnotationFromUniprotKB()
 			throws InterruptedException {
 		Protein p = TestUtils.mockProtein();
@@ -254,5 +254,47 @@ public class AhrdTest {
 				"Uniprot Protein 'sp|Q3EBC8|DCL2_ARATH' should have been assigned the InterPro ID 'IPR005034'",
 				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
 						.get("sp|Q3EBC8|DCL2_ARATH").contains("IPR005034"));
+	}
+
+	@Test
+	public void testLoadBlastResultDomainAnnotationFromUniprotKBTerminates()
+			throws InterruptedException {
+		Protein p = TestUtils.mockProtein();
+		// p needs some InterPro results, otherwise AHRD won't download
+		// annotations for its BlastResults:
+		p.getInterproResults().add(
+				new InterproResult("IPR000999", "Fake 999 domain", "domain"));
+		List<BlastResult> brs = new ArrayList<BlastResult>();
+		for (String accession : new String[] { "B5YXA4",
+				"ANonExistingUniprotID" }) {
+			brs.add(new BlastResult(accession, 0.01, "description", 10, 20, 10,
+					20, 200, 10.0, "swissprot"));
+		}
+		p.getBlastResults().put("swissprot", brs);
+
+		// Test:
+		Map<String, Protein> prots = new HashMap<String, Protein>();
+		prots.put(p.getAccession(), p);
+		this.ahrd.setProteins(prots);
+		this.ahrd.loadBlastResultDomainAnnotationFromUniprotKB();
+		// Inform User of WANTED error message:
+		System.out
+				.println("The following error messages are expected.\n"
+						+ "'xml:1:1: Content is not allowed in prolog.'\n"
+						+ "'Failed to access Uniprot RESTful Web Service with URL 'http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/ANonExistingUniprotID/xml'. Probably the accession in this URL is not a Uniprot Accession?'\n"
+						+ "===>>> Do not worry! <<<===");
+		assertNotNull(
+				"The memory database 'BlastResultAccessionsToInterproIds' should not be null.",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds());
+		assertNotNull(
+				"The collection of InterPro annotations for Uniprot accession 'B5YXA4' should not be NULL.",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.get("B5YXA4"));
+		assertEquals(8, DomainScoreCalculator
+				.getBlastResultAccessionsToInterproIds().get("B5YXA4").size());
+		assertTrue(
+				"Uniprot Protein 'B5YXA4' should have been assigned the InterPro ID 'IPR003593'",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.get("B5YXA4").contains("IPR003593"));
 	}
 }

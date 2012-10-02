@@ -188,9 +188,10 @@ public class AHRD {
 		for (String accession : accessions) {
 			uniprotLoaders.add(new UniprotKBEntry.ParallelLoader(accession));
 		}
-		// Do all jobs
+		// Execute all josb in parallel and await their termination:
 		threadPool.invokeAll(uniprotLoaders);
-		// Shutdown jobs
+		// Assure shutdown of jobs even in case of exceptions keeping them
+		// running:
 		threadPool.shutdown();
 	}
 

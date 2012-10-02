@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import ahrd.exception.UniprotWebServiceAccessException;
+
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -34,22 +36,32 @@ public class UniprotKBEntry {
 			this.accession = accession;
 		}
 
-		public Boolean call() throws UnsupportedEncodingException,
-				ValidityException, ParsingException, IOException {
+		public Boolean call() throws UniprotWebServiceAccessException {
 			if (!DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
 					.containsKey(this.accession)
 					&& !DomainScoreCalculator
 							.getBlastResultAccessionsToPfamIds().containsKey(
 									this.accession)) {
 				String url = "NOT INITIALIZED";
-				url = UniprotKBEntry.url(this.accession);
-				UniprotKBEntry result = UniprotKBEntry.fromUrl(url,
-						this.accession);
-				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
-						.put(result.getAccession(), result.getIprAnnotations());
-				DomainScoreCalculator.getBlastResultAccessionsToPfamIds().put(
-						result.getAccession(), result.getPfamAnnotations());
+				try {
 
+					url = UniprotKBEntry.url(this.accession);
+					UniprotKBEntry result = UniprotKBEntry.fromUrl(url,
+							this.accession);
+					DomainScoreCalculator
+							.getBlastResultAccessionsToInterproIds().put(
+									result.getAccession(),
+									result.getIprAnnotations());
+					DomainScoreCalculator.getBlastResultAccessionsToPfamIds()
+							.put(result.getAccession(),
+									result.getPfamAnnotations());
+				} catch (Exception e) {
+					System.err
+							.println("Failed to access Uniprot RESTful Web Service with URL '"
+									+ url
+									+ "'. Probably the accession in this URL is not a Uniprot Accession?");
+					throw new UniprotWebServiceAccessException(e);
+				}
 			}
 			return true;
 		}
