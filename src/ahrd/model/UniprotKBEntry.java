@@ -34,33 +34,24 @@ public class UniprotKBEntry {
 			this.accession = accession;
 		}
 
-		public Boolean call() {
-			Boolean completed = true;
+		public Boolean call() throws UnsupportedEncodingException,
+				ValidityException, ParsingException, IOException {
 			if (!DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
 					.containsKey(this.accession)
 					&& !DomainScoreCalculator
 							.getBlastResultAccessionsToPfamIds().containsKey(
 									this.accession)) {
 				String url = "NOT INITIALIZED";
-				try {
-					url = UniprotKBEntry.url(this.accession);
-					UniprotKBEntry result = UniprotKBEntry.fromUrl(url,
-							this.accession);
-					DomainScoreCalculator
-							.getBlastResultAccessionsToInterproIds().put(
-									result.getAccession(),
-									result.getIprAnnotations());
-					DomainScoreCalculator.getBlastResultAccessionsToPfamIds()
-							.put(result.getAccession(),
-									result.getPfamAnnotations());
-				} catch (Exception e) {
-					System.err
-							.println("WARNING: Could not fetch UniprotKB-Entry using RESTful URL '"
-									+ url + "'.");
-					e.printStackTrace(System.err);
-				}
+				url = UniprotKBEntry.url(this.accession);
+				UniprotKBEntry result = UniprotKBEntry.fromUrl(url,
+						this.accession);
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.put(result.getAccession(), result.getIprAnnotations());
+				DomainScoreCalculator.getBlastResultAccessionsToPfamIds().put(
+						result.getAccession(), result.getPfamAnnotations());
+
 			}
-			return completed;
+			return true;
 		}
 	}
 
