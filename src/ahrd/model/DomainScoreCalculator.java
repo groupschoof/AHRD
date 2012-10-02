@@ -53,15 +53,15 @@ public class DomainScoreCalculator {
 	 * 2.) Construct the domain-weights vector for the Protein itself 3.) ...and
 	 * all of its BlastResults
 	 * 
-	 * @param prot
+	 * @param Protein
+	 *            prot
+	 * @param SortedSet
+	 *            <String> vsm
+	 * 
 	 * @throws MissingInterproResultException
 	 */
-	public static void constructDomainWeightVectors(Protein prot)
-			throws MissingInterproResultException {
-
-		// Vector Space Model of all distinct annotated Interpro-Entities:
-		SortedSet<String> vsm = constructVectorSpaceModel(prot);
-
+	public static void constructDomainWeightVectors(Protein prot,
+			SortedSet<String> vsm) throws MissingInterproResultException {
 		// Domain-Weight Vector for the Protein itself:
 		List<Double> prVec = new Vector<Double>();
 		for (Iterator<String> it = vsm.iterator(); it.hasNext();) {
@@ -302,7 +302,7 @@ public class DomainScoreCalculator {
 	public void computeDomainSimilarityScores()
 			throws MissingInterproResultException {
 		setVectorSpaceModel(constructVectorSpaceModel(getProtein()));
-		constructDomainWeightVectors(getProtein());
+		constructDomainWeightVectors(getProtein(), getVectorSpaceModel());
 		for (String blastDb : getProtein().getBlastResults().keySet()) {
 			for (BlastResult br : getProtein().getBlastResults().get(blastDb)) {
 				br.setDomainSimilarityScore(domainWeightSimilarity(getProtein()

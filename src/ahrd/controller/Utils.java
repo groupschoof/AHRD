@@ -46,6 +46,22 @@ public class Utils {
 		return (double) Math.round(toBeFormatted * decPlacesFact)
 				/ decPlacesFact;
 	}
+	
+	/**
+	 * Rounds each double in argument list using method roundToNDecimalPlaces(...)
+	 * 
+	 * @param doubles
+	 * @param nDecimalPlaces
+	 * @return List<Double>
+	 */
+	public static List<Double> roundEachToNDecimalPlaces(List<Double> doubles,
+			int nDecimalPlaces) {
+		List<Double> roundedDoubles = new ArrayList<Double>();
+		for (Double dbl : doubles) {
+			roundedDoubles.add(roundToNDecimalPlaces(dbl, nDecimalPlaces));
+		}
+		return roundedDoubles;
+	}
 
 	public static String readFile(String path) throws IOException {
 		FileInputStream stream = new FileInputStream(new File(path));

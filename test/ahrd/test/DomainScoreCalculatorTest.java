@@ -132,7 +132,8 @@ public class DomainScoreCalculatorTest {
 		mockInterproDatabase();
 		// Construct the domain-weight vectors for the protein and its
 		// BlastResults:
-		DomainScoreCalculator.constructDomainWeightVectors(prot);
+		DomainScoreCalculator.constructDomainWeightVectors(prot,
+				DomainScoreCalculator.constructVectorSpaceModel(prot));
 		// Assure that above vectors have been constructed correctly:
 		assertNotNull(prot.getDomainWeights());
 		assertEquals(
