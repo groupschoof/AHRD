@@ -50,6 +50,7 @@ public class Settings implements Cloneable {
 	public static final String INTERPRO_DATABASE_KEY = "interpro_database";
 	public static final String INTERPRO_RESULT_KEY = "interpro_result";
 	public static final String DOMAIN_WEIGHTS_DATABASE = "domain_weights_database";
+	public static final String DOMAIN_WEIGHTS_POSITION_KEY = "domain_weights_table_position";
 	public static final String COMPUTE_DOMAIN_SIMILARITY_ON_KEY = "compute_domain_similarity_on";
 	public static final String GENE_ONTOLOGY_RESULT_KEY = "gene_ontology_result";
 	public static final String OUTPUT_KEY = "output";
@@ -211,6 +212,10 @@ public class Settings implements Cloneable {
 	 * those scores to the output.
 	 */
 	private boolean writeDomainArchitectureSimilarityScoresToOutput = false;
+	/**
+	 * Position of tab delimited table to look up the domain weight:
+	 */
+	private Integer domainWeightTablePosition = 7;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -238,6 +243,9 @@ public class Settings implements Cloneable {
 		setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
 		setPathToDomainWeightsDatabase((String) input
 				.get(DOMAIN_WEIGHTS_DATABASE));
+		if (input.get(DOMAIN_WEIGHTS_POSITION_KEY) != null)
+			setDomainWeightTablePosition(Integer.parseInt((String) input
+					.get(DOMAIN_WEIGHTS_POSITION_KEY)));
 		setComputeDomainSimilarityOn((String) input
 				.get(COMPUTE_DOMAIN_SIMILARITY_ON_KEY));
 		if (input.get(TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null)
@@ -855,6 +863,12 @@ public class Settings implements Cloneable {
 		this.writeDomainArchitectureSimilarityScoresToOutput = writeDomainArchitectureSimilarityScoresToOutput;
 	}
 
-	
+	public Integer getDomainWeightTablePosition() {
+		return domainWeightTablePosition;
+	}
+
+	public void setDomainWeightTablePosition(Integer domainWeightTablePosition) {
+		this.domainWeightTablePosition = domainWeightTablePosition;
+	}
 
 }

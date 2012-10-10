@@ -30,15 +30,13 @@ public class OutputWriter extends AbstractOutputWriter {
 		// Column-Names:
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
-		bw
-				.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
+		bw.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
 
 		if (getSettings().isInTrainingMode()) {
-			bw
-					.write("\tHRD-Length\tReference-Description\tRef-Length\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+			bw.write("\tHRD-Length\tReference-Description\tRef-Length\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
 		}
 		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
-			bw.write("\tProtein-Domain-Weight-Vector");
+			bw.write("\tProtein-Domain-Weight-Vector\tHRD-Domain-Architecture-Similarity-Score");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
@@ -47,13 +45,11 @@ public class OutputWriter extends AbstractOutputWriter {
 			bw.write("\t\"Tokens (tkn->score)\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
-			bw
-					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
+			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
-			bw
-					.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
+			bw.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
 		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
 			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
@@ -157,6 +153,10 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (prot.getDomainWeights() != null
 				&& !prot.getDomainWeights().isEmpty())
 			dwc += prot.getDomainWeights().toString();
+		dwc += "\t";
+		if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null)
+			dwc += prot.getDescriptionScoreCalculator()
+					.getHighestScoringBlastResult().getDomainSimilarityScore();
 		return dwc;
 	}
 
@@ -272,8 +272,8 @@ public class OutputWriter extends AbstractOutputWriter {
 							.relativeBlastScore(hsbr));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
-							.getDescLinePatternFrequencies().get(
-									hsbr.patternize()));
+							.getDescLinePatternFrequencies()
+							.get(hsbr.patternize()));
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
 							.getMaxDescriptionLineFrequency());

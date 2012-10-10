@@ -1,12 +1,15 @@
 package ahrd.model;
 
 import static ahrd.controller.Utils.retrieveAttribteValuesOfXmlChildrenElements;
-import static ahrd.controller.Utils.retrieveContentOfFirstXmlChildElement;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
+
+import ahrd.exception.UniprotWebServiceAccessException;
 
 import nu.xom.Builder;
 import nu.xom.Document;
@@ -33,8 +36,7 @@ public class UniprotKBEntry {
 			this.accession = accession;
 		}
 
-		public Boolean call() {
-			Boolean completed = true;
+		public Boolean call() throws UniprotWebServiceAccessException {
 			if (!DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
 					.containsKey(this.accession)
 					&& !DomainScoreCalculator
@@ -42,8 +44,10 @@ public class UniprotKBEntry {
 									this.accession)) {
 				String url = "NOT INITIALIZED";
 				try {
+
 					url = UniprotKBEntry.url(this.accession);
-					UniprotKBEntry result = UniprotKBEntry.fromUrl(url);
+					UniprotKBEntry result = UniprotKBEntry.fromUrl(url,
+							this.accession);
 					DomainScoreCalculator
 							.getBlastResultAccessionsToInterproIds().put(
 									result.getAccession(),
@@ -53,13 +57,13 @@ public class UniprotKBEntry {
 									result.getPfamAnnotations());
 				} catch (Exception e) {
 					System.err
-							.println("WARNING: Could not fetch UniprotKB-Entry using RESTful URL '"
-									+ url + "'.");
-					e.printStackTrace(System.err);
-					completed = false;
+							.println("Failed to access Uniprot RESTful Web Service with URL '"
+									+ url
+									+ "'. Probably the accession in this URL is not a Uniprot Accession?");
+					throw new UniprotWebServiceAccessException(e);
 				}
 			}
-			return completed;
+			return true;
 		}
 	}
 
@@ -68,12 +72,25 @@ public class UniprotKBEntry {
 	public static final String baseUniprotKBUrl = "http://www.ebi.ac.uk/Tools/dbfetch/dbfetch/uniprotkb/#ACCESSION#/xml";
 	public static final String ACCESSION_PLACEHOLDER = "#ACCESSION#";
 
-	public static String url(String accession) {
-		return baseUniprotKBUrl.replace(ACCESSION_PLACEHOLDER, accession);
+	public static String url(String accession)
+			throws UnsupportedEncodingException {
+		return baseUniprotKBUrl.replace(ACCESSION_PLACEHOLDER,
+				URLEncoder.encode(accession, "UTF-8"));
 	}
 
-	public static UniprotKBEntry fromUrl(String url) throws IOException,
-			ValidityException, ParsingException {
+	/**
+	 * @param url
+	 * @param accession
+	 *            - Provided as argument to store the accession used in the
+	 *            context of this Program, which might differ from Uniprot's
+	 *            latest accession.
+	 * @return UniprotKBEntry as instantiated from the downloaded content.
+	 * @throws IOException
+	 * @throws ValidityException
+	 * @throws ParsingException
+	 */
+	public static UniprotKBEntry fromUrl(String url, String accession)
+			throws IOException, ValidityException, ParsingException {
 		UniprotKBEntry result = null;
 		Builder parser = new Builder();
 		XPathContext c = new XPathContext("xmlns", "http://uniprot.org/uniprot");
@@ -81,21 +98,16 @@ public class UniprotKBEntry {
 		Nodes nds = doc.query("//xmlns:entry", c);
 		if (nds.size() > 0) {
 			Element uni = (Element) nds.get(0);
-			String accession = retrieveContentOfFirstXmlChildElement(uni,
-					"xmlns:accession", c);
 			// Instantiate new UniprotKBEntry, if and only if we find a valid
 			// accession:
 			if (accession != null && !accession.equals("")) {
 				result = new UniprotKBEntry(accession);
 				// Add Interpro-Annotations
-				result
-						.setIprAnnotations(retrieveAttribteValuesOfXmlChildrenElements(
-								uni, "xmlns:dbReference[@type='InterPro']",
-								"id", c));
+				result.setIprAnnotations(retrieveAttribteValuesOfXmlChildrenElements(
+						uni, "xmlns:dbReference[@type='InterPro']", "id", c));
 				// Add PFAM-Annotations
-				result
-						.setPfamAnnotations(retrieveAttribteValuesOfXmlChildrenElements(
-								uni, "xmlns:dbReference[@type='Pfam']", "id", c));
+				result.setPfamAnnotations(retrieveAttribteValuesOfXmlChildrenElements(
+						uni, "xmlns:dbReference[@type='Pfam']", "id", c));
 			}
 		}
 		return result;

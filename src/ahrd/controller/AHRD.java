@@ -155,22 +155,44 @@ public class AHRD {
 
 	/**
 	 * Accesses the RESTful service of UniprotKB to download all domain
-	 * annotation available for the BlastResults. In order to speed things up,
-	 * this is done in parallel.
+	 * annotation available for the BlastResults of all proteins currently in
+	 * the memory database, does not consider BlastResults of proteins without
+	 * domain annotations. In order to speed things up method does its job in
+	 * parallel.
 	 * 
 	 * @throws InterruptedException
 	 */
-	public void loadBlastResultDomainAnnotationFromUniprotKB(Protein prot)
+	public void loadBlastResultDomainAnnotationFromUniprotKB()
 			throws InterruptedException {
-		ExecutorService threadPool = Executors.newFixedThreadPool(50);
-		Collection<Callable<Boolean>> uniprotLoaders = new ArrayList<Callable<Boolean>>();
-		for (String blastDb : prot.getBlastResults().keySet()) {
-			for (BlastResult br : prot.getBlastResults().get(blastDb)) {
-				uniprotLoaders.add(new UniprotKBEntry.ParallelLoader(br
-						.getAccession()));
+		// Collect all BlastResult Accessions domain annotation is needed for:
+		Set<String> accessions = new HashSet<String>();
+		for (String proteinAccession : getProteins().keySet()) {
+			Protein p = getProteins().get(proteinAccession);
+			if ((getSettings()
+					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()
+					&& p.getPfamResults() != null && !p.getPfamResults()
+					.isEmpty())
+					|| (!getSettings()
+							.isDomainArchitectureSimilarityBasedOnPfamAnnotations()
+							&& p.getInterproResults() != null && !p
+							.getInterproResults().isEmpty())) {
+				for (String blastDb : p.getBlastResults().keySet()) {
+					for (BlastResult br : p.getBlastResults().get(blastDb)) {
+						accessions.add(br.getAccession());
+					}
+				}
 			}
 		}
+		ExecutorService threadPool = Executors.newFixedThreadPool(50);
+		Collection<Callable<Boolean>> uniprotLoaders = new ArrayList<Callable<Boolean>>();
+		for (String accession : accessions) {
+			uniprotLoaders.add(new UniprotKBEntry.ParallelLoader(accession));
+		}
+		// Execute all josb in parallel and await their termination:
 		threadPool.invokeAll(uniprotLoaders);
+		// Assure shutdown of jobs even in case of exceptions keeping them
+		// running:
+		threadPool.shutdown();
 	}
 
 	/**
@@ -182,10 +204,11 @@ public class AHRD {
 	 * @throws MissingProteinException
 	 * @throws SAXException
 	 * @throws ParsingException
+	 * @throws InterruptedException
 	 */
 	public void setup(boolean writeLogMsgs) throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
-			ParsingException {
+			ParsingException, InterruptedException {
 		if (writeLogMsgs)
 			System.out.println("Started AHRD...\n");
 
@@ -202,22 +225,24 @@ public class AHRD {
 			System.out.println("...parsed blast results in " + takeTime()
 					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
 
-		// parse domain weights database, if AHRD is run considering domain
-		// architecture similarity scoring
-		if (getSettings().isToComputeDomainSimilarities()) {
-			InterproResult.parseDomainWeights();
-			if (writeLogMsgs)
-				System.out.println("...parsed domain weights database in "
-						+ takeTime() + "sec, currently occupying "
-						+ takeMemoryUsage() + " MB");
-		}
-
 		// one single InterproResult-File
 		if (getSettings().hasValidInterproDatabaseAndResultFile()) {
 			InterproResult.initialiseInterproDb();
 			parseInterproResult();
 			if (writeLogMsgs)
 				System.out.println("...parsed interpro results in "
+						+ takeTime() + "sec, currently occupying "
+						+ takeMemoryUsage() + " MB");
+		}
+
+		// parse domain weights database, if AHRD is run considering domain
+		// architecture similarity scoring
+		if (getSettings().isToComputeDomainSimilarities()) {
+			InterproResult.parseDomainWeights();
+			// Load Domain Annotations for the BlastResults:
+			loadBlastResultDomainAnnotationFromUniprotKB();
+			if (writeLogMsgs)
+				System.out.println("...parsed domain weights database in "
 						+ takeTime() + "sec, currently occupying "
 						+ takeMemoryUsage() + " MB");
 		}

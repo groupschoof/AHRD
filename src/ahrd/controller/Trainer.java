@@ -85,8 +85,9 @@ public class Trainer extends Evaluator {
 	 * 
 	 * @throws IOException
 	 * @throws MissingInterproResultException
+	 * @throws InterruptedException 
 	 */
-	public void train() throws MissingInterproResultException, IOException {
+	public void train() throws MissingInterproResultException, IOException, InterruptedException {
 		while (getSettings().getTemperature() > 0) {
 			// If we run simulated annealing remembering tested Parameters and
 			// their scores,

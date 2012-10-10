@@ -1,4 +1,4 @@
-proteins_fasta: ./test/resources/proteins.fasta
+proteins_fasta: ./test/resources/proteins_dom_arch_sim.fasta
 blast_dbs:
   swissprot:
     weight: 100
@@ -18,21 +18,22 @@ blast_dbs:
 
   trembl:
     weight: 10
-    file: ./test/resources/trembl.pairwise
+    file: ./test/resources/trembl_dom_arch_sim.pairwise
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_trembl.txt
     token_blacklist: ./test/resources/blacklist_token.txt
     description_score_bit_score_weight: 0.4
 
-interpro_database: ./test/resources/interpro_31.xml
-interpro_result: ./test/resources/interpro_result.raw
-domain_weights_database: ./test/resources/domain_weights_database.txt
-compute_domain_similarity_on: pfam
+interpro_database: ./test/resources/interpro_31_dom_arch_sim.xml
+interpro_result: ./test/resources/interpro_result_dom_arch_sim.raw
+domain_weights_database: ./test/resources/domain_weights_database_interpro_test.txt
+domain_weights_table_position: 1
+compute_domain_similarity_on: interpro
 description_score_domain_similarity_weight: 0.2 
 gene_ontology_result: ./test/resources/go_results.csv
-token_score_bit_score_weight: 0.3
+token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
-token_score_domain_similarity_weight: 0.2
+token_score_domain_similarity_weight: 0.0
 description_score_relative_description_frequency_weight: 0.6
 output: ./ahrd_output.csv

@@ -59,7 +59,7 @@ public class InterproResult implements Comparable<InterproResult> {
 	 * 
 	 * @note: see http://www.biomedcentral.com/1471-2105/10/S15/S5
 	 */
-	private Double domainWeight;
+	private Double domainWeight = 0.0;
 
 	private static Map<String, InterproResult> interproDb = new HashMap<String, InterproResult>();
 	private static Map<String, Double> pfamDomainWeights = new HashMap<String, Double>();
@@ -144,9 +144,10 @@ public class InterproResult implements Comparable<InterproResult> {
 		String[] entry = null;
 		List<String> notFoundIprIds = new ArrayList<String>();
 		for (String line; (line = reader.readLine()) != null;) {
-			entry = line.split("\t");
+			entry = line.split("\\s+");
 			domainId = entry[0];
-			Double domainWeight = Double.parseDouble(entry[7]);
+			Double domainWeight = Double.parseDouble(entry[getSettings()
+					.getDomainWeightTablePosition()]);
 			if (getSettings()
 					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
 				getPfamDomainWeights().put(domainId, domainWeight);
@@ -163,7 +164,7 @@ public class InterproResult implements Comparable<InterproResult> {
 		// database:
 		if (!notFoundIprIds.isEmpty())
 			System.err
-					.println("WARNING: Could not find InterPro-Entries with the following IDs in the memory databse:\n"
+					.println("WARNING: Could not find InterPro-Entries with the following IDs in the memory database:\n"
 							+ notFoundIprIds);
 	}
 
