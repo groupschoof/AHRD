@@ -11367,4 +11367,112 @@
       <taxon_data name="Arthropoda" proteins_count="21"/>
     </taxonomy_distribution>
   </interpro>
+  <interpro id="IPR011907" protein_count="354" short_name="Metallothionein_sfam_euk" type="Family">
+    <name>Invented test domain for AHRD Devil-Number</name>
+    <abstract>
+      <p>Metallothioneins (MT) are small proteins that bind heavy metals, such as zinc, copper, cadmium, nickel, etc. They have a high content of cysteine residues that bind the metal ions through clusters of thiolate bonds [<cite idref="PUB00003570"/>, <cite idref="PUB00001490"/>]. An empirical classification into three classes has been proposed by Fowler and coworkers [<cite idref="PUB00005944"/>] and Kojima [<cite idref="PUB00003571"/>]. Members of class I are defined to include polypeptides related in the positions of their cysteines to equine MT-1B, and include mammalian MTs as well as from crustaceans and molluscs. Class II groups MTs from a variety of species, including sea urchins,
+        fungi, insects and cyanobacteria. Class III MTs are atypical polypeptides composed of gamma-glutamylcysteinyl units [<cite idref="PUB00005944"/>].</p>
+      <p>This original classification system has been found to be limited, in the sense that it does not allow clear differentiation of patterns of structural similarities, either between or within classes. Consequently, all class I and class II MTs (the proteinaceous sequences) have now been grouped into families of phylogenetically-related and thus alignable sequences. This system subdivides the MT superfamily into families, subfamilies, subgroups, and isolated isoforms and alleles. </p>
+      <p>The metallothionein superfamily comprises all polypeptides that resemble equine renal metallothionein in several respects [<cite idref="PUB00005944"/>]: e.g., low molecular weight; high metal content; amino acid composition with high Cys and low aromatic residue content; unique sequence with characteristic distribution of cysteines, and spectroscopic manifestations indicative of metal thiolate clusters. A MT family subsumes MTs that share particular sequence-specific features and are thought to be evolutionarily related. The inclusion of a MT within a family presupposes that its amino acid sequence is alignable with that of all members. Fifteen MT families have been characterised, each family being identified by its number and its taxonomic range: e.g., Family 1: vertebrate MTs [see http://www.bioc.unizh.ch/mtpage/protali.html]. </p>
+      <p>This entry is a superfamily of metallothioneins, containing 3 families. All members are from eukaryotes.</p>
+    </abstract>
+    <class_list>
+      <classification id="GO:0046872" class_type="GO">
+        <category>Molecular Function</category>
+        <description>metal ion binding</description>
+      </classification>
+    </class_list>
+    <example_list>
+      <example>
+        <db_xref db="SWISSPROT" dbkey="O62554"/>
+      </example>
+      <example>
+        <db_xref db="SWISSPROT" dbkey="P02795"/>
+      </example>
+      <example>
+        <db_xref db="SWISSPROT" dbkey="P02802"/>
+      </example>
+      <example>
+        <db_xref db="SWISSPROT" dbkey="P04355"/>
+      </example>
+      <example>
+        <db_xref db="SWISSPROT" dbkey="P29499"/>
+      </example>
+    </example_list>
+    <pub_list>
+      <publication id="PUB00001490">
+        <author_list>Kagi JH, Kojima Y.</author_list>
+        <title>Chemistry and biochemistry of metallothionein.</title>
+        <db_xref db="PUBMED" dbkey="2959513"/>
+        <journal>Experientia Suppl.</journal>
+        <location pages="25-61" volume="52"/>
+        <year>1987</year>
+      </publication>
+      <publication id="PUB00003570">
+        <author_list>Kagi JH.</author_list>
+        <title>Overview of metallothionein.</title>
+        <db_xref db="PUBMED" dbkey="1779825"/>
+        <journal>Meth. Enzymol.</journal>
+        <location pages="613-26" volume="205"/>
+        <year>1991</year>
+      </publication>
+      <publication id="PUB00003571">
+        <author_list>Kojima Y.</author_list>
+        <title>Definitions and nomenclature of metallothioneins.</title>
+        <db_xref db="PUBMED" dbkey="1779826"/>
+        <journal>Meth. Enzymol.</journal>
+        <location pages="8-10" volume="205"/>
+        <year>1991</year>
+      </publication>
+      <publication id="PUB00005944">
+        <author_list>Fowler BA, Hildebrand CE, Kojima Y, Webb M.</author_list>
+        <title>Nomenclature of metallothionein.</title>
+        <db_xref db="PUBMED" dbkey="2959504"/>
+        <journal>Experientia Suppl.</journal>
+        <location pages="19-22" volume="52"/>
+        <year>1987</year>
+      </publication>
+    </pub_list>
+    <member_list>
+      <db_xref protein_count="354" db="PFAM" dbkey="PF00131" name="Metallothio"/>
+    </member_list>
+    <external_doc_list>
+      <db_xref db="PANDIT" dbkey="PF00131"/>
+    </external_doc_list>
+    <structure_db_links>
+      <db_xref db="PDB" dbkey="1dfs"/>
+      <db_xref db="PDB" dbkey="1dft"/>
+      <db_xref db="PDB" dbkey="1dmc"/>
+      <db_xref db="PDB" dbkey="1dmd"/>
+      <db_xref db="PDB" dbkey="1dme"/>
+      <db_xref db="PDB" dbkey="1dmf"/>
+      <db_xref db="PDB" dbkey="1j5l"/>
+      <db_xref db="PDB" dbkey="1j5m"/>
+      <db_xref db="PDB" dbkey="1ji9"/>
+      <db_xref db="PDB" dbkey="1m0g"/>
+      <db_xref db="PDB" dbkey="1m0j"/>
+      <db_xref db="PDB" dbkey="1mhu"/>
+      <db_xref db="PDB" dbkey="1mrb"/>
+      <db_xref db="PDB" dbkey="1mrt"/>
+      <db_xref db="PDB" dbkey="2mhu"/>
+      <db_xref db="PDB" dbkey="2mrb"/>
+      <db_xref db="PDB" dbkey="2mrt"/>
+      <db_xref db="PDB" dbkey="4mt2"/>
+      <db_xref db="CATH" dbkey="4.10.10.10"/>
+      <db_xref db="SCOP" dbkey="g.46.1.1"/>
+    </structure_db_links>
+    <taxonomy_distribution>
+      <taxon_data name="Eukaryota" proteins_count="354"/>
+      <taxon_data name="Metazoa" proteins_count="352"/>
+      <taxon_data name="Arthropoda" proteins_count="21"/>
+      <taxon_data name="Chordata" proteins_count="261"/>
+      <taxon_data name="Human" proteins_count="26"/>
+      <taxon_data name="Mouse" proteins_count="10"/>
+      <taxon_data name="Metazoa" proteins_count="2"/>
+      <taxon_data name="Eukaryota" proteins_count="354"/>
+      <taxon_data name="Metazoa" proteins_count="354"/>
+      <taxon_data name="Chordata" proteins_count="261"/>
+      <taxon_data name="Arthropoda" proteins_count="21"/>
+    </taxonomy_distribution>
+  </interpro>
  </interprodb>
