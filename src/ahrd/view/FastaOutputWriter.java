@@ -26,12 +26,12 @@ public class FastaOutputWriter extends AbstractOutputWriter {
 			// Append AA-Sequence
 			bw.write(prot.getSequence() + "\n");
 			bw.write(prot.getDomainWeights()+ "\n");
-			bw.write(prot.getDomainScoreCalculator().getVectorSpaceModel()+ "\n");
-			for (String blastDb : prot.getBlastResults().keySet()) {
-				for (BlastResult br : prot.getBlastResults().get(blastDb)) {
-			System.out.println(br.getDomainWeights());
-		      }
-		}
+			//bw.write(prot.getDomainScoreCalculator().getVectorSpaceModel()+ "\n");
+			//for (String blastDb : prot.getBlastResults().keySet()) {
+			//	for (BlastResult br : prot.getBlastResults().get(blastDb)) {
+			//System.out.println(br.getDomainWeights());
+			//}
+			//		}
 			/*if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null)
 				bw.write(prot.getDescriptionScoreCalculator()
 						.getHighestScoringBlastResult().getDomainSimilarityScore()+ "\n");	*/
