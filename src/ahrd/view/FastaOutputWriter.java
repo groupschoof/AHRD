@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 
+import ahrd.model.BlastResult;
 import ahrd.model.Protein;
 
 public class FastaOutputWriter extends AbstractOutputWriter {
@@ -26,9 +27,14 @@ public class FastaOutputWriter extends AbstractOutputWriter {
 			bw.write(prot.getSequence() + "\n");
 			bw.write(prot.getDomainWeights()+ "\n");
 			bw.write(prot.getDomainScoreCalculator().getVectorSpaceModel()+ "\n");
-			if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null)
+			for (String blastDb : prot.getBlastResults().keySet()) {
+				for (BlastResult br : prot.getBlastResults().get(blastDb)) {
+			System.out.println(br.getDomainWeights());
+		      }
+		}
+			/*if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null)
 				bw.write(prot.getDescriptionScoreCalculator()
-						.getHighestScoringBlastResult().getDomainSimilarityScore()+ "\n");	
+						.getHighestScoringBlastResult().getDomainSimilarityScore()+ "\n");	*/
 						}
 		bw.close();
 	}
