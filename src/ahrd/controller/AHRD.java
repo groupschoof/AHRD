@@ -274,6 +274,7 @@ public class AHRD {
 			// now is the moment for computation of the domain similarity
 			// scores:
 			System.out.println(getSettings().getPathToDomainWeightsDatabase());
+			System.out.println(getSettings().getPathToInterproDatabase());
 			System.out.println(getSettings().hasInterproAnnotations());
 			System.out.println(prot.getInterproResults());
 			if (getSettings().isToComputeDomainSimilarities()
