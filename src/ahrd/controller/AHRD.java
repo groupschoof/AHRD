@@ -274,7 +274,14 @@ public class AHRD {
 			if (getSettings().isToComputeDomainSimilarities()
 					&& prot.hasDomainAnnotation()) {
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
+				System.out.println(prot.getDomainScoreCalculator().getVectorSpaceModel());
+				System.out.println(prot.getDomainWeights());
+				for (String blastDb : prot.getBlastResults().keySet()) {
+					for (BlastResult br : prot.getBlastResults().get(blastDb)) {
+				System.out.println(br.getDomainWeights());
+			      }
 			}
+					
 			// Tokenize each BlastResult's Description-Line and
 			// assign the Tokens their Scores:
 			// tokenizeBlastResultDescriptionLines(prot);
@@ -289,6 +296,7 @@ public class AHRD {
 			// filter for each protein's most-informative
 			// interpro-results
 			InterproResult.filterForMostInforming(prot);
+		 }
 		}
 	}
 
