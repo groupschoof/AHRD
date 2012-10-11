@@ -278,11 +278,11 @@ public class AHRD {
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
 				System.out.println(prot.getDomainScoreCalculator().getVectorSpaceModel());
 				System.out.println(prot.getDomainWeights());
-				/*for (String blastDb : prot.getBlastResults().keySet()) {
+				for (String blastDb : prot.getBlastResults().keySet()) {
 					for (BlastResult br : prot.getBlastResults().get(blastDb)) {
 				System.out.println(br.getDomainWeights());
 			      }
-			}*/
+			}
 					
 			// Tokenize each BlastResult's Description-Line and
 			// assign the Tokens their Scores:

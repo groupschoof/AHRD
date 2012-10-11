@@ -29,7 +29,7 @@ public class FastaOutputWriter extends AbstractOutputWriter {
 			bw.write(prot.getDomainScoreCalculator().getVectorSpaceModel()+ "\n");
 			for (String blastDb : prot.getBlastResults().keySet()) {
 				for (BlastResult br : prot.getBlastResults().get(blastDb)) {
-			System.out.println(br.getDomainWeights());
+					bw.write(br.getDomainWeights()+ "\n");
 		      }
 		}
 			/*if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null)
