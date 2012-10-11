@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -276,11 +278,11 @@ public class AHRD {
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
 				System.out.println(prot.getDomainScoreCalculator().getVectorSpaceModel());
 				System.out.println(prot.getDomainWeights());
-				for (String blastDb : prot.getBlastResults().keySet()) {
+				/*for (String blastDb : prot.getBlastResults().keySet()) {
 					for (BlastResult br : prot.getBlastResults().get(blastDb)) {
 				System.out.println(br.getDomainWeights());
 			      }
-			}
+			}*/
 					
 			// Tokenize each BlastResult's Description-Line and
 			// assign the Tokens their Scores:
