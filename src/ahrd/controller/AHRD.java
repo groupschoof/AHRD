@@ -273,8 +273,12 @@ public class AHRD {
 			// Having selected those BlastResults to be description candidates,
 			// now is the moment for computation of the domain similarity
 			// scores:
+			System.out.println(getSettings().getPathToDomainWeightsDatabase());
+			System.out.println(getSettings().hasInterproAnnotations());
+			System.out.println(prot.getInterproResults());
 			if (getSettings().isToComputeDomainSimilarities()
 					&& prot.hasDomainAnnotation()) {
+			
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
 				System.out.println(prot.getAccession());
 				System.out.println(prot.getDomainScoreCalculator().getVectorSpaceModel());
