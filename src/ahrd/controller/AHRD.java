@@ -279,7 +279,6 @@ public class AHRD {
 			System.out.println(prot.getInterproResults());
 			if (getSettings().isToComputeDomainSimilarities()
 					&& prot.hasDomainAnnotation()) {
-			
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
 				System.out.println(prot.getAccession());
 				System.out.println(prot.getDomainScoreCalculator().getVectorSpaceModel());
