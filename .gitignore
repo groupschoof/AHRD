@@ -1,5 +1,5 @@
 # Ignore everything in directory ./classes 
-classes/**/*
+classes
 
 # Ignore Batcher-Tests:
 start_ahrd_batched.sh
