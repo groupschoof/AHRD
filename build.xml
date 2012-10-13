@@ -49,6 +49,18 @@
 		</javac>
 	</target>
 
+	<target name="compile.debug" description="compile AHRD to enable debugging">
+		<javac srcdir="${src}" destdir="${classes}" includeAntRuntime="yes" nowarn="off" debug="true">
+			<compilerarg value="-Xlint:unchecked" />
+			<classpath refid="classpath.compile" />
+		</javac>
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist}" />
+		<unzip dest="${classes}">
+			<fileset dir="${lib}" />
+		</unzip>
+	</target>
+
 	<target name="dist" depends="compile" description="generate the distribution">
 		<!-- Create the distribution directory -->
 		<mkdir dir="${dist}" />
