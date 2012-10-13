@@ -50,6 +50,10 @@
 	</target>
 
 	<target name="compile.debug" description="compile AHRD to enable debugging">
+		<mkdir dir="${classes}" />
+		<delete>
+			<fileset dir="${classes}" />
+		</delete>
 		<javac srcdir="${src}" destdir="${classes}" includeAntRuntime="yes" nowarn="off" debug="true">
 			<compilerarg value="-Xlint:unchecked" />
 			<classpath refid="classpath.compile" />
