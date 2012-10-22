@@ -278,11 +278,11 @@ public class AHRD {
 			if (getSettings().isToComputeDomainSimilarities()
 					&& prot.hasDomainAnnotation()) {
 				System.out.println(prot.getAccession());
-				try{
+				//try{
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
-				} catch (MissingInterproResultException e) {
+				/*} catch (MissingInterproResultException e) {
 						e.printStackTrace(System.err);
-				}
+				}*/
 				System.out.println(prot.getDomainScoreCalculator().getVectorSpaceModel());
 				System.out.println(prot.getDomainWeights());
 				for (String blastDb : prot.getBlastResults().keySet()) {
