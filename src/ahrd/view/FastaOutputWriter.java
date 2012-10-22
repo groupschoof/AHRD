@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 
-import ahrd.model.BlastResult;
 import ahrd.model.Protein;
 
 public class FastaOutputWriter extends AbstractOutputWriter {

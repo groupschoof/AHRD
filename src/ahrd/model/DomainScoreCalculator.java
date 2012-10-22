@@ -206,7 +206,7 @@ public class DomainScoreCalculator {
 	public static Double getDomainWeight(Protein prot, String domainAccession)
 			throws MissingInterproResultException {
 		Double dw = 0.0;
-		
+		try {
 			if (getSettings()
 					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
 				if (prot.getPfamResults().contains(domainAccession)) {
@@ -228,8 +228,11 @@ public class DomainScoreCalculator {
 				if (prot.getInterproResults().contains(ipr))
 					dw = ipr.getDomainWeight();
 			}
-
-		
+		} catch (NullPointerException npe) {
+			System.err.println("ERROR: Protein = '" + prot.getAccession()
+					+ "', domain-accession = '" + domainAccession + "'");
+			npe.printStackTrace(System.err);
+		}
 		return dw;
 	}
 
@@ -251,30 +254,38 @@ public class DomainScoreCalculator {
 	public static Double getDomainWeight(BlastResult br, String domainAccession)
 			throws MissingInterproResultException {
 		Double dw = 0.0;
-		if (getSettings()
-				.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
-			if (getBlastResultAccessionsToPfamIds().containsKey(
-					br.getAccession())
-					&& getBlastResultAccessionsToPfamIds().get(
-							br.getAccession()).contains(domainAccession)) {
-				dw = InterproResult.getPfamDomainWeights().get(domainAccession);
-				if (dw == null)
+		try {
+			if (getSettings()
+					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
+				if (getBlastResultAccessionsToPfamIds().containsKey(
+						br.getAccession())
+						&& getBlastResultAccessionsToPfamIds().get(
+								br.getAccession()).contains(domainAccession)) {
+					dw = InterproResult.getPfamDomainWeights().get(
+							domainAccession);
+					if (dw == null)
+						throw new MissingInterproResultException(
+								"Could not find domain weight for Pfam Entry '"
+										+ domainAccession
+										+ "'in memory database.");
+				}
+			} else {
+				InterproResult ipr = InterproResult.getInterproDb().get(
+						domainAccession);
+				if (ipr == null)
 					throw new MissingInterproResultException(
-							"Could not find domain weight for Pfam Entry '"
-									+ domainAccession + "'in memory database.");
+							"Could not find Interpro-Entry '" + domainAccession
+									+ "' in memory database.");
+				if (getBlastResultAccessionsToInterproIds().containsKey(
+						br.getAccession())
+						&& getBlastResultAccessionsToInterproIds().get(
+								br.getAccession()).contains(domainAccession))
+					dw = ipr.getDomainWeight();
 			}
-		} else {
-			InterproResult ipr = InterproResult.getInterproDb().get(
-					domainAccession);
-			if (ipr == null)
-				throw new MissingInterproResultException(
-						"Could not find Interpro-Entry '" + domainAccession
-								+ "' in memory database.");
-			if (getBlastResultAccessionsToInterproIds().containsKey(
-					br.getAccession())
-					&& getBlastResultAccessionsToInterproIds().get(
-							br.getAccession()).contains(domainAccession))
-				dw = ipr.getDomainWeight();
+		} catch (NullPointerException npe) {
+			System.err.println("ERROR! BlastResult = '" + br.getAccession()
+					+ "', domain-accession = '" + domainAccession + "'");
+			npe.printStackTrace(System.err);
 		}
 		return dw;
 	}
