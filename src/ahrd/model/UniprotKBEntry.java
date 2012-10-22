@@ -55,6 +55,10 @@ public class UniprotKBEntry {
 					DomainScoreCalculator.getBlastResultAccessionsToPfamIds()
 							.put(result.getAccession(),
 									result.getPfamAnnotations());
+					// Debug:
+					System.out
+							.println("Successfully loaded Domain Annotations from Uniprot for accession '"
+									+ this.accession + "'.");
 				} catch (Exception e) {
 					System.err
 							.println("Failed to access Uniprot RESTful Web Service with URL '"

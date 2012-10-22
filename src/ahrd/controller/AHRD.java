@@ -188,7 +188,7 @@ public class AHRD {
 		for (String accession : accessions) {
 			uniprotLoaders.add(new UniprotKBEntry.ParallelLoader(accession));
 		}
-		// Execute all josb in parallel and await their termination:
+		// Execute all jobs in parallel and await their termination:
 		threadPool.invokeAll(uniprotLoaders);
 		// Assure shutdown of jobs even in case of exceptions keeping them
 		// running:
@@ -277,25 +277,27 @@ public class AHRD {
 			System.out.println(prot.getInterproResults());
 			if (getSettings().isToComputeDomainSimilarities()
 					&& prot.hasDomainAnnotation()) {
-				System.out.println(prot.getAccession());
-
-				//try{
-				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
-				/*} catch (MissingInterproResultException e) {
-						e.printStackTrace(System.err);
-				}*/
+				System.out.println("Protein Accession: " + prot.getAccession());
 
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
-				}
 
-				System.out.println(prot.getDomainScoreCalculator().getVectorSpaceModel());
-				System.out.println(prot.getDomainWeights());
+				System.out
+						.println("Vector Space Model: "
+								+ prot.getDomainScoreCalculator()
+										.getVectorSpaceModel());
+				System.out.println("Protein's Domain Weights Vector (DWV): "
+						+ prot.getDomainWeights());
 				for (String blastDb : prot.getBlastResults().keySet()) {
 					for (BlastResult br : prot.getBlastResults().get(blastDb)) {
-				System.out.println(br.getDomainWeights());
-			      }
+						System.out.println("BlastResult '" + br.getAccession()
+								+ "' DWV: " + br.getDomainWeights());
+						System.out
+								.println("Above BlastResult's Domain Architecture Similarity Score: "
+										+ br.getDomainSimilarityScore());
+					}
+				}
 			}
-					
+
 			// Tokenize each BlastResult's Description-Line and
 			// assign the Tokens their Scores:
 			// tokenizeBlastResultDescriptionLines(prot);
@@ -310,9 +312,8 @@ public class AHRD {
 			// filter for each protein's most-informative
 			// interpro-results
 			InterproResult.filterForMostInforming(prot);
-		 }
 		}
-	
+	}
 
 	public Map<String, Protein> getProteins() {
 		return proteins;
