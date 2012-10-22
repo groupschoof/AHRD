@@ -183,7 +183,14 @@ public class AHRD {
 				}
 			}
 		}
-		ExecutorService threadPool = Executors.newFixedThreadPool(50);
+		// Download in parallel or in a serial manner?
+		int numberOfParallelDownloads = getSettings()
+				.getSerialDownloadDomainAnnotations() ? 50 : 1;
+		// Debug:
+		System.out.println("Number of parallel downloads from Uniprot: "
+				+ numberOfParallelDownloads);
+		ExecutorService threadPool = Executors
+				.newFixedThreadPool(numberOfParallelDownloads);
 		Collection<Callable<Boolean>> uniprotLoaders = new ArrayList<Callable<Boolean>>();
 		for (String accession : accessions) {
 			uniprotLoaders.add(new UniprotKBEntry.ParallelLoader(accession));

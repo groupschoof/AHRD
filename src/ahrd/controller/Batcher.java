@@ -214,6 +214,13 @@ public class Batcher {
 				batchYml.put(Settings.DOMAIN_WEIGHTS_POSITION_KEY, getInput()
 						.get(Settings.DOMAIN_WEIGHTS_POSITION_KEY));
 			}
+			// Download Domain Annotations in a serial manner?:
+			if (getInput().get(Settings.SERIAL_DOWNLOAD_DOMAIN_ANNOTATIONS_KEY) != null) {
+				batchYml.put(
+						Settings.SERIAL_DOWNLOAD_DOMAIN_ANNOTATIONS_KEY,
+						getInput()
+								.get(Settings.SERIAL_DOWNLOAD_DOMAIN_ANNOTATIONS_KEY));
+			}
 			if (getInput().get(
 					Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null) {
 				batchYml.put(

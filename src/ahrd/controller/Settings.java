@@ -80,6 +80,7 @@ public class Settings implements Cloneable {
 	public static final String DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "description_score_domain_similarity_weight";
 	public static final String TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "token_score_domain_similarity_weight";
 	public static final String WRITE_DOMAIN_ARCHITECTURE_SIMILARITY_SCORES_TO_OUTPUT = "write_domain_architecture_similarity_scores_to_output";
+	public static final String SERIAL_DOWNLOAD_DOMAIN_ANNOTATIONS_KEY = "serial_download_domain_annotations";
 
 	/**
 	 * Fields:
@@ -216,6 +217,12 @@ public class Settings implements Cloneable {
 	 * Position of tab delimited table to look up the domain weight:
 	 */
 	private Integer domainWeightTablePosition = 7;
+	/**
+	 * If Uniprot's Web Service is quite slow due to much load, we recommend
+	 * downloading the Blast-Result's Domain Annotations in a serial approach,
+	 * not in parallel.
+	 */
+	private Boolean serialDownloadDomainAnnotations = false;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -243,6 +250,10 @@ public class Settings implements Cloneable {
 		setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
 		setPathToDomainWeightsDatabase((String) input
 				.get(DOMAIN_WEIGHTS_DATABASE));
+		if (input.get(SERIAL_DOWNLOAD_DOMAIN_ANNOTATIONS_KEY) != null
+				&& Boolean.parseBoolean((String) input
+						.get(SERIAL_DOWNLOAD_DOMAIN_ANNOTATIONS_KEY)))
+			setSerialDownloadDomainAnnotations(true);
 		if (input.get(DOMAIN_WEIGHTS_POSITION_KEY) != null)
 			setDomainWeightTablePosition(Integer.parseInt((String) input
 					.get(DOMAIN_WEIGHTS_POSITION_KEY)));
@@ -869,6 +880,15 @@ public class Settings implements Cloneable {
 
 	public void setDomainWeightTablePosition(Integer domainWeightTablePosition) {
 		this.domainWeightTablePosition = domainWeightTablePosition;
+	}
+
+	public Boolean getSerialDownloadDomainAnnotations() {
+		return serialDownloadDomainAnnotations;
+	}
+
+	public void setSerialDownloadDomainAnnotations(
+			Boolean serialDownloadDomainAnnotations) {
+		this.serialDownloadDomainAnnotations = serialDownloadDomainAnnotations;
 	}
 
 }
