@@ -226,7 +226,7 @@ public class Utils {
 	public static Set<String> retrieveAttribteValuesOfXmlChildrenElements(
 			Element element, String xpathQuery, String attributeName,
 			XPathContext context) {
-		Set<String> res = null;
+		Set<String> res = new HashSet<String>();
 		Nodes resultNodes = element.query(xpathQuery, context);
 		if (resultNodes.size() > 0) {
 			res = new HashSet<String>();

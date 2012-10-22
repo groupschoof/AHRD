@@ -277,7 +277,8 @@ public class DomainScoreCalculator {
 							"Could not find Interpro-Entry '" + domainAccession
 									+ "' in memory database.");
 				if (getBlastResultAccessionsToInterproIds().containsKey(
-						br.getAccession())
+						br.getAccession()) && getBlastResultAccessionsToInterproIds().get(
+								br.getAccession()) != null
 						&& getBlastResultAccessionsToInterproIds().get(
 								br.getAccession()).contains(domainAccession))
 					dw = ipr.getDomainWeight();
