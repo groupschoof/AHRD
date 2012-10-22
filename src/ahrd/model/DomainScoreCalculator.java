@@ -206,7 +206,7 @@ public class DomainScoreCalculator {
 	public static Double getDomainWeight(Protein prot, String domainAccession)
 			throws MissingInterproResultException {
 		Double dw = 0.0;
-		try {
+		//try {
 			if (getSettings()
 					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
 				if (prot.getPfamResults().contains(domainAccession)) {
@@ -229,10 +229,10 @@ public class DomainScoreCalculator {
 					dw = ipr.getDomainWeight();
 			}
 
-		} catch (Exception e) {
-			System.out.println(prot.getAccession() + domainAccession);
-
-		}
+//		} catch (Exception e) {
+//			System.out.println(prot.getAccession() + domainAccession);
+//
+//		}
 		return dw;
 	}
 
