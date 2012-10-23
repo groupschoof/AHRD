@@ -201,11 +201,10 @@ public class DomainScoreCalculator {
 	 * @return Double - 0.0 is returned to avoid NullPointerExceptions, in case
 	 *         the InterPro Entry could be found, but it had a NULL domain
 	 *         weight.
-	 * @throws MissingInterproResultException
 	 */
-	public static Double getDomainWeight(Protein prot, String domainAccession)
-			throws MissingInterproResultException {
+	public static Double getDomainWeight(Protein prot, String domainAccession) {
 		Double dw = 0.0;
+		Set<String> missingIprIds = new HashSet<String>();
 		try {
 			if (getSettings()
 					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
@@ -213,19 +212,14 @@ public class DomainScoreCalculator {
 					dw = InterproResult.getPfamDomainWeights().get(
 							domainAccession);
 					if (dw == null)
-						throw new MissingInterproResultException(
-								"Could not find domain weight for Pfam Entry '"
-										+ domainAccession
-										+ "'in memory database.");
+						missingIprIds.add(domainAccession);
 				}
 			} else {
 				InterproResult ipr = InterproResult.getInterproDb().get(
 						domainAccession);
 				if (ipr == null)
-					throw new MissingInterproResultException(
-							"Could not find Interpro-Entry '" + domainAccession
-									+ "' in memory database.");
-				if (prot.getInterproResults().contains(ipr))
+					missingIprIds.add(domainAccession);
+				else if (prot.getInterproResults().contains(ipr))
 					dw = ipr.getDomainWeight();
 			}
 		} catch (NullPointerException npe) {
@@ -233,6 +227,11 @@ public class DomainScoreCalculator {
 					+ "', domain-accession = '" + domainAccession + "'");
 			npe.printStackTrace(System.err);
 		}
+		// Warn about missing InterPro IDs:
+		if (!missingIprIds.isEmpty())
+			System.err
+					.println("WARNING. The following InterPro IDs could not be found in the memory database:\n"
+							+ missingIprIds);
 		return dw;
 	}
 
@@ -249,11 +248,10 @@ public class DomainScoreCalculator {
 	 * @return Double - 0.0 is returned to avoid NullPointerExceptions, in case
 	 *         the InterPro Entry could be found, but it had a NULL domain
 	 *         weight.
-	 * @throws MissingInterproResultException
 	 */
-	public static Double getDomainWeight(BlastResult br, String domainAccession)
-			throws MissingInterproResultException {
+	public static Double getDomainWeight(BlastResult br, String domainAccession) {
 		Double dw = 0.0;
+		Set<String> missingInterProIds = new HashSet<String>();
 		try {
 			if (getSettings()
 					.isDomainArchitectureSimilarityBasedOnPfamAnnotations()) {
@@ -264,20 +262,16 @@ public class DomainScoreCalculator {
 					dw = InterproResult.getPfamDomainWeights().get(
 							domainAccession);
 					if (dw == null)
-						throw new MissingInterproResultException(
-								"Could not find domain weight for Pfam Entry '"
-										+ domainAccession
-										+ "'in memory database.");
+						missingInterProIds.add(domainAccession);
 				}
 			} else {
 				InterproResult ipr = InterproResult.getInterproDb().get(
 						domainAccession);
 				if (ipr == null)
-					throw new MissingInterproResultException(
-							"Could not find Interpro-Entry '" + domainAccession
-									+ "' in memory database.");
+					missingInterProIds.add(domainAccession);
 				if (getBlastResultAccessionsToInterproIds().containsKey(
-						br.getAccession()) && getBlastResultAccessionsToInterproIds().get(
+						br.getAccession())
+						&& getBlastResultAccessionsToInterproIds().get(
 								br.getAccession()) != null
 						&& getBlastResultAccessionsToInterproIds().get(
 								br.getAccession()).contains(domainAccession))
@@ -288,6 +282,11 @@ public class DomainScoreCalculator {
 					+ "', domain-accession = '" + domainAccession + "'");
 			npe.printStackTrace(System.err);
 		}
+		// Warn about missing InterPro Entries:
+		if (!missingInterProIds.isEmpty())
+			System.err
+					.println("WARNING. The following InterPro IDs could not be found in the memory database:\n"
+							+ missingInterProIds);
 		return dw;
 	}
 
