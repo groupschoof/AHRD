@@ -269,7 +269,7 @@ public class DomainScoreCalculator {
 						domainAccession);
 				if (ipr == null)
 					missingInterProIds.add(domainAccession);
-				if (getBlastResultAccessionsToInterproIds().containsKey(
+				else if (getBlastResultAccessionsToInterproIds().containsKey(
 						br.getAccession())
 						&& getBlastResultAccessionsToInterproIds().get(
 								br.getAccession()) != null
