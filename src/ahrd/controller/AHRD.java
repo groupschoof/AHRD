@@ -185,7 +185,7 @@ public class AHRD {
 		}
 		// Download in parallel or in a serial manner?
 		int numberOfParallelDownloads = getSettings()
-				.getSerialDownloadDomainAnnotations() ? 50 : 1;
+				.getSerialDownloadDomainAnnotations() ? 1 : 50;
 		// Debug:
 		System.out.println("Number of parallel downloads from Uniprot: "
 				+ numberOfParallelDownloads);
