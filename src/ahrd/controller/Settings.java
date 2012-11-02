@@ -49,6 +49,7 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_BLACKLIST_KEY = "token_blacklist";
 	public static final String INTERPRO_DATABASE_KEY = "interpro_database";
 	public static final String INTERPRO_RESULT_KEY = "interpro_result";
+	public static final String BLAST_RESULT_DOMAIN_ANNOTATION_FILE_KEY = "blast_results_domain_annotation_file";
 	public static final String DOMAIN_WEIGHTS_DATABASE = "domain_weights_database";
 	public static final String DOMAIN_WEIGHTS_POSITION_KEY = "domain_weights_table_position";
 	public static final String COMPUTE_DOMAIN_SIMILARITY_ON_KEY = "compute_domain_similarity_on";
@@ -89,6 +90,7 @@ public class Settings implements Cloneable {
 	private String pathToReferencesFasta;
 	private String pathToInterproDatabase;
 	private String pathToInterproResults;
+	private String pathToBlastResultsDomainAnnotation;
 	private String pathToGeneOntologyResults;
 	private String pathToOutput;
 	/**
@@ -183,17 +185,6 @@ public class Settings implements Cloneable {
 	 */
 	private String pathToDomainWeightsDatabase;
 	/**
-	 * Path to interproscan results of the Proteins referenced in the BlastHits.
-	 * This data is needed for the Domain-Scoring.
-	 */
-	private String pathToInterproResults4BlastHits;
-	/**
-	 * Path to Pfam results of the Proteins ireferenced in BlastHts. This data
-	 * is needed for the Domain-Scoring.
-	 */
-	private String pathToPfamResults4BlastHits;
-
-	/**
 	 * The configurable weight for the fraction a BlastResult's domain weight
 	 * similarity score is going to assume in the final token score.
 	 */
@@ -259,6 +250,9 @@ public class Settings implements Cloneable {
 					.get(DOMAIN_WEIGHTS_POSITION_KEY)));
 		setComputeDomainSimilarityOn((String) input
 				.get(COMPUTE_DOMAIN_SIMILARITY_ON_KEY));
+		if (input.get(BLAST_RESULT_DOMAIN_ANNOTATION_FILE_KEY) != null)
+			setPathToBlastResultsDomainAnnotation((String) input
+					.get(BLAST_RESULT_DOMAIN_ANNOTATION_FILE_KEY));
 		if (input.get(TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null)
 			setTokenScoreDomainSimilarityWeight(Double
 					.parseDouble((String) input
@@ -814,24 +808,6 @@ public class Settings implements Cloneable {
 		this.pathToDomainWeightsDatabase = pathToDomainWeightsDatabase;
 	}
 
-	public String getPathToInterproResults4BlastHits() {
-		return pathToInterproResults4BlastHits;
-	}
-
-	public void setPathToInterproResults4BlastHits(
-			String pathToInterproResults4BlastHits) {
-		this.pathToInterproResults4BlastHits = pathToInterproResults4BlastHits;
-	}
-
-	public String getPathToPfamResults4BlastHits() {
-		return pathToPfamResults4BlastHits;
-	}
-
-	public void setPathToPfamResults4BlastHits(
-			String pathToPfamResults4BlastHits) {
-		this.pathToPfamResults4BlastHits = pathToPfamResults4BlastHits;
-	}
-
 	public Double getTokenScoreDomainSimilarityWeight() {
 		return tokenScoreDomainSimilarityWeight;
 	}
@@ -891,4 +867,30 @@ public class Settings implements Cloneable {
 		this.serialDownloadDomainAnnotations = serialDownloadDomainAnnotations;
 	}
 
+	public String getPathToBlastResultsDomainAnnotation() {
+		return pathToBlastResultsDomainAnnotation;
+	}
+
+	public void setPathToBlastResultsDomainAnnotation(
+			String pathToBlastResultsDomainAnnotation) {
+		this.pathToBlastResultsDomainAnnotation = pathToBlastResultsDomainAnnotation;
+	}
+
+	/**
+	 * Should the Domain Annotations for the Blast Hits be downloaded by AHRD or
+	 * did the User provide an annotation file?
+	 */
+	public boolean useLocalBlastResultsDomainAnnotations() {
+		boolean out = false;
+		if (getPathToBlastResultsDomainAnnotation() != null) {
+			out = new File(getPathToBlastResultsDomainAnnotation()).exists();
+			if (!out)
+				System.err.println("WARNING: Found parameter '"
+						+ BLAST_RESULT_DOMAIN_ANNOTATION_FILE_KEY
+						+ "' set to '"
+						+ getPathToBlastResultsDomainAnnotation()
+						+ "' but file is not readable!");
+		}
+		return out;
+	}
 }

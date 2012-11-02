@@ -168,6 +168,11 @@ public class TrainerBatcher extends Batcher {
 					getInput().get(
 							Settings.SERIAL_DOWNLOAD_DOMAIN_ANNOTATIONS_KEY));
 		}
+		if (getInput().get(Settings.BLAST_RESULT_DOMAIN_ANNOTATION_FILE_KEY) != null)
+			batchYml.put(
+					Settings.BLAST_RESULT_DOMAIN_ANNOTATION_FILE_KEY,
+					getInput().get(
+							Settings.BLAST_RESULT_DOMAIN_ANNOTATION_FILE_KEY));
 		if (getInput().get(Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY) != null) {
 			batchYml.put(
 					Settings.TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY,

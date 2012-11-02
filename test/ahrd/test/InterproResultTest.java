@@ -1,21 +1,22 @@
 package ahrd.test;
 
+import static ahrd.controller.Settings.getSettings;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.Map;
-
-import static junit.framework.Assert.*;
-import static ahrd.controller.Settings.getSettings;
 
 import nu.xom.ParsingException;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import ahrd.exception.MissingInterproResultException;
+import ahrd.exception.MissingProteinException;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
-
-import ahrd.exception.MissingProteinException;
-import ahrd.exception.MissingInterproResultException;
 
 public class InterproResultTest {
 
@@ -192,4 +193,5 @@ public class InterproResultTest {
 		assertEquals("Domain", ir.getType());
 		assertEquals(0.666, ir.getDomainWeight(), 0.0);
 	}
+	
 }

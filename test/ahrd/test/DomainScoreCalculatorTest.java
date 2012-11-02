@@ -1,7 +1,9 @@
 package ahrd.test;
 
+import static ahrd.controller.Settings.getSettings;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -192,4 +194,59 @@ public class DomainScoreCalculatorTest {
 		assertEquals(0.0, dws, 0.0);
 	}
 
+	@Test
+	public void testParseBlastResultsDomainAnnotations() throws IOException {
+		// Setup
+		DomainScoreCalculator
+				.setBlastResultAccessionsToInterproIds(new HashMap<String, Set<String>>());
+		DomainScoreCalculator
+				.setBlastResultAccessionsToPfamIds(new HashMap<String, Set<String>>());
+		getSettings().setComputeDomainSimilarityOn("interpro");
+		getSettings().setPathToBlastResultsDomainAnnotation(
+				"./test/resources/blast_results_domain_annotations_1.tbl");
+		// Test
+		DomainScoreCalculator.parseBlastResultsDomainAnnotations();
+		assertTrue(
+				"Should have loaded some Blast Hit Accessions to Domain Annotation Mappings.",
+				!DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.isEmpty());
+	}
+
+	@Test
+	public void testParseDomainAnnotationLine() {
+		// Setup
+		getSettings().setComputeDomainSimilarityOn("interpro");
+		String iprAnno1 = "\"SHEEP\" \"IPR000666\"";
+		String iprAnno2 = "GOAT IPR000999";
+		// Test
+		DomainScoreCalculator.parseDomainAnnotationLine(iprAnno1);
+		DomainScoreCalculator.parseDomainAnnotationLine(iprAnno2);
+		assertTrue("Should have parsed two InterPro Domain Annotations.",
+				!DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.isEmpty());
+		assertTrue("IPR000666 should have been annotated",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.get("SHEEP").contains("IPR000666"));
+		assertTrue("IPR000999 should have been annotated",
+				DomainScoreCalculator.getBlastResultAccessionsToInterproIds()
+						.get("GOAT").contains("IPR000999"));
+		// Setup
+		getSettings().setComputeDomainSimilarityOn("pfam");
+		String pfamAnno1 = "\"SHEEP\" \"PF12345\"";
+		String pfamAnno2 = "GOAT PF54321";
+		// Test
+		DomainScoreCalculator.parseDomainAnnotationLine(pfamAnno1);
+		DomainScoreCalculator.parseDomainAnnotationLine(pfamAnno2);
+		assertTrue("Should have parsed two PFam Domain Annotations.",
+				!DomainScoreCalculator.getBlastResultAccessionsToPfamIds()
+						.isEmpty());
+		assertTrue(
+				"PF12345 should have been annotated",
+				DomainScoreCalculator.getBlastResultAccessionsToPfamIds()
+						.get("SHEEP").contains("PF12345"));
+		assertTrue(
+				"PF54321 should have been annotated",
+				DomainScoreCalculator.getBlastResultAccessionsToPfamIds()
+						.get("GOAT").contains("PF54321"));
+	}
 }

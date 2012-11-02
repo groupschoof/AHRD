@@ -2,6 +2,10 @@ package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,6 +30,9 @@ import ahrd.exception.MissingInterproResultException;
  */
 public class DomainScoreCalculator {
 
+	public static final String INTER_PRO_REGEX = "(\\S+).*\"*(IPR\\d{6})\"*";
+	public static final String PFAM_REGEX = "(\\S+).*\"*(PF\\d{5})\"*";
+
 	/**
 	 * Result from parsing SIMAP's concatenated and preprocessed feature-files.
 	 * Preprocessing involves substitution of SIMAP-Hashes with the original
@@ -46,6 +53,51 @@ public class DomainScoreCalculator {
 	private SortedSet<String> vectorSpaceModel;
 	private Map<String, Double> cumulativeTokenDomainSimilarityScores = new HashMap<String, Double>();
 	private Double totalTokenDomainSimilarityScore = 0.0;
+
+	public static void parseBlastResultsDomainAnnotations() throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(new File(
+				getSettings().getPathToBlastResultsDomainAnnotation())));
+		String iterLine = null;
+		while ((iterLine = br.readLine()) != null) {
+			parseDomainAnnotationLine(iterLine);
+		}
+	}
+
+	/**
+	 * Parses a single line of either InterPro or PFam Annotation file. Puts the
+	 * parsed result in the appropriate memory database
+	 * 'BlastResultAccessionsToInterproIds' or 'BlastResultAccessionsToPfamIds'
+	 * respectively.
+	 * 
+	 * @param line
+	 */
+	public static void parseDomainAnnotationLine(String line) {
+		String regEx = null;
+		Map<String, Set<String>> memoryDb = null;
+		if (getSettings().getComputeDomainSimilarityOn().equalsIgnoreCase(
+				"interpro")) {
+			regEx = INTER_PRO_REGEX;
+			memoryDb = getBlastResultAccessionsToInterproIds();
+		} else if (getSettings().getComputeDomainSimilarityOn()
+				.equalsIgnoreCase("pfam")) {
+			regEx = PFAM_REGEX;
+			memoryDb = getBlastResultAccessionsToPfamIds();
+		}
+		String[] parseResult = InterproResult
+				.parseDomainAnnotation(line, regEx);
+		if (parseResult.length == 2) {
+			String protAcc = parseResult[0].replaceAll("\"", "");
+			// Initialize Set of domain annotations
+			if (memoryDb.get(protAcc) == null)
+				memoryDb.put(protAcc, new HashSet<String>());
+			// Add annotation to memory db
+			memoryDb.get(protAcc).add(parseResult[1]);
+		} else {
+			System.err
+					.println("WARNING: Could not parse domain annotation line:\n"
+							+ line);
+		}
+	}
 
 	/**
 	 * 

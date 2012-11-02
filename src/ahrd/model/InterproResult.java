@@ -37,6 +37,8 @@ import ahrd.exception.MissingProteinException;
  */
 public class InterproResult implements Comparable<InterproResult> {
 
+	public static final String PFAM_REGEX = "(\\S+)\\s+.*\\s(PF\\d{5})\\s.*";
+	public static final String INTER_PRO_REGEX = "(\\S+)\\s+.*\\s(IPR\\d{6})\\s.*";
 	private String id;
 	private String shortName;
 	private String name;
@@ -190,8 +192,8 @@ public class InterproResult implements Comparable<InterproResult> {
 					&& getSettings().getComputeDomainSimilarityOn() != null
 					&& getSettings().getComputeDomainSimilarityOn().equals(
 							"pfam")) {
-				String pfamRegEx = "(\\S+)\\s+.*\\s(PF\\d{5})\\s.*";
-				String[] annotation = parseDomainAnnotation(iterLine, pfamRegEx);
+				String[] annotation = parseDomainAnnotation(iterLine,
+						PFAM_REGEX);
 				if (annotation.length == 2) {
 					getProteinFromMemoryDatabase(annotation[0], proteinDb)
 							.getPfamResults().add(annotation[1]);
@@ -200,8 +202,8 @@ public class InterproResult implements Comparable<InterproResult> {
 			// In order to print out conserved protein domains for the query
 			// proteins, we need the InterPro annotations even in case we use
 			// the Pfam annotations to compute domain architecture similarities.
-			String iprRegEx = "(\\S+)\\s+.*\\s(IPR\\d{6})\\s.*";
-			String[] annotation = parseDomainAnnotation(iterLine, iprRegEx);
+			String[] annotation = parseDomainAnnotation(iterLine,
+					INTER_PRO_REGEX);
 			if (annotation.length == 2) {
 				Protein prot = getProteinFromMemoryDatabase(annotation[0],
 						proteinDb);

@@ -23,6 +23,7 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
+import ahrd.model.DomainScoreCalculator;
 import ahrd.model.GeneOntologyResult;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
@@ -154,6 +155,22 @@ public class AHRD {
 	}
 
 	/**
+	 * Initializes the memory database where the Blast Hit Accessions are mapped
+	 * to their Domain Annotations (InterPro or PFam).
+	 * 
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	public void loadBlastResultDomainAnnotations() throws InterruptedException,
+			IOException {
+		if (getSettings().useLocalBlastResultsDomainAnnotations()) {
+			DomainScoreCalculator.parseBlastResultsDomainAnnotations();
+		} else {
+			loadBlastResultDomainAnnotationFromUniprotKB();
+		}
+	}
+
+	/**
 	 * Accesses the RESTful service of UniprotKB to download all domain
 	 * annotation available for the BlastResults of all proteins currently in
 	 * the memory database, does not consider BlastResults of proteins without
@@ -186,9 +203,9 @@ public class AHRD {
 		// Download in parallel or in a serial manner?
 		int numberOfParallelDownloads = getSettings()
 				.getSerialDownloadDomainAnnotations() ? 1 : 50;
-		// Debug:
-		System.out.println("Number of parallel downloads from Uniprot: "
-				+ numberOfParallelDownloads);
+		// Info:
+		// System.out.println("Number of parallel downloads from Uniprot: "
+		// + numberOfParallelDownloads);
 		ExecutorService threadPool = Executors
 				.newFixedThreadPool(numberOfParallelDownloads);
 		Collection<Callable<Boolean>> uniprotLoaders = new ArrayList<Callable<Boolean>>();
@@ -247,7 +264,7 @@ public class AHRD {
 		if (getSettings().isToComputeDomainSimilarities()) {
 			InterproResult.parseDomainWeights();
 			// Load Domain Annotations for the BlastResults:
-			loadBlastResultDomainAnnotationFromUniprotKB();
+			loadBlastResultDomainAnnotations();
 			if (writeLogMsgs)
 				System.out.println("...parsed domain weights database in "
 						+ takeTime() + "sec, currently occupying "
@@ -278,31 +295,9 @@ public class AHRD {
 			// Having selected those BlastResults to be description candidates,
 			// now is the moment for computation of the domain similarity
 			// scores:
-			System.out.println(getSettings().getPathToDomainWeightsDatabase());
-			System.out.println(getSettings().getPathToInterproDatabase());
-			System.out.println(getSettings().hasInterproAnnotations());
-			System.out.println(prot.getInterproResults());
 			if (getSettings().isToComputeDomainSimilarities()
 					&& prot.hasDomainAnnotation()) {
-				System.out.println("Protein Accession: " + prot.getAccession());
-
 				prot.getDomainScoreCalculator().computeDomainSimilarityScores();
-
-				System.out
-						.println("Vector Space Model: "
-								+ prot.getDomainScoreCalculator()
-										.getVectorSpaceModel());
-				System.out.println("Protein's Domain Weights Vector (DWV): "
-						+ prot.getDomainWeights());
-				for (String blastDb : prot.getBlastResults().keySet()) {
-					for (BlastResult br : prot.getBlastResults().get(blastDb)) {
-						System.out.println("BlastResult '" + br.getAccession()
-								+ "' DWV: " + br.getDomainWeights());
-						System.out
-								.println("Above BlastResult's Domain Architecture Similarity Score: "
-										+ br.getDomainSimilarityScore());
-					}
-				}
 			}
 
 			// Tokenize each BlastResult's Description-Line and
