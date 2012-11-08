@@ -149,11 +149,11 @@ public class OutputWriter extends AbstractOutputWriter {
 	}
 
 	public String buildDomainWeightColumn(Protein prot) {
-		String dwc = "\t";
+		String dwc = "\tProt-Dom-Wghts: ";
 		if (prot.getDomainWeights() != null
 				&& !prot.getDomainWeights().isEmpty())
 			dwc += prot.getDomainWeights().toString();
-		dwc += "\t";
+		dwc += "\tHighScorBR-Dom-Wghts: ";
 		if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null)
 			dwc += prot.getDescriptionScoreCalculator()
 					.getHighestScoringBlastResult().getDomainSimilarityScore();
@@ -161,11 +161,10 @@ public class OutputWriter extends AbstractOutputWriter {
 	}
 
 	public String buildDomainWeightColumn(BlastResult br) {
-		String dwc = "\t";
-		if (br != null && br.getDomainWeights() != null
-				&& !br.getDomainWeights().isEmpty())
+		String dwc = "\tBR-Dom-Wights: ";
+		if (br != null && br.getDomainWeights() != null)
 			dwc += br.getDomainWeights().toString();
-		dwc += "\t";
+		dwc += "\tBR-Dom-Sim-Score: ";
 		if (br != null && br.getDomainSimilarityScore() != null)
 			dwc += FRMT.format(br.getDomainSimilarityScore());
 		return dwc;

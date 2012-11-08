@@ -375,6 +375,8 @@ public class DomainScoreCalculator {
 			for (BlastResult br : getProtein().getBlastResults().get(blastDb)) {
 				br.setDomainSimilarityScore(domainWeightSimilarity(getProtein()
 						.getDomainWeights(), br.getDomainWeights()));
+//				System.out.println(br.getAccession() + " DomScore: "
+//						+ br.getDomainSimilarityScore());
 				getProtein().getTokenScoreCalculator()
 						.measureCumulativeDomainSimilarityScores(br);
 				getProtein().getTokenScoreCalculator()

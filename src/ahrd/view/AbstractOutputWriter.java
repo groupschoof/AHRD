@@ -48,26 +48,10 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 				descLine += "Unknown protein";
 		}
 		// Interpro
-		List<InterproResult> sortedIprs = new ArrayList<InterproResult>(
-				protein.getInterproResults());
-		Collections.sort(sortedIprs);
-		for (Iterator<InterproResult> i = sortedIprs.iterator(); i.hasNext();) {
-			InterproResult ipr = i.next();
-			descLine += ipr.getId() + " (" + ipr.getName() + ")";
-			if (i.hasNext())
-				descLine += ", ";
-		}
+		descLine += interproResult(protein);
 		descLine += seperator;
 		// Gene-Ontology-Results:
-		List<GeneOntologyResult> sortedGOs = new ArrayList<GeneOntologyResult>(
-				protein.getGoResults());
-		Collections.sort(sortedGOs);
-		for (Iterator<GeneOntologyResult> i = sortedGOs.iterator(); i.hasNext();) {
-			GeneOntologyResult gor = i.next();
-			descLine += gor.getAcc() + " (" + gor.getName() + ")";
-			if (i.hasNext())
-				descLine += ", ";
-		}
+		descLine += geneOntologyAnnotations(protein);
 		return descLine;
 	}
 
@@ -85,7 +69,7 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 	 * 
 	 * @return the quality code
 	 */
-	public String qualityCode(Protein p) {
+	public static String qualityCode(Protein p) {
 		BlastResult hsbr = p.getDescriptionScoreCalculator()
 				.getHighestScoringBlastResult();
 		String qc = "";
@@ -114,6 +98,34 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 
 	public void setProteins(Collection<Protein> proteins) {
 		this.proteins = proteins;
+	}
+
+	public static String interproResult(Protein protein) {
+		String descLine = "";
+		List<InterproResult> sortedIprs = new ArrayList<InterproResult>(
+				protein.getInterproResults());
+		Collections.sort(sortedIprs);
+		for (Iterator<InterproResult> i = sortedIprs.iterator(); i.hasNext();) {
+			InterproResult ipr = i.next();
+			descLine += ipr.getId() + " (" + ipr.getName() + ")";
+			if (i.hasNext())
+				descLine += ", ";
+		}
+		return descLine;
+	}
+
+	public static String geneOntologyAnnotations(Protein protein) {
+		String descLine = "";
+		List<GeneOntologyResult> sortedGOs = new ArrayList<GeneOntologyResult>(
+				protein.getGoResults());
+		Collections.sort(sortedGOs);
+		for (Iterator<GeneOntologyResult> i = sortedGOs.iterator(); i.hasNext();) {
+			GeneOntologyResult gor = i.next();
+			descLine += gor.getAcc() + " (" + gor.getName() + ")";
+			if (i.hasNext())
+				descLine += ", ";
+		}
+		return descLine;
 	}
 
 }
