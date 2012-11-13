@@ -8,13 +8,13 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
-import ahrd.view.OutputWriter;
+import ahrd.view.IOutputWriter;
 
 public class Evaluator extends AHRD {
 
 	public Evaluator(String pathToInputYml) throws IOException {
 		super(pathToInputYml);
-		}
+	}
 
 	public void setupReferences() throws IOException, MissingAccessionException {
 		String[] fastaEntries = getSettings().getReferencesFasta().split(">");
@@ -74,7 +74,8 @@ public class Evaluator extends AHRD {
 			if (getSettings().doFindHighestPossibleEvaluationScore())
 				evaluator.findHighestPossibleEvaluationScores();
 			// Generate Output:
-			OutputWriter ow = new OutputWriter(evaluator.getProteins().values());
+			IOutputWriter ow = initializeOutputWriter(evaluator.getProteins()
+					.values());
 			ow.writeOutput();
 			System.out.println("Written output into:\n"
 					+ getSettings().getPathToOutput());

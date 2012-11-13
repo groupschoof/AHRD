@@ -96,6 +96,7 @@
 			</batchtest>
 		</junit>
 		<delete file="test/ahrd_output.csv" />
+		<!--delete file="test/ahrd_output.xml" /-->
 		<delete file="test/sim_anneal_path_log.csv" />
 	</target>
 

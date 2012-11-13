@@ -31,6 +31,7 @@ import ahrd.model.UniprotKBEntry;
 import ahrd.view.FastaOutputWriter;
 import ahrd.view.IOutputWriter;
 import ahrd.view.OutputWriter;
+import ahrd.view.JsonOutputWriter;
 
 public class AHRD {
 
@@ -91,9 +92,13 @@ public class AHRD {
 	public static IOutputWriter initializeOutputWriter(
 			Collection<Protein> proteins) {
 		IOutputWriter ow = null;
-		if (getSettings().doOutputFasta())
+		if (getSettings().getOutputFormat() != null
+				&& getSettings().getOutputFormat().equalsIgnoreCase("fasta")) {
 			ow = new FastaOutputWriter(proteins);
-		else
+		} else if (getSettings().getOutputFormat() != null
+				&& getSettings().getOutputFormat().equalsIgnoreCase("json")) {
+			ow = new JsonOutputWriter(proteins);
+		} else
 			ow = new OutputWriter(proteins);
 		return ow;
 	}

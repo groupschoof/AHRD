@@ -145,10 +145,9 @@ public class Batcher {
 			batchYml.put(Settings.F_MEASURE_BETA_PARAM_KEY,
 					getInput().get(Settings.F_MEASURE_BETA_PARAM_KEY));
 		}
-		// Output as Fasta?
-		if (Boolean.parseBoolean((String) getInput().get(
-				Settings.OUTPUT_FASTA_KEY)))
-			batchYml.put(Settings.OUTPUT_FASTA_KEY, true);
+		// Output-Format, if not default (tab delimited values):
+		if (getInput().get(Settings.OUTPUT_FORMAT_KEY) != null)
+			batchYml.put(Settings.OUTPUT_FORMAT_KEY, true);
 
 		// Put weight-parameters:
 		batchYml.put(Settings.TOKEN_SCORE_BIT_SCORE_WEIGHT,

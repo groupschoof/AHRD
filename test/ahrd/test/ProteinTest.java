@@ -81,7 +81,7 @@ public class ProteinTest {
 	public void testProteinConstructionFromFastaWithSequence()
 			throws MissingAccessionException, IOException {
 		// Setup trigger to also remember the AA-Sequence in memory:
-		getSettings().setOutputFasta(true);
+		getSettings().setOutputFormat("fasta");
 		// NOTE: We expect this method to be called with a split String, read
 		// from a FASTA-File.
 		// The splitting is done for '>'!

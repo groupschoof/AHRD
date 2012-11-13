@@ -136,8 +136,8 @@ needs.
 
 h3. 2.5 Output:
 
-AHRD supports two different formats. The default one is a tab-delimited table.
-The other is FASTA-Format.
+AHRD supports three different formats. The default one is a tab-delimited table.
+Others are FASTA-, and XML-Format.
 
 h4. 2.5.1 Tab-Delimited Table:
 
@@ -164,12 +164,21 @@ h4. 2.5.2 Fasta-Format:
 To set AHRD to write its output in FASTA-Format set the following switch in the input.yml:
 
 <pre>
-output_fasta: true
+output_format: 'fasta'
 </pre>
 
 AHRD will write a valid FASTA-File of your query-proteins where the Header will
 be composed of the same parts as above, but here separated by whitespaces.
 
+h4. 2.5.3 XML-Format:
+
+To set AHRD to write its output in XML-Format set the following switch in the input.yml:
+
+<pre>
+output_format: 'xml'
+</pre>
+
+AHRD will write a valid XML-File.
 
 h3. 3 Algorithm:
 

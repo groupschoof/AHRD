@@ -77,7 +77,7 @@ public class Settings implements Cloneable {
 	public static final String REMEMBER_SIMULATED_ANNEALING_PATH_KEY = "remember_simulated_annealing_path";
 	public static final String P_MUTATE_SAME_PARAMETER_SCALE_KEY = "p_mutate_same_parameter_scale";
 	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
-	public static final String OUTPUT_FASTA_KEY = "output_fasta";
+	public static final String OUTPUT_FORMAT_KEY = "output_format";
 	public static final String DESCRIPTION_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "description_score_domain_similarity_weight";
 	public static final String TOKEN_SCORE_DOMAIN_SIMILARITY_WEIGHT_KEY = "token_score_domain_similarity_weight";
 	public static final String WRITE_DOMAIN_ARCHITECTURE_SIMILARITY_SCORES_TO_OUTPUT = "write_domain_architecture_similarity_scores_to_output";
@@ -178,7 +178,7 @@ public class Settings implements Cloneable {
 	/**
 	 * Write output as fasta-file?
 	 */
-	private boolean outputFasta = false;
+	private String outputFormat;
 	/**
 	 * Path to Domain-Weight file as downloadable from
 	 * http://pat.kobic.re.kr/wdac/data/domain_scores.gz
@@ -289,8 +289,9 @@ public class Settings implements Cloneable {
 		setWriteDomainArchitectureSimilarityScoresToOutput(Boolean
 				.parseBoolean((String) input
 						.get(WRITE_DOMAIN_ARCHITECTURE_SIMILARITY_SCORES_TO_OUTPUT)));
-		setOutputFasta(Boolean.parseBoolean((String) input
-				.get(OUTPUT_FASTA_KEY)));
+		// Output-Format:
+		if (input.get(OUTPUT_FORMAT_KEY) != null)
+			setOutputFormat((String) input.get(OUTPUT_FORMAT_KEY));
 		// Generate the Blacklists and Filters for each Blast-Database from
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
@@ -425,6 +426,35 @@ public class Settings implements Cloneable {
 	}
 
 	/**
+	 * Should the Domain Annotations for the Blast Hits be downloaded by AHRD or
+	 * did the User provide an annotation file?
+	 */
+	public boolean useLocalBlastResultsDomainAnnotations() {
+		boolean out = false;
+		if (getPathToBlastResultsDomainAnnotation() != null) {
+			out = new File(getPathToBlastResultsDomainAnnotation()).exists();
+			if (!out)
+				System.err.println("WARNING: Found parameter '"
+						+ BLAST_RESULT_DOMAIN_ANNOTATION_FILE_KEY
+						+ "' set to '"
+						+ getPathToBlastResultsDomainAnnotation()
+						+ "' but file is not readable!");
+		}
+		return out;
+	}
+
+	/**
+	 * TRUE if and only if output format has been set to <i>fasta</i>. Ignores
+	 * case when comparing value.
+	 * 
+	 * @return boolean
+	 */
+	public boolean doOutputFasta() {
+		return getOutputFormat() != null
+				&& getOutputFormat().equalsIgnoreCase("fasta");
+	}
+
+	/**
 	 * Break with the classic simulated annealing approach and remember each
 	 * visited Parameter-Set and its score. This enables speeding up the
 	 * optimization with the drawback of higher memory usage.
@@ -520,7 +550,7 @@ public class Settings implements Cloneable {
 		return readFile(getPathToProteinsFasta());
 	}
 
-	private String getPathToReferencesFasta() {
+	public String getPathToReferencesFasta() {
 		return pathToReferencesFasta;
 	}
 
@@ -736,14 +766,6 @@ public class Settings implements Cloneable {
 		this.parameters = parameters;
 	}
 
-	public boolean doOutputFasta() {
-		return outputFasta;
-	}
-
-	public void setOutputFasta(boolean outputFasta) {
-		this.outputFasta = outputFasta;
-	}
-
 	public Double getOptimizationAcceptanceProbabilityScalingFactor() {
 		return optimizationAcceptanceProbabilityScalingFactor;
 	}
@@ -876,21 +898,11 @@ public class Settings implements Cloneable {
 		this.pathToBlastResultsDomainAnnotation = pathToBlastResultsDomainAnnotation;
 	}
 
-	/**
-	 * Should the Domain Annotations for the Blast Hits be downloaded by AHRD or
-	 * did the User provide an annotation file?
-	 */
-	public boolean useLocalBlastResultsDomainAnnotations() {
-		boolean out = false;
-		if (getPathToBlastResultsDomainAnnotation() != null) {
-			out = new File(getPathToBlastResultsDomainAnnotation()).exists();
-			if (!out)
-				System.err.println("WARNING: Found parameter '"
-						+ BLAST_RESULT_DOMAIN_ANNOTATION_FILE_KEY
-						+ "' set to '"
-						+ getPathToBlastResultsDomainAnnotation()
-						+ "' but file is not readable!");
-		}
-		return out;
+	public String getOutputFormat() {
+		return outputFormat;
+	}
+
+	public void setOutputFormat(String outputFormat) {
+		this.outputFormat = outputFormat;
 	}
 }

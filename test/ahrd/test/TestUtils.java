@@ -132,6 +132,43 @@ public class TestUtils {
 		return blastResults;
 	}
 
+	public static List<BlastResult> mockTrEmblBlastResults() {
+		List<BlastResult> blastResults = new ArrayList<BlastResult>();
+		blastResults.add(mockBlastResult("accession_A", 1.0, "description One A",
+				10, 20, 10, 20, 200, 30.0, "trembl", new HashSet<String>(
+						Arrays.asList("description", "one", "A"))));
+		blastResults.add(mockBlastResult("accession_B", 2.0, "description Two B",
+				10, 20, 10, 20, 200, 30.0, "trembl", new HashSet<String>(
+						Arrays.asList("description", "two", "B"))));
+		blastResults.add(mockBlastResult(
+				"accession_C",
+				3.0,
+				"Putative - sUbFaMilY;, \" activity|, bad C",
+				10,
+				20,
+				10,
+				20,
+				200,
+				30.0,
+				"trembl",
+				new HashSet<String>(Arrays.asList("putative", "subfamily",
+						"activity", "bad", "C"))));
+		blastResults.add(mockBlastResult(
+				"accession_D",
+				4.0,
+				"family subfamily activity NADH-Dehydrogenase D",
+				10,
+				20,
+				10,
+				20,
+				200,
+				30.0,
+				"trembl",
+				new HashSet<String>(Arrays.asList("family", "subfamily",
+						"activity", "nadh", "dehydrogenase", "D"))));
+		return blastResults;
+	}
+	
 	public static Map<String, Double> mockTokenScoresForDescCalcTest() {
 		Map<String, Double> tknScrs = new HashMap<String, Double>();
 		tknScrs.put("description", 0.5);

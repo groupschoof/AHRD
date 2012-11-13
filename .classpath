@@ -21,5 +21,8 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/xom-1.2.6.jar"/>
 	<classpathentry kind="lib" path="lib/yamlbeans-1.06.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.2.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.2.2.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
