@@ -34,7 +34,7 @@ public class ProteinOutput {
 	public String HumanReadableDescription = "unknown protein";
 	public String InterproID = NA;
 	public String GeneOntologyID = NA;
-	public String HRDLength = NA;
+	public String HRDLength;
 	public String ReferenceDescription;
 	public String RefLength;
 	public String EvaluationScore;
@@ -44,7 +44,6 @@ public class ProteinOutput {
 	public String ProteinDomainWeightVector;
 	public String HRDDomainArchitectureSimilarityScore;
 	public Map<String, BlastResultOutput> Best_BlastHits = new HashMap<String, BlastResultOutput>();
-	public String Length;
 	public String BHDomainWeightVector;
 	public String BHDomainArchitectureSimilarityScore;
 	public String Sum_TokenScores;
@@ -76,117 +75,86 @@ public class ProteinOutput {
 	 */
 	public ProteinOutput(Protein prot) {
 		super();
-		System.out.println("1");
 		BlastResult br = prot.getDescriptionScoreCalculator()
 				.getHighestScoringBlastResult();
-		System.out.println("2");
 		this.ProteinAccession = prot.getAccession();
-		System.out.println("3");
 		if (br != null) {
 			this.BlastHitAccession = br.getAccession();
-			System.out.println("4");
 			this.AHRDQualityCode = qualityCode(prot);
-			System.out.println("5");
 			this.HumanReadableDescription = br.getDescription();
-			System.out.println("6");
 		}
 		if (prot.getInterproResults() != null
 				&& !prot.getInterproResults().isEmpty()) {
 			this.InterproID = interproResult(prot);
-			System.out.println("7");
 		} else
 			this.InterproID = NA;
 		if (prot.getGoResults() != null && !prot.getGoResults().isEmpty()) {
 			this.GeneOntologyID = geneOntologyAnnotations(prot);
-			System.out.println("8");
 		}
 		if (getSettings().isInTrainingMode()) {
 			// HRD-Length\tReference-Description\tRef-Length\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR"
 			if (br != null && br.getTokens() != null)
 				this.HRDLength = format(br.getTokens().size());
-			System.out.println("9");
 			this.ReferenceDescription = prot.getEvaluationScoreCalculator()
 					.getReferenceDescription().getDescription();
-			System.out.println("10");
 			this.RefLength = format(prot.getEvaluationScoreCalculator()
 					.getReferenceDescription().getTokens().size());
-			System.out.println("11");
 			this.EvaluationScore = format(prot.getEvaluationScoreCalculator()
 					.getEvalutionScore());
-			System.out.println("12");
 			this.DifftobestCompetitor = format(prot
 					.getEvaluationScoreCalculator()
 					.getEvalScoreMinBestCompScore());
-			System.out.println("13");
 			this.TPR = format(prot.getEvaluationScoreCalculator()
 					.getTruePositivesRate());
-			System.out.println("14");
 			this.FPR = format(prot.getEvaluationScoreCalculator()
 					.getFalsePositivesRate());
-			System.out.println("15");
 		}
-		System.out.println("16_A");
 		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
 			this.ProteinDomainWeightVector = saveToString(prot
 					.getDomainWeights());
-			System.out.println("17");
 			if (br != null)
 				this.HRDDomainArchitectureSimilarityScore = format(br
 						.getDomainSimilarityScore());
 			else
 				this.HRDDomainArchitectureSimilarityScore = NA;
-			System.out.println("18");
 			this.vectorSpaceModel = saveToString(prot
 					.getDomainScoreCalculator().getVectorSpaceModel());
-			System.out.println("19");
 			if (br != null)
 				this.HRDDomainArchitectureDomainWeightVector = saveToString(br
 						.getDomainWeights());
 			else
 				this.HRDDomainArchitectureDomainWeightVector = NA;
-			System.out.println("20");
 		}
-		System.out.println("20_A");
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			for (String blastDb : getSettings().getBlastDatabases()) {
 				BlastResult iterBr = prot.getEvaluationScoreCalculator()
 						.getUnchangedBlastResults().get(blastDb);
 				this.Best_BlastHits.put(blastDb, new BlastResultOutput(iterBr));
-				System.out.println("21");
 			}
 		}
-		System.out.println("22");
-		if (getSettings().doWriteHRDScoresToOutput() && br != null) {
-			this.Sum_TokenScores = format(prot.getTokenScoreCalculator()
-					.sumOfAllTokenScores(br));
-			System.out.println("23");
-			this.TokenHighScore = format(prot.getTokenScoreCalculator()
-					.getTokenHighScore());
-			System.out.println("24");
-			this.CorrectionFactor = format(prot.getLexicalScoreCalculator()
-					.correctionFactor(br));
-			System.out.println("25");
-			this.GOScore = format(prot.getLexicalScoreCalculator()
-					.geneOntologyScore(br));
-			System.out.println("26");
-			this.LexicalScore = format(prot.getLexicalScoreCalculator()
-					.lexicalScore(br));
-			System.out.println("27");
-			this.RelativeBitScore = format(prot.getDescriptionScoreCalculator()
-					.relativeBlastScore(br));
-			System.out.println("28");
-			this.DescriptionLineFrequency = format(prot
+		if (getSettings().doWriteHRDScoresToOutput()) {
+			this.Sum_TokenScores = br != null ? format(prot
+					.getTokenScoreCalculator().sumOfAllTokenScores(br)) : NA;
+			this.TokenHighScore = br != null ? format(prot
+					.getTokenScoreCalculator().getTokenHighScore()) : NA;
+			this.CorrectionFactor = br != null ? format(prot
+					.getLexicalScoreCalculator().correctionFactor(br)) : NA;
+			this.GOScore = br != null ? format(prot.getLexicalScoreCalculator()
+					.geneOntologyScore(br)) : NA;
+			this.LexicalScore = br != null ? format(prot
+					.getLexicalScoreCalculator().lexicalScore(br)) : NA;
+			this.RelativeBitScore = br != null ? format(prot
+					.getDescriptionScoreCalculator().relativeBlastScore(br))
+					: NA;
+			this.DescriptionLineFrequency = br != null ? format(prot
 					.getDescriptionScoreCalculator()
-					.getDescLinePatternFrequencies().get(br.patternize()));
-			System.out.println("29");
-			this.Max_DescLineFreq = format(prot.getDescriptionScoreCalculator()
-					.getMaxDescriptionLineFrequency());
-			System.out.println("30");
-			this.PatternFactor = format(prot.getDescriptionScoreCalculator()
-					.patternFactor(br));
-			System.out.println("31");
+					.getDescLinePatternFrequencies().get(br.patternize())) : NA;
+			this.Max_DescLineFreq = br != null ? format(prot
+					.getDescriptionScoreCalculator()
+					.getMaxDescriptionLineFrequency()) : NA;
+			this.PatternFactor = br != null ? format(prot
+					.getDescriptionScoreCalculator().patternFactor(br)) : NA;
 		}
-		System.out.println("32");
 	}
 
 	public static String saveToString(Object o) {

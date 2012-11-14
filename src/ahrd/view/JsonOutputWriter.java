@@ -29,7 +29,7 @@ public class JsonOutputWriter extends AbstractOutputWriter {
 		BufferedWriter o = new BufferedWriter(new FileWriter(getSettings()
 				.getPathToOutput()));
 		Gson gson = new Gson();
-		o.write(gson.toJson(this.proteinOutputs));
+		o.write(gson.toJson(this.proteinOutputs) + "\n");
 		o.close();
 	}
 }

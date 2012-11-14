@@ -1,10 +1,6 @@
 package ahrd.view;
 
 import static ahrd.controller.Settings.getSettings;
-import static ahrd.view.ProteinOutput.saveToString;
-import static ahrd.view.ProteinOutput.format;
-import java.util.Set;
-
 import ahrd.model.BlastResult;
 
 /**
@@ -23,37 +19,23 @@ public class BlastResultOutput {
 	public String accession = ProteinOutput.NA;
 	public String description = ProteinOutput.NA;
 	public String length;
-	public String domainWeightsVector;
-	public String domainSimilarityScore;
 
 	public BlastResultOutput(BlastResult blastResult) {
 		if (blastResult != null) {
 			this.accession = blastResult.getAccession();
 			this.description = blastResult.getDescription();
 		}
-		if (getSettings().isInTrainingMode()) {
-			if (blastResult != null)
-				setLength(blastResult.getTokens());
-			else
-				this.length = ProteinOutput.NA;
-		}
-		if (getSettings().isWriteDomainArchitectureSimilarityScoresToOutput()) {
-			if (blastResult != null) {
-				this.domainWeightsVector = saveToString(blastResult
-						.getDomainWeights());
-				this.domainSimilarityScore = format(blastResult
-						.getDomainSimilarityScore());
-			} else {
-				this.domainWeightsVector = ProteinOutput.NA;
-				this.domainSimilarityScore = ProteinOutput.NA;
-			}
-		}
+		if (getSettings().isInTrainingMode())
+			setLength(blastResult);
 	}
 
-	public void setLength(Set<String> tokens) {
-		if (tokens != null && tokens.size() > 0)
-			this.length = new Integer(tokens.size()).toString();
-		else
+	public void setLength(BlastResult blastResult) {
+		if (blastResult != null && blastResult.getTokens() != null) {
+			if (blastResult.getTokens() != null
+					&& blastResult.getTokens().size() > 0)
+				this.length = new Integer(blastResult.getTokens().size())
+						.toString();
+		} else
 			this.length = "0";
 	}
 }

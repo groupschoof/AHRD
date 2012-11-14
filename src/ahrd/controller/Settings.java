@@ -20,6 +20,14 @@ import com.esotericsoftware.yamlbeans.YamlReader;
  * all AHRD's current settings. This eases greatly access of input-values from
  * everywhere.
  * 
+ * @TODO: <strong>Refactor</strong> class to be directly initialized using
+ *        google's <strong>yamlbeans</strong> which is already included in AHRD.
+ *        The long initialize method and the long list of static KEY-names will
+ *        then be obsolete. Also remove getters and setters and work with public
+ *        fields. See
+ *        http://code.google.com/p/yamlbeans/#Deserializing_other_classes for
+ *        details.
+ * 
  * @author hallab, klee
  */
 public class Settings implements Cloneable {

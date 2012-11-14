@@ -72,28 +72,22 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 	public static String qualityCode(Protein p) {
 		BlastResult hsbr = p.getDescriptionScoreCalculator()
 				.getHighestScoringBlastResult();
-		System.out.println("A");
 		String qc = "";
 		// Position 1
 		qc += (hsbr.getBitScore() > 50.0 && hsbr.getEValue() < 0.1) ? "*" : "-";
-		System.out.println("B");
 		// Position 2
 		qc += (TokenScoreCalculator.overlapScore(hsbr.getQueryStart(),
 				hsbr.getQueryEnd(), p.getSequenceLength(),
 				hsbr.getSubjectStart(), hsbr.getSubjectEnd(),
 				hsbr.getSubjectLength()) > 0.6) ? "*" : "-";
-		System.out.println("C");
 		// Position 3
 		qc += (p.getDescriptionScoreCalculator().getDescriptionHighScore() >= 0.5) ? "*"
 				: "-";
-		System.out.println("D");
 		// Position 4
 		qc += (p.getLexicalScoreCalculator().geneOntologyScore(hsbr) > 0.0) ? "*"
 				: "-";
-		System.out.println("E");
 		// Internal DescriptionScore:
 		qc += "[" + FRMT.format(hsbr.getDescriptionScore()) + "]";
-		System.out.println("F");
 		
 		return qc;
 	}

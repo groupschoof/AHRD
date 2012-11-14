@@ -17,6 +17,21 @@ import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
 import com.esotericsoftware.yamlbeans.YamlWriter;
 
+/**
+ * Handles generation of Batch-Jobs. I.e. one might want to run AHRD on a whole
+ * genome with 30,000 proteins and has a compute cluster tailored for parallel
+ * computation available. The generation of AHRD <emph>input.yml</emph> files
+ * for i.e. 1000 proteins each from a single batcher input file is implemented
+ * here.
+ * 
+ * @TODO: Refactor to directly initialize this class using google's
+ *        <strong>yamlbeans</strong> library. This should greatly shorten the
+ *        long <emph>generateYml</emph> method. See
+ *        http://code.google.com/p/yamlbeans/#Deserializing_other_classes and
+ *        http://code.google.com/p/yamlbeans/#Serializing_objects for details.
+ * 
+ * @author Asis Hallab, Kathrin Klee
+ */
 public class Batcher {
 
 	public static final String AHRD_CALL_KEY = "ahrd_call";

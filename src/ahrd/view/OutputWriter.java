@@ -13,6 +13,14 @@ import ahrd.model.Blast2GoAnnot;
 import ahrd.model.BlastResult;
 import ahrd.model.Protein;
 
+/**
+ * Class handles tabular, <i>tab</i> delimited output into a file.
+ * 
+ * @TODO: Refactor class to use the Output-Beans ProteinOutput and
+ *        BlastResultOutput.
+ * 
+ * @author Asis Hallab, Kathrin Klee, Mythri Bangalore
+ */
 public class OutputWriter extends AbstractOutputWriter {
 
 	protected BufferedWriter hrdScoresWriter;
@@ -149,24 +157,14 @@ public class OutputWriter extends AbstractOutputWriter {
 	}
 
 	public String buildDomainWeightColumn(Protein prot) {
-		String dwc = "\tProt-Dom-Wghts: ";
+		String dwc = "\t";
 		if (prot.getDomainWeights() != null
 				&& !prot.getDomainWeights().isEmpty())
 			dwc += prot.getDomainWeights().toString();
-		dwc += "\tHighScorBR-Dom-Wghts: ";
+		dwc += "\t";
 		if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null)
 			dwc += prot.getDescriptionScoreCalculator()
 					.getHighestScoringBlastResult().getDomainSimilarityScore();
-		return dwc;
-	}
-
-	public String buildDomainWeightColumn(BlastResult br) {
-		String dwc = "\tBR-Dom-Wights: ";
-		if (br != null && br.getDomainWeights() != null)
-			dwc += br.getDomainWeights().toString();
-		dwc += "\tBR-Dom-Sim-Score: ";
-		if (br != null && br.getDomainSimilarityScore() != null)
-			dwc += FRMT.format(br.getDomainSimilarityScore());
 		return dwc;
 	}
 
@@ -306,10 +304,6 @@ public class OutputWriter extends AbstractOutputWriter {
 			if (getSettings().isInTrainingMode())
 				hdr += ("\tLength-" + blastDb)
 						+ ("\tEvaluation-Score-" + blastDb);
-			if (getSettings().isToComputeDomainSimilarities()) {
-				hdr += ("\tBH-Domain-Weight-Vector-" + blastDb)
-						+ ("\tBH-Domain-Architecture-Similarity-Score-" + blastDb);
-			}
 		}
 		return hdr;
 	}
@@ -335,10 +329,6 @@ public class OutputWriter extends AbstractOutputWriter {
 				if (getSettings().isInTrainingMode()) {
 					csvRow += "\t0\t0.0";
 				}
-			}
-			if (getSettings()
-					.isWriteDomainArchitectureSimilarityScoresToOutput()) {
-				csvRow += buildDomainWeightColumn(bestBr);
 			}
 		}
 		return csvRow;
