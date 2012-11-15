@@ -12,6 +12,7 @@ import ahrd.controller.AHRD;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.BlastResult;
 import ahrd.model.Protein;
+import ahrd.model.TokenScoreCalculator;
 
 /**
  * Class handles tabular, <i>tab</i> delimited output into a file.
@@ -53,7 +54,7 @@ public class OutputWriter extends AbstractOutputWriter {
 			bw.write("\t\"Tokens (tkn->score)\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
-			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
+			bw.write("\tSum(Token-Scores)\tOverlapScore\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
@@ -252,6 +253,11 @@ public class OutputWriter extends AbstractOutputWriter {
 			csvCells += "\t"
 					+ FRMT.format(prot.getTokenScoreCalculator()
 							.sumOfAllTokenScores(hsbr));
+			csvCells += "\t"
+					+ FRMT.format(TokenScoreCalculator.overlapScore(
+							hsbr.getQueryStart(), hsbr.getQueryEnd(),
+							prot.getSequenceLength(), hsbr.getSubjectStart(),
+							hsbr.getSubjectEnd(), hsbr.getSubjectLength()));
 			csvCells += "\t"
 					+ FRMT.format(prot.getTokenScoreCalculator()
 							.getTokenHighScore());

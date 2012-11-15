@@ -75,7 +75,7 @@ public class BlastResultTest {
 		BlastResult.parseBlastResults(protDb, "swissprot");
 		assertNotNull(protDb.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getBlastResults().get("swissprot"));
-		assertEquals(108, protDb.get("gene:chr01.1056:mRNA:chr01.1056")
+		assertEquals(200, protDb.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getBlastResults().get("swissprot").size());
 		assertEquals(16, protDb.get("gene:chr01.502:mRNA:chr01.502")
 				.getBlastResults().get("swissprot").size());

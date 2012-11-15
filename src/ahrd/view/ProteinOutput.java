@@ -1,15 +1,17 @@
 package ahrd.view;
 
+import static ahrd.controller.Settings.getSettings;
+import static ahrd.model.TokenScoreCalculator.overlapScore;
+import static ahrd.view.AbstractOutputWriter.FRMT;
+import static ahrd.view.AbstractOutputWriter.geneOntologyAnnotations;
+import static ahrd.view.AbstractOutputWriter.interproResult;
+import static ahrd.view.AbstractOutputWriter.qualityCode;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import ahrd.model.BlastResult;
 import ahrd.model.Protein;
-import static ahrd.view.AbstractOutputWriter.qualityCode;
-import static ahrd.view.AbstractOutputWriter.interproResult;
-import static ahrd.view.AbstractOutputWriter.geneOntologyAnnotations;
-import static ahrd.controller.Settings.getSettings;
-import static ahrd.view.AbstractOutputWriter.FRMT;
 
 /**
  * This class is meant as a mediator between output writers and the model
@@ -41,22 +43,21 @@ public class ProteinOutput {
 	public String DifftobestCompetitor;
 	public String TPR;
 	public String FPR;
-	public String ProteinDomainWeightVector;
-	public String HRDDomainArchitectureSimilarityScore;
 	public Map<String, BlastResultOutput> Best_BlastHits = new HashMap<String, BlastResultOutput>();
-	public String BHDomainWeightVector;
-	public String BHDomainArchitectureSimilarityScore;
 	public String Sum_TokenScores;
 	public String TokenHighScore;
 	public String CorrectionFactor;
 	public String GOScore;
+	public String OverlapScore;
 	public String LexicalScore;
 	public String RelativeBitScore;
 	public String DescriptionLineFrequency;
 	public String Max_DescLineFreq;
 	public String PatternFactor;
 	public String vectorSpaceModel;
+	public String ProteinDomainWeightVector;
 	public String HRDDomainArchitectureDomainWeightVector;
+	public String HRDDomainArchitectureSimilarityScore;
 
 	/**
 	 * NULL will be translated into 'NA'
@@ -141,6 +142,10 @@ public class ProteinOutput {
 					.getLexicalScoreCalculator().correctionFactor(br)) : NA;
 			this.GOScore = br != null ? format(prot.getLexicalScoreCalculator()
 					.geneOntologyScore(br)) : NA;
+			this.OverlapScore = br != null ? format(overlapScore(
+					br.getQueryStart(), br.getQueryEnd(),
+					prot.getSequenceLength(), br.getSubjectStart(),
+					br.getSubjectEnd(), br.getSubjectLength())) : NA;
 			this.LexicalScore = br != null ? format(prot
 					.getLexicalScoreCalculator().lexicalScore(br)) : NA;
 			this.RelativeBitScore = br != null ? format(prot
