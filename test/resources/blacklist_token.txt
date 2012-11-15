@@ -24,3 +24,8 @@
 (?i)related
 (?i)remark
 (?i)\b\w?orf(\w?|\d+)\b
+(?i)unnamed
+(?i)hypothetical
+(?i)unknown
+(?i)clone
+(?i)function

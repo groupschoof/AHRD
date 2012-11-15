@@ -1,10 +1,8 @@
 (?i)^similar\s+to
-(?i)^probable 
-(?i)^putative 
-(?i)^predicted 
+(?i)^putative\s+protein 
+(?i)^predicted\s+protein 
 (?i)^uncharacterized
 (?i)^unknown
 (?i)^hypothetical
-(?i)^unnamed
 (?i)^whole\s+genome\s+shotgun\s+sequence
 (?i)^clone
