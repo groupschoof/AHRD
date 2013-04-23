@@ -14,23 +14,25 @@ Shared tokens with Gene-Ontology Annotations increase the description-scoring
 in order to use standard nomenclature where possible. Finally the best scoring
 description is assigned.
 
-h2. 1.1 Requirements:
+h2. 1 Getting started
+
+h3. 1.1 Requirements:
 
 AHRD is a Java-Program which requires Java 1.5 or higher and ant.
 
 
-h2. 1.2 Installation:
+h3. 1.2 Installation
 
-h3. 1.2.1 Get AHRD
+h4. 1.2.1 Get AHRD
 
 Copy (clone) AHRD to your computer using git:
 <pre>git clone git://github.com/groupschoof/AHRD.git</pre>
 
-h3. 1.2.2 Build the executable jar:
+h4. 1.2.2 Build the executable jar:
 
 Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 
-h2. 2 Usage:
+h2. 2 Usage
 
 All AHRD-Inputs are passed to AHRD in a single YML-File.
 See ./ahrd_example_input.yml for details.
@@ -59,24 +61,6 @@ h3. 2.2 AHRD Example run:
 or just execute
 
 <pre>ant test.run </pre>
-
-h3. 2.2.1 AHRD run using BLASTX results:
-
-In order to run AHRD on BLASTX results instead of BLASTP results you have to
-modify the following parameters in the ahrd_example_input.yml:
-<pre>token_score_bit_score_weight: 0.5
-token_score_database_score_weight: 0.3
-token_score_overlap_score_weight: 0.2</pre>
-
-Since the algorithm is based on protein sequences and the BLASTX searches are
-based on nucleotide sequence there will be a problem calculating the overlap
-score of the blast result.  To overcome this problem the
-token_score_overlap_score_weight has to be set to 0.0. Therefore the other two
-scores have to be raised. These three parameters have to sum up to 1. The
-resulting parameter configuration could look like this:
-<pre>token_score_bit_score_weight: 0.6
-token_score_database_score_weight: 0.4
-token_score_overlap_score_weight: 0.0</pre>
 
 h3. 2.3 Recommended BLAST-Search:
 
@@ -131,8 +115,25 @@ output_fasta: true
 AHRD will write a valid FASTA-File of your query-proteins where the Header will
 be composed of the same parts as above, but here separated by whitespaces.
 
+h3. 2.6 AHRD run using BLASTX results:
 
-h3. 3 Algorithm:
+In order to run AHRD on BLASTX results instead of BLASTP results you have to
+modify the following parameters in the ahrd_example_input.yml:
+<pre>token_score_bit_score_weight: 0.5
+token_score_database_score_weight: 0.3
+token_score_overlap_score_weight: 0.2</pre>
+
+Since the algorithm is based on protein sequences and the BLASTX searches are
+based on nucleotide sequence there will be a problem calculating the overlap
+score of the blast result.  To overcome this problem the
+token_score_overlap_score_weight has to be set to 0.0. Therefore the other two
+scores have to be raised. These three parameters have to sum up to 1. The
+resulting parameter configuration could look like this:
+<pre>token_score_bit_score_weight: 0.6
+token_score_database_score_weight: 0.4
+token_score_overlap_score_weight: 0.0</pre>
+
+h2. 3 Algorithm
 
 Based on e-values the 200 best scoring blast results are chosen from each
 database-search (e.g. Swissprot, TAIR, trEMBL). For all 600 resulting candidate
@@ -167,7 +168,7 @@ meaningless "fill words". If available an assigned Interpro domain is appended
 to the description line and each line will contain an evaluation section that
 reflects the significance of the assigned human readable description.
 
-h4. 3.1 Pseudo-Code
+h3. 3.1 Pseudo-Code
 
 # Choose 600 best scoring blast results
 # Filter description lines of above blast-results using regular expressions:
@@ -181,38 +182,38 @@ h4. 3.1 Pseudo-Code
 # Choose best scoring description line
 # Append InterProScan description to chosen description line if available
 
-h4. 3.2 Used Formulae and Parameters:
+h3. 3.2 Used Formulae and Parameters:
 
 <img src="http://github.com/groupschoof/AHRD/raw/master/images/formulae.jpg" />
 
-h5. 3.3 Parameters
+h3. 3.3 Parameters
 
 Above formulae use the following parameters as given in *./ahrd_example_input.yml*
 
-h5. 3.3.1 The weights in formula Token-Score are:  
+h4. 3.3.1 The weights in formula Token-Score are:  
 
 <pre>token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2 </pre> and Blast-Database specific:
 <pre>weight: 100 </pre>
 
-h5. 3.3.2 The weight in formula Lexical-Score is:
+h4. 3.3.2 The weight in formula Lexical-Score is:
 
 <pre>description_score_relative_description_frequency_weight: 0.6 </pre>
 
-h5. 3.3.3 The weight in formula Description-Score also is Blast-database specific:
+h4. 3.3.3 The weight in formula Description-Score also is Blast-database specific:
 
 <pre>description_score_bit_score_weight: 0.2 </pre>
 
-h2. 4. Testing:
+h2. 4 Testing
 
 If you want to run the complete JUnit Test-Suite execute: <pre>ant</pre>
 
-h2. 5. License
+h2. 5 License
 
 See attached file LICENSE.txt for details.
 
-h2. 6. Authors
+h2. 6 Authors
 
 Asis Hallab, Kathrin Klee, and Prof. Dr. Heiko Schoof
 
