@@ -103,7 +103,7 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 		qc += (p.getLexicalScoreCalculator().geneOntologyScore(hsbr) > 0.0) ? "*"
 				: "-";
 		// Internal DescriptionScore:
-		qc += "[" + FRMT.format(hsbr.getDescriptionScore()) + "]";
+		//qc += "[" + FRMT.format(hsbr.getDescriptionScore()) + "]";
 
 		return qc;
 	}
