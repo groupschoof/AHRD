@@ -45,8 +45,8 @@ that AHRD is generic and can make use of any number of different Blast
 databases that do not necessarily have to be the above ones. If e.g. annotating
 genes from a fungal genome searching yeast databases might be more
 recommendable than using TAIR (_Arabidopsis thaliana_).
-Optionally domain search results from InterProScan and Gene Ontology information 
-can be given as additional input to improve the results.
+Optionally domain search results from InterProScan and functional annotations
+from Gene Ontology can be given as additional input to improve the results.
 
 All parameters can be set manually, or the default ones can be used as given in
 the example input file ./test/resources/ahrd_input_test_run.yml (see section
@@ -69,12 +69,20 @@ h3. 2.2 Batcher
 Start the Batcher with:
 <pre>mkdir test/resources/batch_ymls 
 java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./test/resources/batcher_input_test.yml</pre>
-You will have to edit ./test/resources/batcher_input_test.yml according to your
-needs.
+You will have to edit ./test/resources/batcher_input_test.yml according to your needs.
 
 h3. 2.3 Input
 
-h4. 2.3.1 Recommended BLAST-Search
+Example files for all input files can be found under ./test/resources/
+
+h4. 2.3.1 Required input data
+
+# Protein sequences in fasta format
+# BLAST seach results in pairwise format for protein sequences
+
+(If you run AHRD in batches the blast search results need to be batched in the same way as the fasta files.)
+
+Recommended BLAST-Search:
 
 For your query proteins you should start independent BLAST searches e.g.
 in the three different databases mentioned above:
@@ -82,6 +90,21 @@ in the three different databases mentioned above:
 <pre>
 blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
 </pre>
+
+h4. 2.3.2 Optional input data
+
+# Domain search results from InterProScan in raw format
+# Gene ontology annotations in csv format
+
+In case InterProScan results are given as input, AHRD needs the Interpro database XML- and dtd-file.
+
+h4. 2.3.3 Required config files
+
+# Input yml with all settings and parameters (see section Parameters)
+# Blacklists and filters (they can either be used as provided or can be adapted to your needs and database)
+## Description blacklist
+## Token blacklist
+## Description filter for each single blast database
 
 h3. 2.4 Output
 
