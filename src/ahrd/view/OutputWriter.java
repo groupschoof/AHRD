@@ -31,7 +31,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
 		bw
-				.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
+				.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
 
 		if (getSettings().isInTrainingMode()) {
 			bw
