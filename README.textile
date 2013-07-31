@@ -32,6 +32,9 @@ h4. 1.2.2 Build the executable jar
 
 Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 
+An executable jar (Java 1.6 compiled) of the paper release version can also be downloaded here:
+https://www3.uni-bonn.de/cropbio/tools-and-databases
+
 h2. 2 Usage
 
 All AHRD-Inputs are passed to AHRD in a single YML-File.
