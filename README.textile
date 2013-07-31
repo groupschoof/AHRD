@@ -16,7 +16,7 @@ description is assigned.
 
 h2. 1 Getting started
 
-h3. 1.1 Requirements:
+h3. 1.1 Requirements
 
 AHRD is a Java-Program which requires Java 1.5 or higher and ant.
 
@@ -25,10 +25,10 @@ h3. 1.2 Installation
 
 h4. 1.2.1 Get AHRD
 
-Copy (clone) AHRD to your computer using git:
+Copy (clone) AHRD to your computer using git via commandline:
 <pre>git clone git://github.com/groupschoof/AHRD.git</pre>
 
-h4. 1.2.2 Build the executable jar:
+h4. 1.2.2 Build the executable jar
 
 Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 
@@ -45,6 +45,8 @@ that AHRD is generic and can make use of any number of different Blast
 databases that do not necessarily have to be the above ones. If e.g. annotating
 genes from a fungal genome searching yeast databases might be more
 recommendable than using TAIR (_Arabidopsis thaliana_).
+Optionally domain search results from InterProScan and Gene Ontology information 
+can be given as additional input to improve the results.
 
 All parameters can be set manually, or the default ones can be used as given in
 the example input file ./test/resources/ahrd_input_test_run.yml (see section
@@ -54,7 +56,7 @@ AHRD is recommended to be run on batches of 1,000 to 2,000 proteins. If you
 want to annotate a whole genome use the included Batcher to split your
 input-data into Batches of appropriate size (see section Batcher).
 
-h3. 2.2 AHRD Example run:
+h3. 2.1 AHRD Example run
 
 <pre>java -Xmx2g -jar ./dist/ahrd.jar ahrd_example_input.yml </pre>
 
@@ -62,7 +64,17 @@ or just execute
 
 <pre>ant test.run </pre>
 
-h3. 2.3 Recommended BLAST-Search:
+h3. 2.2 Batcher
+
+Start the Batcher with:
+<pre>mkdir test/resources/batch_ymls 
+java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./test/resources/batcher_input_test.yml</pre>
+You will have to edit ./test/resources/batcher_input_test.yml according to your
+needs.
+
+h3. 2.3 Input
+
+h4. 2.3.1 Recommended BLAST-Search
 
 For your query proteins you should start independent BLAST searches e.g.
 in the three different databases mentioned above:
@@ -71,20 +83,12 @@ in the three different databases mentioned above:
 blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
 </pre>
 
-h3. 2.4 Batcher:
-
-Start the Batcher with:
-<pre>mkdir test/resources/batch_ymls 
-java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./test/resources/batcher_input_test.yml</pre>
-You will have to edit ./test/resources/batcher_input_test.yml according to your
-needs.
-
-h3. 2.5 Output:
+h3. 2.4 Output
 
 AHRD supports two different formats. The default one is a tab-delimited table.
 The other is FASTA-Format.
 
-h4. 2.5.1 Tab-Delimited Table:
+h4. 2.4.1 Tab-Delimited Table
 
 AHRD writes out a CSV table with the following columns:
 # Protein-Accesion -- The Query Protein's Accession
@@ -104,7 +108,7 @@ otherwise. Their meaning is explained in the following table:
 | 3 | Top token score of assigned HRD is >0.5 |
 | 4 | Gene ontology terms found in description line |
 
-h4. 2.5.2 Fasta-Format:
+h4. 2.4.2 Fasta-Format
 
 To set AHRD to write its output in FASTA-Format set the following switch in the input.yml:
 
@@ -115,10 +119,11 @@ output_fasta: true
 AHRD will write a valid FASTA-File of your query-proteins where the Header will
 be composed of the same parts as above, but here separated by whitespaces.
 
-h3. 2.6 AHRD run using BLASTX results:
+h3. 2.5 AHRD run using BLASTX results
 
 In order to run AHRD on BLASTX results instead of BLASTP results you have to
 modify the following parameters in the ahrd_example_input.yml:
+
 <pre>token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2</pre>
@@ -129,6 +134,7 @@ score of the blast result.  To overcome this problem the
 token_score_overlap_score_weight has to be set to 0.0. Therefore the other two
 scores have to be raised. These three parameters have to sum up to 1. The
 resulting parameter configuration could look like this:
+
 <pre>token_score_bit_score_weight: 0.6
 token_score_database_score_weight: 0.4
 token_score_overlap_score_weight: 0.0</pre>
@@ -182,7 +188,7 @@ h3. 3.1 Pseudo-Code
 # Choose best scoring description line
 # Append InterProScan description to chosen description line if available
 
-h3. 3.2 Used Formulae and Parameters:
+h3. 3.2 Used Formulae and Parameters
 
 <img src="http://github.com/groupschoof/AHRD/raw/master/images/formulae.jpg" />
 
@@ -190,18 +196,19 @@ h3. 3.3 Parameters
 
 Above formulae use the following parameters as given in *./ahrd_example_input.yml*
 
-h4. 3.3.1 The weights in formula Token-Score are:  
+h4. 3.3.1 The weights in formula Token-Score are
 
 <pre>token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
-token_score_overlap_score_weight: 0.2 </pre> and Blast-Database specific:
+token_score_overlap_score_weight: 0.2 </pre>
+and Blast-Database specific:
 <pre>weight: 100 </pre>
 
-h4. 3.3.2 The weight in formula Lexical-Score is:
+h4. 3.3.2 The weight in formula Lexical-Score is
 
 <pre>description_score_relative_description_frequency_weight: 0.6 </pre>
 
-h4. 3.3.3 The weight in formula Description-Score also is Blast-database specific:
+h4. 3.3.3 The weight in formula Description-Score also is Blast-database specific
 
 <pre>description_score_bit_score_weight: 0.2 </pre>
 
