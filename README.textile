@@ -100,8 +100,8 @@ In case InterProScan results are given as input, AHRD needs the Interpro databas
 
 h4. 2.3.3 Required config files
 
-# Input yml with all settings and parameters (see section Parameters)
-# Blacklists and filters (they can either be used as provided or can be adapted to your needs and database)
+# Input yml with all pathes and parameters according to your needs (see ahrd_example_input.yml and section Parameters)
+# Blacklists and filters (they can either be used as provided or can be adapted to your needs and databases)
 ## Description blacklist
 ## Token blacklist
 ## Description filter for each single blast database
@@ -217,7 +217,8 @@ h3. 3.2 Used Formulae and Parameters
 
 h3. 3.3 Parameters
 
-Above formulae use the following parameters as given in *./ahrd_example_input.yml*
+Above formulae use the following parameters as given in *./ahrd_example_input.yml*.
+These parameters can either be used as provided or can be adapted to your needs.
 
 h4. 3.3.1 The weights in formula Token-Score are
 
