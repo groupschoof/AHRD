@@ -25,7 +25,7 @@ h3. 1.2 Installation
 
 h4. 1.2.1 Get AHRD
 
-Copy (clone) AHRD to your computer using git via commandline:
+Copy (clone) AHRD to your computer using git via command-line:
 <pre>git clone git://github.com/groupschoof/AHRD.git
 git checkout tags/2.0-stable</pre>
 
@@ -103,7 +103,7 @@ h4. 2.2.3 Required config files
 ## *Description filter* for each single blast database (Argument @filter: ./test/resources/filter_descline_sprot.txt@) - Any part of a Blast-Hit description that matches any one of the regular expressions in this file will be deleted from the description.
 ## *Token blacklist* (Argument @token_blacklist: ./test/resources/blacklist_token.txt@) - Blast-Hit's descriptions are composed of words. Any such word matching any one of the regular expressions in this file will be ignored by AHRD's scoring, albeit it will not be deleted from the description and thus might still be seen in the final output.
 
-h5. 2.2.3.1 Test custom blascklists and filters
+h5. 2.2.3.1 Test custom blacklists and filters
 
 As explained in 2.2.3 AHRD makes use of blacklists and filters provided as Java regular expressions. You can test your own custom blacklists and filters:
 
@@ -115,7 +115,7 @@ Example Output for test string "activity", and regular expressions "(?i)interact
 <pre>[junit] activity 
 [junit] (?i)interacting -> activity
 [junit] (?i)activity -> </pre>
-Shows how the first regular expression does not match anything in the test string "activity", but after matching it agains the second regular expression nothing remains. The test applies all provided regular expression _in order of appeareance_ and shows what _remains_ of the provided test string after each iteration.
+Shows how the first regular expression does not match anything in the test string "activity", but after matching it against the second regular expression nothing remains. The test applies all provided regular expression _in order of appearance_ and shows what _remains_ of the provided test string after each iteration.
 
 
 h3. 2.3 Batcher
@@ -135,7 +135,7 @@ You will have to edit @./batcher_input_example.yml@ and provide the following ar
 # @gene_ontology_results_dir:@ The directory in which each Batch's Gene Ontology annotation file is stored.
 # @output_dir:@ The directory each AHRD run should create a subdirectory with the output for the processed batch.
 
-_Batch-Name requirement:_ All above explained files belonging to the same Batch _must_ have the same name. This name must start with alpha-numeric characters and may finish with digits indicating the Batche's number. File extensions are allowed to be varying. 
+_Batch-Name requirement:_ All above explained files belonging to the same Batch _must_ have the same name. This name must start with alpha-numeric characters and may finish with digits indicating the Batch's number. File extensions are allowed to be varying. 
 
 h3. 2.4 Output
 
