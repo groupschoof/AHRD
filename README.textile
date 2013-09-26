@@ -70,10 +70,22 @@ or just execute
 
 h3. 2.2 Batcher
 
-Start the Batcher with:
-<pre>mkdir test/resources/batch_ymls 
-java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./test/resources/batcher_input_test.yml</pre>
-You will have to edit ./test/resources/batcher_input_test.yml according to your needs.
+AHRD provides a function to generate several input.yml files from large datasets, consisting of _batches_ of query proteins. For each of these batches the user is expected to provide the batch's query proteins in FASTA format, and one Blast result file for each database searched. The AHRD batcher will then generate a unique input.yml file and entry in a batch shell script to execute AHRD on the respective batches in parallel for example on a compute cluster using a batch-system like LSF. We recommend this for genome scale datasets.
+
+To generate the mentioned input.yml files and batcher shell script that can subsequently be used to start AHRD in parallel use the batcher function as follows:
+<pre>java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./batcher_input_example.yml</pre>
+You will have to edit @./batcher_input_example.yml@ and provide the following arguments. Note, that in the mentioned directories each file will be interpreted as belonging to one unique Batch, if and only if they have identical file names. 
+
+# @shell_script:@ Path to the shell-script file which later contains all the statements to invoke AHRD on each supplied batch in parallel.
+# @ahrd_call: "java -Xmx2048m -jar ./dist/ahrd.jar #batch#"@ This line will be the basis of executing AHRD on each supplied batch. The line _must_ contain @#batch#@ wich will be replaced with the input.yml files. To use a batch system like LSF this line has to be modified to something like @bsub -q normal 'java -Xmx2048m -jar ./dist/ahrd.jar #batch#'@
+# @proteins_dir:@ The path to the directory the query protein batches are stored in.
+# @batch_ymls_dir:@ The path to the directory the AHRD-Batcher should store the generated input.yml files in.
+# @dir:@ Each database entry requires this argument, the path to the directory each batch's blast result file from searches in the corresponding Blast-database is located.
+# @interpro_results_dir:@ The directory in which each Batch's @interproscan@ result file is located.
+# @gene_ontology_results_dir:@ The directory in which each Batch's Gene Ontology annotation file is stored.
+# @output_dir:@ The directory each AHRD run should create a subdirectory with the output for the processed batch.
+
+_Batch-Name requirement:_ All above explained files belonging to the same Batch _must_ have the same name. This name must start with alpha-numeric characters and may finish with digits indicating the Batche's number. File extensions are allowed to be varying. 
 
 h3. 2.3 Input
 
