@@ -68,7 +68,42 @@ or just execute
 
 <pre>ant test.run </pre>
 
-h3. 2.2 Batcher
+h3. 2.2 Input
+
+Example files for all input files can be found under ./test/resources/
+
+h4. 2.2.1 Required input data
+
+# Protein sequences in fasta format
+# BLAST seach results in pairwise format for protein sequences
+
+(If you run AHRD in batches the blast search results need to be batched in the same way as the fasta files.)
+
+Recommended BLAST-Search:
+
+For your query proteins you should start independent BLAST searches e.g.
+in the three different databases mentioned above:
+
+<pre>
+blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
+</pre>
+
+h4. 2.2.2 Optional input data
+
+# Domain search results from InterProScan in raw format
+# Gene ontology annotations in csv format
+
+In case InterProScan results are given as input, AHRD needs the Interpro database XML- and dtd-file.
+
+h4. 2.2.3 Required config files
+
+# Input yml with all pathes and parameters according to your needs (see ahrd_example_input.yml and section Parameters)
+# Blacklists and filters (they can either be used as provided or can be adapted to your needs and databases). Each of these files contains a list of valid Java regular expressions, one per line. For details on Java regular expressions please refer to http://docs.oracle.com/javase/tutorial/essential/regex/.
+## *Description blacklist* (Argument @blacklist: ./test/resources/blacklist_descline.txt@) - Any Blast-Hit's description matching one of the regular expressions in this file will be ignored.
+## *Description filter* for each single blast database (Argument @filter: ./test/resources/filter_descline_sprot.txt@) - Any part of a Blast-Hit description that matches any one of the regular expressions in this file will be deleted from the description.
+## *Token blacklist* (Argument @token_blacklist: ./test/resources/blacklist_token.txt@) - Blast-Hit's descriptions are composed of words. Any such word matching any one of the regular expressions in this file will be ignored by AHRD's scoring, albeit it will not be deleted from the description and thus might still be seen in the final output.
+
+h3. 2.3 Batcher
 
 AHRD provides a function to generate several input.yml files from large datasets, consisting of _batches_ of query proteins. For each of these batches the user is expected to provide the batch's query proteins in FASTA format, and one Blast result file for each database searched. The AHRD batcher will then generate a unique input.yml file and entry in a batch shell script to execute AHRD on the respective batches in parallel for example on a compute cluster using a batch-system like LSF. We recommend this for genome scale datasets.
 
@@ -86,41 +121,6 @@ You will have to edit @./batcher_input_example.yml@ and provide the following ar
 # @output_dir:@ The directory each AHRD run should create a subdirectory with the output for the processed batch.
 
 _Batch-Name requirement:_ All above explained files belonging to the same Batch _must_ have the same name. This name must start with alpha-numeric characters and may finish with digits indicating the Batche's number. File extensions are allowed to be varying. 
-
-h3. 2.3 Input
-
-Example files for all input files can be found under ./test/resources/
-
-h4. 2.3.1 Required input data
-
-# Protein sequences in fasta format
-# BLAST seach results in pairwise format for protein sequences
-
-(If you run AHRD in batches the blast search results need to be batched in the same way as the fasta files.)
-
-Recommended BLAST-Search:
-
-For your query proteins you should start independent BLAST searches e.g.
-in the three different databases mentioned above:
-
-<pre>
-blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
-</pre>
-
-h4. 2.3.2 Optional input data
-
-# Domain search results from InterProScan in raw format
-# Gene ontology annotations in csv format
-
-In case InterProScan results are given as input, AHRD needs the Interpro database XML- and dtd-file.
-
-h4. 2.3.3 Required config files
-
-# Input yml with all pathes and parameters according to your needs (see ahrd_example_input.yml and section Parameters)
-# Blacklists and filters (they can either be used as provided or can be adapted to your needs and databases). Each of these files contains a list of valid Java regular expressions, one per line. For details on Java regular expressions please refer to http://docs.oracle.com/javase/tutorial/essential/regex/.
-## *Description blacklist* (Argument @blacklist: ./test/resources/blacklist_descline.txt@) - Any Blast-Hit's description matching one of the regular expressions in this file will be ignored.
-## *Description filter* for each single blast database (Argument @filter: ./test/resources/filter_descline_sprot.txt@) - Any part of a Blast-Hit description that matches any one of the regular expressions in this file will be deleted from the description.
-## *Token blacklist* (Argument @token_blacklist: ./test/resources/blacklist_token.txt@) - Blast-Hit's descriptions are composed of words. Any such word matching any one of the regular expressions in this file will be ignored by AHRD's scoring, albeit it will not be deleted from the description and thus might still be seen in the final output.
 
 h3. 2.4 Output
 
@@ -262,7 +262,7 @@ See attached file LICENSE.txt for details.
 
 h2. 6 Authors
 
-Asis Hallab, Kathrin Klee, and Prof. Dr. Heiko Schoof
+Asis Hallab, Kathrin Klee, Sri Girish, and Prof. Dr. Heiko Schoof
 
 INRES Crop Bioinformatics
 University of Bonn
