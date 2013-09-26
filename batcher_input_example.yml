@@ -1,0 +1,40 @@
+shell_script: ./test/resources/start_ahrd_batched.sh
+ahrd_call: "java -Xmx2048m -jar ./dist/ahrd.jar #batch#"
+
+proteins_dir: ./test/resources/proteins
+batch_ymls_dir: ./test/resources/batch_ymls
+
+token_score_bit_score_weight: 0.5
+token_score_database_score_weight: 0.3
+token_score_overlap_score_weight: 0.2
+description_score_relative_description_frequency_weight: 0.6
+
+blast_dbs:
+  swissprot:
+    dir: ./test/resources/sprot_blast_results
+    weight: 100
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_sprot.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+    description_score_bit_score_weight: 0.2
+
+  tair:
+    dir: ./test/resources/tair_blast_results
+    weight: 50
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_tair.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+    description_score_bit_score_weight: 0.4
+
+  trembl:
+    dir: ./test/resources/trembl_blast_results
+    weight: 10
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_trembl.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+    description_score_bit_score_weight: 0.4
+
+interpro_results_dir: ./test/resources/interpro_results
+interpro_database: ./test/resources/interpro_31.xml
+gene_ontology_results_dir: ./test/resources/gene_ontology_results
+output_dir: ./test/resources/

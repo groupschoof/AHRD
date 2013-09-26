@@ -4,9 +4,6 @@ classes/**/*
 # Ignore Batcher-Tests:
 start_ahrd_batched.sh
 
-# The following directory is only created, if Batcher is tested:
-test/resources/batch_ymls
-
 # Executable jar should also be ignored
 dist/ahrd.jar
 
