@@ -107,8 +107,8 @@ h4. 2.3.3 Required config files
 # Input yml with all pathes and parameters according to your needs (see ahrd_example_input.yml and section Parameters)
 # Blacklists and filters (they can either be used as provided or can be adapted to your needs and databases). Each of these files contains a list of valid Java regular expressions, one per line. For details on Java regular expressions please refer to http://docs.oracle.com/javase/tutorial/essential/regex/.
 ## *Description blacklist* (Argument @blacklist: ./test/resources/blacklist_descline.txt@) - Any Blast-Hit's description matching one of the regular expressions in this file will be ignored.
-## *Token blacklist* (Argument @token_blacklist: ./test/resources/blacklist_token.txt@) - Blast-Hit's descriptions are composed of words. Any such word matching any one of the regular expressions in this file will not be ignored by AHRD's scoring, albeit it will not be deleted from the description and thus might still be seen in the final output.
 ## *Description filter* for each single blast database (Argument @filter: ./test/resources/filter_descline_sprot.txt@) - Any part of a Blast-Hit description that matches any one of the regular expressions in this file will be deleted from the description.
+## *Token blacklist* (Argument @token_blacklist: ./test/resources/blacklist_token.txt@) - Blast-Hit's descriptions are composed of words. Any such word matching any one of the regular expressions in this file will be ignored by AHRD's scoring, albeit it will not be deleted from the description and thus might still be seen in the final output.
 
 h3. 2.4 Output
 
