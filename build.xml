@@ -99,5 +99,13 @@
 		</junit>
 	</target>
 
+	<target name="test.parse.blastout.xml" depends="compile.test">
+		<junit printsummary="true" fork="true" forkmode="perTest">
+			<classpath refid="classpath.test" />
+			<formatter type="plain" usefile="false" />
+			<test name="ahrd.test.TestXmlBlastoutParser" />
+		</junit>
+	</target>
+
 </project>
 
