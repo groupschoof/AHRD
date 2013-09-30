@@ -271,6 +271,10 @@ h2. 4 Testing
 
 If you want to run the complete JUnit Test-Suite execute: <pre>ant</pre>
 
+h3. 4.1 Parse Blast-XML output
+
+The code is almost finished. What is needed is to get the already available data copied into our custom BlastResult objects and have a proper test method for this creation of BlastResult instances from the new JAXB Parser. Classes are in package @ahrd.model.blast@ and "full parser" in @ahrd.test.BlastXmlOutputParser.java@. See @build.xml@ section "test.parse.blastout.xml" for details or test parser *even on very large blast xml output files* using the command line. Also do not forget to implement a decision switch to use BlastXmlParser if and only if the blast output file terminates in @.xml@.
+
 h2. 5 License
 
 See attached file LICENSE.txt for details.
