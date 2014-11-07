@@ -42,7 +42,7 @@ public class TrainerOutputWriter {
 		String hdr = "Temperature\t";
 		if (isFinalOutput)
 			hdr += "Average Maximum-Evaluation-Score\t";
-		hdr += "Average Evaluation-Score";
+		hdr += "Average Evaluation-Score(F_AHRD-F_best_competitor)";
 		if (!isFinalOutput)
 			hdr += "\tDiff-to-curr-Accepted\tAccepted";
 		hdr += "\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Pattern-Factor-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
