@@ -3,6 +3,7 @@ package ahrd.controller;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.IOException;
+import java.util.List;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
@@ -17,7 +18,8 @@ public class Evaluator extends AHRD {
 	}
 
 	public void setupReferences() throws IOException, MissingAccessionException {
-		String[] fastaEntries = getSettings().getReferencesFasta().split(">");
+		List<String> fastaEntries = Protein.splitFasta(getSettings()
+				.getReferencesFasta());
 		for (String fastaEntry : fastaEntries) {
 			if (fastaEntry != null && !fastaEntry.trim().equals("")) {
 				ReferenceDescription rd = ReferenceDescription
