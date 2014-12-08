@@ -7,6 +7,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -119,6 +121,18 @@ public class ProteinTest {
 		assertTrue(prot_db instanceof Map);
 		assertNotNull(prot_db);
 		assertEquals(2, prot_db.size());
+	}
+
+	@Test
+	public void testFastaSplitter() {
+		System.out.println("HALLO");
+		String str = ">Protein One->Expressed in stupid user\nSPGYDASMTDSRSSGISMSIGGRSLASEDSDGLTPSAVFSQIMNPKGR\n>Protein Two\nMADDSKFCFFLVSTFLLLAVVVNVTLAANYVPGDDILLNCGGPDNLPDADGRKWGTDIGS";
+		List<String> fastaEntries = Protein.splitFasta(str);
+		assertEquals(
+				Arrays.asList(
+						"Protein One->Expressed in stupid user\nSPGYDASMTDSRSSGISMSIGGRSLASEDSDGLTPSAVFSQIMNPKGR",
+						"Protein Two\nMADDSKFCFFLVSTFLLLAVVVNVTLAANYVPGDDILLNCGGPDNLPDADGRKWGTDIGS"),
+				fastaEntries);
 	}
 
 }

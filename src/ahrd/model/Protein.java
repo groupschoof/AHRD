@@ -2,6 +2,7 @@ package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,13 @@ public class Protein {
 			setEvaluationScoreCalculator(new EvaluationScoreCalculator(this));
 	}
 
+	public static List<String> splitFasta(String fastaStr) {
+		List<String> fastaEntries = new ArrayList<String>(
+				Arrays.asList(fastaStr.split("(^|\n|\r)>")));
+		fastaEntries.removeAll(Arrays.asList("", null));
+		return fastaEntries;
+	}
+
 	public static Protein constructFromFastaEntry(String fastaEntry)
 			throws MissingAccessionException {
 		String[] fasta_data = fastaEntry.split("\n");
@@ -90,7 +98,7 @@ public class Protein {
 	public static Map<String, Protein> initializeProteins(
 			String fastaFileContent) throws MissingAccessionException {
 		Map<String, Protein> proteins = new HashMap<String, Protein>();
-		String[] fastaEntries = fastaFileContent.trim().split(">");
+		List<String> fastaEntries = splitFasta(fastaFileContent);
 		for (String fastaEntry : fastaEntries) {
 			if (fastaEntry != null && !fastaEntry.trim().equals("")
 					&& !fastaEntry.equals("\n")) {
