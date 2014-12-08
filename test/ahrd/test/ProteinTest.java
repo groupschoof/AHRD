@@ -125,7 +125,6 @@ public class ProteinTest {
 
 	@Test
 	public void testFastaSplitter() {
-		System.out.println("HALLO");
 		String str = ">Protein One->Expressed in stupid user\nSPGYDASMTDSRSSGISMSIGGRSLASEDSDGLTPSAVFSQIMNPKGR\n>Protein Two\nMADDSKFCFFLVSTFLLLAVVVNVTLAANYVPGDDILLNCGGPDNLPDADGRKWGTDIGS";
 		List<String> fastaEntries = Protein.splitFasta(str);
 		assertEquals(
