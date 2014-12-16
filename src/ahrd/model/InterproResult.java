@@ -158,6 +158,7 @@ public class InterproResult implements Comparable<InterproResult> {
 			System.err
 					.println("Could not find the following Interpro_IDs in Database:\n"
 							+ missingInterproIds);
+		br.close();
 	}
 
 	public static Map<String, InterproResult> getInterproDb() {

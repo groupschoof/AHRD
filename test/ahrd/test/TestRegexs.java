@@ -43,6 +43,7 @@ public class TestRegexs {
 			patternList.add(Pattern.compile(iterLine.trim(),
 					Pattern.CASE_INSENSITIVE));
 		}
+		br.close();
 		return patternList;
 	}
 
@@ -55,6 +56,7 @@ public class TestRegexs {
 		while ((iterLine = br.readLine()) != null) {
 			matchesList.add(iterLine.trim());
 		}
+		br.close();
 		return matchesList;
 	}
 

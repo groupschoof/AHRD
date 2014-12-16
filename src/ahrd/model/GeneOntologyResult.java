@@ -38,6 +38,7 @@ public class GeneOntologyResult implements Comparable<GeneOntologyResult> {
 				}
 			}
 		}
+		br.close();
 	}
 
 	public int compareTo(GeneOntologyResult goToCompare) {
