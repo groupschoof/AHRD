@@ -43,14 +43,17 @@ public class TrainerTest {
 		assertTrue("Trainer should initialize Settings to Training-Mode.",
 				getSettings().isInTrainingMode());
 		Protein p1 = new Protein("protein_one", 200);
+		p1.getEvaluationScoreCalculator().setEvalutionScore(1.0);
 		p1.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(1.0);
 		p1.getEvaluationScoreCalculator().setTruePositivesRate(0.6);
 		p1.getEvaluationScoreCalculator().setFalsePositivesRate(0.7);
 		Protein p2 = new Protein("protein_two", 210);
+		p2.getEvaluationScoreCalculator().setEvalutionScore(0.8);
 		p2.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.8);
 		p2.getEvaluationScoreCalculator().setTruePositivesRate(0.7);
 		p2.getEvaluationScoreCalculator().setFalsePositivesRate(0.5);
 		Protein p3 = new Protein("protein_three", 220);
+		p3.getEvaluationScoreCalculator().setEvalutionScore(0.3);
 		p3.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.3);
 		p3.getEvaluationScoreCalculator().setTruePositivesRate(0.5);
 		p3.getEvaluationScoreCalculator().setFalsePositivesRate(0.3);
@@ -73,7 +76,7 @@ public class TrainerTest {
 			p.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.0);
 		}
 		trainer.calcAveragesOfEvalScoreTPRandFPR();
-		assertEquals(0.0, getSettings().getAvgEvaluationScore(), 0.00000000001);
+		assertEquals(getSettings().getAvgEvaluationScore(), 0.7, 0.00000000001);
 	}
 
 	@Test

@@ -204,9 +204,8 @@ public class Trainer extends Evaluator {
 	}
 
 	/**
-	 * Calculates the average of the difference between AHRD's EvaluationScore
-	 * and the best competitor's (objective-function). Also calculates the
-	 * average True-Positives- and False-Positives-Rates.
+	 * Calculates the average of AHRD's EvaluationScore (objective-function).
+	 * Also calculates the average True-Positives- and False-Positives-Rates.
 	 */
 	public void calcAveragesOfEvalScoreTPRandFPR() {
 		// average evaluation-score
@@ -218,8 +217,8 @@ public class Trainer extends Evaluator {
 		for (Protein p : getProteins().values()) {
 			EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
 			if (e != null) {
-				if (e.getEvalScoreMinBestCompScore() != null)
-					avgEvlScr += e.getEvalScoreMinBestCompScore();
+				if (e.getEvalutionScore() != null)
+					avgEvlScr += e.getEvalutionScore();
 				if (e.getTruePositivesRate() != null)
 					avgTruePosRate += e.getTruePositivesRate();
 				if (e.getFalsePositivesRate() != null)
