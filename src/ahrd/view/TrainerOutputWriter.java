@@ -45,7 +45,7 @@ public class TrainerOutputWriter {
 		hdr += "Average Evaluation-Score(F_AHRD-F_best_competitor)";
 		if (!isFinalOutput)
 			hdr += "\tDiff-to-curr-Accepted\tAccepted";
-		hdr += "\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Pattern-Factor-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
+		hdr += "\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Relative-Description-Frequency-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
 		for (String blastDb : this.sortedBlastDatabases) {
 			hdr += "\t" + blastDb + "-Weight";
 			hdr += "\t" + blastDb + "-Description-Score-Bit-Score-Weight";
