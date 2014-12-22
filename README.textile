@@ -90,6 +90,8 @@ blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot
 
 h4. 2.2.2 Optional input data
 
+AHRD optionally considers other protein function annotations. Formerly this was requested in genome projects [1]. We do _not_ recommend their use any more, due to AHRD's excellent performance without this protein function information.
+
 # Domain search results from InterProScan in raw format
 # Gene ontology annotations in csv format
 
@@ -284,3 +286,9 @@ University of Bonn
 Katzenburgweg 2
 53115 Bonn
 Germany
+
+h2. References
+
+# Young, Nevin D., Frédéric Debellé, Giles E. D. Oldroyd, Rene Geurts, Steven B. Cannon, Michael K. Udvardi, Vagner A. Benedito, et al. “The Medicago Genome Provides Insight into the Evolution of Rhizobial Symbioses.” Nature 480, no. 7378 (December 22, 2011): 520–24. doi:10.1038/nature10625.
+
+# The Tomato Genome Consortium. “The Tomato Genome Sequence Provides Insights into Fleshy Fruit Evolution.” Nature 485, no. 7400 (May 31, 2012): 635–41. doi:10.1038/nature11119.
