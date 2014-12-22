@@ -246,7 +246,7 @@ h3. 3.1 Pseudo-Code
 
 h3. 3.2 Used Formulae and Parameters
 
-<img src="http://github.com/groupschoof/AHRD/raw/master/images/formulae.jpg" />
+!https://raw.githubusercontent.com/groupschoof/AHRD/master/images/formulae.jpg!
 
 h3. 3.3 Parameters
 
