@@ -289,6 +289,4 @@ Germany
 
 h2. References
 
-# Young, Nevin D., Frédéric Debellé, Giles E. D. Oldroyd, Rene Geurts, Steven B. Cannon, Michael K. Udvardi, Vagner A. Benedito, et al. “The Medicago Genome Provides Insight into the Evolution of Rhizobial Symbioses.” Nature 480, no. 7378 (December 22, 2011): 520–24. doi:10.1038/nature10625.
-
-# The Tomato Genome Consortium. “The Tomato Genome Sequence Provides Insights into Fleshy Fruit Evolution.” Nature 485, no. 7400 (May 31, 2012): 635–41. doi:10.1038/nature11119.
+fn1. Young, Nevin D., Frédéric Debellé, Giles E. D. Oldroyd, Rene Geurts, Steven B. Cannon, Michael K. Udvardi, Vagner A. Benedito, et al. “The Medicago Genome Provides Insight into the Evolution of Rhizobial Symbioses.” Nature 480, no. 7378 (December 22, 2011): 520–24. doi:10.1038/nature10625.
