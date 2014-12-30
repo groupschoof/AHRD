@@ -119,7 +119,7 @@ public class Settings implements Cloneable {
 	 * For the <strong>simulated annealing</strong> algorithm, this will be
 	 * current temperature. (Default is 1000)
 	 */
-	private Integer temperature = 1000;
+	private Integer temperature = 75000;
 	/**
 	 * For the <strong>simulated annealing</strong> algorithm, this will be
 	 * value the current temperature gets cooled down each step. (Default is 1)
@@ -130,21 +130,21 @@ public class Settings implements Cloneable {
 	 * scaling factor for the probability distribution P('Accept worse scoring
 	 * Parameter-Set') := exp(-delta_scores*scaling_factor/current-temperature).
 	 */
-	private Double optimizationAcceptanceProbabilityScalingFactor = 200000000.0;
+	private Double optimizationAcceptanceProbabilityScalingFactor = 2500000000.0;
 	/**
 	 * In simulated annealing optimization each cycle has to mutate the current
 	 * Parameter-Set to generate a neighboring set in parameter space. The
 	 * random value used to add or subtract to a single parameter is Gaussian
 	 * distributed and has the following mean:
 	 */
-	private Double mutatorMean = 0.2;
+	private Double mutatorMean = 0.25;
 	/**
 	 * In simulated annealing optimization each cycle has to mutate the current
 	 * Parameter-Set to generate a neighboring set in parameter space. The
 	 * random value used to add or subtract to a single parameter is Gaussian
 	 * distributed and has the following standard deviation:
 	 */
-	private Double mutatorDeviation = 0.25;
+	private Double mutatorDeviation = 0.15;
 	/**
 	 * If the last optimization step was done with better performing parameters,
 	 * randomly decide to mutate the same Parameter to generate a new Neighbor
