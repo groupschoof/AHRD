@@ -49,16 +49,16 @@ that AHRD is generic and can make use of any number of different Blast
 databases that do not necessarily have to be the above ones. If e.g. annotating
 genes from a fungal genome searching yeast databases might be more
 recommendable than using TAIR (_Arabidopsis thaliana_).
-Optionally domain search results from InterProScan and functional annotations
-from Gene Ontology can be given as additional input to improve the results.
 
 All parameters can be set manually, or the default ones can be used as given in
 the example input file ./test/resources/ahrd_input_test_run.yml (see section
 Parameters).
 
-AHRD is recommended to be run on batches of 1,000 to 2,000 proteins. If you
-want to annotate a whole genome use the included Batcher to split your
-input-data into Batches of appropriate size (see section Batcher).
+In order to parallelize the protein function annotation processes,  
+AHRD can be run on batches of recommended size between 1,000 to 2,000 proteins. 
+If you want to annotate large protein sets use the included Batcher to split your
+input-data into Batches of appropriate size (see section Batcher). 
+As of Java 7 or higher AHRD is quite fast and batching might no longer be necessary.
 
 h3. 2.1 AHRD Example run
 
@@ -88,7 +88,11 @@ in the three different databases mentioned above:
 blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
 </pre>
 
+_Note_ We are currently working on extending AHRD to parse Blast+ output. As of now, legacy blast is still a requirement.
+
 h4. 2.2.2 Optional input data
+
+AHRD optionally considers other protein function annotations. Formerly this was requested in genome projects [1]. We do _not_ recommend their use any more, due to AHRD's excellent performance without this protein function information.
 
 # Domain search results from InterProScan in raw format
 # Gene ontology annotations in csv format
@@ -112,10 +116,12 @@ As explained in 2.2.3 AHRD makes use of blacklists and filters provided as Java 
 # Execute @ant test.regexs@ and study the output.
 
 Example Output for test string "activity", and regular expressions "(?i)interacting", and "(?i)activity" applied in serial:
+
 <pre>[junit] activity 
 [junit] (?i)interacting -> activity
 [junit] (?i)activity -> </pre>
-Shows how the first regular expression does not match anything in the test string "activity", but after matching it against the second regular expression nothing remains. The test applies all provided regular expression _in order of appearance_ and shows what _remains_ of the provided test string after each iteration.
+
+The above example demonstrates how the first regular expression does not match anything in the test string "activity", but after matching it against the second regular expression nothing remains, because the matched substring has been filtered out. As you can see, this test applies all provided regular expression _in order of appearance_ and shows what _remains_ of the provided test string after filtering with the provided regular expressions.
 
 
 h3. 2.3 Batcher
@@ -244,7 +250,7 @@ h3. 3.1 Pseudo-Code
 
 h3. 3.2 Used Formulae and Parameters
 
-<img src="http://github.com/groupschoof/AHRD/raw/master/images/formulae.jpg" />
+!https://raw.githubusercontent.com/groupschoof/AHRD/master/images/formulae.jpg!
 
 h3. 3.3 Parameters
 
@@ -284,3 +290,7 @@ University of Bonn
 Katzenburgweg 2
 53115 Bonn
 Germany
+
+h2. References
+
+fn1. Young, Nevin D., Frédéric Debellé, Giles E. D. Oldroyd, Rene Geurts, Steven B. Cannon, Michael K. Udvardi, Vagner A. Benedito, et al. “The Medicago Genome Provides Insight into the Evolution of Rhizobial Symbioses.” Nature 480, no. 7378 (December 22, 2011): 520–24. doi:10.1038/nature10625.
