@@ -265,11 +265,7 @@ token_score_overlap_score_weight: 0.2 </pre>
 and Blast-Database specific:
 <pre>weight: 100 </pre>
 
-h4. 3.3.2 The weight in formula Lexical-Score is
-
-<pre>description_score_relative_description_frequency_weight: 0.6 </pre>
-
-h4. 3.3.3 The weight in formula Description-Score also is Blast-database specific
+h4. 3.3.2 The weight in formula Description-Score also is Blast-database specific
 
 <pre>description_score_bit_score_weight: 0.2 </pre>
 
