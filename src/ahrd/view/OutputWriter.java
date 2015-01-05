@@ -30,12 +30,10 @@ public class OutputWriter extends AbstractOutputWriter {
 		// Column-Names:
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
-		bw
-				.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
+		bw.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
 
 		if (getSettings().isInTrainingMode()) {
-			bw
-					.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+			bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
@@ -44,13 +42,11 @@ public class OutputWriter extends AbstractOutputWriter {
 			bw.write("\t\"Tokens (tkn->score)\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
-			bw
-					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore");
+			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
-			bw
-					.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
+			bw.write("\tBlast2GO-Annotation\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
 		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
 			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
@@ -207,7 +203,7 @@ public class OutputWriter extends AbstractOutputWriter {
 	 * Append the following columns to the current CSV-Row:
 	 * sum_of_all_token_scores, token_high_score, correction_factor, go_score,
 	 * lexical_score, rel_bit_score, desc_line_frequency,
-	 * max_desc_line_frequency, pattern_factor
+	 * max_desc_line_frequency
 	 * 
 	 * @note: Printing out these values may slow down the running-time, as these
 	 *        values are not necessarily stored in memory.

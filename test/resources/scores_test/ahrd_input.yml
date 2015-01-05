@@ -31,7 +31,6 @@ gene_ontology_result: ./test/resources/empty_file.txt
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
-description_score_relative_description_frequency_weight: 0.6
 write_token_set_to_output: false
 write_best_blast_hits_to_output: false
 write_scores_to_output: true
