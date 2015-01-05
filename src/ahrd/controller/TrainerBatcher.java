@@ -118,11 +118,7 @@ public class TrainerBatcher extends Batcher {
 
 		batchYml.put(Settings.TOKEN_SCORE_OVERLAP_SCORE_WEIGHT,
 				parameters.getTokenScoreOverlapScoreWeight());
-
-		batchYml.put(
-				Settings.DESCRIPTION_SCORE_RELATIVE_DESCIPTION_FREQUENCY_WEIGHT,
-				parameters.getDescriptionScorePatternFactorWeight());
-
+		
 		// Put data for each Blast-Db into Yml-Hash
 		Map<String, Object> inputBlastDbs = (Map<String, Object>) ((HashMap<String, Object>) getInput()
 				.get(Settings.BLAST_DBS_KEY)).clone();

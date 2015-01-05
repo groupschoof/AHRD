@@ -12,9 +12,7 @@ public class DescriptionScoreCalculator {
 	private double maxBitScore = 0.0;
 	private BlastResult highestScoringBlastResult;
 	private Double descriptionHighScore;
-	private Map<String, Integer> descLinePatternFrequencies = new HashMap<String, Integer>();
-	private int maxDescriptionLineFrequency = 0;
-
+	
 	public DescriptionScoreCalculator(Protein protein) {
 		super();
 		setProtein(protein);
@@ -49,19 +47,7 @@ public class DescriptionScoreCalculator {
 	public void calcDescriptionScore(BlastResult blastResult) {
 		blastResult.setDescriptionScore(getProtein()
 				.getLexicalScoreCalculator().lexicalScore(blastResult)
-				+ relativeBlastScore(blastResult) + patternFactor(blastResult));
-	}
-
-	/**
-	 * Calculates the PatternFactor, which is the frequency of the description
-	 * divided by the number of occurrences of the most frequent description.
-	 * 
-	 * @param br
-	 * @return
-	 */
-	public double patternFactor(BlastResult br) {
-		return getSettings().getDescriptionScorePatternFactorWeight()
-				* (getDescLinePatternFrequencies().get(br.patternize()) / getMaxDescriptionLineFrequency());
+				+ relativeBlastScore(blastResult));
 	}
 
 	public double relativeBlastScore(BlastResult br) {
@@ -73,16 +59,6 @@ public class DescriptionScoreCalculator {
 	public void measureMaxBitScore(double bitScore) {
 		if (bitScore > getMaxBitScore())
 			setMaxBitScore(bitScore);
-	}
-
-	public void measureDescriptionLineFrequency(String descLinePattern) {
-		Integer currentFrequency = getDescLinePatternFrequencies().containsKey(
-				descLinePattern) ? getDescLinePatternFrequencies().get(
-				descLinePattern) + 1 : 1;
-		getDescLinePatternFrequencies().put(descLinePattern, currentFrequency);
-		// Measure maxDescriptionLineFrequency:
-		if (currentFrequency > getMaxDescriptionLineFrequency())
-			setMaxDescriptionLineFrequency(currentFrequency);
 	}
 
 	/**
@@ -139,33 +115,4 @@ public class DescriptionScoreCalculator {
 	public void setDescriptionHighScore(Double descriptionHighScore) {
 		this.descriptionHighScore = descriptionHighScore;
 	}
-
-	public Map<String, Integer> getDescLinePatternFrequencies() {
-		return descLinePatternFrequencies;
-	}
-
-	public void setDescLinePatternFrequencies(
-			Map<String, Integer> descriptionLineFrequencies) {
-		this.descLinePatternFrequencies = descriptionLineFrequencies;
-	}
-
-	/**
-	 * Get maxDescriptionLineFrequency.
-	 * 
-	 * @return maxDescriptionLineFrequency as int.
-	 */
-	public int getMaxDescriptionLineFrequency() {
-		return maxDescriptionLineFrequency;
-	}
-
-	/**
-	 * Set maxDescriptionLineFrequency.
-	 * 
-	 * @param maxDescriptionLineFrequency
-	 *            the value to set.
-	 */
-	public void setMaxDescriptionLineFrequency(int maxDescriptionLineFrequency) {
-		this.maxDescriptionLineFrequency = maxDescriptionLineFrequency;
-	}
-
 }

@@ -59,7 +59,6 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_SCORE_BIT_SCORE_WEIGHT = "token_score_bit_score_weight";
 	public static final String TOKEN_SCORE_DATABASE_SCORE_WEIGHT = "token_score_database_score_weight";
 	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT = "token_score_overlap_score_weight";
-	public static final String DESCRIPTION_SCORE_RELATIVE_DESCIPTION_FREQUENCY_WEIGHT = "description_score_relative_description_frequency_weight";
 	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT = "description_score_bit_score_weight";
 	public static final String REFERENCES_FASTA_KEY = "references_fasta";
 	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
@@ -211,9 +210,6 @@ public class Settings implements Cloneable {
 				.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
 		setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input
 				.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
-		setDescriptionScorePatternFactorWeight(Double
-				.parseDouble((String) input
-						.get(DESCRIPTION_SCORE_RELATIVE_DESCIPTION_FREQUENCY_WEIGHT)));
 		setWriteTokenSetToOutput(Boolean.parseBoolean((String) input
 				.get(WRITE_TOKEN_SET_TO_OUTPUT)));
 		setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input
@@ -508,16 +504,6 @@ public class Settings implements Cloneable {
 			Double tokenScoreOverlapScoreWeight) {
 		this.getParameters().setTokenScoreOverlapScoreWeight(
 				tokenScoreOverlapScoreWeight);
-	}
-
-	public Double getDescriptionScorePatternFactorWeight() {
-		return getParameters().getDescriptionScorePatternFactorWeight();
-	}
-
-	public void setDescriptionScorePatternFactorWeight(
-			Double descriptionScorePatternFactorWeight) {
-		this.getParameters().setDescriptionScorePatternFactorWeight(
-				descriptionScorePatternFactorWeight);
 	}
 
 	public Boolean getWriteTokenSetToOutput() {

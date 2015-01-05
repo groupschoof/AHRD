@@ -45,7 +45,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		}
 		if (getSettings().getWriteScoresToOutput()) {
 			bw
-					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore\tDescriptionLineFrequency\tMax(DescLineFreq)\tPattern-Factor");
+					.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
@@ -242,16 +242,6 @@ public class OutputWriter extends AbstractOutputWriter {
 			csvCells += "\t"
 					+ FRMT.format(prot.getDescriptionScoreCalculator()
 							.relativeBlastScore(hsbr));
-			csvCells += "\t"
-					+ FRMT.format(prot.getDescriptionScoreCalculator()
-							.getDescLinePatternFrequencies().get(
-									hsbr.patternize()));
-			csvCells += "\t"
-					+ FRMT.format(prot.getDescriptionScoreCalculator()
-							.getMaxDescriptionLineFrequency());
-			csvCells += "\t"
-					+ FRMT.format(prot.getDescriptionScoreCalculator()
-							.patternFactor(hsbr));
 		}
 		return csvCells;
 	}
