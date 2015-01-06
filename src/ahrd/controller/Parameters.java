@@ -25,7 +25,7 @@ public class Parameters implements Cloneable {
 	private Double tokenScoreBitScoreWeight;
 	private Double tokenScoreDatabaseScoreWeight;
 	private Double tokenScoreOverlapScoreWeight;
-	private Double descriptionScorePatternFactorWeight;
+
 	private Map<String, Map<String, String>> blastDbParameters = new HashMap<String, Map<String, String>>();
 	/**
 	 * If we test different settings in the parameter-space, remember the
@@ -59,7 +59,6 @@ public class Parameters implements Cloneable {
 		out.setTokenScoreOverlapScoreWeight(randomMultipleOfOneTenth());
 		// normalize the randomly chosen weights:
 		out.normalizeTokenScoreWeights();
-		out.setDescriptionScorePatternFactorWeight(randomMultipleOfOneTenth());
 		// Init BlastDbs' Parameters:
 		for (String blastDbName : sortedDistinctBlastDatabaseNames) {
 			out.setDescriptionScoreBitScoreWeight(blastDbName,
@@ -98,7 +97,7 @@ public class Parameters implements Cloneable {
 	public int parameterToMutateRandomIndex() {
 		int randParamInd = 0;
 		// How many Parameters can be mutated?
-		int noOfParams = 4 + 2 * getBlastDatabases().size();
+		int noOfParams = 3 + 2 * getBlastDatabases().size();
 		// Randomly choose a parameter to change:
 		Random rand = Utils.random;
 		randParamInd = rand.nextInt(noOfParams);
@@ -143,20 +142,18 @@ public class Parameters implements Cloneable {
 			randParamToMutate = parameterToMutateRandomIndex();
 		}
 		// Once a parameter is chosen by its index, mutate it:
-		if (randParamToMutate < 4) {
+		if (randParamToMutate < 3) {
 			// Mutate one of the four parameters independent of the number of
 			// Blast-Databases:
 			if (randParamToMutate == 0)
-				ngb.mutateDescriptionScorePatternFactorWeight();
-			else if (randParamToMutate == 1)
 				ngb.mutateTokenScoreBitScoreWeight();
-			else if (randParamToMutate == 2)
+			else if (randParamToMutate == 1)
 				ngb.mutateTokenScoreDatabaseScoreWeight();
-			else if (randParamToMutate == 3)
+			else if (randParamToMutate == 2)
 				ngb.mutateTokenScoreOverlapScoreWeight();
 		} else {
 			// Mutate a Parameter associated with a Blast-Database:
-			int indOfBlastDbToMutate = randParamToMutate - 4;
+			int indOfBlastDbToMutate = randParamToMutate - 3;
 			int blastDbIndex = (new Double(
 					Math.floor(indOfBlastDbToMutate / 2.0))).intValue();
 			String blastDbToMutate = getSettings().getSortedBlastDatabases()
@@ -205,16 +202,6 @@ public class Parameters implements Cloneable {
 		else
 			bsw += mutateBy;
 		setDescriptionScoreBitScoreWeight(blastDatabaseName, bsw.toString());
-	}
-
-	public void mutateDescriptionScorePatternFactorWeight() {
-		double pfw = getDescriptionScorePatternFactorWeight();
-		Double mutateBy = mutatePercentageBy();
-		if (randomSaveSubtract(pfw, mutateBy))
-			pfw -= mutateBy;
-		else
-			pfw += mutateBy;
-		setDescriptionScorePatternFactorWeight(pfw);
 	}
 
 	/**
@@ -361,9 +348,7 @@ public class Parameters implements Cloneable {
 				&& ((Parameters) eql).getTokenScoreDatabaseScoreWeight()
 						.equals(this.getTokenScoreDatabaseScoreWeight())
 				&& ((Parameters) eql).getTokenScoreOverlapScoreWeight().equals(
-						this.getTokenScoreOverlapScoreWeight())
-				&& ((Parameters) eql).getDescriptionScorePatternFactorWeight()
-						.equals(this.getDescriptionScorePatternFactorWeight());
+						this.getTokenScoreOverlapScoreWeight());
 	}
 
 	@Override
@@ -376,8 +361,7 @@ public class Parameters implements Cloneable {
 		}
 		hashSrc += getTokenScoreBitScoreWeight()
 				+ getTokenScoreDatabaseScoreWeight()
-				+ getTokenScoreOverlapScoreWeight()
-				+ getDescriptionScorePatternFactorWeight();
+				+ getTokenScoreOverlapScoreWeight();
 		return hashSrc.hashCode();
 	}
 
@@ -444,15 +428,6 @@ public class Parameters implements Cloneable {
 	public void setTokenScoreOverlapScoreWeight(
 			Double tokenScoreOverlapScoreWeight) {
 		this.tokenScoreOverlapScoreWeight = tokenScoreOverlapScoreWeight;
-	}
-
-	public Double getDescriptionScorePatternFactorWeight() {
-		return descriptionScorePatternFactorWeight;
-	}
-
-	public void setDescriptionScorePatternFactorWeight(
-			Double descriptionScorePatternFactorWeight) {
-		this.descriptionScorePatternFactorWeight = descriptionScorePatternFactorWeight;
 	}
 
 	public Double getAvgEvaluationScore() {

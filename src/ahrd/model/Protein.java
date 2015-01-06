@@ -130,9 +130,6 @@ public class Protein {
 		getTokenScoreCalculator().measureTotalScores(br);
 		// Measure highest BitScore:
 		getDescriptionScoreCalculator().measureMaxBitScore(br.getBitScore());
-		// Measure the frequency of the BlastResult-Description-Line:
-		getDescriptionScoreCalculator().measureDescriptionLineFrequency(
-				br.patternize());
 	}
 
 	public String getAccession() {

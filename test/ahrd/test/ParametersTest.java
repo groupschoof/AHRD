@@ -37,13 +37,13 @@ public class ParametersTest {
 	public void testParameterToMutateRandomIndex() {
 		Parameters p = getSettings().getParameters();
 		Set<Integer> inds = new HashSet<Integer>();
-		for (int i = 0; i < 300; i++) {
+		for (int i = 0; i < 500; i++) {
 			inds.add(p.parameterToMutateRandomIndex());
 		}
-		assertEquals(10, inds.size());
-		// Parameter-Indices: 0..3 + 2 * 3 (#Blast-Databases) = 10
-		// Indices 0 to 9 should all be present:
-		for (int r = 0; r < 10; r++) {
+		assertEquals(9, inds.size());
+		// Parameter-Indices: 0..2 + 2 * 3 (#Blast-Databases) = 9
+		// Indices 0 to 8 should all be present:
+		for (int r = 0; r < 9; r++) {
 			assertTrue(
 					"Parameter-Index "
 							+ r
@@ -121,18 +121,6 @@ public class ParametersTest {
 					!origDsBsWs.get(blastDB).equals(
 							p.getDescriptionScoreBitScoreWeight(blastDB)));
 		}
-	}
-
-	@Test
-	public void testMutateDescriptionScorePatternFactorWeight() {
-		Parameters p = getSettings().getParameters();
-		Double dspfw = new Double(p.getDescriptionScorePatternFactorWeight());
-		// test:
-		p.mutateDescriptionScorePatternFactorWeight();
-		assertTrue(
-				"mutateDescriptionScorePatternFactorWeight() should increase or diminish dspfw",
-				!dspfw.equals(getSettings()
-						.getDescriptionScorePatternFactorWeight()));
 	}
 
 	@Test
@@ -222,12 +210,10 @@ public class ParametersTest {
 								s.getTokenScoreDatabaseScoreWeight()) || !n
 						.getTokenScoreOverlapScoreWeight().equals(
 								s.getTokenScoreOverlapScoreWeight()))
-						|| !n.getDescriptionScorePatternFactorWeight().equals(
-								s.getDescriptionScorePatternFactorWeight())
 						|| blastParamDiff);
 		// Extreme Score-Increase should result in mutation of the same
 		// parameter:
-		for (int paramInd = 0; paramInd < 10; paramInd++) {
+		for (int paramInd = 0; paramInd < 9; paramInd++) {
 			n.setLastMutatedParameter(paramInd);
 			Parameters n2 = n.neighbour(1.0);
 			assertEquals(
@@ -235,29 +221,24 @@ public class ParametersTest {
 					new Integer(paramInd), n2.getLastMutatedParameter());
 			if (paramInd == 0)
 				assertTrue(
-						"DescriptionScorePatternFactorWeight should have been mutated.",
-						!n.getDescriptionScorePatternFactorWeight().equals(
-								n2.getDescriptionScorePatternFactorWeight()));
-			else if (paramInd == 1)
-				assertTrue(
 						"TokenScoreBitScoreWeight should have been mutated.",
 						!n.getTokenScoreBitScoreWeight().equals(
 								n2.getTokenScoreBitScoreWeight()));
-			else if (paramInd == 2)
+			else if (paramInd == 1)
 				assertTrue(
 						"TokenScoreDatabaseScoreWeight should have been mutated.",
 						!n.getTokenScoreDatabaseScoreWeight().equals(
 								n2.getTokenScoreDatabaseScoreWeight()));
-			else if (paramInd == 3)
+			else if (paramInd == 2)
 				assertTrue(
 						"TokenScoreOverlapScoreWeight should have been mutated.",
 						!n.getTokenScoreOverlapScoreWeight().equals(
 								n2.getTokenScoreOverlapScoreWeight()));
-			else if (paramInd > 3) {
+			else if (paramInd > 2) {
 				String blastDbName = getSettings().getSortedBlastDatabases()
-						.get((new Double(Math.floor((paramInd - 4) / 2.0)))
+						.get((new Double(Math.floor((paramInd - 3) / 2.0)))
 								.intValue());
-				boolean mutatedBlastDbWeight = paramInd % 2 == 0;
+				boolean mutatedBlastDbWeight = ! (paramInd % 2 == 0);
 				if (mutatedBlastDbWeight)
 					assertTrue(
 							"BlastDatabaseWeight of db " + blastDbName
@@ -359,11 +340,6 @@ public class ParametersTest {
 		q.setTokenScoreOverlapScoreWeight(1.5);
 		assertTrue(
 				"Changed TokenScoreOverlapScoreWeight should result in inequality.",
-				!p.equals(q));
-		q = p.clone();
-		q.setDescriptionScorePatternFactorWeight(1.5);
-		assertTrue(
-				"Changed DescriptionScorePatternFactorWeight should result in inequality.",
 				!p.equals(q));
 		q = p.clone();
 		q.setBlastDbWeight("swissprot", "696");
