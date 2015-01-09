@@ -104,6 +104,9 @@ public class TrainerTest {
 	@Test
 	public void testAcceptanceProbability() {
 		getSettings().setAvgEvaluationScore(0.5);
+		getSettings().setOptimizationAcceptanceProbabilityScalingFactor(
+				new Double(200000000));
+		getSettings().setTemperature(1000);
 		// test first iteration, when accepted Settings are null:
 		assertEquals(1.0, trainer.acceptanceProbability(), 0.0);
 		// test current Settings better than accepted:
@@ -113,9 +116,12 @@ public class TrainerTest {
 		// test current Settings worse than accepted ones:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
 		getSettings().setAvgEvaluationScore(0.9999741);
-		// exp(-(0.0000259*200,000,000)/1000) = 0.005628006
+		// 0.9999741 - 1.0 = -2.59 * 10^-5
+		assertEquals(-0.0000259,
+				trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.00000001);
+		// exp((-0.0000259*200,000,000)/1000) = 0.005628006
 		assertEquals(0.005628006, trainer.acceptanceProbability(), 0.000000001);
-		// exp(-(0.0000259*200,000,000)/10000) = 0.5957108
+		// exp((-0.0000259*200,000,000)/10000) = 0.5957108
 		getSettings().setTemperature(10000);
 		assertEquals(0.5957108, trainer.acceptanceProbability(), 0.000001);
 	}
@@ -137,7 +143,8 @@ public class TrainerTest {
 		trainer.getAcceptedParameters().setAvgEvaluationScore(0.5);
 		getSettings().setAvgEvaluationScore(0.25);
 		// 0.25 - 0.5 = -0.25
-		assertEquals(-0.25, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
+		assertEquals(-0.25, trainer.diffEvalScoreToCurrentlyAcceptedParams(),
+				0.0);
 	}
 
 	@Test

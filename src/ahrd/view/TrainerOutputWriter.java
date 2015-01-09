@@ -45,7 +45,7 @@ public class TrainerOutputWriter {
 		hdr += "Average Evaluation-Score(F-Score)";
 		if (!isFinalOutput)
 			hdr += "\tDiff-to-curr-Accepted\tAccepted";
-		hdr += "\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Relative-Description-Frequency-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
+		hdr += "\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
 		for (String blastDb : this.sortedBlastDatabases) {
 			hdr += "\t" + blastDb + "-Weight";
 			hdr += "\t" + blastDb + "-Description-Score-Bit-Score-Weight";
@@ -92,9 +92,8 @@ public class TrainerOutputWriter {
 				+ s.getAvgEvaluationScore() + "\t"
 				+ diffAvgEvalScoreToCurrAccepted + "\t" + accepted + "\t"
 				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
-				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
-				+ FRMT.format(s.getDescriptionScorePatternFactorWeight())
-				+ "\t" + FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
+				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t" + "\t"
+				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreOverlapScoreWeight());
 		for (String blastDb : this.sortedBlastDatabases) {
@@ -112,8 +111,7 @@ public class TrainerOutputWriter {
 				+ s.getAvgEvaluationScore() + "\t"
 				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
 				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
-				+ FRMT.format(s.getDescriptionScorePatternFactorWeight())
-				+ "\t" + FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
+				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreOverlapScoreWeight());
 		for (String blastDb : this.sortedBlastDatabases) {

@@ -157,13 +157,7 @@ public class Batcher {
 				.get(Settings.TOKEN_SCORE_DATABASE_SCORE_WEIGHT));
 		batchYml.put(Settings.TOKEN_SCORE_OVERLAP_SCORE_WEIGHT, getInput().get(
 				Settings.TOKEN_SCORE_OVERLAP_SCORE_WEIGHT));
-		batchYml
-				.put(
-						Settings.DESCRIPTION_SCORE_RELATIVE_DESCIPTION_FREQUENCY_WEIGHT,
-						getInput()
-								.get(
-										Settings.DESCRIPTION_SCORE_RELATIVE_DESCIPTION_FREQUENCY_WEIGHT));
-
+		
 		// Put data for each Blast-Db into Yml-Hash
 		Map<String, Object> blast_dbs = new HashMap<String, Object>();
 		Map<String, Object> inputBlastDbs = (Map<String, Object>) getInput()

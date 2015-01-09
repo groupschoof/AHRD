@@ -50,9 +50,9 @@ public class Trainer extends Evaluator {
 			// Write final output
 			Settings bestSettings = getSettings().clone();
 			bestSettings.setParameters(trainer.getBestParameters());
-			trainer.outWriter.writeFinalOutput(bestSettings, trainer
-					.getAvgMaxEvaluationScore(), trainer
-					.getBestParametersFoundAtTemperature());
+			trainer.outWriter.writeFinalOutput(bestSettings,
+					trainer.getAvgMaxEvaluationScore(),
+					trainer.getBestParametersFoundAtTemperature());
 			System.out
 					.println("Logged path through parameter- and score-space into:\n"
 							+ getSettings()
@@ -185,8 +185,8 @@ public class Trainer extends Evaluator {
 			// In this case the difference in avg. evaluation scores of current
 			// to accepted parameters is always NEGATIVE.
 			// Hence the following formula can be written as:
-			// p := exp(-(delta.scores*sf)/T.curr), where delta.score is a
-			// positive real value.
+			// p := exp((delta.scores*sf)/T.curr), where delta.score is a
+			// negative real value.
 			p = Math.exp(diffEvalScoreToCurrentlyAcceptedParams() * sf
 					/ getSettings().getTemperature());
 		}

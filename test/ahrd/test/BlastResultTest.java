@@ -96,14 +96,6 @@ public class BlastResultTest {
 		// passes the blacklist-check and has it's "bad
 		// tokens" filtered out.
 		Protein p = protDb.get("gene:chr01.502:mRNA:chr01.502");
-		assertTrue(p.getDescriptionScoreCalculator()
-				.getDescLinePatternFrequencies()
-				.containsKey("dicerendoribonuclease"));
-		assertEquals(13.0, p.getDescriptionScoreCalculator()
-				.getDescLinePatternFrequencies().get("dicerendoribonuclease"),
-				0);
-		assertEquals(13.0, p.getDescriptionScoreCalculator()
-				.getMaxDescriptionLineFrequency(), 0);
 		// Test for maximum Bit-Score being saved:
 		assertEquals(94.4, p.getDescriptionScoreCalculator().getMaxBitScore(),
 				0.0);

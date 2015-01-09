@@ -59,7 +59,6 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_SCORE_BIT_SCORE_WEIGHT = "token_score_bit_score_weight";
 	public static final String TOKEN_SCORE_DATABASE_SCORE_WEIGHT = "token_score_database_score_weight";
 	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT = "token_score_overlap_score_weight";
-	public static final String DESCRIPTION_SCORE_RELATIVE_DESCIPTION_FREQUENCY_WEIGHT = "description_score_relative_description_frequency_weight";
 	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT = "description_score_bit_score_weight";
 	public static final String REFERENCES_FASTA_KEY = "references_fasta";
 	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
@@ -119,7 +118,7 @@ public class Settings implements Cloneable {
 	 * For the <strong>simulated annealing</strong> algorithm, this will be
 	 * current temperature. (Default is 1000)
 	 */
-	private Integer temperature = 1000;
+	private Integer temperature = 75000;
 	/**
 	 * For the <strong>simulated annealing</strong> algorithm, this will be
 	 * value the current temperature gets cooled down each step. (Default is 1)
@@ -130,21 +129,21 @@ public class Settings implements Cloneable {
 	 * scaling factor for the probability distribution P('Accept worse scoring
 	 * Parameter-Set') := exp(-delta_scores*scaling_factor/current-temperature).
 	 */
-	private Double optimizationAcceptanceProbabilityScalingFactor = 200000000.0;
+	private Double optimizationAcceptanceProbabilityScalingFactor = 2500000000.0;
 	/**
 	 * In simulated annealing optimization each cycle has to mutate the current
 	 * Parameter-Set to generate a neighboring set in parameter space. The
 	 * random value used to add or subtract to a single parameter is Gaussian
 	 * distributed and has the following mean:
 	 */
-	private Double mutatorMean = 0.2;
+	private Double mutatorMean = 0.25;
 	/**
 	 * In simulated annealing optimization each cycle has to mutate the current
 	 * Parameter-Set to generate a neighboring set in parameter space. The
 	 * random value used to add or subtract to a single parameter is Gaussian
 	 * distributed and has the following standard deviation:
 	 */
-	private Double mutatorDeviation = 0.25;
+	private Double mutatorDeviation = 0.15;
 	/**
 	 * If the last optimization step was done with better performing parameters,
 	 * randomly decide to mutate the same Parameter to generate a new Neighbor
@@ -211,9 +210,6 @@ public class Settings implements Cloneable {
 				.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
 		setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input
 				.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
-		setDescriptionScorePatternFactorWeight(Double
-				.parseDouble((String) input
-						.get(DESCRIPTION_SCORE_RELATIVE_DESCIPTION_FREQUENCY_WEIGHT)));
 		setWriteTokenSetToOutput(Boolean.parseBoolean((String) input
 				.get(WRITE_TOKEN_SET_TO_OUTPUT)));
 		setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input
@@ -508,16 +504,6 @@ public class Settings implements Cloneable {
 			Double tokenScoreOverlapScoreWeight) {
 		this.getParameters().setTokenScoreOverlapScoreWeight(
 				tokenScoreOverlapScoreWeight);
-	}
-
-	public Double getDescriptionScorePatternFactorWeight() {
-		return getParameters().getDescriptionScorePatternFactorWeight();
-	}
-
-	public void setDescriptionScorePatternFactorWeight(
-			Double descriptionScorePatternFactorWeight) {
-		this.getParameters().setDescriptionScorePatternFactorWeight(
-				descriptionScorePatternFactorWeight);
 	}
 
 	public Boolean getWriteTokenSetToOutput() {

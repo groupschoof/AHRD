@@ -32,7 +32,6 @@ gene_ontology_result: ./test/resources/go_results.csv
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
-description_score_relative_description_frequency_weight: 0.6
 output: ./test/ahrd_output.csv
 path_log: ./test/sim_anneal_path_log.csv
 remember_simulated_annealing_path: true
