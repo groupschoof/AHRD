@@ -1,9 +1,9 @@
 package ahrd.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -128,8 +128,32 @@ public class BlastResultTest {
 		assertEquals(br.getSubjectStart(), new Integer(969));
 		assertNull(br.getSubjectLength());
 		// Assert that multiple High Scoring Pairs are read out as a single Hit,
-		// that one with the best Bit-Score:
+		// that is the one with the best Bit-Score:
 		assertEquals(brs.size(), 207);
+	}
+
+	@Test
+	public void testParseBlastDatabase() throws IOException,
+			MissingProteinException {
+		TestUtils.initTestSettings();
+		Map<String, Protein> protDb = TestUtils.mockProteinDb();
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(
+				protDb, "tair");
+		BlastResult.parseBlastDatabase(protDb, "tair", brs);
+		Protein p1 = protDb.get("gene:chr01.502:mRNA:chr01.502");
+		Protein p2 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
+		assertTrue(!p1.getBlastResults().get("tair").isEmpty());
+		assertEquals(7, p1.getBlastResults().get("tair").size());
+		assertEquals("AT3G03300.2", p1.getBlastResults().get("tair").get(0)
+				.getAccession());
+		assertEquals(new Integer(1375), p1.getBlastResults().get("tair").get(0)
+				.getSubjectLength());
+		assertTrue(!p2.getBlastResults().get("tair").isEmpty());
+		assertEquals(200, p2.getBlastResults().get("tair").size());
+		assertEquals("AT3G45420.1", p2.getBlastResults().get("tair").get(199)
+				.getAccession());
+		assertEquals(new Integer(668), p2.getBlastResults().get("tair")
+				.get(199).getSubjectLength());
 	}
 
 	@Test

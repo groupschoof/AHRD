@@ -15,7 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 
+import ahrd.controller.Settings;
 import ahrd.exception.MissingProteinException;
 
 /**
@@ -27,6 +29,8 @@ import ahrd.exception.MissingProteinException;
 public class BlastResult implements Comparable<BlastResult> {
 
 	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
+	public static final String FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME = "accession";
+	public static final String FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME = "description";
 
 	private String accession;
 	private Double eValue;
@@ -257,6 +261,41 @@ public class BlastResult implements Comparable<BlastResult> {
 		}
 	}
 
+	/**
+	 * Adds the sequence length and Human Readable Description (HRD) to all
+	 * matching BlastHits found in the argument Map 'blastResults'. Afterwards
+	 * the respective BlastResult instances are added to their respective
+	 * Proteins. See function addBlastResult in class Protein for more details.
+	 * 
+	 * @param blastResults
+	 * @param fastaAccession
+	 * @param hitAALength
+	 * @param hrd
+	 */
+	public static void fastaEntryValuesForBlastHit(
+			Map<String, List<BlastResult>> blastResults, String fastaAccession,
+			Integer hitAALength, String hrd) {
+		for (BlastResult br : blastResults.get(fastaAccession)) {
+			//System.out.println("Curr length is " + hitAALength);
+			br.setSubjectLength(hitAALength);
+			br.setDescription(hrd);
+			br.getProtein().addBlastResult(br);
+		}
+	}
+
+	/**
+	 * Extracts from the provided protein database in FASTA format the length
+	 * and human readable descriptions of those Proteins that are Hits
+	 * (Subjects) in the argument blastResults. Each time such a Hit is found
+	 * the mentioned measurements are set in the respective instance of
+	 * BlastResult and subsequently the method 'Protein.addBlastResult(…)' is
+	 * invoked.
+	 * 
+	 * @param proteinDb
+	 * @param blastDbName
+	 * @param blastResults
+	 * @throws IOException
+	 */
 	public static void parseBlastDatabase(Map<String, Protein> proteinDb,
 			String blastDbName, Map<String, List<BlastResult>> blastResults)
 			throws IOException {
@@ -266,12 +305,66 @@ public class BlastResult implements Comparable<BlastResult> {
 		try {
 			fastaIn = new BufferedReader(new FileReader(getSettings()
 					.getPathToBlastDatabase(blastDbName)));
-			String str;
+			String str, hrd = new String();
+			String acc = "";
+			Integer hitAALength = new Integer(0);
+			boolean hit = false;
 			while ((str = fastaIn.readLine()) != null) {
 				if (str.startsWith(">")) {
+					// Finished reading in the original Fasta-Entry of a
+					// Blast-Hit? If so, process it:
+					if (hit) {
+						fastaEntryValuesForBlastHit(blastResults, acc,
+								hitAALength, hrd);
+						// Clean up to enable processing the next Hit
+						hitAALength = new Integer(0);
+						// Note, that the boolean 'hit' will be set in the
+						// following If-Else-Block.
+					}
 
+					// Process the current Fasta-Header-Line:
+					Matcher m = getSettings().getFastaHeaderRegex(blastDbName)
+							.matcher(str);
+					if (!m.matches()) {
+						// Provided REGEX to parse FASTA header does not work in
+						// this case:
+						System.err
+								.println("WARNING: FASTA header line\n"
+										+ str.trim()
+										+ "\ndoes not match provided regular expression\n"
+										+ getSettings().getFastaHeaderRegex(
+												blastDbName).toString()
+										+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
+										+ "To fix this, please use - Bast database specific - parameter "
+										+ Settings.FASTA_HEADER_REGEX_KEY
+										+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
+										+ blastDbName + "'.");
+					} else if (blastResults.containsKey(m.group(
+							FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
+						// Found the next Blast HIT:
+						acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME)
+								.trim();
+						hrd = m.group(
+								FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME)
+								.trim();
+						// Following lines, until the next header, contain
+						// information to be collected:
+						hit = true;
+					} else {
+						// Found a Protein in the FASTA database, that is of no
+						// relevance within this context:
+						hit = false;
+					}
+				} else if (hit) {
+					// Process non header-line, if and only if, we are reading
+					// the sequence of a Blast-Hit:
+					hitAALength += str.trim().length();
 				}
 			}
+			// Was the last read FASTA entry a Blast-Hit? If so, it needs
+			// processing:
+			if (hit)
+				fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
 		} finally {
 			fastaIn.close();
 		}
