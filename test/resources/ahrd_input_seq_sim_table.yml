@@ -1,9 +1,9 @@
 proteins_fasta: ./test/resources/proteins.fasta
+temperature: 10
 blast_dbs:
   swissprot:
     weight: 100
     file: ./test/resources/swissprot_blast8_tabular.txt
-    database: ./test/resources/swissprot_blast_db.fasta
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_sprot.txt
     token_blacklist: ./test/resources/blacklist_token.txt
@@ -12,7 +12,6 @@ blast_dbs:
   tair:
     weight: 50
     file: ./test/resources/tair_blast8_tabular.txt
-    database: ./test/resources/tair_blast_db.fasta
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_tair.txt
     token_blacklist: ./test/resources/blacklist_token.txt
@@ -21,7 +20,6 @@ blast_dbs:
   trembl:
     weight: 10
     file: ./test/resources/trembl_blast8_tabular.txt
-    database: ./test/resources/trembl_blast_db.fasta
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_trembl.txt
     token_blacklist: ./test/resources/blacklist_token.txt
@@ -33,4 +31,20 @@ gene_ontology_result: ./test/resources/go_results.csv
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
-output: ./test/ahrd_output.csv
+write_token_set_to_output: false
+write_best_blast_hits_to_output: true
+write_scores_to_output: false
+output: ./ahrd_output.csv
+references_fasta: ./test/resources/references.fasta
+blast2go: ./test/resources/blast2go_out.annot
+remember_simulated_annealing_path: true
+seq_sim_search_table_comment_line_regex: "#"
+seq_sim_search_table_sep: "\t"
+seq_sim_search_table_query_col: 10
+seq_sim_search_table_subject_col: 11
+seq_sim_search_table_query_start_col: 16
+seq_sim_search_table_query_end_col: 17
+seq_sim_search_table_subject_start_col: 18
+seq_sim_search_table_subject_end_col: 19
+seq_sim_search_table_e_value_col: 20
+seq_sim_search_table_bit_score_col: 21

@@ -1,11 +1,12 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.getSettings;
 import static ahrd.model.ReferenceDescription.tokenizeDescription;
 import static ahrd.model.TokenScoreCalculator.passesBlacklist;
-import static ahrd.controller.Settings.getSettings;
-import java.io.FileInputStream;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,11 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
-import org.biojava.bio.program.sax.BlastLikeSAXParser;
-import org.biojava.bio.program.ssbind.SeqSimilarityAdapter;
-import org.biojava.bio.search.SearchContentHandler;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import ahrd.exception.MissingProteinException;
@@ -31,6 +29,8 @@ import ahrd.exception.MissingProteinException;
 public class BlastResult implements Comparable<BlastResult> {
 
 	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
+	public static final Pattern FASTA_ACC_DESCRIPTION_REGEX = Pattern
+			.compile("^>(\\S+)\\s+(\\S+)");
 
 	private String accession;
 	private Double eValue;
@@ -105,32 +105,29 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	/**
-	 * Reads in BlastResults and assigns them to the Proteins in argument
-	 * proteinDb.
+	 * Reads in BlastResults, or any other results from sequence similarity
+	 * searches, and assigns them to the Proteins in argument proteinDb. The
+	 * result file is expected to be in tabular format, that is each line is
+	 * supposed to contain a single High Scoring Pair (HSP). Preferred format is
+	 * 'Blast8' (-m 8).
 	 * 
-	 * Example code taken from biojava.org.
 	 */
 	public static void parseBlastResults(Map<String, Protein> proteinDb,
 			String blastDbName) throws MissingProteinException, SAXException,
 			IOException {
-		// get the Blast input as a Stream
-		InputStream is = new FileInputStream(getSettings()
-				.getPathToBlastResults(blastDbName));
-		// make a BlastLikeSAXParser
-		BlastLikeSAXParser parser = new BlastLikeSAXParser();
-		// try to parse, even if the blast version is not recognized.
-		parser.setModeLazy();
-		// make the SAX event adapter that will pass events to a Handler.
-		SeqSimilarityAdapter adapter = new SeqSimilarityAdapter();
-		// set the parsers SAX event adapter
-		parser.setContentHandler(adapter);
-		// register builder with custom adapter
-		SearchContentHandler scHandler = new BlastSearchContentAdapter(
-				proteinDb, blastDbName);
-		adapter.setSearchContentHandler(scHandler);
-		// parse the file, after this the result List will be populated with
-		// SeqSimilaritySearchResults
-		parser.parse(new InputSource(is));
+		BufferedReader fastaIn = new BufferedReader(new FileReader(
+				getSettings().getPathToBlastResults(blastDbName)));
+		String str;
+		while ((str = fastaIn.readLine()) != null) {
+			// Only evaluate current line, either if there is no
+			// comment-line-regex given, or if it is given it does not match:
+			if (getSettings().getSeqSimSearchTableCommentLineRegex() == null
+					|| !getSettings().getSeqSimSearchTableCommentLineRegex()
+							.matcher(str).matches()) {
+
+			}
+		}
+		fastaIn.close();
 	}
 
 	public static List<BlastResult> filterBestScoringBlastResults(

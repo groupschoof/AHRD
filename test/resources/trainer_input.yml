@@ -4,7 +4,7 @@ references_fasta: ./test/resources/references.fasta
 blast_dbs:
   swissprot:
     weight: 100
-    file: ./test/resources/swissprot.pairwise
+    file: ./test/resources/swissprot_blast8_tabular.txt
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_sprot.txt
     token_blacklist: ./test/resources/blacklist_token.txt
@@ -12,7 +12,7 @@ blast_dbs:
 
   tair:
     weight: 50
-    file: ./test/resources/tair.pairwise
+    file: ./test/resources/tair_blast8_tabular.txt
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_tair.txt
     token_blacklist: ./test/resources/blacklist_token.txt
@@ -20,7 +20,7 @@ blast_dbs:
 
   trembl:
     weight: 10
-    file: ./test/resources/trembl.pairwise
+    file: ./test/resources/trembl_blast8_tabular.txt
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_trembl.txt
     token_blacklist: ./test/resources/blacklist_token.txt

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.esotericsoftware.yamlbeans.YamlReader;
 
@@ -44,6 +45,7 @@ public class Settings implements Cloneable {
 	public static final String BLAST_DBS_KEY = "blast_dbs";
 	public static final String BLAST_DB_WEIGHT_KEY = "weight";
 	public static final String BLAST_RESULT_FILE_KEY = "file";
+	public static final String BLAST_DATABASE_KEY = "database";
 	public static final String BLAST_BLACKLIST_KEY = "blacklist";
 	public static final String BLAST_FILTER_KEY = "filter";
 	public static final String TOKEN_BLACKLIST_KEY = "token_blacklist";
@@ -73,6 +75,16 @@ public class Settings implements Cloneable {
 	public static final String P_MUTATE_SAME_PARAMETER_SCALE_KEY = "p_mutate_same_parameter_scale";
 	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
 	public static final String OUTPUT_FASTA_KEY = "output_fasta";
+	public static final String SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY = "seq_sim_search_table_comment_line_regex";
+	public static final String SEQ_SIM_SEARCH_TABLE_SEP_KEY = "seq_sim_search_table_sep";
+	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY = "seq_sim_search_table_query_col";
+	public static final String SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY = "seq_sim_search_table_subject_col";
+	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY = "seq_sim_search_table_query_start_col";
+	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY = "seq_sim_search_table_query_end_col";
+	public static final String SEQ_SIM_SEARCH_TABLE_SUBJECT_START_COL_KEY = "seq_sim_search_table_subject_start_col";
+	public static final String SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY = "seq_sim_search_table_subject_end_col";
+	public static final String SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY = "seq_sim_search_table_e_value_col";
+	public static final String SEQ_SIM_SEARCH_TABLE_BIT_SCORE_END_COL_KEY = "seq_sim_search_table_bit_score_col";
 
 	/**
 	 * Fields:
@@ -116,7 +128,7 @@ public class Settings implements Cloneable {
 	private String pathToBlast2GoAnnotations;
 	/**
 	 * For the <strong>simulated annealing</strong> algorithm, this will be
-	 * current temperature. (Default is 1000)
+	 * current temperature. (Default is 75000)
 	 */
 	private Integer temperature = 75000;
 	/**
@@ -169,6 +181,21 @@ public class Settings implements Cloneable {
 	 * Write output as fasta-file?
 	 */
 	private boolean outputFasta = false;
+	/**
+	 * The following fields control how the result table of a sequence
+	 * similarity search is parsed. All concerned fields start with
+	 * 'seqSimSearchTable'.
+	 */
+	private Pattern seqSimSearchTableCommentLineRegex = null;
+	private Pattern seqSimSearchTableSep = Pattern.compile("\t");
+	private Integer seqSimSearchTableQueryCol = 0;
+	private Integer seqSimSearchTableSubjectCol = 1;
+	private Integer seqSimSearchTableQueryStartCol = 6;
+	private Integer seqSimSearchTableQueryEndCol = 7;
+	private Integer seqSimSearchTableSubjectStartCol = 8;
+	private Integer seqSimSearchTableSubjectEndCol = 9;
+	private Integer seqSimSearchTableEValueCol = 10;
+	private Integer seqSimSearchTableBitScoreCol = 11;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -222,8 +249,7 @@ public class Settings implements Cloneable {
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
 			this.blastResultsBlacklists
-					.put(
-							blastDatabaseName,
+					.put(blastDatabaseName,
 							fromFile(getPathToBlastResultsBlackList(blastDatabaseName)));
 			this.blastResultsFilter.put(blastDatabaseName,
 					fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
@@ -282,6 +308,48 @@ public class Settings implements Cloneable {
 				&& Boolean.parseBoolean(input.get(
 						FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY).toString()))
 			this.findHighestPossibleEvaluationScore = true;
+		// Set any non default parameters controlling, how sequence similarity
+		// search result tables are parsed:
+		if (input.get(SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY) != null) {
+			setSeqSimSearchTableCommentLineRegex(Pattern.compile(input.get(
+					SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_SEP_KEY) != null) {
+			setSeqSimSearchTableSep(Pattern.compile(input.get(
+					SEQ_SIM_SEARCH_TABLE_SEP_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY) != null) {
+			setSeqSimSearchTableQueryCol(Integer.parseInt(input.get(
+					SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY) != null) {
+			setSeqSimSearchTableSubjectCol(Integer.parseInt(input.get(
+					SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY) != null) {
+			setSeqSimSearchTableQueryStartCol(Integer.parseInt(input.get(
+					SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY) != null) {
+			setSeqSimSearchTableQueryEndCol(Integer.parseInt(input.get(
+					SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_START_COL_KEY) != null) {
+			setSeqSimSearchTableSubjectStartCol(Integer.parseInt(input.get(
+					SEQ_SIM_SEARCH_TABLE_SUBJECT_START_COL_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY) != null) {
+			setSeqSimSearchTableSubjectEndCol(Integer.parseInt(input.get(
+					SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY) != null) {
+			setSeqSimSearchTableEValueCol(Integer.parseInt(input.get(
+					SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_END_COL_KEY) != null) {
+			setSeqSimSearchTableBitScoreCol(Integer.parseInt(input.get(
+					SEQ_SIM_SEARCH_TABLE_BIT_SCORE_END_COL_KEY).toString()));
+		}
 	}
 
 	/**
@@ -387,6 +455,10 @@ public class Settings implements Cloneable {
 
 	public String getPathToBlastResults(String blastDatabaseName) {
 		return getBlastDbSettings(blastDatabaseName).get(BLAST_RESULT_FILE_KEY);
+	}
+
+	public String getPathToBlastDatabase(String blastDatabaseName) {
+		return getBlastDbSettings(blastDatabaseName).get(BLAST_DATABASE_KEY);
 	}
 
 	private String getPathToBlastResultsBlackList(String blastDatabaseName) {
@@ -678,4 +750,90 @@ public class Settings implements Cloneable {
 				&& !getPathToHRDScoresOutput().equals("");
 	}
 
+	public Integer getSeqSimSearchTableQueryCol() {
+		return seqSimSearchTableQueryCol;
+	}
+
+	public void setSeqSimSearchTableQueryCol(Integer seqSimSearchTableQueryCol) {
+		this.seqSimSearchTableQueryCol = seqSimSearchTableQueryCol;
+	}
+
+	public Integer getSeqSimSearchTableSubjectCol() {
+		return seqSimSearchTableSubjectCol;
+	}
+
+	public void setSeqSimSearchTableSubjectCol(
+			Integer seqSimSearchTableSubjectCol) {
+		this.seqSimSearchTableSubjectCol = seqSimSearchTableSubjectCol;
+	}
+
+	public Integer getSeqSimSearchTableQueryStartCol() {
+		return seqSimSearchTableQueryStartCol;
+	}
+
+	public void setSeqSimSearchTableQueryStartCol(
+			Integer seqSimSearchTableQueryStartCol) {
+		this.seqSimSearchTableQueryStartCol = seqSimSearchTableQueryStartCol;
+	}
+
+	public Integer getSeqSimSearchTableQueryEndCol() {
+		return seqSimSearchTableQueryEndCol;
+	}
+
+	public void setSeqSimSearchTableQueryEndCol(
+			Integer seqSimSearchTableQueryEndCol) {
+		this.seqSimSearchTableQueryEndCol = seqSimSearchTableQueryEndCol;
+	}
+
+	public Integer getSeqSimSearchTableSubjectStartCol() {
+		return seqSimSearchTableSubjectStartCol;
+	}
+
+	public void setSeqSimSearchTableSubjectStartCol(
+			Integer seqSimSearchTableSubjectStartCol) {
+		this.seqSimSearchTableSubjectStartCol = seqSimSearchTableSubjectStartCol;
+	}
+
+	public Integer getSeqSimSearchTableSubjectEndCol() {
+		return seqSimSearchTableSubjectEndCol;
+	}
+
+	public void setSeqSimSearchTableSubjectEndCol(
+			Integer seqSimSearchTableSubjectEndCol) {
+		this.seqSimSearchTableSubjectEndCol = seqSimSearchTableSubjectEndCol;
+	}
+
+	public Pattern getSeqSimSearchTableCommentLineRegex() {
+		return seqSimSearchTableCommentLineRegex;
+	}
+
+	public void setSeqSimSearchTableCommentLineRegex(
+			Pattern seqSimSearchTableCommentLineRegex) {
+		this.seqSimSearchTableCommentLineRegex = seqSimSearchTableCommentLineRegex;
+	}
+
+	public Pattern getSeqSimSearchTableSep() {
+		return seqSimSearchTableSep;
+	}
+
+	public void setSeqSimSearchTableSep(Pattern seqSimSearchTableSep) {
+		this.seqSimSearchTableSep = seqSimSearchTableSep;
+	}
+
+	public Integer getSeqSimSearchTableEValueCol() {
+		return seqSimSearchTableEValueCol;
+	}
+
+	public void setSeqSimSearchTableEValueCol(Integer seqSimSearchTableEValueCol) {
+		this.seqSimSearchTableEValueCol = seqSimSearchTableEValueCol;
+	}
+
+	public Integer getSeqSimSearchTableBitScoreCol() {
+		return seqSimSearchTableBitScoreCol;
+	}
+
+	public void setSeqSimSearchTableBitScoreCol(
+			Integer seqSimSearchTableBitScoreCol) {
+		this.seqSimSearchTableBitScoreCol = seqSimSearchTableBitScoreCol;
+	}
 }

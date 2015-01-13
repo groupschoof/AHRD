@@ -75,7 +75,7 @@ public class TrainerBatcherTest {
 				sprotBlastDb.get(Settings.BLAST_FILTER_KEY));
 		assertEquals("./test/resources/blacklist_token.txt",
 				sprotBlastDb.get(Settings.TOKEN_BLACKLIST_KEY));
-		assertEquals("./test/resources/swissprot.pairwise",
+		assertEquals("./test/resources/swissprot_blast8_tabular.txt",
 				sprotBlastDb.get(Settings.BLAST_RESULT_FILE_KEY));
 		// Interpro:
 		assertEquals("./test/resources/interpro_31.xml",
