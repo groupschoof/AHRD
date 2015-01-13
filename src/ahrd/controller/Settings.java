@@ -86,6 +86,8 @@ public class Settings implements Cloneable {
 	public static final String SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY = "seq_sim_search_table_e_value_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_BIT_SCORE_END_COL_KEY = "seq_sim_search_table_bit_score_col";
 	public static final String FASTA_HEADER_REGEX_KEY = "fasta_header_regex";
+	public static final Pattern DEFAULT_FASTA_HEADER_REGEX = Pattern
+			.compile("^>(?<accession>\\S+)\\s+(?<description>\\S+)");
 
 	/**
 	 * Fields:
@@ -197,8 +199,6 @@ public class Settings implements Cloneable {
 	private Integer seqSimSearchTableSubjectEndCol = 9;
 	private Integer seqSimSearchTableEValueCol = 10;
 	private Integer seqSimSearchTableBitScoreCol = 11;
-	private Pattern fastaHeaderRegex = Pattern
-			.compile("^>(?<accession>\\S+)\\s+(?<description>\\S+)");
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -353,10 +353,6 @@ public class Settings implements Cloneable {
 			setSeqSimSearchTableBitScoreCol(Integer.parseInt(input.get(
 					SEQ_SIM_SEARCH_TABLE_BIT_SCORE_END_COL_KEY).toString()));
 		}
-		if (input.get(FASTA_HEADER_REGEX_KEY) != null) {
-			setFastaHeaderRegex(Pattern.compile(input.get(
-					FASTA_HEADER_REGEX_KEY).toString()));
-		}
 	}
 
 	/**
@@ -466,6 +462,14 @@ public class Settings implements Cloneable {
 
 	public String getPathToBlastDatabase(String blastDatabaseName) {
 		return getBlastDbSettings(blastDatabaseName).get(BLAST_DATABASE_KEY);
+	}
+
+	public Pattern getFastaHeaderRegex(String blastDatabaseName) {
+		return (getBlastDbSettings(blastDatabaseName)
+				.containsKey(FASTA_HEADER_REGEX_KEY)) ? Pattern
+				.compile(getBlastDbSettings(blastDatabaseName).get(
+						FASTA_HEADER_REGEX_KEY).toString())
+				: DEFAULT_FASTA_HEADER_REGEX;
 	}
 
 	private String getPathToBlastResultsBlackList(String blastDatabaseName) {
@@ -842,13 +846,5 @@ public class Settings implements Cloneable {
 	public void setSeqSimSearchTableBitScoreCol(
 			Integer seqSimSearchTableBitScoreCol) {
 		this.seqSimSearchTableBitScoreCol = seqSimSearchTableBitScoreCol;
-	}
-
-	public Pattern getFastaHeaderRegex() {
-		return fastaHeaderRegex;
-	}
-
-	public void setFastaHeaderRegex(Pattern fastaHeaderRegex) {
-		this.fastaHeaderRegex = fastaHeaderRegex;
 	}
 }
