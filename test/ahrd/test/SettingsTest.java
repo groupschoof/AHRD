@@ -62,7 +62,7 @@ public class SettingsTest {
 		assertEquals(new Integer(11), getSettings()
 				.getSeqSimSearchTableBitScoreCol());
 		assertEquals(
-				Pattern.compile("^>(?accession\\S+)\\s+(?description\\S+)")
+				Pattern.compile("^>(?<accession>\\S+)\\s+(?<description>\\S+)")
 						.toString(), getSettings().getFastaHeaderRegex()
 						.toString());
 		// Assert custom values:
@@ -88,7 +88,7 @@ public class SettingsTest {
 		assertEquals(new Integer(21), getSettings()
 				.getSeqSimSearchTableBitScoreCol());
 		assertEquals(
-				Pattern.compile("^>(?accession\\w+)\\s+(?description\\w+)")
+				Pattern.compile("^>(?<accession>\\w+)\\s+(?<description>\\w+)")
 						.toString(), getSettings().getFastaHeaderRegex()
 						.toString());
 	}

@@ -197,7 +197,8 @@ public class Settings implements Cloneable {
 	private Integer seqSimSearchTableSubjectEndCol = 9;
 	private Integer seqSimSearchTableEValueCol = 10;
 	private Integer seqSimSearchTableBitScoreCol = 11;
-	private Pattern fastaHeaderRegex = Pattern.compile("^>(?accession\\S+)\\s+(?description\\S+)");
+	private Pattern fastaHeaderRegex = Pattern
+			.compile("^>(?<accession>\\S+)\\s+(?<description>\\S+)");
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
