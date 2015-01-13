@@ -62,9 +62,14 @@ public class SettingsTest {
 		assertEquals(new Integer(11), getSettings()
 				.getSeqSimSearchTableBitScoreCol());
 		assertEquals(
-				Pattern.compile("^>(?<accession>\\S+)\\s+(?<description>\\S+)")
+				Pattern.compile(
+						"^>(?<accession>[aA][tT]\\d[gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
 						.toString(), getSettings().getFastaHeaderRegex("tair")
 						.toString());
+		assertEquals(
+				Pattern.compile("^>(?<accession>\\S+)\\s+(?<description>\\S+)")
+						.toString(), getSettings()
+						.getFastaHeaderRegex("trembl").toString());
 		// Assert custom values:
 		setSettings(new Settings(
 				"./test/resources/ahrd_input_seq_sim_table.yml"));
@@ -89,7 +94,7 @@ public class SettingsTest {
 				.getSeqSimSearchTableBitScoreCol());
 		assertEquals(
 				Pattern.compile(
-						"^>(?<accession>\\S+)\\s+\\|.+\\|\\s+(?<description>\\S+)")
+						"^>(?<accession>[aA][tT]\\d[gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
 						.toString(), getSettings().getFastaHeaderRegex("tair")
 						.toString());
 		assertEquals(
