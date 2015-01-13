@@ -61,8 +61,10 @@ public class SettingsTest {
 				.getSeqSimSearchTableEValueCol());
 		assertEquals(new Integer(11), getSettings()
 				.getSeqSimSearchTableBitScoreCol());
-		assertEquals(Pattern.compile("^>(\\S+)\\s+(\\S+)").toString(),
-				getSettings().getFastaHeaderRegex().toString());
+		assertEquals(
+				Pattern.compile("^>(?accession\\S+)\\s+(?description\\S+)")
+						.toString(), getSettings().getFastaHeaderRegex()
+						.toString());
 		// Assert custom values:
 		setSettings(new Settings(
 				"./test/resources/ahrd_input_seq_sim_table.yml"));
@@ -85,8 +87,10 @@ public class SettingsTest {
 				.getSeqSimSearchTableEValueCol());
 		assertEquals(new Integer(21), getSettings()
 				.getSeqSimSearchTableBitScoreCol());
-		assertEquals(Pattern.compile("^>(\\w+)\\s+(\\w+)").toString(),
-				getSettings().getFastaHeaderRegex().toString());
+		assertEquals(
+				Pattern.compile("^>(?accession\\w+)\\s+(?description\\w+)")
+						.toString(), getSettings().getFastaHeaderRegex()
+						.toString());
 	}
 
 	@Test

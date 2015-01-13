@@ -27,7 +27,7 @@ import ahrd.exception.MissingProteinException;
 public class BlastResult implements Comparable<BlastResult> {
 
 	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
-	
+
 	private String accession;
 	private Double eValue;
 	private String description;
@@ -258,9 +258,23 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public static void parseBlastDatabase(Map<String, Protein> proteinDb,
-			String blastDbName, Map<String, BlastResult> blastResults) {
+			String blastDbName, Map<String, List<BlastResult>> blastResults)
+			throws IOException {
 		// Parse line by line FASTA Blast search DB. Extract Subject Lengths and
 		// Subject HRDs.
+		BufferedReader fastaIn = null;
+		try {
+			fastaIn = new BufferedReader(new FileReader(getSettings()
+					.getPathToBlastDatabase(blastDbName)));
+			String str;
+			while ((str = fastaIn.readLine()) != null) {
+				if (str.startsWith(">")) {
+
+				}
+			}
+		} finally {
+			fastaIn.close();
+		}
 	}
 
 	public static List<BlastResult> filterBestScoringBlastResults(
