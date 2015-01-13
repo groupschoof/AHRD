@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import ahrd.exception.MissingProteinException;
 
@@ -28,9 +27,7 @@ import ahrd.exception.MissingProteinException;
 public class BlastResult implements Comparable<BlastResult> {
 
 	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
-	public static final Pattern FASTA_ACC_DESCRIPTION_REGEX = Pattern
-			.compile("^>(\\S+)\\s+(\\S+)");
-
+	
 	private String accession;
 	private Double eValue;
 	private String description;

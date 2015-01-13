@@ -48,3 +48,4 @@ seq_sim_search_table_subject_start_col: 18
 seq_sim_search_table_subject_end_col: 19
 seq_sim_search_table_e_value_col: 20
 seq_sim_search_table_bit_score_col: 21
+fasta_header_regex: "^>(\\w+)\\s+(\\w+)"

@@ -85,6 +85,7 @@ public class Settings implements Cloneable {
 	public static final String SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY = "seq_sim_search_table_subject_end_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY = "seq_sim_search_table_e_value_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_BIT_SCORE_END_COL_KEY = "seq_sim_search_table_bit_score_col";
+	public static final String FASTA_HEADER_REGEX_KEY = "fasta_header_regex";
 
 	/**
 	 * Fields:
@@ -196,6 +197,7 @@ public class Settings implements Cloneable {
 	private Integer seqSimSearchTableSubjectEndCol = 9;
 	private Integer seqSimSearchTableEValueCol = 10;
 	private Integer seqSimSearchTableBitScoreCol = 11;
+	private Pattern fastaHeaderRegex = Pattern.compile("^>(\\S+)\\s+(\\S+)");
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -349,6 +351,10 @@ public class Settings implements Cloneable {
 		if (input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_END_COL_KEY) != null) {
 			setSeqSimSearchTableBitScoreCol(Integer.parseInt(input.get(
 					SEQ_SIM_SEARCH_TABLE_BIT_SCORE_END_COL_KEY).toString()));
+		}
+		if (input.get(FASTA_HEADER_REGEX_KEY) != null) {
+			setFastaHeaderRegex(Pattern.compile(input.get(
+					FASTA_HEADER_REGEX_KEY).toString()));
 		}
 	}
 
@@ -835,5 +841,13 @@ public class Settings implements Cloneable {
 	public void setSeqSimSearchTableBitScoreCol(
 			Integer seqSimSearchTableBitScoreCol) {
 		this.seqSimSearchTableBitScoreCol = seqSimSearchTableBitScoreCol;
+	}
+
+	public Pattern getFastaHeaderRegex() {
+		return fastaHeaderRegex;
+	}
+
+	public void setFastaHeaderRegex(Pattern fastaHeaderRegex) {
+		this.fastaHeaderRegex = fastaHeaderRegex;
 	}
 }
