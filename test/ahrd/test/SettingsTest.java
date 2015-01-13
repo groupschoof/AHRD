@@ -44,8 +44,7 @@ public class SettingsTest {
 			throws IOException {
 		// Assert default values:
 		assertNull(getSettings().getSeqSimSearchTableCommentLineRegex());
-		assertEquals(Pattern.compile("\t").toString(), getSettings()
-				.getSeqSimSearchTableSep().toString());
+		assertEquals("\t", getSettings().getSeqSimSearchTableSep());
 		assertEquals(new Integer(0), getSettings()
 				.getSeqSimSearchTableQueryCol());
 		assertEquals(new Integer(1), getSettings()
@@ -67,8 +66,7 @@ public class SettingsTest {
 				"./test/resources/ahrd_input_seq_sim_table.yml"));
 		assertEquals(Pattern.compile("#").toString(), getSettings()
 				.getSeqSimSearchTableCommentLineRegex().toString());
-		assertEquals(Pattern.compile("\t").toString(), getSettings()
-				.getSeqSimSearchTableSep().toString());
+		assertEquals("\t", getSettings().getSeqSimSearchTableSep());
 		assertEquals(new Integer(10), getSettings()
 				.getSeqSimSearchTableQueryCol());
 		assertEquals(new Integer(11), getSettings()

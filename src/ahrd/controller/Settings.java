@@ -187,7 +187,7 @@ public class Settings implements Cloneable {
 	 * 'seqSimSearchTable'.
 	 */
 	private Pattern seqSimSearchTableCommentLineRegex = null;
-	private Pattern seqSimSearchTableSep = Pattern.compile("\t");
+	private String seqSimSearchTableSep = "\t";
 	private Integer seqSimSearchTableQueryCol = 0;
 	private Integer seqSimSearchTableSubjectCol = 1;
 	private Integer seqSimSearchTableQueryStartCol = 6;
@@ -315,8 +315,8 @@ public class Settings implements Cloneable {
 					SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SEP_KEY) != null) {
-			setSeqSimSearchTableSep(Pattern.compile(input.get(
-					SEQ_SIM_SEARCH_TABLE_SEP_KEY).toString()));
+			setSeqSimSearchTableSep(input.get(SEQ_SIM_SEARCH_TABLE_SEP_KEY)
+					.toString());
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY) != null) {
 			setSeqSimSearchTableQueryCol(Integer.parseInt(input.get(
@@ -812,11 +812,11 @@ public class Settings implements Cloneable {
 		this.seqSimSearchTableCommentLineRegex = seqSimSearchTableCommentLineRegex;
 	}
 
-	public Pattern getSeqSimSearchTableSep() {
+	public String getSeqSimSearchTableSep() {
 		return seqSimSearchTableSep;
 	}
 
-	public void setSeqSimSearchTableSep(Pattern seqSimSearchTableSep) {
+	public void setSeqSimSearchTableSep(String seqSimSearchTableSep) {
 		this.seqSimSearchTableSep = seqSimSearchTableSep;
 	}
 

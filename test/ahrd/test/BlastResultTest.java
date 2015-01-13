@@ -1,18 +1,19 @@
 package ahrd.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
@@ -56,49 +57,79 @@ public class BlastResultTest {
 		assertTrue(br.getTokens().contains("three"));
 	}
 
-	/**
-	 * TODO: Remove overlapping tests with AhrdTest.testAhrdParsesBlast
-	 * 
-	 * @throws MissingProteinException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
 	@Test
-	public void testParseBlastResultsOfQueryProteins()
-			throws MissingProteinException, SAXException, IOException {
-		// Strangely the following line missing causes a NPE in Java 7:
+	public void testAddBlastResult() throws IOException {
+		TestUtils.initTestSettings();
+		Map<String, Protein> proteinDb = TestUtils.mockProteinDb();
+		Protein p1 = proteinDb.get("gene:chr01.502:mRNA:chr01.502");
+		Protein p2 = proteinDb.get("gene:chr01.1056:mRNA:chr01.1056");
+		Map<String, List<BlastResult>> blastResults = new HashMap<String, List<BlastResult>>();
+		BlastResult.addBlastResult(blastResults, new BlastResult("accession_1",
+				1.0, 10, 20, 10, 20, 200, "swissprot", p1));
+		assertEquals(1, blastResults.size());
+		assertEquals(1, blastResults.get("accession_1").size());
+		BlastResult.addBlastResult(blastResults, new BlastResult("accession_1",
+				1.0, 10, 20, 10, 20, 300, "swissprot", p1));
+		assertEquals(1, blastResults.size());
+		assertEquals(1, blastResults.get("accession_1").size());
+		assertEquals(new Double(300), blastResults.get("accession_1").get(0)
+				.getBitScore());
+		BlastResult.addBlastResult(blastResults, new BlastResult("accession_1",
+				1.0, 10, 20, 10, 20, 300, "swissprot", p2));
+		assertEquals(1, blastResults.size());
+		assertEquals(2, blastResults.get("accession_1").size());
+		assertEquals(new Double(300), blastResults.get("accession_1").get(1)
+				.getBitScore());
+		assertEquals(p2, blastResults.get("accession_1").get(1).getProtein());
+		BlastResult.addBlastResult(blastResults, new BlastResult("accession_2",
+				1.0, 10, 20, 10, 20, 300, "swissprot", p2));
+		assertEquals(2, blastResults.size());
+		assertEquals(1, blastResults.get("accession_2").size());
+	}
+
+	@Test
+	public void testParseBlastResults() throws MissingProteinException,
+			IOException {
 		TestUtils.initTestSettings();
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
-		assertTrue(protDb.containsKey("gene:chr01.1056:mRNA:chr01.1056"));
-		assertTrue(protDb.containsKey("gene:chr01.502:mRNA:chr01.502"));
-
-		BlastResult.parseBlastResults(protDb, "swissprot");
-		assertNotNull(protDb.get("gene:chr01.1056:mRNA:chr01.1056")
-				.getBlastResults().get("swissprot"));
-		assertEquals(108, protDb.get("gene:chr01.1056:mRNA:chr01.1056")
-				.getBlastResults().get("swissprot").size());
-		assertEquals(16, protDb.get("gene:chr01.502:mRNA:chr01.502")
-				.getBlastResults().get("swissprot").size());
-
-		BlastResult br = (BlastResult) protDb
-				.get("gene:chr01.1056:mRNA:chr01.1056").getBlastResults()
-				.get("swissprot").get(0);
-		assertEquals("sp|Q9SCZ4|FERON_ARATH", br.getAccession());
-		assertEquals(0.0, br.getEValue(), 0.0);
-		assertEquals(1095, br.getBitScore(), 0.0);
-		assertEquals(30.0, br.getQueryStart(), 0.0);
-		assertEquals(828.0, br.getQueryEnd(), 0.0);
-		assertEquals("Receptor-like protein kinase FERONIA",
-				br.getDescription());
-		// While parsing the BlastResults for a Protein, the
-		// frequencies of each Description-Line should be
-		// measured. This is after the Description-Line
-		// passes the blacklist-check and has it's "bad
-		// tokens" filtered out.
-		Protein p = protDb.get("gene:chr01.502:mRNA:chr01.502");
-		// Test for maximum Bit-Score being saved:
-		assertEquals(94.4, p.getDescriptionScoreCalculator().getMaxBitScore(),
-				0.0);
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(
+				protDb, "tair");
+		assertNotNull(brs);
+		assertTrue(brs.containsKey("AT3G03300.2"));
+		assertTrue(brs.containsKey("AT3G03300.1"));
+		assertTrue(brs.containsKey("AT3G43920.1"));
+		assertTrue(brs.containsKey("AT3G43920.2"));
+		assertTrue(brs.containsKey("AT3G43920.3"));
+		assertTrue(brs.containsKey("AT5G20320.1"));
+		assertTrue(brs.containsKey("AT1G01040.1"));
+		assertEquals(brs.get("AT3G03300.2").get(0).getProtein(),
+				protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT3G03300.1").get(0).getProtein(),
+				protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT3G43920.1").get(0).getProtein(),
+				protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT3G43920.2").get(0).getProtein(),
+				protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT3G43920.3").get(0).getProtein(),
+				protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT5G20320.1").get(0).getProtein(),
+				protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT1G01040.1").get(0).getProtein(),
+				protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		BlastResult br = brs.get("AT3G03300.2").get(0);
+		assertEquals(br.getAccession(), "AT3G03300.2");
+		assertEquals(br.getBitScore(), new Double(94.4), 0.0000001);
+		assertEquals(br.getBlastDatabaseName(), "tair");
+		assertNull(br.getDescription());
+		assertEquals(br.getEValue(), Math.pow(10, -20), Math.pow(10, -21));
+		assertEquals(br.getQueryEnd(), new Integer(99));
+		assertEquals(br.getQueryStart(), new Integer(1));
+		assertEquals(br.getSubjectEnd(), new Integer(1067));
+		assertEquals(br.getSubjectStart(), new Integer(969));
+		assertNull(br.getSubjectLength());
+		// Assert that multiple High Scoring Pairs are read out as a single Hit,
+		// that one with the best Bit-Score:
+		assertEquals(brs.size(), 207);
 	}
 
 	@Test

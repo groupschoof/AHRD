@@ -10,13 +10,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import org.xml.sax.SAXException;
 
 import ahrd.exception.MissingProteinException;
 
@@ -75,10 +74,59 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * is obtained from.
 	 */
 	private Set<String> evaluationTokens;
+	/**
+	 * The query accession is only stored during the parsing of tabular sequence
+	 * similarity search results. It should only be used in that context.
+	 */
+	private Protein protein;
+
+	/**
+	 * Makes a double string representation parseable by Double.parseDouble(…).
+	 * 
+	 * @param input
+	 * @return String
+	 */
+	public static String validateDouble(String input) {
+		if (input.startsWith("e") || input.startsWith("E"))
+			input = "1" + input;
+		return input;
+	}
 
 	public BlastResult(String blastDatabaseName) {
 		super();
 		setBlastDatabaseName(blastDatabaseName);
+	}
+
+	/**
+	 * Constructor missing only Subject-Length and the Human Readable
+	 * Description, both of which will be obtained from the original Database in
+	 * FASTA format.
+	 * 
+	 * @param accession
+	 * @param eValue
+	 * @param queryStart
+	 * @param queryEnd
+	 * @param subjectStart
+	 * @param subjectEnd
+	 * @param bitScore
+	 * @param blastDatabaseName
+	 * @param protein
+	 * 
+	 * @return BlastResult
+	 */
+	public BlastResult(String accession, double eValue, int queryStart,
+			int queryEnd, int subjectStart, int subjectEnd, double bitScore,
+			String blastDatabaseName, Protein protein) {
+		super();
+		setAccession(accession);
+		setEValue(eValue);
+		setQueryStart(queryStart);
+		setQueryEnd(queryEnd);
+		setSubjectStart(subjectStart);
+		setSubjectEnd(subjectEnd);
+		setBitScore(bitScore);
+		setBlastDatabaseName(blastDatabaseName);
+		setProtein(protein);
 	}
 
 	public BlastResult(String accession, double eValue, String description,
@@ -111,23 +159,111 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * supposed to contain a single High Scoring Pair (HSP). Preferred format is
 	 * 'Blast8' (-m 8).
 	 * 
+	 * @param proteinDb
+	 * @param blastDbName
+	 * @return Map<String,List<BlastResult>> Set of Hit-Accessions (Key) to the
+	 *         full BlastResult(s) (Value)
+	 * @throws MissingProteinException
+	 * @throws IOException
 	 */
-	public static void parseBlastResults(Map<String, Protein> proteinDb,
-			String blastDbName) throws MissingProteinException, SAXException,
-			IOException {
-		BufferedReader fastaIn = new BufferedReader(new FileReader(
-				getSettings().getPathToBlastResults(blastDbName)));
-		String str;
-		while ((str = fastaIn.readLine()) != null) {
-			// Only evaluate current line, either if there is no
-			// comment-line-regex given, or if it is given it does not match:
-			if (getSettings().getSeqSimSearchTableCommentLineRegex() == null
-					|| !getSettings().getSeqSimSearchTableCommentLineRegex()
-							.matcher(str).matches()) {
-
+	public static Map<String, List<BlastResult>> parseBlastResults(
+			Map<String, Protein> proteinDb, String blastDbName)
+			throws MissingProteinException, IOException {
+		Map<String, List<BlastResult>> brs = new HashMap<String, List<BlastResult>>();
+		BufferedReader fastaIn = null;
+		try {
+			fastaIn = new BufferedReader(new FileReader(getSettings()
+					.getPathToBlastResults(blastDbName)));
+			String str;
+			while ((str = fastaIn.readLine()) != null) {
+				// Only evaluate current line, either if there is no
+				// comment-line-regex given, or if it is given AND it does not
+				// match:
+				if (getSettings().getSeqSimSearchTableCommentLineRegex() == null
+						|| !getSettings()
+								.getSeqSimSearchTableCommentLineRegex()
+								.matcher(str).matches()) {
+					String[] brFields = str.split(getSettings()
+							.getSeqSimSearchTableSep());
+					if (!proteinDb.containsKey(brFields[getSettings()
+							.getSeqSimSearchTableQueryCol()])) {
+						throw new MissingProteinException(
+								"Could not find Protein for Accession '"
+										+ brFields[getSettings()
+												.getSeqSimSearchTableQueryCol()]
+										+ "' in Protein Database.");
+					}// ELSE
+					BlastResult br = new BlastResult(
+							brFields[getSettings()
+									.getSeqSimSearchTableSubjectCol()],
+							Double.parseDouble(validateDouble(brFields[getSettings()
+									.getSeqSimSearchTableEValueCol()])),
+							Integer.parseInt(brFields[getSettings()
+									.getSeqSimSearchTableQueryStartCol()]),
+							Integer.parseInt(brFields[getSettings()
+									.getSeqSimSearchTableQueryEndCol()]),
+							Integer.parseInt(brFields[getSettings()
+									.getSeqSimSearchTableSubjectStartCol()]),
+							Integer.parseInt(brFields[getSettings()
+									.getSeqSimSearchTableSubjectEndCol()]),
+							Double.parseDouble(brFields[getSettings()
+									.getSeqSimSearchTableBitScoreCol()]),
+							blastDbName, proteinDb.get(brFields[getSettings()
+									.getSeqSimSearchTableQueryCol()]));
+					addBlastResult(brs, br);
+				}
 			}
+		} finally {
+			fastaIn.close();
 		}
-		fastaIn.close();
+		return brs;
+	}
+
+	/**
+	 * The argument BlastResult is added to the argument Map of BlastResults. If
+	 * a BlastResult of same accession and for the same query protein is already
+	 * present, and the argument BlastResult has a better Bit-Score, it replaces
+	 * the one of worse Bit-Score. If this is a so far not seen BlastResult,
+	 * regarding Hit-Accession and Query-Accession, it will simply be added.
+	 * 
+	 * @param brs
+	 * @param br
+	 */
+	public static void addBlastResult(Map<String, List<BlastResult>> brs,
+			BlastResult br) {
+		if (brs.containsKey(br.getAccession())) {
+			boolean isMultipleHsp = false;
+			List<BlastResult> sameHitBrs = brs.get(br.getAccession());
+			for (BlastResult iterBr : sameHitBrs) {
+				// If and only if there is a BlastResult of same Hit and Query
+				// that also has a better Bit-Score, replace the one of lower
+				// Bit-Score with the higher one:
+				if (iterBr.getProtein().equals(br.getProtein())) {
+					isMultipleHsp = true;
+					if (iterBr.getBitScore() < br.getBitScore()) {
+						sameHitBrs.remove(iterBr);
+						sameHitBrs.add(br);
+					}
+				}
+			}
+			// If this a Hit for another Protein, add it:
+			if (!isMultipleHsp) {
+				sameHitBrs.add(br);
+			}
+
+		} else {
+			// Add a new List<BlastResult> containing the argument BlastResult
+			// br to the argument Map brs:
+			List<BlastResult> sameHitBrs = new ArrayList<BlastResult>();
+			sameHitBrs.add(br);
+			brs.put(br.getAccession(), sameHitBrs);
+		}
+	}
+
+	public static void parseBlastDatabase(Map<String, Protein> proteinDb,
+			String blastDbName, Map<String, BlastResult> blastResults) {
+		// Parse line by line FASTA Blast search DB. Extract Subject Lengths and
+		// Subject HRDs.
 	}
 
 	public static List<BlastResult> filterBestScoringBlastResults(
@@ -333,4 +469,13 @@ public class BlastResult implements Comparable<BlastResult> {
 	public void setSubjectLength(Integer subjectLength) {
 		this.subjectLength = subjectLength;
 	}
+
+	public Protein getProtein() {
+		return protein;
+	}
+
+	public void setProtein(Protein protein) {
+		this.protein = protein;
+	}
+
 }
