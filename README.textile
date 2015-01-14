@@ -18,7 +18,7 @@ h2. 1 Getting started
 
 h3. 1.1 Requirements
 
-AHRD is a Java-Program which requires Java 1.5 or higher and ant.
+AHRD is a Java-Program which requires Java 1.7 or higher and ant.
 
 
 h3. 1.2 Installation
