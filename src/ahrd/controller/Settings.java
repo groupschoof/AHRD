@@ -87,7 +87,7 @@ public class Settings implements Cloneable {
 	public static final String SEQ_SIM_SEARCH_TABLE_BIT_SCORE_END_COL_KEY = "seq_sim_search_table_bit_score_col";
 	public static final String FASTA_HEADER_REGEX_KEY = "fasta_header_regex";
 	public static final Pattern DEFAULT_FASTA_HEADER_REGEX = Pattern
-			.compile("^>(?<accession>\\S+)\\s+(?<description>\\S+)");
+			.compile("^>(?<accession>\\S+)\\s+(?<description>.+?)\\s+(((OS|os)=.+)|((GN|gn)=.+))?$");
 
 	/**
 	 * Fields:

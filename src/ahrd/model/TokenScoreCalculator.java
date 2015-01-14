@@ -25,7 +25,8 @@ public class TokenScoreCalculator {
 	// Please enter your initials ___
 	private double tokenHighScore = 0.0;
 
-	public static boolean passesBlacklist(String token, List<String> blacklist) {
+	public static boolean tokenPassesBlacklist(String token,
+			List<String> blacklist) {
 		// No Token passes being NULL or empty String
 		boolean passed = (token != null && !token.equals(""));
 		Iterator<String> i = blacklist.iterator();

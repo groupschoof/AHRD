@@ -112,10 +112,7 @@ public class AHRD {
 	public void parseBlastResults() throws IOException,
 			MissingProteinException, SAXException {
 		for (String blastDatabase : getSettings().getBlastDatabases()) {
-			// Last Argument 'false' means that the best scoring BlastHits are
-			// not remembered to be compared with the AHRD-Result, as would be
-			// done for training the algorithm:
-			BlastResult.parseBlastResults(getProteins(), blastDatabase);
+			BlastResult.readBlastResults(getProteins(), blastDatabase);
 		}
 	}
 

@@ -66,10 +66,8 @@ public class SettingsTest {
 						"^>(?<accession>[aA][tT]\\d[gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
 						.toString(), getSettings().getFastaHeaderRegex("tair")
 						.toString());
-		assertEquals(
-				Pattern.compile("^>(?<accession>\\S+)\\s+(?<description>\\S+)")
-						.toString(), getSettings()
-						.getFastaHeaderRegex("trembl").toString());
+		assertEquals(Settings.DEFAULT_FASTA_HEADER_REGEX.toString(),
+				getSettings().getFastaHeaderRegex("trembl").toString());
 		// Assert custom values:
 		setSettings(new Settings(
 				"./test/resources/ahrd_input_seq_sim_table.yml"));
@@ -97,10 +95,8 @@ public class SettingsTest {
 						"^>(?<accession>[aA][tT]\\d[gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
 						.toString(), getSettings().getFastaHeaderRegex("tair")
 						.toString());
-		assertEquals(
-				Pattern.compile("^>(?<accession>\\S+)\\s+(?<description>\\S+)")
-						.toString(), getSettings()
-						.getFastaHeaderRegex("trembl").toString());
+		assertEquals(Settings.DEFAULT_FASTA_HEADER_REGEX.toString(),
+				getSettings().getFastaHeaderRegex("trembl").toString());
 	}
 
 	@Test

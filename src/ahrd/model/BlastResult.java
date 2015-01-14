@@ -2,7 +2,7 @@ package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.model.ReferenceDescription.tokenizeDescription;
-import static ahrd.model.TokenScoreCalculator.passesBlacklist;
+import static ahrd.model.TokenScoreCalculator.tokenPassesBlacklist;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,10 +12,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ahrd.controller.Settings;
 import ahrd.exception.MissingProteinException;
@@ -154,6 +156,26 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	/**
+	 * Wraps up two steps:
+	 * <ul>
+	 * <li>Parse tabular Sequence Similarity Search Results</li>
+	 * <li>Extract Human Readable Descriptions (HRDs) and Sequence Lengths from
+	 * Protein Database in FASTA format</li>
+	 * </ul>
+	 * 
+	 * @param proteinDb
+	 * @param blastDbName
+	 * @throws IOException
+	 * @throws MissingProteinException
+	 */
+	public static void readBlastResults(Map<String, Protein> proteinDb,
+			String blastDbName) throws MissingProteinException, IOException {
+		Map<String, List<BlastResult>> brs = parseBlastResults(proteinDb,
+				blastDbName);
+		parseBlastDatabase(proteinDb, blastDbName, brs);
+	}
+
+	/**
 	 * Reads in BlastResults, or any other results from sequence similarity
 	 * searches, and assigns them to the Proteins in argument proteinDb. The
 	 * result file is expected to be in tabular format, that is each line is
@@ -265,7 +287,8 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * Adds the sequence length and Human Readable Description (HRD) to all
 	 * matching BlastHits found in the argument Map 'blastResults'. Afterwards
 	 * the respective BlastResult instances are added to their respective
-	 * Proteins. See function addBlastResult in class Protein for more details.
+	 * Proteins. See function <code>generateHRDCandidateForProtein(…)</code> for
+	 * more details.
 	 * 
 	 * @param blastResults
 	 * @param fastaAccession
@@ -276,10 +299,9 @@ public class BlastResult implements Comparable<BlastResult> {
 			Map<String, List<BlastResult>> blastResults, String fastaAccession,
 			Integer hitAALength, String hrd) {
 		for (BlastResult br : blastResults.get(fastaAccession)) {
-			//System.out.println("Curr length is " + hitAALength);
 			br.setSubjectLength(hitAALength);
 			br.setDescription(hrd);
-			br.getProtein().addBlastResult(br);
+			br.generateHRDCandidateForProtein();
 		}
 	}
 
@@ -407,9 +429,34 @@ public class BlastResult implements Comparable<BlastResult> {
 		for (String tokenCandidate : new HashSet<String>(
 				Arrays.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
 			tokenCandidate = tokenCandidate.toLowerCase();
-			if (passesBlacklist(tokenCandidate, tknBlackList))
+			if (tokenPassesBlacklist(tokenCandidate, tknBlackList))
 				getTokens().add(tokenCandidate);
 		}
+	}
+
+	public boolean passesBlacklist(String blastResultDescriptionLine) {
+		boolean passesBlacklist = (blastResultDescriptionLine != null && !blastResultDescriptionLine
+				.equals(""));
+		for (Iterator<String> i = getSettings().getBlastResultsBlackList(
+				getBlastDatabaseName()).iterator(); (i.hasNext() && passesBlacklist);) {
+			Pattern p = Pattern.compile(i.next());
+			Matcher m = p.matcher(blastResultDescriptionLine);
+			passesBlacklist = !m.find();
+		}
+		return passesBlacklist;
+	}
+
+	public String filter(String blastResultDescriptionLine) {
+		String filteredDescLine = blastResultDescriptionLine;
+		for (Iterator<String> i = getSettings().getBlastResultsFilter(
+				getBlastDatabaseName()).iterator(); i.hasNext();) {
+			Pattern p = Pattern.compile(i.next());
+			// Replace with whitespace, so word-boundaries are kept up
+			filteredDescLine = p.matcher(filteredDescLine).replaceAll(" ");
+		}
+		// Condense multiple whitespaces into one and trim the description-line:
+		filteredDescLine = filteredDescLine.replaceAll("\\s{2,}", " ").trim();
+		return filteredDescLine;
 	}
 
 	/**
@@ -457,6 +504,45 @@ public class BlastResult implements Comparable<BlastResult> {
 				new Integer(queryEnd), new Integer(subjectStart), new Integer(
 						subjectEnd), new Integer(subjectLength), new Double(
 						bitScore), new String(blastDatabaseName));
+	}
+
+	/**
+	 * Investigates this instance's properties, especially the Description. If
+	 * the instance is valid and its description passes the Blacklist, it will
+	 * be added as a candidate HRD to the respective query Protein's
+	 * BlastResults.
+	 */
+	public void generateHRDCandidateForProtein() {
+		// For Training-Purposes:
+		if (getSettings().getWriteBestBlastHitsToOutput()) {
+			// Of course we do have to treat this best-blast-hit
+			// differently than the further to process one below, so
+			// clone:
+			BlastResult theClone = clone();
+			// Pass best Blast-Hit's Description through filter:
+			theClone.setDescription(filter(theClone.getDescription()));
+			// Tokenize without filtering tokens through the Blacklist:
+			theClone.setTokens(tokenizeDescription(theClone.getDescription()));
+			getProtein().getEvaluationScoreCalculator()
+					.addUnchangedBlastResult(getBlastDatabaseName(), theClone);
+		}
+		if (passesBlacklist(getDescription())) {
+			// Pass bestScoringHSP through filter:
+			setDescription(filter(getDescription()));
+			// Tokenize the filtered Description-Line:
+			tokenize();
+			// Pass bestScoringHSP through Blacklist and add it, if it
+			// is still valid:
+			if (isValid()) {
+				// Generate the pattern of the Description's unique
+				// tokens:
+				patternize();
+				// Adds the BlastResult to the getProtein()'s set and
+				// measures the cumulative and total scores later needed
+				// to calculate the Token-Scores:
+				getProtein().addBlastResult(this);
+			}
+		}
 	}
 
 	public String getAccession() {

@@ -58,7 +58,7 @@ public class AhrdTest {
 		Protein p = ahrd.getProteins().get("gene:chr01.502:mRNA:chr01.502");
 		BlastResult br = p.getBlastResults().get("swissprot").get(0);
 		assertEquals(2.0, br.getTokens().size(), 0.0);
-		// test measurement of cumulative token-scores was triggered:		
+		// test measurement of cumulative token-scores was triggered:
 		assertTrue(p.getTokenScoreCalculator().getCumulativeTokenBitScores()
 				.containsKey("dicer"));
 		assertTrue(p.getTokenScoreCalculator()
@@ -90,8 +90,9 @@ public class AhrdTest {
 		ahrd.parseGeneOntologyResult();
 		assertEquals(1, ahrd.getProteins().get("gene:chr01.502:mRNA:chr01.502")
 				.getGoResults().size());
-		assertEquals(2, ahrd.getProteins().get(
-				"gene:chr01.1056:mRNA:chr01.1056").getGoResults().size());
+		assertEquals(2,
+				ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
+						.getGoResults().size());
 	}
 
 	// @Test
@@ -112,7 +113,7 @@ public class AhrdTest {
 	// a.filterBestScoringBlastResults(p);
 	// assertEquals(1.0, p.getBlastResults().get("trembl").size(), 0.0);
 	// // a.tokenizeBlastResultDescriptionLines(p);
-	//		
+	//
 	// // Only a single BlastHit in trembl:
 	// assertEquals(2.0,
 	// p.getBlastResults().get("trembl").get(0).getTokens().size(), 0.0);
