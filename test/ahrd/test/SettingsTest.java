@@ -63,7 +63,7 @@ public class SettingsTest {
 				.getSeqSimSearchTableBitScoreCol());
 		assertEquals(
 				Pattern.compile(
-						"^>(?<accession>[aA][tT]\\d[gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
+						"^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
 						.toString(), getSettings().getFastaHeaderRegex("tair")
 						.toString());
 		assertEquals(Settings.DEFAULT_FASTA_HEADER_REGEX.toString(),
@@ -92,7 +92,7 @@ public class SettingsTest {
 				.getSeqSimSearchTableBitScoreCol());
 		assertEquals(
 				Pattern.compile(
-						"^>(?<accession>[aA][tT]\\d[gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
+						"^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
 						.toString(), getSettings().getFastaHeaderRegex("tair")
 						.toString());
 		assertEquals(Settings.DEFAULT_FASTA_HEADER_REGEX.toString(),

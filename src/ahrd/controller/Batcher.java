@@ -126,24 +126,24 @@ public class Batcher {
 		// Set proteins_fasta:
 		batchYml.put(Settings.PROTEINS_FASTA_KEY,
 				appendSlashIfNotPresent(getInput().get(PROTEINS_DIR_KEY)
-						.toString())
-						+ batchName);
+						.toString()) + batchName);
 
 		// Set references, if given:
 		if (getInput().containsKey(REFERENCES_DIR_KEY)) {
-			batchYml.put(Settings.REFERENCES_FASTA_KEY, generatePathToFile(
-					batchName, REFERENCES_DIR_KEY, null));
+			batchYml.put(Settings.REFERENCES_FASTA_KEY,
+					generatePathToFile(batchName, REFERENCES_DIR_KEY, null));
 		}
 		// Set blast2go-results, if given:
 		if (getInput().containsKey(BLAST_2_GO_RESULTS_DIR_KEY)) {
-			batchYml.put(Settings.BLAST_2_GO_ANNOT_FILE_KEY,
+			batchYml.put(
+					Settings.BLAST_2_GO_ANNOT_FILE_KEY,
 					generatePathToFile(batchName, BLAST_2_GO_RESULTS_DIR_KEY,
 							null));
 		}
 		// Store F-Score-Beta-Parameter, if given:
 		if (getInput().containsKey(Settings.F_MEASURE_BETA_PARAM_KEY)) {
-			batchYml.put(Settings.F_MEASURE_BETA_PARAM_KEY, getInput().get(
-					Settings.F_MEASURE_BETA_PARAM_KEY));
+			batchYml.put(Settings.F_MEASURE_BETA_PARAM_KEY,
+					getInput().get(Settings.F_MEASURE_BETA_PARAM_KEY));
 		}
 		// Output as Fasta?
 		if (Boolean.parseBoolean((String) getInput().get(
@@ -151,13 +151,13 @@ public class Batcher {
 			batchYml.put(Settings.OUTPUT_FASTA_KEY, true);
 
 		// Put weight-parameters:
-		batchYml.put(Settings.TOKEN_SCORE_BIT_SCORE_WEIGHT, getInput().get(
-				Settings.TOKEN_SCORE_BIT_SCORE_WEIGHT));
+		batchYml.put(Settings.TOKEN_SCORE_BIT_SCORE_WEIGHT,
+				getInput().get(Settings.TOKEN_SCORE_BIT_SCORE_WEIGHT));
 		batchYml.put(Settings.TOKEN_SCORE_DATABASE_SCORE_WEIGHT, getInput()
 				.get(Settings.TOKEN_SCORE_DATABASE_SCORE_WEIGHT));
-		batchYml.put(Settings.TOKEN_SCORE_OVERLAP_SCORE_WEIGHT, getInput().get(
-				Settings.TOKEN_SCORE_OVERLAP_SCORE_WEIGHT));
-		
+		batchYml.put(Settings.TOKEN_SCORE_OVERLAP_SCORE_WEIGHT,
+				getInput().get(Settings.TOKEN_SCORE_OVERLAP_SCORE_WEIGHT));
+
 		// Put data for each Blast-Db into Yml-Hash
 		Map<String, Object> blast_dbs = new HashMap<String, Object>();
 		Map<String, Object> inputBlastDbs = (Map<String, Object>) getInput()
@@ -168,21 +168,33 @@ public class Batcher {
 					.get(blastDbName);
 			// out:
 			Map<String, String> blastDbYml = new HashMap<String, String>();
-			blastDbYml.put(Settings.BLAST_DB_WEIGHT_KEY, inputBlastDb
-					.get(Settings.BLAST_DB_WEIGHT_KEY));
-			blastDbYml.put(Settings.BLAST_BLACKLIST_KEY, inputBlastDb
-					.get(Settings.BLAST_BLACKLIST_KEY));
-			blastDbYml.put(Settings.BLAST_FILTER_KEY, inputBlastDb
-					.get(Settings.BLAST_FILTER_KEY));
-			blastDbYml.put(Settings.TOKEN_BLACKLIST_KEY, inputBlastDb
-					.get(Settings.TOKEN_BLACKLIST_KEY));
+			blastDbYml.put(Settings.BLAST_DB_WEIGHT_KEY,
+					inputBlastDb.get(Settings.BLAST_DB_WEIGHT_KEY));
+			blastDbYml.put(Settings.BLAST_BLACKLIST_KEY,
+					inputBlastDb.get(Settings.BLAST_BLACKLIST_KEY));
+			blastDbYml.put(Settings.BLAST_FILTER_KEY,
+					inputBlastDb.get(Settings.BLAST_FILTER_KEY));
+			blastDbYml.put(Settings.TOKEN_BLACKLIST_KEY,
+					inputBlastDb.get(Settings.TOKEN_BLACKLIST_KEY));
+			// Blast database in FASTA format to be parsed for Hit sequence
+			// lengths and Hit Human Readable Descriptions:
+			blastDbYml.put(Settings.BLAST_DATABASE_KEY,
+					inputBlastDb.get(Settings.BLAST_DATABASE_KEY));
+			// Pass on optional FASTA_HEADER_REGEX, if given:
+			if (inputBlastDb.containsKey(Settings.FASTA_HEADER_REGEX_KEY)) {
+				blastDbYml.put(Settings.FASTA_HEADER_REGEX_KEY,
+						inputBlastDb.get(Settings.FASTA_HEADER_REGEX_KEY));
+			}
 			// Weight:
 			blastDbYml.put(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT,
 					inputBlastDb
 							.get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
 			// Find matching Blast-Result-File
-			blastDbYml.put(Settings.BLAST_RESULT_FILE_KEY, findFileInDirectory(
-					inputBlastDb.get(BLAST_RESULTS_DIR_KEY), batchName));
+			blastDbYml
+					.put(Settings.BLAST_RESULT_FILE_KEY,
+							findFileInDirectory(
+									inputBlastDb.get(BLAST_RESULTS_DIR_KEY),
+									batchName));
 			blast_dbs.put(blastDbName, blastDbYml);
 		}
 		batchYml.put(Settings.BLAST_DBS_KEY, blast_dbs);
@@ -191,19 +203,22 @@ public class Batcher {
 		if (getInput().get(Settings.INTERPRO_DATABASE_KEY) != null
 				&& (getInput().get(INTERPRO_RESULTS_DIR_KEY) != null || getInput()
 						.get(INTERPRO_RESULTS_FILE_KEY) != null)) {
-			batchYml.put(Settings.INTERPRO_DATABASE_KEY, getInput().get(
-					Settings.INTERPRO_DATABASE_KEY));
-			batchYml.put(Settings.INTERPRO_RESULT_KEY, generatePathToFile(
-					batchName, INTERPRO_RESULTS_DIR_KEY,
-					INTERPRO_RESULTS_FILE_KEY));
+			batchYml.put(Settings.INTERPRO_DATABASE_KEY,
+					getInput().get(Settings.INTERPRO_DATABASE_KEY));
+			batchYml.put(
+					Settings.INTERPRO_RESULT_KEY,
+					generatePathToFile(batchName, INTERPRO_RESULTS_DIR_KEY,
+							INTERPRO_RESULTS_FILE_KEY));
 		}
 
 		// Gene-Ontology-Result, if given:
 		if (getInput().get(GENE_ONTOLOGY_RESULTS_DIR_KEY) != null
 				|| getInput().get(GENE_ONTOLOGY_RESULTS_FILE_KEY) != null) {
-			batchYml.put(Settings.GENE_ONTOLOGY_RESULT_KEY, generatePathToFile(
-					batchName, GENE_ONTOLOGY_RESULTS_DIR_KEY,
-					GENE_ONTOLOGY_RESULTS_FILE_KEY));
+			batchYml.put(
+					Settings.GENE_ONTOLOGY_RESULT_KEY,
+					generatePathToFile(batchName,
+							GENE_ONTOLOGY_RESULTS_DIR_KEY,
+							GENE_ONTOLOGY_RESULTS_FILE_KEY));
 		}
 
 		// Output-File:
@@ -246,11 +261,11 @@ public class Batcher {
 
 		// Pass on simulated annealing parameters, if any are given:
 		if (getInput().get(Settings.TEMPERATURE_KEY) != null)
-			batchYml.put(Settings.TEMPERATURE_KEY, (String) getInput().get(
-					Settings.TEMPERATURE_KEY));
+			batchYml.put(Settings.TEMPERATURE_KEY,
+					(String) getInput().get(Settings.TEMPERATURE_KEY));
 		if (getInput().get(Settings.COOL_DOWN_BY_KEY) != null)
-			batchYml.put(Settings.COOL_DOWN_BY_KEY, (String) getInput().get(
-					Settings.COOL_DOWN_BY_KEY));
+			batchYml.put(Settings.COOL_DOWN_BY_KEY,
+					(String) getInput().get(Settings.COOL_DOWN_BY_KEY));
 
 		// Pass on boolean parameter find_highest_possible_evaluation_score, if
 		// given and set to true:
@@ -284,8 +299,8 @@ public class Batcher {
 	}
 
 	public String generateAhrdCall(String pathToBatchYml, String batchName) {
-		String ahrdCall = getInput().get(AHRD_CALL_KEY).toString().replaceAll(
-				AHRD_CALL_BATCH, pathToBatchYml);
+		String ahrdCall = getInput().get(AHRD_CALL_KEY).toString()
+				.replaceAll(AHRD_CALL_BATCH, pathToBatchYml);
 		return ahrdCall.replaceAll(AHRD_CALL_BATCH_NAME, batchName);
 	}
 
