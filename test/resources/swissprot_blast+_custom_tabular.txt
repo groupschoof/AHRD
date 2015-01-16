@@ -1,0 +1,232 @@
+gene:chr01.502:mRNA:chr01.502	sp|Q3EBC8|DCL2_ARATH	1	99	983	1081	1e-24	94.4	sp|Q3EBC8|DCL2_ARATH Endoribonuclease Dicer homolog 2 OS=Arabidopsis thaliana GN=At3g03300 PE=1 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|Q10HL3|DCL2A_ORYSJ	1	99	994	1093	1e-16	70.5	sp|Q10HL3|DCL2A_ORYSJ Endoribonuclease Dicer homolog 2a OS=Oryza sativa subsp. japonica GN=DCL2A PE=2 SV=1
+gene:chr01.502:mRNA:chr01.502	sp|Q69LX2|DCL2B_ORYSJ	1	99	965	1064	2e-16	70.5	sp|Q69LX2|DCL2B_ORYSJ Endoribonuclease Dicer homolog 2b OS=Oryza sativa subsp. japonica GN=DCL2B PE=2 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|Q5N870|DCL3A_ORYSJ	1	82	1054	1135	3e-15	66.6	sp|Q5N870|DCL3A_ORYSJ Endoribonuclease Dicer homolog 3a OS=Oryza sativa subsp. japonica GN=DCL3A PE=2 SV=1
+gene:chr01.502:mRNA:chr01.502	sp|Q9LXW7|DCL3_ARATH	1	82	1010	1091	5e-13	60.1	sp|Q9LXW7|DCL3_ARATH Endoribonuclease Dicer homolog 3 OS=Arabidopsis thaliana GN=DCL3 PE=1 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|Q9LXW7|DCL3_ARATH	8	53	1226	1271	0.058	26.6	sp|Q9LXW7|DCL3_ARATH Endoribonuclease Dicer homolog 3 OS=Arabidopsis thaliana GN=DCL3 PE=1 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|A7LFZ6|DCL4_ORYSJ	1	75	1031	1105	1e-12	58.9	sp|A7LFZ6|DCL4_ORYSJ Endoribonuclease Dicer homolog 4 OS=Oryza sativa subsp. japonica GN=DCL4 PE=2 SV=1
+gene:chr01.502:mRNA:chr01.502	sp|A7LFZ6|DCL4_ORYSJ	18	50	1254	1279	0.60	23.5	sp|A7LFZ6|DCL4_ORYSJ Endoribonuclease Dicer homolog 4 OS=Oryza sativa subsp. japonica GN=DCL4 PE=2 SV=1
+gene:chr01.502:mRNA:chr01.502	sp|Q7XD96|DCL3B_ORYSJ	1	86	1053	1138	2e-12	58.5	sp|Q7XD96|DCL3B_ORYSJ Endoribonuclease Dicer homolog 3b OS=Oryza sativa subsp. japonica GN=DCL3B PE=3 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|Q7XD96|DCL3B_ORYSJ	1	59	1484	1553	4.4	21.2	sp|Q7XD96|DCL3B_ORYSJ Endoribonuclease Dicer homolog 3b OS=Oryza sativa subsp. japonica GN=DCL3B PE=3 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|P84634|DCL4_ARATH	1	75	1107	1181	1e-11	56.2	sp|P84634|DCL4_ARATH Dicer-like protein 4 OS=Arabidopsis thaliana GN=DCL4 PE=1 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|Q6TV19|DICER_DANRE	1	82	1283	1364	1e-10	53.1	sp|Q6TV19|DICER_DANRE Endoribonuclease Dicer OS=Danio rerio GN=dicer1 PE=2 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|A0MQH0|DICER_CRIGR	1	94	1301	1400	1e-10	52.8	sp|A0MQH0|DICER_CRIGR Endoribonuclease Dicer OS=Cricetulus griseus GN=DICER1 PE=2 SV=3
+gene:chr01.502:mRNA:chr01.502	sp|Q9UPY3|DICER_HUMAN	1	82	1301	1382	1e-10	52.8	sp|Q9UPY3|DICER_HUMAN Endoribonuclease Dicer OS=Homo sapiens GN=DICER1 PE=1 SV=3
+gene:chr01.502:mRNA:chr01.502	sp|Q25BN1|DICER_CHICK	10	82	1311	1383	1e-10	52.8	sp|Q25BN1|DICER_CHICK Endoribonuclease Dicer OS=Gallus gallus GN=DICER1 PE=2 SV=3
+gene:chr01.502:mRNA:chr01.502	sp|Q9VCU9|DCR1_DROME	11	85	1740	1808	1e-10	52.8	sp|Q9VCU9|DCR1_DROME Endoribonuclease Dcr-1 OS=Drosophila melanogaster GN=Dcr-1 PE=1 SV=1
+gene:chr01.502:mRNA:chr01.502	sp|Q8R418|DICER_MOUSE	1	82	1301	1382	2e-10	52.8	sp|Q8R418|DICER_MOUSE Endoribonuclease Dicer OS=Mus musculus GN=Dicer1 PE=1 SV=3
+gene:chr01.502:mRNA:chr01.502	sp|B3DLA6|DICER_XENTR	10	82	1287	1359	4e-10	51.2	sp|B3DLA6|DICER_XENTR Endoribonuclease Dicer OS=Xenopus tropicalis GN=dicer1 PE=2 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|C0LGD7|Y1684_ARATH	16	54	294	333	2.3	21.9	sp|C0LGD7|Y1684_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g06840 OS=Arabidopsis thaliana GN=At1g06840 PE=2 SV=2
+gene:chr01.502:mRNA:chr01.502	sp|Q9SI06|Y5573_ARATH	70	83	262	275	9.5	20.0	sp|Q9SI06|Y5573_ARATH Putative leucine-rich repeat receptor-like serine/threonine-protein kinase At2g04300 OS=Arabidopsis thaliana GN=At2g04300 PE=3 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SCZ4|FERON_ARATH	27	828	27	895	0.0	 1132	sp|Q9SCZ4|FERON_ARATH Receptor-like protein kinase FERONIA OS=Arabidopsis thaliana GN=FER PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SR05|ANX1_ARATH	1	828	1	850	0.0	  744	sp|Q9SR05|ANX1_ARATH Receptor-like protein kinase ANXUR1 OS=Arabidopsis thaliana GN=ANX1 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q3E8W4|ANX2_ARATH	5	828	10	858	0.0	  743	sp|Q3E8W4|ANX2_ARATH Receptor-like protein kinase ANXUR2 OS=Arabidopsis thaliana GN=ANX2 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LK35|THE1_ARATH	7	828	3	855	0.0	  622	sp|Q9LK35|THE1_ARATH Receptor-like protein kinase THESEUS 1 OS=Arabidopsis thaliana GN=THE1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FID8|Y5900_ARATH	176	828	234	873	0.0	  606	sp|Q9FID8|Y5900_ARATH Putative receptor-like protein kinase At5g39000 OS=Arabidopsis thaliana GN=At5g39000 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FID8|Y5900_ARATH	10	181	6	180	5e-27	  112	sp|Q9FID8|Y5900_ARATH Putative receptor-like protein kinase At5g39000 OS=Arabidopsis thaliana GN=At5g39000 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SA72|Y1357_ARATH	172	750	238	799	0.0	  592	sp|Q9SA72|Y1357_ARATH Probable receptor-like protein kinase At1g30570 OS=Arabidopsis thaliana GN=At1g30570 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SA72|Y1357_ARATH	17	143	12	142	6e-06	43.9	sp|Q9SA72|Y1357_ARATH Probable receptor-like protein kinase At1g30570 OS=Arabidopsis thaliana GN=At1g30570 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SA72|Y1357_ARATH	207	281	68	131	0.13	29.6	sp|Q9SA72|Y1357_ARATH Probable receptor-like protein kinase At1g30570 OS=Arabidopsis thaliana GN=At1g30570 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FLJ8|Y5613_ARATH	24	764	22	825	0.0	  585	sp|Q9FLJ8|Y5613_ARATH Probable receptor-like protein kinase At5g61350 OS=Arabidopsis thaliana GN=At5g61350 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FID9|Y5389_ARATH	178	828	233	880	0.0	  575	sp|Q9FID9|Y5389_ARATH Probable receptor-like protein kinase At5g38990 OS=Arabidopsis thaliana GN=At5g38990 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FID9|Y5389_ARATH	7	162	2	157	3e-27	  112	sp|Q9FID9|Y5389_ARATH Probable receptor-like protein kinase At5g38990 OS=Arabidopsis thaliana GN=At5g38990 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9T020|Y4391_ARATH	30	828	52	878	0.0	  568	sp|Q9T020|Y4391_ARATH Probable receptor-like protein kinase At4g39110 OS=Arabidopsis thaliana GN=At4g39110 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SJT0|Y2214_ARATH	28	765	49	813	0.0	  558	sp|Q9SJT0|Y2214_ARATH Probable receptor-like protein kinase At2g21480 OS=Arabidopsis thaliana GN=At2g21480 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LX66|HERK_ARATH	171	828	212	830	0.0	  545	sp|Q9LX66|HERK_ARATH Receptor-like protein kinase HERK 1 OS=Arabidopsis thaliana GN=HERK1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LX66|HERK_ARATH	14	162	8	147	5e-13	66.6	sp|Q9LX66|HERK_ARATH Receptor-like protein kinase HERK 1 OS=Arabidopsis thaliana GN=HERK1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FN92|Y5597_ARATH	6	751	5	762	0.0	  540	sp|Q9FN92|Y5597_ARATH Probable receptor-like protein kinase At5g59700 OS=Arabidopsis thaliana GN=At5g59700 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FLW0|Y5241_ARATH	172	828	223	824	6e-171	  514	sp|Q9FLW0|Y5241_ARATH Probable receptor-like protein kinase At5g24010 OS=Arabidopsis thaliana GN=At5g24010 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FLW0|Y5241_ARATH	28	162	24	153	3e-07	48.1	sp|Q9FLW0|Y5241_ARATH Probable receptor-like protein kinase At5g24010 OS=Arabidopsis thaliana GN=At5g24010 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O80623|Y2393_ARATH	6	755	11	772	3e-165	  499	sp|O80623|Y2393_ARATH Probable receptor-like protein kinase At2g39360 OS=Arabidopsis thaliana GN=At2g39360 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O22187|Y2232_ARATH	7	748	4	765	3e-141	  437	sp|O22187|Y2232_ARATH Probable receptor-like protein kinase At2g23200 OS=Arabidopsis thaliana GN=At2g23200 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FID6|Y5392_ARATH	13	749	4	775	2e-88	  295	sp|Q9FID6|Y5392_ARATH Probable receptor-like protein kinase At5g39020 OS=Arabidopsis thaliana GN=At5g39020 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FID5|Y5393_ARATH	170	749	227	779	1e-85	  287	sp|Q9FID5|Y5393_ARATH Probable receptor-like protein kinase At5g39030 OS=Arabidopsis thaliana GN=At5g39030 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FID5|Y5393_ARATH	8	181	3	176	9e-27	  110	sp|Q9FID5|Y5393_ARATH Probable receptor-like protein kinase At5g39030 OS=Arabidopsis thaliana GN=At5g39030 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGD7|Y1684_ARATH	368	747	546	900	2e-81	  278	sp|C0LGD7|Y1684_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g06840 OS=Arabidopsis thaliana GN=At1g06840 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGV0|Y5487_ARATH	370	750	533	886	6e-78	  267	sp|C0LGV0|Y5487_ARATH Probable LRR receptor-like serine/threonine-protein kinase At5g48740 OS=Arabidopsis thaliana GN=At5g48740 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGL4|Y2289_ARATH	457	759	561	860	1e-76	  263	sp|C0LGL4|Y2289_ARATH Probable LRR receptor-like serine/threonine-protein kinase At2g28960 OS=Arabidopsis thaliana GN=At2g28960 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8LKZ1|NORK_PEA	388	761	522	887	2e-76	  263	sp|Q8LKZ1|NORK_PEA Nodulation receptor kinase OS=Pisum sativum GN=NORK PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8LKZ1|NORK_PEA	206	292	228	305	0.012	33.1	sp|Q8LKZ1|NORK_PEA Nodulation receptor kinase OS=Pisum sativum GN=NORK PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8L4H4|NORK_MEDTR	459	761	586	888	2e-76	  263	sp|Q8L4H4|NORK_MEDTR Nodulation receptor kinase OS=Medicago truncatula GN=NORK PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8L4H4|NORK_MEDTR	253	298	269	313	9e-04	37.0	sp|Q8L4H4|NORK_MEDTR Nodulation receptor kinase OS=Medicago truncatula GN=NORK PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SFT7|Y3707_ARATH	459	743	67	355	2e-76	  251	sp|Q9SFT7|Y3707_ARATH Serine/threonine-protein kinase At3g07070 OS=Arabidopsis thaliana GN=At3g07070 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9CAL8|PEK13_ARATH	369	774	222	673	3e-76	  259	sp|Q9CAL8|PEK13_ARATH Proline-rich receptor-like protein kinase PERK13 OS=Arabidopsis thaliana GN=PERK13 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGG4|Y1518_ARATH	383	761	513	872	3e-76	  262	sp|C0LGG4|Y1518_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g51860 OS=Arabidopsis thaliana GN=At1g51860 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGG6|Y5189_ARATH	373	748	490	845	8e-76	  261	sp|C0LGG6|Y5189_ARATH Probable LRR receptor-like protein kinase At1g51890 OS=Arabidopsis thaliana GN=At1g51890 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FZB8|Y5181_ARATH	343	759	454	863	1e-75	  260	sp|Q9FZB8|Y5181_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g51810 OS=Arabidopsis thaliana GN=At1g51810 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FFW5|PERK8_ARATH	369	742	207	615	4e-75	  255	sp|Q9FFW5|PERK8_ARATH Proline-rich receptor-like protein kinase PERK8 OS=Arabidopsis thaliana GN=PERK8 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9ZUE0|PEK12_ARATH	381	742	245	645	6e-75	  256	sp|Q9ZUE0|PEK12_ARATH Proline-rich receptor-like protein kinase PERK12 OS=Arabidopsis thaliana GN=PERK12 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SI06|Y5573_ARATH	457	750	570	860	3e-74	  256	sp|Q9SI06|Y5573_ARATH Putative leucine-rich repeat receptor-like serine/threonine-protein kinase At2g04300 OS=Arabidopsis thaliana GN=At2g04300 PE=3 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LIG2|RLK6_ARATH	372	750	507	870	5e-74	  256	sp|Q9LIG2|RLK6_ARATH Receptor-like protein kinase At3g21340 OS=Arabidopsis thaliana GN=At3g21340 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGG3|Y5182_ARATH	388	764	510	865	1e-73	  254	sp|C0LGG3|Y5182_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g51820 OS=Arabidopsis thaliana GN=At1g51820 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SGY7|PEK11_ARATH	388	742	264	644	5e-73	  250	sp|Q9SGY7|PEK11_ARATH Putative proline-rich receptor-like protein kinase PERK11 OS=Arabidopsis thaliana GN=PERK11 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LX29|ACR4L_ARATH	457	745	498	789	1e-72	  252	sp|Q9LX29|ACR4L_ARATH Serine/threonine-protein kinase-like protein ACR4 OS=Arabidopsis thaliana GN=ACR4 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGD9|Y1756_ARATH	457	775	558	871	1e-72	  251	sp|C0LGD9|Y1756_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g07560 OS=Arabidopsis thaliana GN=At1g07560 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGQ7|Y4245_ARATH	457	756	579	874	1e-72	  251	sp|C0LGQ7|Y4245_ARATH Probable LRR receptor-like serine/threonine-protein kinase At4g20450 OS=Arabidopsis thaliana GN=At4g20450 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LFP7|Y5158_ARATH	403	751	77	432	4e-72	  242	sp|Q9LFP7|Y5158_ARATH Probable receptor-like protein kinase At5g15080 OS=Arabidopsis thaliana GN=At5g15080 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LSE1|CDG1_ARATH	400	745	1	355	4e-72	  240	sp|Q9LSE1|CDG1_ARATH Serine/threonine-protein kinase CDG1 OS=Arabidopsis thaliana GN=CDG1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q0WRY5|CDL1_ARATH	423	743	2	349	7e-72	  238	sp|Q0WRY5|CDL1_ARATH Serine/threonine-protein kinase CDL1 OS=Arabidopsis thaliana GN=CDL1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FE20|PBS1_ARATH	438	743	48	362	9e-72	  240	sp|Q9FE20|PBS1_ARATH Serine/threonine-protein kinase PBS1 OS=Arabidopsis thaliana GN=PBS1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8GXZ3|Y5102_ARATH	441	742	45	347	1e-71	  238	sp|Q8GXZ3|Y5102_ARATH Serine/threonine-protein kinase At5g01020 OS=Arabidopsis thaliana GN=At5g01020 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGP2|MEE39_ARATH	457	745	554	840	1e-71	  249	sp|C0LGP2|MEE39_ARATH Probable LRR receptor-like serine/threonine-protein kinase MEE39 OS=Arabidopsis thaliana GN=MEE39 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FZB1|Y5188_ARATH	457	756	554	848	2e-71	  248	sp|Q9FZB1|Y5188_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g51880 OS=Arabidopsis thaliana GN=At1g51880 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SRH7|Y3130_ARATH	439	751	94	426	3e-71	  239	sp|Q9SRH7|Y3130_ARATH Receptor-like serine/threonine-protein kinase At3g01300 OS=Arabidopsis thaliana GN=At3g01300 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGR6|Y4291_ARATH	439	752	537	861	6e-71	  247	sp|C0LGR6|Y4291_ARATH Probable LRR receptor-like serine/threonine-protein kinase At4g29180 OS=Arabidopsis thaliana GN=At4g29180 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGI2|Y1677_ARATH	459	752	596	887	2e-70	  245	sp|C0LGI2|Y1677_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g67720 OS=Arabidopsis thaliana GN=At1g67720 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGG7|Y1534_ARATH	116	809	332	952	2e-70	  246	sp|C0LGG7|Y1534_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g53420 OS=Arabidopsis thaliana GN=At1g53420 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|P27450|CX32_ARATH	432	742	25	366	3e-70	  234	sp|P27450|CX32_ARATH Probable serine/threonine-protein kinase Cx32, chloroplastic OS=Arabidopsis thaliana GN=At4g35600 PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SX31|PERK9_ARATH	371	742	263	650	6e-70	  241	sp|Q9SX31|PERK9_ARATH Proline-rich receptor-like protein kinase PERK9 OS=Arabidopsis thaliana GN=PERK9 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LQQ8|RLCK7_ARATH	459	743	91	379	1e-69	  233	sp|Q9LQQ8|RLCK7_ARATH Probable serine/threonine-protein kinase RLCKVII OS=Arabidopsis thaliana GN=At1g07870 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q06548|APK1A_ARATH	451	742	48	351	1e-69	  233	sp|Q06548|APK1A_ARATH Protein kinase APK1A, chloroplastic OS=Arabidopsis thaliana GN=APK1A PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGG8|Y5343_ARATH	223	748	476	947	1e-69	  244	sp|C0LGG8|Y5343_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g53430 OS=Arabidopsis thaliana GN=At1g53430 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9C821|PEK15_ARATH	355	757	29	433	2e-69	  235	sp|Q9C821|PEK15_ARATH Proline-rich receptor-like protein kinase PERK15 OS=Arabidopsis thaliana GN=PERK15 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LK03|PERK2_ARATH	459	742	342	628	2e-69	  240	sp|Q9LK03|PERK2_ARATH Proline-rich receptor-like protein kinase PERK2 OS=Arabidopsis thaliana GN=PERK2 PE=2 SV=3
+gene:chr01.1056:mRNA:chr01.1056	sp|Q1PEM5|PERK3_ARATH	353	742	86	457	4e-69	  234	sp|Q1PEM5|PERK3_ARATH Proline-rich receptor-like protein kinase PERK3 OS=Arabidopsis thaliana GN=PERK3 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|O81069|Y2899_ARATH	449	745	558	850	4e-69	  241	sp|O81069|Y2899_ARATH Probable leucine-rich repeat receptor-like protein kinase At2g28990 OS=Arabidopsis thaliana GN=At2g28990 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LV48|PERK1_ARATH	459	752	268	564	5e-69	  237	sp|Q9LV48|PERK1_ARATH Proline-rich receptor-like protein kinase PERK1 OS=Arabidopsis thaliana GN=PERK1 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LV48|PERK1_ARATH	364	411	121	168	1.8	25.8	sp|Q9LV48|PERK1_ARATH Proline-rich receptor-like protein kinase PERK1 OS=Arabidopsis thaliana GN=PERK1 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O64556|Y2923_ARATH	452	755	552	852	5e-69	  241	sp|O64556|Y2923_ARATH Putative leucine-rich repeat receptor-like serine/threonine-protein kinase At2g19230 OS=Arabidopsis thaliana GN=At2g19230 PE=3 SV=3
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9ASQ5|CRCK3_ARATH	458	742	212	501	1e-68	  233	sp|Q9ASQ5|CRCK3_ARATH Calmodulin-binding receptor-like cytoplasmic kinase 3 OS=Arabidopsis thaliana GN=CRCK3 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|P46573|APK1B_ARATH	451	750	49	360	1e-68	  230	sp|P46573|APK1B_ARATH Protein kinase APK1B, chloroplastic OS=Arabidopsis thaliana GN=APK1B PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGT5|Y5169_ARATH	454	746	558	847	2e-68	  239	sp|C0LGT5|Y5169_ARATH Probable LRR receptor-like serine/threonine-protein kinase At5g16900 OS=Arabidopsis thaliana GN=At5g16900 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGU1|Y5374_ARATH	452	742	610	900	2e-68	  240	sp|C0LGU1|Y5374_ARATH Probable LRR receptor-like serine/threonine-protein kinase At5g37450 OS=Arabidopsis thaliana GN=At5g37450 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|P93050|RKF3_ARATH	408	742	237	558	3e-68	  234	sp|P93050|RKF3_ARATH Probable LRR receptor-like serine/threonine-protein kinase RKF3 OS=Arabidopsis thaliana GN=RKF3 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SNA3|Y3463_ARATH	457	768	573	875	5e-68	  238	sp|Q9SNA3|Y3463_ARATH Putative receptor-like protein kinase At3g46340 OS=Arabidopsis thaliana GN=At3g46340 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGG9|Y5344_ARATH	223	748	474	945	7e-68	  238	sp|C0LGG9|Y5344_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g53440 OS=Arabidopsis thaliana GN=At1g53440 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|O65530|PEK14_ARATH	425	784	344	711	8e-68	  235	sp|O65530|PEK14_ARATH Proline-rich receptor-like protein kinase PERK14 OS=Arabidopsis thaliana GN=PERK14 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LFG1|Y3359_ARATH	388	742	554	884	1e-67	  237	sp|Q9LFG1|Y3359_ARATH Putative leucine-rich repeat receptor-like serine/threonine-protein kinase At3g53590 OS=Arabidopsis thaliana GN=At3g53590 PE=3 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FIL7|CRCK1_ARATH	459	746	135	429	1e-67	  229	sp|Q9FIL7|CRCK1_ARATH Calmodulin-binding receptor-like cytoplasmic kinase 1 OS=Arabidopsis thaliana GN=CRCK1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9ZQQ7|Y2144_ARATH	351	747	494	855	1e-67	  237	sp|Q9ZQQ7|Y2144_ARATH Putative leucine-rich repeat receptor-like serine/threonine-protein kinase At2g14440 OS=Arabidopsis thaliana GN=At2g14440 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O49840|APK2B_ARATH	451	764	63	383	2e-67	  227	sp|O49840|APK2B_ARATH Protein kinase 2B, chloroplastic OS=Arabidopsis thaliana GN=APK2B PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8GX23|PERK5_ARATH	424	752	263	595	3e-67	  233	sp|Q8GX23|PERK5_ARATH Proline-rich receptor-like protein kinase PERK5 OS=Arabidopsis thaliana GN=PERK5 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8H186|Y3545_ARATH	451	751	41	351	4e-67	  225	sp|Q8H186|Y3545_ARATH Probable receptor-like protein kinase At3g55450 OS=Arabidopsis thaliana GN=At3g55450 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|P43293|NAK_ARATH	457	753	54	361	4e-67	  225	sp|P43293|NAK_ARATH Probable serine/threonine-protein kinase NAK OS=Arabidopsis thaliana GN=NAK PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|O64483|SIRK_ARATH	457	771	562	860	7e-67	  234	sp|O64483|SIRK_ARATH Senescence-induced receptor-like serine/threonine-protein kinase OS=Arabidopsis thaliana GN=SIRK PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9ZQR3|Y2451_ARATH	351	747	469	837	9e-67	  234	sp|Q9ZQR3|Y2451_ARATH Leucine-rich repeat receptor-like serine/threonine-protein kinase At2g14510 OS=Arabidopsis thaliana GN=At2g14510 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O49839|APK2A_ARATH	451	752	66	374	1e-66	  225	sp|O49839|APK2A_ARATH Protein kinase 2A, chloroplastic OS=Arabidopsis thaliana GN=APK2A PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|P43298|TMK1_ARATH	384	764	484	888	1e-66	  234	sp|P43298|TMK1_ARATH Probable receptor protein kinase TMK1 OS=Arabidopsis thaliana GN=TMK1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9ASQ6|Y1972_ARATH	459	755	661	956	2e-66	  234	sp|Q9ASQ6|Y1972_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g29720 OS=Arabidopsis thaliana GN=RFK1 PE=2 SV=3
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9C660|PEK10_ARATH	384	763	331	722	3e-66	  231	sp|Q9C660|PEK10_ARATH Proline-rich receptor-like protein kinase PERK10 OS=Arabidopsis thaliana GN=PERK10 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|O24585|CRI4_MAIZE	457	747	491	784	1e-65	  231	sp|O24585|CRI4_MAIZE Putative receptor protein kinase CRINKLY4 OS=Zea mays GN=CR4 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGH3|Y5614_ARATH	206	755	477	975	2e-65	  231	sp|C0LGH3|Y5614_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g56140 OS=Arabidopsis thaliana GN=At1g56140 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LZM4|WAKLQ_ARATH	457	752	349	656	2e-65	  227	sp|Q9LZM4|WAKLQ_ARATH Wall-associated receptor kinase-like 20 OS=Arabidopsis thaliana GN=WAKL20 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9ZNQ8|PERK4_ARATH	459	747	272	562	4e-65	  226	sp|Q9ZNQ8|PERK4_ARATH Proline-rich receptor-like protein kinase PERK4 OS=Arabidopsis thaliana GN=PERK4 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LN59|WAKLK_ARATH	457	751	437	732	8e-65	  228	sp|Q9LN59|WAKLK_ARATH Putative wall-associated receptor kinase-like 11 OS=Arabidopsis thaliana GN=WAKL11 PE=3 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9M092|WAKLM_ARATH	457	742	430	717	9e-65	  227	sp|Q9M092|WAKLM_ARATH Wall-associated receptor kinase-like 17 OS=Arabidopsis thaliana GN=WAKL17 PE=3 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q3EDL4|Y1154_ARATH	434	765	110	449	2e-64	  220	sp|Q3EDL4|Y1154_ARATH Probable serine/threonine-protein kinase At1g01540 OS=Arabidopsis thaliana GN=At1g01540 PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGE0|Y1765_ARATH	254	749	511	958	2e-64	  228	sp|C0LGE0|Y1765_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g07650 OS=Arabidopsis thaliana GN=At1g07650 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGN2|Y3148_ARATH	459	742	660	944	2e-64	  228	sp|C0LGN2|Y3148_ARATH Probable leucine-rich repeat receptor-like serine/threonine-protein kinase At3g14840 OS=Arabidopsis thaliana GN=LRR-RLK PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGN2|Y3148_ARATH	655	723	8	80	8.0	23.9	sp|C0LGN2|Y3148_ARATH Probable leucine-rich repeat receptor-like serine/threonine-protein kinase At3g14840 OS=Arabidopsis thaliana GN=LRR-RLK PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q0WNY5|WAKLN_ARATH	457	742	439	726	3e-64	  226	sp|Q0WNY5|WAKLN_ARATH Wall-associated receptor kinase-like 18 OS=Arabidopsis thaliana GN=WAKL18 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9C9L5|WAKLH_ARATH	459	757	435	740	3e-64	  226	sp|Q9C9L5|WAKLH_ARATH Wall-associated receptor kinase-like 9 OS=Arabidopsis thaliana GN=WAKL9 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9XI96|PERK7_ARATH	421	742	277	610	3e-64	  224	sp|Q9XI96|PERK7_ARATH Proline-rich receptor-like protein kinase PERK7 OS=Arabidopsis thaliana GN=PERK7 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGD6|Y1570_ARATH	459	750	560	848	3e-64	  226	sp|C0LGD6|Y1570_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g05700 OS=Arabidopsis thaliana GN=At1g05700 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGD8|Y1755_ARATH	457	756	548	836	3e-64	  226	sp|C0LGD8|Y1755_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g07550 OS=Arabidopsis thaliana GN=At1g07550 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FX99|Y1497_ARATH	347	804	211	647	4e-64	  223	sp|Q9FX99|Y1497_ARATH Probable receptor-like protein kinase At1g49730 OS=Arabidopsis thaliana GN=At1g49730 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O65924|Y2921_ARATH	457	759	564	858	6e-64	  226	sp|O65924|Y2921_ARATH Putative leucine-rich repeat receptor-like protein kinase At2g19210 OS=Arabidopsis thaliana GN=At2g19210 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O48814|BIK1_ARATH	438	750	37	355	8e-64	  216	sp|O48814|BIK1_ARATH Serine/threonine-protein kinase BIK1 OS=Arabidopsis thaliana GN=BIK1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9M342|WAKLP_ARATH	457	734	340	625	1e-63	  222	sp|Q9M342|WAKLP_ARATH Wall-associated receptor kinase-like 15 OS=Arabidopsis thaliana GN=WAKL15 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LS95|PERK6_ARATH	459	752	325	620	1e-63	  223	sp|Q9LS95|PERK6_ARATH Putative proline-rich receptor-like protein kinase PERK6 OS=Arabidopsis thaliana GN=PERK6 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q6NKZ9|Y4345_ARATH	443	742	117	419	2e-63	  216	sp|Q6NKZ9|Y4345_ARATH Probable receptor-like serine/threonine-protein kinase At4g34500 OS=Arabidopsis thaliana GN=At4g34500 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGW2|PAM74_ARATH	457	745	567	852	3e-63	  224	sp|C0LGW2|PAM74_ARATH Probable LRR receptor-like serine/threonine-protein kinase PAM74 OS=Arabidopsis thaliana GN=PAM74 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8VYA3|WAKLJ_ARATH	457	742	419	705	2e-62	  220	sp|Q8VYA3|WAKLJ_ARATH Wall-associated receptor kinase-like 10 OS=Arabidopsis thaliana GN=WAKL10 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FM85|Y5564_ARATH	459	753	64	365	2e-62	  213	sp|Q9FM85|Y5564_ARATH Probable receptor-like protein kinase At5g56460 OS=Arabidopsis thaliana GN=At5g56460 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8RWW0|ALE2_ARATH	457	755	335	628	2e-62	  219	sp|Q8RWW0|ALE2_ARATH Receptor-like serine/threonine-protein kinase ALE2 OS=Arabidopsis thaliana GN=ALE2 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9M2S4|LRKS4_ARATH	458	742	333	618	3e-62	  218	sp|Q9M2S4|LRKS4_ARATH L-type lectin-domain containing receptor kinase S.4 OS=Arabidopsis thaliana GN=LECRKS4 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9CAH1|Y1725_ARATH	459	749	72	369	5e-62	  212	sp|Q9CAH1|Y1725_ARATH Putative receptor-like protein kinase At1g72540 OS=Arabidopsis thaliana GN=At1g72540 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LRP3|Y3174_ARATH	459	742	142	426	7e-62	  212	sp|Q9LRP3|Y3174_ARATH Probable receptor-like protein kinase At3g17420 OS=Arabidopsis thaliana GN=At3g17420 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8RY17|WAKLI_ARATH	459	753	409	700	8e-62	  218	sp|Q8RY17|WAKLI_ARATH Wall-associated receptor kinase-like 22 OS=Arabidopsis thaliana GN=WAKL22 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8LEB6|Y5185_ARATH	459	742	154	438	9e-62	  213	sp|Q8LEB6|Y5185_ARATH Probable receptor-like protein kinase At5g18500 OS=Arabidopsis thaliana GN=At5g18500 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FIJ6|ACCR4_ARATH	459	745	431	733	9e-62	  218	sp|Q9FIJ6|ACCR4_ARATH Serine/threonine-protein kinase-like protein CCR4 OS=Arabidopsis thaliana GN=CCR4 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGH2|Y1561_ARATH	459	755	682	976	1e-61	  220	sp|C0LGH2|Y1561_ARATH Probable LRR receptor-like serine/threonine-protein kinase At1g56130 OS=Arabidopsis thaliana GN=At1g56130 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8VZJ9|CRCK2_ARATH	459	742	107	400	1e-61	  210	sp|Q8VZJ9|CRCK2_ARATH Calmodulin-binding receptor-like cytoplasmic kinase 2 OS=Arabidopsis thaliana GN=CRCK2 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LTC0|Y5707_ARATH	403	752	3	376	3e-61	  209	sp|Q9LTC0|Y5707_ARATH Probable receptor-like protein kinase At5g47070 OS=Arabidopsis thaliana GN=At5g47070 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LY50|ACCR3_ARATH	458	761	483	804	3e-61	  217	sp|Q9LY50|ACCR3_ARATH Putative serine/threonine-protein kinase-like protein CCR3 OS=Arabidopsis thaliana GN=CCR3 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O04086|Y1105_ARATH	369	742	218	580	4e-61	  214	sp|O04086|Y1105_ARATH Probable receptor-like protein kinase At1g11050 OS=Arabidopsis thaliana GN=At1g11050 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LT96|Y5977_ARATH	457	747	620	910	4e-61	  218	sp|Q9LT96|Y5977_ARATH Probable leucine-rich repeat receptor-like protein kinase At5g49770 OS=Arabidopsis thaliana GN=At5g49770 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8RY67|WAKLO_ARATH	459	742	336	621	4e-61	  215	sp|Q8RY67|WAKLO_ARATH Wall-associated receptor kinase-like 14 OS=Arabidopsis thaliana GN=WAKL14 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8RY67|WAKLO_ARATH	309	344	361	396	10.0	23.5	sp|Q8RY67|WAKLO_ARATH Wall-associated receptor kinase-like 14 OS=Arabidopsis thaliana GN=WAKL14 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9S9M1|WAKLE_ARATH	454	742	415	703	5e-61	  215	sp|Q9S9M1|WAKLE_ARATH Wall-associated receptor kinase-like 5 OS=Arabidopsis thaliana GN=WAKL5 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q94F62|BAK1_ARATH	457	742	275	564	5e-61	  213	sp|Q94F62|BAK1_ARATH BRASSINOSTEROID INSENSITIVE 1-associated receptor kinase 1 OS=Arabidopsis thaliana GN=BAK1 PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|O81906|B120_ARATH	366	742	423	800	6e-61	  216	sp|O81906|B120_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase B120 OS=Arabidopsis thaliana GN=B120 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FN93|Y5596_ARATH	457	765	568	873	7e-61	  216	sp|Q9FN93|Y5596_ARATH Probable LRR receptor-like serine/threonine-protein kinase At5g59680 OS=Arabidopsis thaliana GN=At5g59680 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LMT9|WAKLL_ARATH	459	753	442	745	8e-61	  215	sp|Q9LMT9|WAKLL_ARATH Putative wall-associated receptor kinase-like 13 OS=Arabidopsis thaliana GN=WAKL13 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8GYF5|WAKLR_ARATH	429	764	271	612	1e-60	  212	sp|Q8GYF5|WAKLR_ARATH Wall-associated receptor kinase-like 21 OS=Arabidopsis thaliana GN=WAKL21 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|P0C5E2|Y1839_ARATH	459	737	332	612	2e-60	  212	sp|P0C5E2|Y1839_ARATH Probable serine/threonine-protein kinase At1g18390 OS=Arabidopsis thaliana GN=At1g18390 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FXF2|RKF1_ARATH	187	778	456	980	3e-60	  216	sp|Q9FXF2|RKF1_ARATH Probable LRR receptor-like serine/threonine-protein kinase RFK1 OS=Arabidopsis thaliana GN=RKF1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9M3D7|LRK14_ARATH	457	741	336	618	3e-60	  212	sp|Q9M3D7|LRK14_ARATH Putative L-type lectin-domain containing receptor kinase I.4 OS=Arabidopsis thaliana GN=LECRK14 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9S9M5|WAKLA_ARATH	459	742	417	700	4e-60	  213	sp|Q9S9M5|WAKLA_ARATH Wall-associated receptor kinase-like 1 OS=Arabidopsis thaliana GN=WAKL1 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q7X8C5|WAKLB_ARATH	455	743	400	688	5e-60	  213	sp|Q7X8C5|WAKLB_ARATH Wall-associated receptor kinase-like 2 OS=Arabidopsis thaliana GN=WAKL2 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8RY65|NIK2_ARATH	349	742	214	582	6e-60	  211	sp|Q8RY65|NIK2_ARATH Protein NSP-INTERACTING KINASE 2 OS=Arabidopsis thaliana GN=NIK2 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FN94|RLK7_ARATH	457	742	552	834	7e-60	  213	sp|Q9FN94|RLK7_ARATH Receptor-like protein kinase At5g59670 OS=Arabidopsis thaliana GN=At5g59670 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9S9M2|WAKLD_ARATH	459	742	412	695	8e-60	  212	sp|Q9S9M2|WAKLD_ARATH Wall-associated receptor kinase-like 4 OS=Arabidopsis thaliana GN=WAKL4 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FLV4|Y5248_ARATH	459	779	520	837	1e-59	  212	sp|Q9FLV4|Y5248_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At5g24080 OS=Arabidopsis thaliana GN=At5g24080 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LJF3|BRL3_ARATH	349	738	719	1129	2e-59	  214	sp|Q9LJF3|BRL3_ARATH Receptor-like protein kinase BRI1-like 3 OS=Arabidopsis thaliana GN=BRL3 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FIF0|LRK22_ARATH	457	742	361	645	2e-59	  210	sp|Q9FIF0|LRK22_ARATH Putative L-type lectin-domain containing receptor kinase II.2 OS=Arabidopsis thaliana GN=LECRK22 PE=3 SV=3
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9S9M3|WAKLC_ARATH	459	742	416	697	3e-59	  210	sp|Q9S9M3|WAKLC_ARATH Wall-associated receptor kinase-like 3 OS=Arabidopsis thaliana GN=WAKL3 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q93ZS4|NIK3_ARATH	457	742	287	575	3e-59	  209	sp|Q93ZS4|NIK3_ARATH Protein NSP-INTERACTING KINASE 3 OS=Arabidopsis thaliana GN=NIK3 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q0WVM4|Y2239_ARATH	457	742	285	569	3e-59	  209	sp|Q0WVM4|Y2239_ARATH Probable LRR receptor-like serine/threonine-protein kinase At2g23950 OS=Arabidopsis thaliana GN=At2g23950 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q94AG2|SERK1_ARATH	457	742	288	577	3e-59	  208	sp|Q94AG2|SERK1_ARATH Somatic embryogenesis receptor kinase 1 OS=Arabidopsis thaliana GN=SERK1 PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FJI4|LK111_ARATH	459	738	336	613	4e-59	  209	sp|Q9FJI4|LK111_ARATH Putative L-type lectin-domain containing receptor kinase I.11 OS=Arabidopsis thaliana GN=LECRK111 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SKG5|SERK4_ARATH	457	742	280	569	4e-59	  207	sp|Q9SKG5|SERK4_ARATH Somatic embryogenesis receptor kinase 4 OS=Arabidopsis thaliana GN=SERK4 PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SJG2|Y2296_ARATH	459	742	171	455	5e-59	  205	sp|Q9SJG2|Y2296_ARATH Probable receptor-like protein kinase At2g42960 OS=Arabidopsis thaliana GN=At2g42960 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LMN7|WAK5_ARATH	452	753	388	689	6e-59	  209	sp|Q9LMN7|WAK5_ARATH Wall-associated receptor kinase 5 OS=Arabidopsis thaliana GN=WAK5 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FHG4|LRKS7_ARATH	457	738	351	636	6e-59	  208	sp|Q9FHG4|LRKS7_ARATH Probable L-type lectin-domain containing receptor kinase S.7 OS=Arabidopsis thaliana GN=LECRKS7 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LSR8|LRK19_ARATH	459	747	332	618	7e-59	  209	sp|Q9LSR8|LRK19_ARATH L-type lectin-domain containing receptor kinase I.9 OS=Arabidopsis thaliana GN=LECRK19 PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9M3D8|LRK13_ARATH	457	747	328	616	8e-59	  207	sp|Q9M3D8|LRK13_ARATH L-type lectin-domain containing receptor kinase I.3 OS=Arabidopsis thaliana GN=LECRK13 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O49339|PTI12_ARATH	459	746	59	354	1e-58	  200	sp|O49339|PTI12_ARATH PTI1-like tyrosine-protein kinase 2 OS=Arabidopsis thaliana GN=PTI12 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9XIC7|SERK2_ARATH	457	742	291	580	1e-58	  206	sp|Q9XIC7|SERK2_ARATH Somatic embryogenesis receptor kinase 2 OS=Arabidopsis thaliana GN=SERK2 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SY89|Y1661_ARATH	459	742	513	796	2e-58	  208	sp|Q9SY89|Y1661_ARATH Putative G-type lectin S-receptor-like serine/threonine-protein kinase At1g61610 OS=Arabidopsis thaliana GN=At1g61610 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q41328|PTI1_SOLLC	436	742	38	345	3e-58	  199	sp|Q41328|PTI1_SOLLC Pto-interacting protein 1 OS=Solanum lycopersicum GN=PTI1 PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGU5|Y5457_ARATH	457	758	286	583	3e-58	  205	sp|C0LGU5|Y5457_ARATH Probable LRR receptor-like serine/threonine-protein kinase At5g45780 OS=Arabidopsis thaliana GN=At5g45780 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9ZWC8|BRL1_ARATH	349	734	719	1127	4e-58	  210	sp|Q9ZWC8|BRL1_ARATH Serine/threonine-protein kinase BRI1-like 1 OS=Arabidopsis thaliana GN=BRL1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8VYY5|NCRK_ARATH	458	738	197	489	4e-58	  204	sp|Q8VYY5|NCRK_ARATH Receptor-like serine/threonine-protein kinase NCRK OS=Arabidopsis thaliana GN=NCRK PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FIF1|LRK21_ARATH	457	742	341	625	5e-58	  206	sp|Q9FIF1|LRK21_ARATH Probable L-type lectin-domain containing receptor kinase II.1 OS=Arabidopsis thaliana GN=LECRK21 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8GUQ5|BRI1_SOLLC	350	738	767	1157	5e-58	  210	sp|Q8GUQ5|BRI1_SOLLC Brassinosteroid LRR receptor kinase OS=Solanum lycopersicum GN=CURL3 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SA25|WAKLG_ARATH	454	742	373	661	6e-58	  206	sp|Q9SA25|WAKLG_ARATH Wall-associated receptor kinase-like 8 OS=Arabidopsis thaliana GN=WAKL8 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|B9DFG5|PTI13_ARATH	459	751	101	401	6e-58	  199	sp|B9DFG5|PTI13_ARATH PTI1-like tyrosine-protein kinase 3 OS=Arabidopsis thaliana GN=PTI13 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8L899|BRI1_SOLPE	350	738	767	1157	6e-58	  209	sp|Q8L899|BRI1_SOLPE Systemin receptor SR160 OS=Solanum peruvianum PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LMN8|WAK3_ARATH	459	750	403	693	7e-58	  206	sp|Q9LMN8|WAK3_ARATH Wall-associated receptor kinase 3 OS=Arabidopsis thaliana GN=WAK3 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|O80939|LRK41_ARATH	458	795	334	673	7e-58	  205	sp|O80939|LRK41_ARATH L-type lectin-domain containing receptor kinase IV.1 OS=Arabidopsis thaliana GN=LECRK41 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LSV3|WAKLS_ARATH	459	742	96	379	9e-58	  199	sp|Q9LSV3|WAKLS_ARATH Putative wall-associated receptor kinase-like 16 OS=Arabidopsis thaliana GN=WAKL16 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9M0X5|CRK25_ARATH	370	738	272	615	9e-58	  205	sp|Q9M0X5|CRK25_ARATH Cysteine-rich receptor-like protein kinase 25 OS=Arabidopsis thaliana GN=CRK25 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8LPB4|PSKR1_DAUCA	362	742	646	1015	1e-57	  207	sp|Q8LPB4|PSKR1_DAUCA Phytosulfokine receptor 1 OS=Daucus carota GN=PSKR PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LYN8|EXS_ARATH	387	742	829	1190	2e-57	  208	sp|Q9LYN8|EXS_ARATH Leucine-rich repeat receptor protein kinase EXS OS=Arabidopsis thaliana GN=EXS PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8L7G3|CRK7_ARATH	458	737	323	603	2e-57	  204	sp|Q8L7G3|CRK7_ARATH Cysteine-rich receptor-like protein kinase 7 OS=Arabidopsis thaliana GN=CRK7 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O80719|Y2706_ARATH	461	751	63	359	2e-57	  197	sp|O80719|Y2706_ARATH Probable receptor-like protein kinase At2g47060 OS=Arabidopsis thaliana GN=At2g47060 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LMN6|WAK4_ARATH	452	786	390	725	4e-57	  204	sp|Q9LMN6|WAK4_ARATH Wall-associated receptor kinase 4 OS=Arabidopsis thaliana GN=WAK4 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q39202|RLK1_ARATH	457	747	519	805	1e-56	  203	sp|Q39202|RLK1_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase RLK1 OS=Arabidopsis thaliana GN=RLK1 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8RWZ5|SD25_ARATH	458	742	482	765	1e-56	  202	sp|Q8RWZ5|SD25_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase SD2-5 OS=Arabidopsis thaliana GN=SD25 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O04534|LRK51_ARATH	459	747	332	620	1e-56	  201	sp|O04534|LRK51_ARATH Putative L-type lectin-domain containing receptor kinase V.1 OS=Arabidopsis thaliana GN=LECRK51 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8GWJ7|CRK19_ARATH	334	745	218	602	2e-56	  201	sp|Q8GWJ7|CRK19_ARATH Cysteine-rich receptor-like protein kinase 19 OS=Arabidopsis thaliana GN=CRK19 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SXB8|Y1133_ARATH	388	741	449	795	2e-56	  202	sp|Q9SXB8|Y1133_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At1g11330 OS=Arabidopsis thaliana GN=At1g11330 PE=2 SV=3
+gene:chr01.1056:mRNA:chr01.1056	sp|O04533|LRK52_ARATH	459	768	322	628	2e-56	  200	sp|O04533|LRK52_ARATH Putative L-type lectin-domain containing receptor kinase V.2 OS=Arabidopsis thaliana GN=LECRK52 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O64783|Y1137_ARATH	459	753	489	796	2e-56	  202	sp|O64783|Y1137_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At1g61370 OS=Arabidopsis thaliana GN=At1g61370 PE=3 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9M1G4|LRK15_ARATH	459	747	332	618	2e-56	  200	sp|Q9M1G4|LRK15_ARATH Probable L-type lectin-domain containing receptor kinase I.5 OS=Arabidopsis thaliana GN=LECRK15 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8VYT3|Y4052_ARATH	457	742	289	573	4e-56	  199	sp|Q8VYT3|Y4052_ARATH Probable LRR receptor-like serine/threonine-protein kinase At4g30520 OS=Arabidopsis thaliana GN=At4g30520 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|C0LGL9|FEI2_ARATH	459	742	292	572	4e-56	  198	sp|C0LGL9|FEI2_ARATH LRR receptor-like serine/threonine-protein kinase FEI 2 OS=Arabidopsis thaliana GN=FEI2 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O65472|CRK12_ARATH	457	741	353	639	5e-56	  200	sp|O65472|CRK12_ARATH Putative cysteine-rich receptor-like protein kinase 12 OS=Arabidopsis thaliana GN=CRK12 PE=3 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SXB4|Y1130_ARATH	459	737	497	769	5e-56	  201	sp|Q9SXB4|Y1130_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At1g11300 OS=Arabidopsis thaliana GN=At1g11300 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q39191|WAK1_ARATH	452	750	389	687	5e-56	  200	sp|Q39191|WAK1_ARATH Wall-associated receptor kinase 1 OS=Arabidopsis thaliana GN=WAK1 PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q5XF57|Y5576_ARATH	452	738	248	531	6e-56	  197	sp|Q5XF57|Y5576_ARATH Probable receptor-like serine/threonine-protein kinase At5g57670 OS=Arabidopsis thaliana GN=At5g57670 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O65405|CRK28_ARATH	363	737	261	631	7e-56	  199	sp|O65405|CRK28_ARATH Cysteine-rich receptor-like protein kinase 28 OS=Arabidopsis thaliana GN=CRK28 PE=3 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8GXQ3|WAKLF_ARATH	454	673	415	636	8e-56	  198	sp|Q8GXQ3|WAKLF_ARATH Wall-associated receptor kinase-like 6 OS=Arabidopsis thaliana GN=WAKL6 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LYX1|LRK82_ARATH	457	756	360	685	9e-56	  199	sp|Q9LYX1|LRK82_ARATH L-type lectin-domain containing receptor kinase VIII.2 OS=Arabidopsis thaliana GN=LECRK82 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LDM5|CRK31_ARATH	458	741	326	611	1e-55	  198	sp|Q9LDM5|CRK31_ARATH Putative cysteine-rich receptor-like protein kinase 31 OS=Arabidopsis thaliana GN=CRK31 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O64780|Y1614_ARATH	458	738	487	768	1e-55	  200	sp|O64780|Y1614_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At1g61400 OS=Arabidopsis thaliana GN=At1g61400 PE=3 SV=4
+gene:chr01.1056:mRNA:chr01.1056	sp|O65238|Y5537_ARATH	437	747	486	809	1e-55	  200	sp|O65238|Y5537_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At5g35370 OS=Arabidopsis thaliana GN=At5g35370 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LMP1|WAK2_ARATH	452	750	384	682	1e-55	  199	sp|Q9LMP1|WAK2_ARATH Wall-associated receptor kinase 2 OS=Arabidopsis thaliana GN=WAK2 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8LPS5|SERK5_ARATH	457	742	261	550	1e-55	  197	sp|Q8LPS5|SERK5_ARATH Somatic embryogenesis receptor kinase 5 OS=Arabidopsis thaliana GN=SERK5 PE=1 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9T058|Y4119_ARATH	393	741	479	808	2e-55	  199	sp|Q9T058|Y4119_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At4g11900 OS=Arabidopsis thaliana GN=At4g11900 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q8H199|CRK14_ARATH	458	737	324	604	2e-55	  197	sp|Q8H199|CRK14_ARATH Cysteine-rich receptor-like protein kinase 14 OS=Arabidopsis thaliana GN=CRK14 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LFH9|LRK81_ARATH	457	741	362	651	3e-55	  197	sp|Q9LFH9|LRK81_ARATH L-type lectin-domain containing receptor kinase VIII.1 OS=Arabidopsis thaliana GN=LECRK81 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9XEC8|CRK38_ARATH	458	738	326	603	3e-55	  196	sp|Q9XEC8|CRK38_ARATH Cysteine-rich receptor-like protein kinase 38 OS=Arabidopsis thaliana GN=CRK38 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O65476|CRK16_ARATH	458	741	322	607	4e-55	  197	sp|O65476|CRK16_ARATH Putative cysteine-rich receptor-like protein kinase 16 OS=Arabidopsis thaliana GN=CRK16 PE=3 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9LW83|CE101_ARATH	453	738	509	797	5e-55	  198	sp|Q9LW83|CE101_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase CES101 OS=Arabidopsis thaliana GN=CES101 PE=2 SV=2
+gene:chr01.1056:mRNA:chr01.1056	sp|O22476|BRI1_ARATH	457	738	869	1152	8e-55	  200	sp|O22476|BRI1_ARATH Protein BRASSINOSTEROID INSENSITIVE 1 OS=Arabidopsis thaliana GN=BRI1 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9ZPS9|BRL2_ARATH	457	742	824	1127	9e-55	  199	sp|Q9ZPS9|BRL2_ARATH Serine/threonine-protein kinase BRI1-like 2 OS=Arabidopsis thaliana GN=BRL2 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9ZR08|Y4230_ARATH	459	741	520	803	1e-54	  197	sp|Q9ZR08|Y4230_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At4g03230 OS=Arabidopsis thaliana GN=At4g03230 PE=3 SV=3
+gene:chr01.1056:mRNA:chr01.1056	sp|Q39203|SD22_ARATH	459	742	451	739	1e-54	  197	sp|Q39203|SD22_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase SD2-2 OS=Arabidopsis thaliana GN=SD22 PE=1 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9SXB5|Y1135_ARATH	459	737	497	769	1e-54	  197	sp|Q9SXB5|Y1135_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At1g11305 OS=Arabidopsis thaliana GN=At1g11305 PE=3 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|O64477|Y2913_ARATH	459	747	483	772	2e-54	  197	sp|O64477|Y2913_ARATH G-type lectin S-receptor-like serine/threonine-protein kinase At2g19130 OS=Arabidopsis thaliana GN=At2g19130 PE=2 SV=1
+gene:chr01.1056:mRNA:chr01.1056	sp|Q9FN37|PSKR2_ARATH	456	742	739	1026	3e-54	  197	sp|Q9FN37|PSKR2_ARATH Phytosulfokine receptor 2 OS=Arabidopsis thaliana GN=PSKR2 PE=2 SV=1
