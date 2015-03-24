@@ -88,6 +88,9 @@ public class Settings implements Cloneable {
 	public static final String FASTA_HEADER_REGEX_KEY = "fasta_header_regex";
 	public static final Pattern DEFAULT_FASTA_HEADER_REGEX = Pattern
 			.compile("^>(?<accession>\\S+)\\s+(?<description>.+?)\\s+(((OS|os)=.+)|((GN|gn)=.+))?$");
+	public static final String SHORT_ACCESSION_GO_REGEX_KEY = "short_accession_go_regex";
+	public static final Pattern DEFAULT_SHORT_ACCESSION_GO_REGEX = Pattern
+			.compile("^UniProtKB\\t(?<shortAccession>\\S+)\\t\\S+\\t(?<goTerm>GO:\\d{7})\\t");
 
 	/**
 	 * Fields:
