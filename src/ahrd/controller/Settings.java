@@ -475,6 +475,14 @@ public class Settings implements Cloneable {
 				: DEFAULT_FASTA_HEADER_REGEX;
 	}
 
+	public Pattern getShortAccessionRegex(String blastDatabaseName) {
+		return (getBlastDbSettings(blastDatabaseName)
+				.containsKey(SHORT_ACCESSION_GO_REGEX_KEY)) ? Pattern
+				.compile(getBlastDbSettings(blastDatabaseName).get(
+						SHORT_ACCESSION_GO_REGEX_KEY).toString())
+				: DEFAULT_SHORT_ACCESSION_GO_REGEX;
+	}
+
 	private String getPathToBlastResultsBlackList(String blastDatabaseName) {
 		return getBlastDbSettings(blastDatabaseName).get(BLAST_BLACKLIST_KEY);
 	}
