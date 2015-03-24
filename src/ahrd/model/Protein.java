@@ -1,6 +1,7 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public class Protein {
 	private Integer sequenceLength;
 	private Map<String, List<BlastResult>> blastResults;
 	private Set<InterproResult> interproResults = new HashSet<InterproResult>();
-	private Set<GeneOntologyResult> goResults = new HashSet<GeneOntologyResult>();
+	private Set<String> goResults = new HashSet<String>();
 	private TokenScoreCalculator tokenScoreCalculator;
 	private LexicalScoreCalculator lexicalScoreCalculator;
 	private DescriptionScoreCalculator descriptionScoreCalculator;
@@ -156,11 +157,11 @@ public class Protein {
 		this.interproResults = interproResults;
 	}
 
-	public Set<GeneOntologyResult> getGoResults() {
+	public Set<String> getGoResults() {
 		return goResults;
 	}
 
-	public void setGoResults(Set<GeneOntologyResult> goResults) {
+	public void setGoResults(Set<String> goResults) {
 		this.goResults = goResults;
 	}
 

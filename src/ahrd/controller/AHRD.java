@@ -19,7 +19,6 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
-import ahrd.model.GeneOntologyResult;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import ahrd.view.FastaOutputWriter;
@@ -32,6 +31,7 @@ public class AHRD {
 
 	private Map<String, Protein> proteins;
 	private Map<String, Double> descriptionScoreBitScoreWeights = new HashMap<String, Double>();
+	private Map<String, Set<String>> referenceGoAnnotations;
 	private long timestamp;
 	private long memorystamp;
 
@@ -133,9 +133,13 @@ public class AHRD {
 		}
 	}
 
-	public void parseGeneOntologyResult() throws IOException {
+	/**
+	 * Method finds GO term annotations for Proteins in the searched Blast
+	 * databases and stores them in a Map.
+	 */
+	public void parseReferenceGoAnnotations() {
 		if (getSettings().hasGeneOntologyAnnotations()) {
-			GeneOntologyResult.parseGeneOntologyResult(getProteins());
+			
 		}
 	}
 
@@ -177,6 +181,10 @@ public class AHRD {
 			System.out.println("...parsed blast results in " + takeTime()
 					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
 
+		// Reference GO Annotations (for Proteins in the searched Blast
+		// Databases)
+		parseReferenceGoAnnotations();
+
 		// one single InterproResult-File
 		if (getSettings().hasValidInterproDatabaseAndResultFile()) {
 			InterproResult.initialiseInterproDb();
@@ -186,14 +194,6 @@ public class AHRD {
 						+ takeTime() + "sec, currently occupying "
 						+ takeMemoryUsage() + " MB");
 		}
-
-		// one single Gene-Ontology-Annotation-File
-		parseGeneOntologyResult();
-		if (writeLogMsgs)
-			System.out.println("...parsed gene ontology results in "
-					+ takeTime() + "sec, currently occupying "
-					+ takeMemoryUsage() + " MB");
-
 	}
 
 	/**
@@ -241,4 +241,14 @@ public class AHRD {
 			Map<String, Double> descriptionScoreBitScoreWeights) {
 		this.descriptionScoreBitScoreWeights = descriptionScoreBitScoreWeights;
 	}
+
+	public Map<String, Set<String>> getReferenceGoAnnotations() {
+		return referenceGoAnnotations;
+	}
+
+	public void setReferenceGoAnnotations(
+			Map<String, Set<String>> referenceGoAnnotations) {
+		this.referenceGoAnnotations = referenceGoAnnotations;
+	}
+	
 }

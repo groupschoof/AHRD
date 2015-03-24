@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ahrd.model.BlastResult;
-import ahrd.model.GeneOntologyResult;
 import ahrd.model.Protein;
 
 public class LexicalScoreCalculatorTest {
@@ -55,30 +54,6 @@ public class LexicalScoreCalculatorTest {
 	}
 
 	@Test
-	public void testGeneOntologyScore() {
-		// Mock test-data
-		Protein p = TestUtils.mockProtein();
-		BlastResult br = new BlastResult("accession", 1.0, "goat sheep wool",
-				10, 20, 10, 20, 200, 30, "swissprot");
-		br.getTokens().add("sheep");
-		br.getTokens().add("goats");
-		br.getTokens().add("wool");
-		List<BlastResult> brs = new ArrayList<BlastResult>();
-		brs.add(br);
-		p.getBlastResults().put("swissprot", brs);
-		p.getGoResults().add(
-				new GeneOntologyResult("GO:001234",
-						"Metabolic wool growth in sheep", 0.75));
-		p.getGoResults().add(
-				new GeneOntologyResult("GO:004321",
-						"Horn growth-factor in goats", 0.88));
-
-		// 0.75 + 0.75 + 0.88
-		assertEquals(2.38, p.getLexicalScoreCalculator().geneOntologyScore(br),
-				0.0);
-	}
-
-	@Test
 	public void testLexicalScore() {
 		Protein p = TestUtils.mockProtein();
 		List<BlastResult> brs = new ArrayList<BlastResult>();
@@ -95,8 +70,8 @@ public class LexicalScoreCalculatorTest {
 		p.getTokenScoreCalculator().getTokenScores().put("three", 0.8);
 		p.getTokenScoreCalculator().setTokenHighScore(0.8);
 
-		// (((0.2 + 0.3 + 0.8) / 0.8) / (3.0/1.0) + GoScore(1.11))
-		assertEquals(1.6516666666666668, p.getLexicalScoreCalculator()
-				.lexicalScore(br), 0.0);
+		// (((0.2 + 0.3 + 0.8) / 0.8) / (3.0/1.0))
+		assertEquals(0.5416667, p.getLexicalScoreCalculator().lexicalScore(br),
+				0.0000001);
 	}
 }

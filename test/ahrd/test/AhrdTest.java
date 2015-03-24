@@ -84,17 +84,6 @@ public class AhrdTest {
 		}
 	}
 
-	@Test
-	public void testParseGeneOntologyResults() throws Exception {
-		ahrd.setProteins(TestUtils.mockProteinDb());
-		ahrd.parseGeneOntologyResult();
-		assertEquals(1, ahrd.getProteins().get("gene:chr01.502:mRNA:chr01.502")
-				.getGoResults().size());
-		assertEquals(2,
-				ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
-						.getGoResults().size());
-	}
-
 	// @Test
 	// public void testScoresInCompleteRun() throws IOException,
 	// MissingAccessionException, MissingProteinException, SAXException,
