@@ -32,7 +32,6 @@ blast_dbs:
 
 interpro_database: ./test/resources/interpro_31.xml
 interpro_result: ./test/resources/interpro_result.raw
-gene_ontology_result: ./test/resources/go_results.csv
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2

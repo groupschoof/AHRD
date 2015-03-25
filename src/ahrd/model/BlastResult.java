@@ -33,6 +33,8 @@ public class BlastResult implements Comparable<BlastResult> {
 	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
 	public static final String FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME = "accession";
 	public static final String FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME = "description";
+	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
+	public static final String GO_TERM_GROUP_NAME = "goTerm";
 
 	private String accession;
 	private Double eValue;
@@ -165,13 +167,17 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * 
 	 * @param proteinDb
 	 * @param blastDbName
+	 * @param uniqueShortAccessions
+	 *            - Used only if AHRD is requested to generate Gene Ontology
+	 *            term annotations
 	 * @throws IOException
 	 * @throws MissingProteinException
 	 */
 	public static void readBlastResults(Map<String, Protein> proteinDb,
-			String blastDbName) throws MissingProteinException, IOException {
+			String blastDbName, Set<String> uniqueAccessions)
+			throws MissingProteinException, IOException {
 		Map<String, List<BlastResult>> brs = parseBlastResults(proteinDb,
-				blastDbName);
+				blastDbName, uniqueAccessions);
 		parseBlastDatabase(proteinDb, blastDbName, brs);
 	}
 
@@ -184,14 +190,18 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * 
 	 * @param proteinDb
 	 * @param blastDbName
+	 * @param uniqueShortAccessions
+	 *            - Used only if AHRD is requested to generate Gene Ontology
+	 *            term annotations
 	 * @return Map<String,List<BlastResult>> Set of Hit-Accessions (Key) to the
 	 *         full BlastResult(s) (Value)
 	 * @throws MissingProteinException
 	 * @throws IOException
 	 */
 	public static Map<String, List<BlastResult>> parseBlastResults(
-			Map<String, Protein> proteinDb, String blastDbName)
-			throws MissingProteinException, IOException {
+			Map<String, Protein> proteinDb, String blastDbName,
+			Set<String> uniqueShortAccessions) throws MissingProteinException,
+			IOException {
 		Map<String, List<BlastResult>> brs = new HashMap<String, List<BlastResult>>();
 		BufferedReader fastaIn = null;
 		try {
@@ -233,7 +243,7 @@ public class BlastResult implements Comparable<BlastResult> {
 									.getSeqSimSearchTableBitScoreCol()]),
 							blastDbName, proteinDb.get(brFields[getSettings()
 									.getSeqSimSearchTableQueryCol()]));
-					addBlastResult(brs, br);
+					addBlastResult(brs, br, uniqueShortAccessions);
 				}
 			}
 		} finally {
@@ -251,9 +261,10 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * 
 	 * @param brs
 	 * @param br
+	 * @param uniqueShortAccessions
 	 */
 	public static void addBlastResult(Map<String, List<BlastResult>> brs,
-			BlastResult br) {
+			BlastResult br, Set<String> uniqueShortAccessions) {
 		if (brs.containsKey(br.getAccession())) {
 			boolean isMultipleHsp = false;
 			List<BlastResult> sameHitBrs = brs.get(br.getAccession());
@@ -280,6 +291,12 @@ public class BlastResult implements Comparable<BlastResult> {
 			List<BlastResult> sameHitBrs = new ArrayList<BlastResult>();
 			sameHitBrs.add(br);
 			brs.put(br.getAccession(), sameHitBrs);
+		}
+		// Finally, if AHRD is requested to annotate Gene Ontology Terms, we
+		// need to extract all unique short reference protein (BlastResult)
+		// accessions:
+		if (getSettings().hasGeneOntologyAnnotations()) {
+			uniqueShortAccessions.add(br.getShortAccession());
 		}
 	}
 
@@ -543,6 +560,33 @@ public class BlastResult implements Comparable<BlastResult> {
 				getProtein().addBlastResult(this);
 			}
 		}
+	}
+
+	/**
+	 * Extracts from the possibly longer Accession the shorter one which is used
+	 * in the reference Gene Ontology Annotation (GOA) file. This is required
+	 * due to the fact that UniprotKB uses short accessions in the GOA files but
+	 * provides long accessions in the Blast Databases. A very unfortunate lack
+	 * of standardization, indeed!
+	 * 
+	 * @return String
+	 */
+	public String getShortAccession() {
+		Pattern p = getSettings()
+				.getShortAccessionRegex(getBlastDatabaseName());
+		Matcher m = p.matcher(getAccession());
+		String shortAccession = getAccession();
+		if (!m.find()) {
+			System.err
+					.println("WARNING: Regular Expression '"
+							+ p.toString()
+							+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '"
+							+ getAccession()
+							+ "' - continuing with the original accession. This might lead to unrecognized reference GO annotations!");
+		} else {
+			shortAccession = m.group(SHORT_ACCESSION_GROUP_NAME);
+		}
+		return (shortAccession);
 	}
 
 	public String getAccession() {

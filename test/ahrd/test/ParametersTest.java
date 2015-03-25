@@ -135,7 +135,7 @@ public class ParametersTest {
 				1.0,
 				p.getTokenScoreBitScoreWeight()
 						+ p.getTokenScoreDatabaseScoreWeight()
-						+ p.getTokenScoreOverlapScoreWeight(), 0.0001);
+						+ p.getTokenScoreOverlapScoreWeight(), 0.001);
 		assertTrue(
 				"All three Token-Score-Weights should have changed.",
 				!dbsw.equals(p.getTokenScoreDatabaseScoreWeight())

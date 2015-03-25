@@ -65,24 +65,24 @@ public class BlastResultTest {
 		Protein p2 = proteinDb.get("gene:chr01.1056:mRNA:chr01.1056");
 		Map<String, List<BlastResult>> blastResults = new HashMap<String, List<BlastResult>>();
 		BlastResult.addBlastResult(blastResults, new BlastResult("accession_1",
-				1.0, 10, 20, 10, 20, 200, "swissprot", p1));
+				1.0, 10, 20, 10, 20, 200, "swissprot", p1), null);
 		assertEquals(1, blastResults.size());
 		assertEquals(1, blastResults.get("accession_1").size());
 		BlastResult.addBlastResult(blastResults, new BlastResult("accession_1",
-				1.0, 10, 20, 10, 20, 300, "swissprot", p1));
+				1.0, 10, 20, 10, 20, 300, "swissprot", p1), null);
 		assertEquals(1, blastResults.size());
 		assertEquals(1, blastResults.get("accession_1").size());
 		assertEquals(new Double(300), blastResults.get("accession_1").get(0)
 				.getBitScore());
 		BlastResult.addBlastResult(blastResults, new BlastResult("accession_1",
-				1.0, 10, 20, 10, 20, 300, "swissprot", p2));
+				1.0, 10, 20, 10, 20, 300, "swissprot", p2), null);
 		assertEquals(1, blastResults.size());
 		assertEquals(2, blastResults.get("accession_1").size());
 		assertEquals(new Double(300), blastResults.get("accession_1").get(1)
 				.getBitScore());
 		assertEquals(p2, blastResults.get("accession_1").get(1).getProtein());
 		BlastResult.addBlastResult(blastResults, new BlastResult("accession_2",
-				1.0, 10, 20, 10, 20, 300, "swissprot", p2));
+				1.0, 10, 20, 10, 20, 300, "swissprot", p2), null);
 		assertEquals(2, blastResults.size());
 		assertEquals(1, blastResults.get("accession_2").size());
 	}
@@ -93,7 +93,7 @@ public class BlastResultTest {
 		TestUtils.initTestSettings();
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(
-				protDb, "tair");
+				protDb, "tair", null);
 		assertNotNull(brs);
 		assertTrue(brs.containsKey("AT3G03300.2"));
 		assertTrue(brs.containsKey("AT3G03300.1"));
@@ -138,7 +138,7 @@ public class BlastResultTest {
 		TestUtils.initTestSettings();
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(
-				protDb, "tair");
+				protDb, "tair", null);
 		BlastResult.parseBlastDatabase(protDb, "tair", brs);
 		Protein p1 = protDb.get("gene:chr01.502:mRNA:chr01.502");
 		Protein p2 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
@@ -189,4 +189,10 @@ public class BlastResultTest {
 		assertTrue(blastResults.contains(br));
 	}
 
+	@Test
+	public void testGetShortAccession() {
+		BlastResult br = new BlastResult("sp|Q9SXB8|Y1133_ARATH", 1.0,
+				"description_1", 10, 20, 10, 20, 200, 30, "swissprot");
+		assertEquals("Q9SXB8", br.getShortAccession());
+	}
 }

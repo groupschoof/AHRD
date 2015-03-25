@@ -2,6 +2,7 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Settings.setSettings;
+import static ahrd.model.ReferenceGoAnnotations.parseReferenceGoAnnotations;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -32,6 +33,7 @@ public class AHRD {
 	private Map<String, Protein> proteins;
 	private Map<String, Double> descriptionScoreBitScoreWeights = new HashMap<String, Double>();
 	private Map<String, Set<String>> referenceGoAnnotations;
+	private Set<String> uniqueBlastResultShortAccessions;
 	private long timestamp;
 	private long memorystamp;
 
@@ -94,6 +96,10 @@ public class AHRD {
 
 	/**
 	 * Constructor initializes this run's settings as a thread-local variable.
+	 * Also conditionally initializes fields
+	 * <code>uniqueBlastResultShortAccessions</code> and
+	 * <code>referenceGoAnnotations</code> required only if AHRD is requested to
+	 * generate Gene Ontology term annotations.
 	 * 
 	 * @param pathToYmlInput
 	 * @throws IOException
@@ -101,6 +107,12 @@ public class AHRD {
 	public AHRD(String pathToYmlInput) throws IOException {
 		super();
 		setSettings(new Settings(pathToYmlInput));
+		// The following fields are only used if AHRD is requested to generate
+		// Gene Ontology term annotations:
+		if (getSettings().hasGeneOntologyAnnotations()) {
+			this.setUniqueBlastResultShortAccessions(new HashSet<String>());
+			this.setReferenceGoAnnotations(new HashMap<String, Set<String>>());
+		}
 	}
 
 	public void initializeProteins() throws IOException,
@@ -112,7 +124,8 @@ public class AHRD {
 	public void parseBlastResults() throws IOException,
 			MissingProteinException, SAXException {
 		for (String blastDatabase : getSettings().getBlastDatabases()) {
-			BlastResult.readBlastResults(getProteins(), blastDatabase);
+			BlastResult.readBlastResults(getProteins(), blastDatabase,
+					getUniqueBlastResultShortAccessions());
 		}
 	}
 
@@ -136,10 +149,12 @@ public class AHRD {
 	/**
 	 * Method finds GO term annotations for Proteins in the searched Blast
 	 * databases and stores them in a Map.
+	 * 
+	 * @throws IOException
 	 */
-	public void parseReferenceGoAnnotations() {
+	public void setUpReferenceGoAnnotations() throws IOException {
 		if (getSettings().hasGeneOntologyAnnotations()) {
-			
+			setReferenceGoAnnotations(parseReferenceGoAnnotations(getUniqueBlastResultShortAccessions()));
 		}
 	}
 
@@ -183,7 +198,14 @@ public class AHRD {
 
 		// Reference GO Annotations (for Proteins in the searched Blast
 		// Databases)
-		parseReferenceGoAnnotations();
+		setUpReferenceGoAnnotations();
+		if (writeLogMsgs) {
+			System.out
+					.println("...parsed reference Gene Ontology Annotations (GOA) in "
+							+ takeTime()
+							+ "sec, currently occupying "
+							+ takeMemoryUsage() + " MB");
+		}
 
 		// one single InterproResult-File
 		if (getSettings().hasValidInterproDatabaseAndResultFile()) {
@@ -250,5 +272,14 @@ public class AHRD {
 			Map<String, Set<String>> referenceGoAnnotations) {
 		this.referenceGoAnnotations = referenceGoAnnotations;
 	}
-	
+
+	public Set<String> getUniqueBlastResultShortAccessions() {
+		return uniqueBlastResultShortAccessions;
+	}
+
+	public void setUniqueBlastResultShortAccessions(
+			Set<String> uniqueBlastResultShortAccessions) {
+		this.uniqueBlastResultShortAccessions = uniqueBlastResultShortAccessions;
+	}
+
 }

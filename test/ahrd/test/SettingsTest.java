@@ -153,16 +153,6 @@ public class SettingsTest {
 	}
 
 	@Test
-	public void testHasGeneOntologyAnnotations() {
-		// Should have GO-Annotations with default test-Settings:
-		assertTrue(getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyResults(null);
-		assertTrue(!getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyResults("/not/existing/path.raw");
-		assertTrue(!getSettings().hasGeneOntologyAnnotations());
-	}
-
-	@Test
 	public void testRememberSimulatedAnnealingPath() {
 		// Flag should be set in default Test-Settings:
 		assertTrue(

@@ -88,9 +88,12 @@ public class Settings implements Cloneable {
 	public static final String FASTA_HEADER_REGEX_KEY = "fasta_header_regex";
 	public static final Pattern DEFAULT_FASTA_HEADER_REGEX = Pattern
 			.compile("^>(?<accession>\\S+)\\s+(?<description>.+?)\\s+(((OS|os)=.+)|((GN|gn)=.+))?$");
-	public static final String SHORT_ACCESSION_GO_REGEX_KEY = "short_accession_go_regex";
-	public static final Pattern DEFAULT_SHORT_ACCESSION_GO_REGEX = Pattern
-			.compile("^UniProtKB\\t(?<shortAccession>\\S+)\\t\\S+\\t(?<goTerm>GO:\\d{7})\\t");
+	public static final String SHORT_ACCESSION_REGEX_KEY = "short_accession_regex";
+	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern
+			.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
+	public static final String REFERENCE_GO_REGEX_KEY = "reference_go_regex";
+	public static final Pattern DEFAULT_REFERENCE_GO_REGEX = Pattern
+			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 
 	/**
 	 * Fields:
@@ -202,6 +205,7 @@ public class Settings implements Cloneable {
 	private Integer seqSimSearchTableSubjectEndCol = 9;
 	private Integer seqSimSearchTableEValueCol = 10;
 	private Integer seqSimSearchTableBitScoreCol = 11;
+	private Pattern referenceGoRegex;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -356,6 +360,11 @@ public class Settings implements Cloneable {
 			setSeqSimSearchTableBitScoreCol(Integer.parseInt(input.get(
 					SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
 		}
+		// Enable parsing of custom (non UniprotKB) go annotation (GOA) files:
+		if (input.get(REFERENCE_GO_REGEX_KEY) != null) {
+			setReferenceGoRegex(Pattern.compile(input.get(
+					REFERENCE_GO_REGEX_KEY).toString()));
+		}
 	}
 
 	/**
@@ -477,10 +486,10 @@ public class Settings implements Cloneable {
 
 	public Pattern getShortAccessionRegex(String blastDatabaseName) {
 		return (getBlastDbSettings(blastDatabaseName)
-				.containsKey(SHORT_ACCESSION_GO_REGEX_KEY)) ? Pattern
+				.containsKey(SHORT_ACCESSION_REGEX_KEY)) ? Pattern
 				.compile(getBlastDbSettings(blastDatabaseName).get(
-						SHORT_ACCESSION_GO_REGEX_KEY).toString())
-				: DEFAULT_SHORT_ACCESSION_GO_REGEX;
+						SHORT_ACCESSION_REGEX_KEY).toString())
+				: DEFAULT_SHORT_ACCESSION_REGEX;
 	}
 
 	private String getPathToBlastResultsBlackList(String blastDatabaseName) {
@@ -857,5 +866,21 @@ public class Settings implements Cloneable {
 	public void setSeqSimSearchTableBitScoreCol(
 			Integer seqSimSearchTableBitScoreCol) {
 		this.seqSimSearchTableBitScoreCol = seqSimSearchTableBitScoreCol;
+	}
+
+	/**
+	 * Either returns the custom regular expression pattern used to parse the
+	 * provided reference Gene Ontology annotions (GOA) or returns the default
+	 * pattern designed to work for UniprotKB GOA files.
+	 * 
+	 * @return Pattern
+	 */
+	public Pattern getReferenceGoRegex() {
+		return this.referenceGoRegex != null ? referenceGoRegex
+				: DEFAULT_REFERENCE_GO_REGEX;
+	}
+
+	public void setReferenceGoRegex(Pattern referenceGoRegex) {
+		this.referenceGoRegex = referenceGoRegex;
 	}
 }
