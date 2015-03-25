@@ -59,6 +59,9 @@ public class AHRD {
 			AHRD ahrd = new AHRD(args[0]);
 			// Load and parse all inputs
 			ahrd.setup(true);
+			// After the setup the unique short accessions are no longer needed:
+			ahrd.setUniqueBlastResultShortAccessions(null);
+			
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			ahrd.assignHumanReadableDescriptions();
