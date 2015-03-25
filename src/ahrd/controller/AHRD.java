@@ -61,7 +61,7 @@ public class AHRD {
 			ahrd.setup(true);
 			// After the setup the unique short accessions are no longer needed:
 			ahrd.setUniqueBlastResultShortAccessions(null);
-			
+
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			ahrd.assignHumanReadableDescriptions();
@@ -244,6 +244,17 @@ public class AHRD {
 			// Find the highest scoring Blast-Result:
 			prot.getDescriptionScoreCalculator()
 					.findHighestScoringBlastResult();
+			// If AHRD is requested to annotate Gene Ontology Terms, do so:
+			if (getSettings().hasGeneOntologyAnnotations()
+					&& getReferenceGoAnnotations().containsKey(
+							prot.getDescriptionScoreCalculator()
+									.getHighestScoringBlastResult()
+									.getShortAccession())) {
+				prot.setGoResults(getReferenceGoAnnotations().get(
+						prot.getDescriptionScoreCalculator()
+								.getHighestScoringBlastResult()
+								.getShortAccession()));
+			}
 			// filter for each protein's most-informative
 			// interpro-results
 			InterproResult.filterForMostInforming(prot);

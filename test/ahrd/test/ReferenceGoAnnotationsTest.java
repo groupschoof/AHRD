@@ -18,7 +18,9 @@ import org.xml.sax.SAXException;
 import ahrd.controller.AHRD;
 import ahrd.controller.Utils;
 import ahrd.exception.MissingAccessionException;
+import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
+import ahrd.model.Protein;
 
 public class ReferenceGoAnnotationsTest {
 
@@ -67,10 +69,23 @@ public class ReferenceGoAnnotationsTest {
 		ahrd.setup(false);
 		assertNotNull(ahrd.getReferenceGoAnnotations());
 		assertTrue(!ahrd.getReferenceGoAnnotations().isEmpty());
-		assertEquals(3, ahrd.getReferenceGoAnnotations().size());
+		assertEquals(4, ahrd.getReferenceGoAnnotations().size());
 		Set<String> refGos = ahrd.getReferenceGoAnnotations()
 				.get("AT1G01040.1");
 		assertTrue(refGos.contains("GO:0003824"));
 		assertTrue(refGos.contains("GO:0003870"));
+	}
+
+	@Test
+	public void testAnnotatesGoTerms() throws IOException,
+			MissingAccessionException, MissingProteinException, SAXException,
+			ParsingException, MissingInterproResultException {
+		ahrd.setup(false);
+		ahrd.assignHumanReadableDescriptions();
+		Protein p = ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056");
+		assertNotNull(p.getGoResults());
+		assertEquals(2, p.getGoResults().size());
+		assertTrue(p.getGoResults().contains("GO:0006355"));
+		assertTrue(p.getGoResults().contains("GO:0043401"));
 	}
 }

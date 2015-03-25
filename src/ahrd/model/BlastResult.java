@@ -37,6 +37,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
 
 	private String accession;
+	private String shortAccession;
 	private Double eValue;
 	private String description;
 	/**
@@ -572,19 +573,21 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * @return String
 	 */
 	public String getShortAccession() {
-		Pattern p = getSettings()
-				.getShortAccessionRegex(getBlastDatabaseName());
-		Matcher m = p.matcher(getAccession());
-		String shortAccession = getAccession();
-		if (!m.find()) {
-			System.err
-					.println("WARNING: Regular Expression '"
-							+ p.toString()
-							+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '"
-							+ getAccession()
-							+ "' - continuing with the original accession. This might lead to unrecognized reference GO annotations!");
-		} else {
-			shortAccession = m.group(SHORT_ACCESSION_GROUP_NAME);
+		if (shortAccession == null) {
+			Pattern p = getSettings().getShortAccessionRegex(
+					getBlastDatabaseName());
+			Matcher m = p.matcher(getAccession());
+			shortAccession = getAccession();
+			if (!m.find()) {
+				System.err
+						.println("WARNING: Regular Expression '"
+								+ p.toString()
+								+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '"
+								+ getAccession()
+								+ "' - continuing with the original accession. This might lead to unrecognized reference GO annotations!");
+			} else {
+				shortAccession = m.group(SHORT_ACCESSION_GROUP_NAME);
+			}
 		}
 		return (shortAccession);
 	}
