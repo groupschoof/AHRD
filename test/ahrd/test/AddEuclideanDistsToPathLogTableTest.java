@@ -6,6 +6,7 @@ import static ahrd.controller.AddEuclideanDistsToPathLogTable.measureEuclideanDi
 import static ahrd.controller.AddEuclideanDistsToPathLogTable.normalizeDatabaseWeights;
 import static ahrd.controller.AddEuclideanDistsToPathLogTable.parseCurrentPathLogLine;
 import static ahrd.controller.AddEuclideanDistsToPathLogTable.parseDatabaseWeightColumnArg;
+import static ahrd.controller.AddEuclideanDistsToPathLogTable.parseTemperature;
 import static ahrd.controller.Utils.fromFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -76,12 +77,26 @@ public class AddEuclideanDistsToPathLogTableTest {
 	}
 
 	@Test
+	public void testParseTemperature() {
+		assertEquals(
+				50000,
+				parseTemperature(
+						"50000\t0.5263841932366594\t0.0\t3\t0.524761\t0.157966\t0.1\t0.79625\t0.11375\t0.09\t30\t30\t10\t30\t0.0",
+						0));
+		assertEquals(
+				5,
+				parseTemperature(
+						"5\t0.5263841932366594\t0.0\t3\t0.524761\t0.157966\t0.1\t0.79625\t0.11375\t0.09\t30\t30\t10\t30\t0.0",
+						0));
+	}
+
+	@Test
 	public void testMain() throws IOException {
 		try {
 			main(new String[] { "test/resources/path_log_tbl.tsv", "6", "13",
-					"3", "10,12", "./test/resources/tmp_path_log.tsv" });
+					"3", "0", "10,12", "./test/resources/tmp_path_log.tsv" });
 			List<String> lines = fromFile("./test/resources/tmp_path_log.tsv");
-			assertEquals(30, lines.size());
+			assertEquals(5, lines.size());
 			// Check the first lines:
 			assertEquals(
 					"Temperature\tAverage Evaluation-Score(F-Score)\tDiff-to-curr-Accepted\tAccepted\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tDescription-Score-Relative-Description-Frequency-Weight\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight\tswissprot-Weight\tswissprot-Description-Score-Bit-Score-Weight\ttrembl-Weight\ttrembl-Description-Score-Bit-Score-Weight\tEuclidean.Distance.2.Curr.Acptd",
@@ -95,6 +110,9 @@ public class AddEuclideanDistsToPathLogTableTest {
 			assertEquals(
 					"49998\t0.5251306827089552\t-0.0012535105277041714\t0\t0.522247\t0.156624\t0.1\t0.79625\t0.11375\t0.09\t30\t30\t10\t29.491517\t0.780230999999997",
 					lines.get(3));
+			assertEquals(
+					"50000\t0.5263841932366594\t0.0\t3\t0.524761\t0.157966\t0.1\t0.79625\t0.11375\t0.09\t30\t30\t10\t30\t0.0",
+					lines.get(4));
 		} finally {
 			// clean up:
 			Files.deleteIfExists(Paths.get("./test/resources/tmp_path_log.tsv"));

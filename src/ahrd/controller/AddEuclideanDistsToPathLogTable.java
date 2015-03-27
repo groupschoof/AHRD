@@ -17,20 +17,22 @@ public class AddEuclideanDistsToPathLogTable {
 
 	public static void main(String[] args) throws IOException {
 		System.out
-				.println("Usage: java -Xmx2g -cp ahrd.jar ahrd.controller.AddEuclideanDistsToPathLogTable path_log_table.tsv startColumn stopColumn acceptedColumn dbWeightsColInds(e.g. 5,8,11) extended_path_log_table_out.tsv");
+				.println("Usage: java -Xmx2g -cp ahrd.jar ahrd.controller.AddEuclideanDistsToPathLogTable path_log_table.tsv startColumn stopColumn acceptedColumn temperatureColumn dbWeightsColInds(e.g. 5,8,11) extended_path_log_table_out.tsv");
 		BufferedReader tblIn = null;
 		BufferedWriter tblOut = null;
 		int startCol = Integer.parseInt(args[1]);
 		// Arrays.copyOfRange excludes the 'until' column, hence add 1:
 		int stopCol = Integer.parseInt(args[2]) + 1;
 		int acceptedCol = Integer.parseInt(args[3]);
-		int[] dbWghtsCols = parseDatabaseWeightColumnArg(args[4], startCol);
+		int tempeCol = Integer.parseInt(args[4]);
+		int[] dbWghtsCols = parseDatabaseWeightColumnArg(args[5], startCol);
 		try {
 			// In- and Output:
 			tblIn = new BufferedReader(new FileReader(args[0]));
-			tblOut = new BufferedWriter(new FileWriter(args[5]));
+			tblOut = new BufferedWriter(new FileWriter(args[6]));
 			// Iterated lines:
 			String header, line;
+			long currTemp, lastTemp;
 			if ((header = tblIn.readLine()) != null) {
 				if ((line = tblIn.readLine()) != null) {
 					// Write first lines into output:
@@ -38,23 +40,25 @@ public class AddEuclideanDistsToPathLogTable {
 					// Initialize first parameter set in path log table:
 					double[] currAcpt = parseCurrentPathLogLine(line, startCol,
 							stopCol);
+					lastTemp = parseTemperature(line, tempeCol);
 					double[] currEval;
 					while ((line = tblIn.readLine()) != null) {
 						currEval = parseCurrentPathLogLine(line, startCol,
 								stopCol);
-						appendLineToOutputPathLogTable(
-								tblOut,
-								line,
-								measureEuclideanDist(
-										normalizeDatabaseWeights(currAcpt,
-												dbWghtsCols),
-										normalizeDatabaseWeights(currEval,
-												dbWghtsCols)));
+						currTemp = parseTemperature(line, tempeCol);
+						double euclDist = currTemp <= lastTemp ? measureEuclideanDist(
+								normalizeDatabaseWeights(currAcpt, dbWghtsCols),
+								normalizeDatabaseWeights(currEval, dbWghtsCols))
+								: 0;
+						appendLineToOutputPathLogTable(tblOut, line, euclDist);
 						// Set currently accepted parameters, if the currently
 						// evaluated ones have been accepted during simulated
 						// annealing:
 						if (isAccepted(line, acceptedCol))
 							currAcpt = currEval;
+						// Check using temperature, if not a new batch of path
+						// logs has started:
+						lastTemp = currTemp;
 					}
 				}
 			}
@@ -127,5 +131,11 @@ public class AddEuclideanDistsToPathLogTable {
 			dist += Math.pow(x[i] - y[i], 2);
 		}
 		return Math.sqrt(dist);
+	}
+
+	public static long parseTemperature(String pathLogLine,
+			int temparatureColumnIndex) {
+		return Integer
+				.parseInt(pathLogLine.split(PATH_LOG_TABLE_SEP_CHAR)[temparatureColumnIndex]);
 	}
 }
