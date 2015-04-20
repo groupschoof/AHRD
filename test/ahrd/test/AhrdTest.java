@@ -83,38 +83,4 @@ public class AhrdTest {
 			assertTrue(protein.getInterproResults().size() > 0);
 		}
 	}
-
-	// @Test
-	// public void testScoresInCompleteRun() throws IOException,
-	// MissingAccessionException, MissingProteinException, SAXException,
-	// ParsingException {
-	// System.out.println("Method: testScoresInCompleteRun()");
-	// // Setup a AHRD-Run for a single Protein-Sequence
-	// AHRD a = new AHRD("./test/resources/scores_test/ahrd_input.yml");
-	// a.setup(false);
-	// // Test measurements:
-	// Protein p = a.getProteins().get("Solyc11g010630.2.1");
-	// assertEquals(1.0, p.getDescriptionScoreCalculator()
-	// .getDescriptionLineFrequencies().get("AT5g65480/K19O4_1"), 0.0);
-	// assertEquals(1.0,
-	// p.getDescriptionScoreCalculator().getMaxDescriptionLineFrequency(), 0.0);
-	// // Find highest scoring Description-Line and test for correct scores:
-	// a.filterBestScoringBlastResults(p);
-	// assertEquals(1.0, p.getBlastResults().get("trembl").size(), 0.0);
-	// // a.tokenizeBlastResultDescriptionLines(p);
-	//
-	// // Only a single BlastHit in trembl:
-	// assertEquals(2.0,
-	// p.getBlastResults().get("trembl").get(0).getTokens().size(), 0.0);
-	// // Only trembl has processable BlastHits:
-	// p.getTokenScoreCalculator().assignTokenScores();
-	// assertEquals(2.0, p.getTokenScoreCalculator().getTokenScores().size(),
-	// 0.0);
-	// assertEquals(1.0,
-	// p.getTokenScoreCalculator().getTokenScores().get("at5g65480"), 0.0);
-	// assertEquals(1.0,
-	// p.getTokenScoreCalculator().getTokenScores().get("k1904_1"), 0.0);
-	// // prot.getTokenScoreCalculator().filterTokenScores();
-	// }
-
 }

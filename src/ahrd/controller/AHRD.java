@@ -229,53 +229,38 @@ public class AHRD {
 	 */
 	public void assignHumanReadableDescriptions()
 			throws MissingInterproResultException, IOException {
-		int step = 0;
 		for (String protAcc : getProteins().keySet()) {
 			Protein prot = getProteins().get(protAcc);
-			step = 1;
-			try {
-				// Find best scoring Blast-Hit's Description-Line (based on
-				// evalue):
-				filterBestScoringBlastResults(prot);
-				step = 2;
-				// Tokenize each BlastResult's Description-Line and
-				// assign the Tokens their Scores:
-				// tokenizeBlastResultDescriptionLines(prot);
-				prot.getTokenScoreCalculator().assignTokenScores();
-				step = 3;
-				// Tell informative from non-informative Tokens.
-				// Assign each non-informative a new Score :=
-				// currentScore - (Token-High-Score / 2)
-				prot.getTokenScoreCalculator().filterTokenScores();
-				step = 4;
-				// Find the highest scoring Blast-Result:
-				prot.getDescriptionScoreCalculator()
-						.findHighestScoringBlastResult();
-				step = 5;
-				// If AHRD is requested to annotate Gene Ontology Terms, do so:
-				if (getSettings().hasGeneOntologyAnnotations()
-						&& getReferenceGoAnnotations().containsKey(
-								prot.getDescriptionScoreCalculator()
-										.getHighestScoringBlastResult()
-										.getShortAccession())) {
-					prot.setGoResults(getReferenceGoAnnotations().get(
+			// Find best scoring Blast-Hit's Description-Line (based on
+			// evalue):
+			filterBestScoringBlastResults(prot);
+			// Tokenize each BlastResult's Description-Line and
+			// assign the Tokens their Scores:
+			// tokenizeBlastResultDescriptionLines(prot);
+			prot.getTokenScoreCalculator().assignTokenScores();
+			// Tell informative from non-informative Tokens.
+			// Assign each non-informative a new Score :=
+			// currentScore - (Token-High-Score / 2)
+			prot.getTokenScoreCalculator().filterTokenScores();
+			// Find the highest scoring Blast-Result:
+			prot.getDescriptionScoreCalculator()
+					.findHighestScoringBlastResult();
+			// If AHRD is requested to annotate Gene Ontology Terms, do so:
+			if (getSettings().hasGeneOntologyAnnotations()
+					&& prot.getDescriptionScoreCalculator()
+							.getHighestScoringBlastResult() != null
+					&& getReferenceGoAnnotations().containsKey(
 							prot.getDescriptionScoreCalculator()
 									.getHighestScoringBlastResult()
-									.getShortAccession()));
-					step = 6;
-				}
-				// filter for each protein's most-informative
-				// interpro-results
-				InterproResult.filterForMostInforming(prot);
-				step = 7;
-			} catch (NullPointerException npe) {
-				npe.printStackTrace(System.err);
-				System.err.println("\n\nNPE: Protein '" + prot.getAccession()
-						+ "' - step " + step);
-				System.err.println("\n\nCandidate Blast Hit: "
-						+ prot.getDescriptionScoreCalculator()
-								.getHighestScoringBlastResult().getAccession());
+									.getShortAccession())) {
+				prot.setGoResults(getReferenceGoAnnotations().get(
+						prot.getDescriptionScoreCalculator()
+								.getHighestScoringBlastResult()
+								.getShortAccession()));
 			}
+			// filter for each protein's most-informative
+			// interpro-results
+			InterproResult.filterForMostInforming(prot);
 		}
 	}
 

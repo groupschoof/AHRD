@@ -1,4 +1,4 @@
-proteins_fasta: ./test/resources/proteins.fasta
+proteins_fasta: ./test/resources/proteins_4_test_run.fasta
 blast_dbs:
   swissprot:
     weight: 100
