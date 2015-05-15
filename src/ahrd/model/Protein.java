@@ -4,6 +4,7 @@ import static ahrd.controller.Settings.getSettings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -108,6 +109,21 @@ public class Protein {
 			}
 		}
 		return proteins;
+	}
+
+	/**
+	 * Extracts all unique Gene Ontology (GO) terms annotated to the Proteins in
+	 * argument prots.
+	 * 
+	 * @param prots
+	 * @return Set<String>
+	 */
+	public static Set<String> uniqueGOaccessions(Collection<Protein> prots) {
+		Set<String> ugt = new HashSet<String>();
+		for (Protein prot : prots) {
+			ugt.addAll(prot.getGoResults());
+		}
+		return ugt;
 	}
 
 	/**

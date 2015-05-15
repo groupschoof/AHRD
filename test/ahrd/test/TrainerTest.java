@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -81,7 +82,7 @@ public class TrainerTest {
 
 	@Test
 	public void testRememberSimulatedAnnealingPath()
-			throws MissingInterproResultException, IOException {
+			throws MissingInterproResultException, IOException, SQLException {
 		// Just do two cycles:
 		getSettings().setTemperature(2);
 		Parameters p = getSettings().getParameters().clone();

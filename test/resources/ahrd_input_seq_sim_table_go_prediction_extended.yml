@@ -1,0 +1,36 @@
+proteins_fasta: ./test/resources/proteins.fasta
+gene_ontology_result: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
+token_score_bit_score_weight: 0.5
+token_score_database_score_weight: 0.3
+token_score_overlap_score_weight: 0.2
+output: ./ahrd_output.csv
+extended_go_result_table: ./ahrd_extended_go_table.tsv
+blast_dbs:
+  swissprot:
+    weight: 100
+    file: ./test/resources/swissprot_blast8_tabular.txt
+    database: ./test/resources/swissprot_blast_db.fasta
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_sprot.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+    description_score_bit_score_weight: 0.2
+
+  tair:
+    weight: 50
+    file: ./test/resources/tair_blast8_tabular.txt
+    database: ./test/resources/tair_blast_db.fasta
+    fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
+    short_accession_regex: "^(?<shortAccession>.+)$"
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_tair.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+    description_score_bit_score_weight: 0.4
+
+  trembl:
+    weight: 10
+    file: ./test/resources/trembl_blast8_tabular.txt
+    database: ./test/resources/trembl_blast_db.fasta
+    blacklist: ./test/resources/blacklist_descline.txt
+    filter: ./test/resources/filter_descline_trembl.txt
+    token_blacklist: ./test/resources/blacklist_token.txt
+    description_score_bit_score_weight: 0.4

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
@@ -79,7 +80,7 @@ public class ReferenceGoAnnotationsTest {
 	@Test
 	public void testAnnotatesGoTerms() throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
-			ParsingException, MissingInterproResultException {
+			ParsingException, MissingInterproResultException, SQLException {
 		ahrd.setup(false);
 		ahrd.assignHumanReadableDescriptions();
 		Protein p = ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056");

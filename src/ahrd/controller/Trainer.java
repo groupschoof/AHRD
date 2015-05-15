@@ -3,6 +3,7 @@ package ahrd.controller;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -87,8 +88,10 @@ public class Trainer extends Evaluator {
 	 * 
 	 * @throws IOException
 	 * @throws MissingInterproResultException
+	 * @throws SQLException
 	 */
-	public void train() throws MissingInterproResultException, IOException {
+	public void train() throws MissingInterproResultException, IOException,
+			SQLException {
 		while (getSettings().getTemperature() > 0) {
 			// If we run simulated annealing remembering tested Parameters and
 			// their scores,

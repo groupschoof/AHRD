@@ -5,6 +5,8 @@ import static ahrd.controller.Settings.setSettings;
 import static ahrd.model.ReferenceGoAnnotations.parseReferenceGoAnnotations;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,15 +22,18 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
+import ahrd.model.GOdbSQL;
+import ahrd.model.GOterm;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
+import ahrd.view.ExtendedGOAnnotationTableWriter;
 import ahrd.view.FastaOutputWriter;
 import ahrd.view.IOutputWriter;
 import ahrd.view.OutputWriter;
 
 public class AHRD {
 
-	public static final String VERSION = "3.0";
+	public static final String VERSION = "3.1";
 
 	private Map<String, Protein> proteins;
 	private Map<String, Double> descriptionScoreBitScoreWeights = new HashMap<String, Double>();
@@ -36,6 +41,7 @@ public class AHRD {
 	private Set<String> uniqueBlastResultShortAccessions;
 	private long timestamp;
 	private long memorystamp;
+	private Map<String, GOterm> goDB;
 
 	protected long takeTime() {
 		// Measure time:
@@ -80,7 +86,21 @@ public class AHRD {
 			// Log
 			System.out.println("Wrote output in " + ahrd.takeTime()
 					+ "sec, currently occupying " + ahrd.takeMemoryUsage()
-					+ " MB\n\nDONE");
+					+ " MB");
+			// If requested, write extended Gene Ontology (GO) annotation table:
+			if (getSettings().generateExtendedGoResultTable()) {
+				System.out
+						.println("Writing extended Gene Ontology (GO) term annotation table to '"
+								+ getSettings().getExtendedGoResultTablePath()
+								+ "'.");
+				ExtendedGOAnnotationTableWriter gw = new ExtendedGOAnnotationTableWriter(
+						ahrd.getProteins().values(), ahrd.getGoDB());
+				gw.writeOutput();
+				System.out.println("Wrote extended GO table in "
+						+ ahrd.takeTime() + "sec, currently occupying "
+						+ ahrd.takeMemoryUsage() + " MB");
+			}
+			System.out.println("\n\nDONE");
 		} catch (Exception e) {
 			System.err.println("We are sorry, an un-expected ERROR occurred:");
 			e.printStackTrace(System.err);
@@ -226,9 +246,10 @@ public class AHRD {
 	 * 
 	 * @throws MissingInterproResultException
 	 * @throws IOException
+	 * @throws SQLException
 	 */
 	public void assignHumanReadableDescriptions()
-			throws MissingInterproResultException, IOException {
+			throws MissingInterproResultException, IOException, SQLException {
 		for (String protAcc : getProteins().keySet()) {
 			Protein prot = getProteins().get(protAcc);
 			// Find best scoring Blast-Hit's Description-Line (based on
@@ -261,6 +282,41 @@ public class AHRD {
 			// filter for each protein's most-informative
 			// interpro-results
 			InterproResult.filterForMostInforming(prot);
+		}
+		if (getSettings().generateExtendedGoResultTable())
+			extendGOtermAnnotationsWithParentalTerms();
+	}
+
+	/**
+	 * Extends each Proteins' Gene Ontology (GO) terms with their respective
+	 * parental terms. Per protein each respective GO term is only annotated
+	 * once.
+	 * 
+	 * @throws SQLException
+	 */
+	public void extendGOtermAnnotationsWithParentalTerms() throws SQLException {
+		// Initialize the in memory Gene Ontology (GO) database:
+		System.out.println("1");
+		Set<String> gts = Protein.uniqueGOaccessions(getProteins().values());
+		System.out.println("2");
+		Connection goCon = null;
+		System.out.println("3");
+		try {
+			goCon = GOdbSQL.connectToGeneOntologyDb();
+			System.out.println("4");
+			setGoDB(GOdbSQL.parentGoTermsForAccessions(gts, goCon));
+			System.out.println("5");
+		} finally {
+			goCon.close();
+			System.out.println("6");
+		}
+		// Extend each Proteins' GO results with their parental terms:
+		for (Protein p : getProteins().values()) {
+			Collection<String> gos = p.getGoResults();
+			System.out.println("7");
+			if (gos != null)
+				p.setGoResults(GOdbSQL.uniqueGOAccessions(gos, getGoDB()));
+			System.out.println("8");
 		}
 	}
 
@@ -297,6 +353,14 @@ public class AHRD {
 	public void setUniqueBlastResultShortAccessions(
 			Set<String> uniqueBlastResultShortAccessions) {
 		this.uniqueBlastResultShortAccessions = uniqueBlastResultShortAccessions;
+	}
+
+	public Map<String, GOterm> getGoDB() {
+		return goDB;
+	}
+
+	public void setGoDB(Map<String, GOterm> goDB) {
+		this.goDB = goDB;
 	}
 
 }
