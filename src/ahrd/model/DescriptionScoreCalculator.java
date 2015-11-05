@@ -12,7 +12,7 @@ public class DescriptionScoreCalculator {
 	private double maxBitScore = 0.0;
 	private BlastResult highestScoringBlastResult;
 	private Double descriptionHighScore;
-	
+
 	public DescriptionScoreCalculator(Protein protein) {
 		super();
 		setProtein(protein);
@@ -26,16 +26,18 @@ public class DescriptionScoreCalculator {
 		BlastResult bestScoringBr = null;
 		Map<Double, BlastResult> scoreRanking = new HashMap<Double, BlastResult>();
 		for (String blastDb : getProtein().getBlastResults().keySet()) {
-			for (BlastResult iterBlastResult : getProtein().getBlastResults()
-					.get(blastDb)) {
-				getProtein().getDescriptionScoreCalculator()
-						.calcDescriptionScore(iterBlastResult);
+			for (BlastResult iterBlastResult : getProtein().getBlastResults().get(blastDb)) {
+				getProtein().getDescriptionScoreCalculator().calcDescriptionScore(iterBlastResult);
 				// Only take Description-Lines into account
 				// that have at least a single non-blacklisted Token:
 				if (iterBlastResult.getTokens().size() > 0) {
-					System.out.println(iterBlastResult.getAccession() + "\t" + iterBlastResult.getDescriptionScore());
-					scoreRanking.put(iterBlastResult.getDescriptionScore(),
-							iterBlastResult);
+					System.out.println(iterBlastResult.getAccession() + "\t"
+							+ TokenScoreCalculator.overlapScore(iterBlastResult.getQueryStart(),
+									iterBlastResult.getQueryEnd(), getProtein().getSequenceLength(),
+									iterBlastResult.getSubjectStart(), iterBlastResult.getSubjectEnd(),
+									iterBlastResult.getSubjectLength())
+							+ "\t" + iterBlastResult.getDescriptionScore());
+					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
 				}
 			}
 		}
@@ -47,15 +49,13 @@ public class DescriptionScoreCalculator {
 	}
 
 	public void calcDescriptionScore(BlastResult blastResult) {
-		blastResult.setDescriptionScore(getProtein()
-				.getLexicalScoreCalculator().lexicalScore(blastResult)
-				+ relativeBlastScore(blastResult));
+		blastResult.setDescriptionScore(
+				getProtein().getLexicalScoreCalculator().lexicalScore(blastResult) + relativeBlastScore(blastResult));
 	}
 
 	public double relativeBlastScore(BlastResult br) {
-		return getSettings().getDescriptionScoreBitScoreWeight(
-				br.getBlastDatabaseName())
-				* br.getBitScore() / getMaxBitScore();
+		return getSettings().getDescriptionScoreBitScoreWeight(br.getBlastDatabaseName()) * br.getBitScore()
+				/ getMaxBitScore();
 	}
 
 	public void measureMaxBitScore(double bitScore) {
@@ -105,8 +105,7 @@ public class DescriptionScoreCalculator {
 		return highestScoringBlastResult;
 	}
 
-	public void setHighestScoringBlastResult(
-			BlastResult highestScoringBlastResult) {
+	public void setHighestScoringBlastResult(BlastResult highestScoringBlastResult) {
 		this.highestScoringBlastResult = highestScoringBlastResult;
 	}
 
