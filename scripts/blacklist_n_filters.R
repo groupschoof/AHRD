@@ -78,3 +78,9 @@ referenceSetSimilarities <- function(ref.set.a, ref.set.b, ref.set.a.freqs) {
     rep(curr.best.f.scr, ref.set.a.freqs[[i]])
   })))
 }
+
+overlapScore <- function(queryStart,queryEnd,
+  queryLength,subjectStart,subjectEnd, subjectLength ) {
+    ((queryEnd - queryStart + 1.0) + (subjectEnd - subjectStart + 1.0))
+				/ (queryLength + subjectLength)
+}
