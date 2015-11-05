@@ -32,9 +32,11 @@ public class DescriptionScoreCalculator {
 						.calcDescriptionScore(iterBlastResult);
 				// Only take Description-Lines into account
 				// that have at least a single non-blacklisted Token:
-				if (iterBlastResult.getTokens().size() > 0)
+				if (iterBlastResult.getTokens().size() > 0) {
+					System.out.println(iterBlastResult.getAccession() + "\t" + iterBlastResult.getDescriptionScore());
 					scoreRanking.put(iterBlastResult.getDescriptionScore(),
 							iterBlastResult);
+				}
 			}
 		}
 		if (scoreRanking.size() > 0) {
