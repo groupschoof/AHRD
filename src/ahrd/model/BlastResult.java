@@ -356,12 +356,14 @@ public class BlastResult implements Comparable<BlastResult> {
 					// Blast-Hit? If so, process it:
 					if (hit) {
 						fastaEntryValuesForBlastHit(blastResults, acc,
-								hitAALength, hrd);
+						 		hitAALength, hrd);
+						System.out.println(">" + acc + " " + hrd + "\n" + hitAASeq.toString());
 						// Clean up to enable processing the next Hit
 						hitAALength = new Integer(0);
+						hitAASeq = new StringBuffer();
 						// Note, that the boolean 'hit' will be set in the
 						// following If-Else-Block.
-						System.out.println(">" + acc + " " + hrd + "\n" + hitAASeq.toString());
+						
 					}
 
 					// Process the current Fasta-Header-Line:
