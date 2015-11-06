@@ -31,12 +31,12 @@ public class DescriptionScoreCalculator {
 				// Only take Description-Lines into account
 				// that have at least a single non-blacklisted Token:
 				if (iterBlastResult.getTokens().size() > 0) {
-					System.out.println(iterBlastResult.getAccession() + "\t"
-							+ TokenScoreCalculator.overlapScore(iterBlastResult.getQueryStart(),
-									iterBlastResult.getQueryEnd(), getProtein().getSequenceLength(),
-									iterBlastResult.getSubjectStart(), iterBlastResult.getSubjectEnd(),
-									iterBlastResult.getSubjectLength())
-							+ "\t" + iterBlastResult.getDescriptionScore());
+//					System.out.println(iterBlastResult.getAccession() + "\t"
+//							+ TokenScoreCalculator.overlapScore(iterBlastResult.getQueryStart(),
+//									iterBlastResult.getQueryEnd(), getProtein().getSequenceLength(),
+//									iterBlastResult.getSubjectStart(), iterBlastResult.getSubjectEnd(),
+//									iterBlastResult.getSubjectLength())
+//							+ "\t" + iterBlastResult.getDescriptionScore());
 					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
 				}
 			}
