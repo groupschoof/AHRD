@@ -346,6 +346,7 @@ public class BlastResult implements Comparable<BlastResult> {
 			fastaIn = new BufferedReader(new FileReader(getSettings()
 					.getPathToBlastDatabase(blastDbName)));
 			String str, hrd = new String();
+			StringBuffer hitAASeq = new StringBuffer();
 			String acc = "";
 			Integer hitAALength = new Integer(0);
 			boolean hit = false;
@@ -360,6 +361,7 @@ public class BlastResult implements Comparable<BlastResult> {
 						hitAALength = new Integer(0);
 						// Note, that the boolean 'hit' will be set in the
 						// following If-Else-Block.
+						System.out.println(">" + acc + " " + hrd + "\n" + hitAASeq.toString());
 					}
 
 					// Process the current Fasta-Header-Line:
@@ -399,6 +401,8 @@ public class BlastResult implements Comparable<BlastResult> {
 					// Process non header-line, if and only if, we are reading
 					// the sequence of a Blast-Hit:
 					hitAALength += str.trim().length();
+					// Debug:
+					hitAASeq.append(str.trim());
 				}
 			}
 			// Was the last read FASTA entry a Blast-Hit? If so, it needs
