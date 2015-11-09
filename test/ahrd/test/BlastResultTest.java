@@ -245,4 +245,22 @@ public class BlastResultTest {
 		assertEquals(200, filtrdBrs.size());
 		assertEquals("tr|W9CFB7|W9CFB7_9HELO", filtrdBrs.get(0).getAccession());
 	}
+
+	@Test
+	public void testGenerateHRDCandidateForProtein() throws IOException, MissingProteinException {
+		TestUtils.initTestSettings();
+		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
+		getSettings().getBlastDbSettings().get("trembl").put("database",
+				"./test/resources/bgh04634_trembl_database.fasta");
+		getSettings().setPathToGeneOntologyResults(null);
+		getSettings().setWriteBestBlastHitsToOutput(true);
+		Map<String, Protein> protDb = TestUtils.mockProteinDb();
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
+		BlastResult.parseBlastDatabase(protDb, "trembl", brs);
+		Protein p1 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
+		assertTrue(!p1.getEvaluationScoreCalculator().getUnchangedBlastResults().isEmpty());
+		assertNotNull(p1.getEvaluationScoreCalculator().getUnchangedBlastResults().get("trembl"));
+		assertEquals("tr|W9CFB7|W9CFB7_9HELO",
+				p1.getEvaluationScoreCalculator().getUnchangedBlastResults().get("trembl").getAccession());
+	}
 }
