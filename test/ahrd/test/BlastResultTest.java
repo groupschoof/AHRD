@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ahrd.exception.MissingProteinException;
@@ -26,6 +27,11 @@ public class BlastResultTest {
 		super();
 	}
 
+	@Before
+	public void setUp() throws IOException {
+		TestUtils.initTestSettings();
+	}
+
 	@Test
 	public void testPatternize() {
 		BlastResult br = TestUtils.mockBlastResult("accession_5", 5.0, "description_5 Fly-Wing formation", 10, 20, 10,
@@ -36,7 +42,6 @@ public class BlastResultTest {
 
 	@Test
 	public void testTokenize() throws IOException {
-		TestUtils.initTestSettings();
 		BlastResult br = new BlastResult("accession_1", 1.0, "one tWo Three protein homolog putative", 10, 20, 10, 20,
 				200, 30, "swissprot");
 		br.tokenize();
@@ -49,7 +54,6 @@ public class BlastResultTest {
 
 	@Test
 	public void testAddBlastResult() throws IOException {
-		TestUtils.initTestSettings();
 		Map<String, Protein> proteinDb = TestUtils.mockProteinDb();
 		Protein p1 = proteinDb.get("gene:chr01.502:mRNA:chr01.502");
 		Protein p2 = proteinDb.get("gene:chr01.1056:mRNA:chr01.1056");
@@ -77,7 +81,6 @@ public class BlastResultTest {
 
 	@Test
 	public void testParseBlastResults() throws MissingProteinException, IOException {
-		TestUtils.initTestSettings();
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "tair", null);
 		assertNotNull(brs);
@@ -113,7 +116,6 @@ public class BlastResultTest {
 
 	@Test
 	public void testParseBlastDatabase() throws IOException, MissingProteinException {
-		TestUtils.initTestSettings();
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "tair", null);
 		BlastResult.parseBlastDatabase(protDb, "tair", brs);
@@ -131,9 +133,9 @@ public class BlastResultTest {
 
 	@Test
 	public void testCompareBlastResultsBasedOnTheirEvalues() {
-		BlastResult br1 = new BlastResult("accession_1", 1.0, "description_1", 10, 20, 10, 20, 200, 30, "swissprot");
-		BlastResult br2 = new BlastResult("accession_2", 2.0, "description_2", 10, 20, 10, 20, 200, 30, "swissprot");
-		BlastResult br3 = new BlastResult("accession_3", 2.0, "description_3", 10, 20, 10, 20, 200, 30, "swissprot");
+		BlastResult br1 = new BlastResult("accession_1", 3e-163, "description_1", 10, 20, 10, 20, 200, 30, "swissprot");
+		BlastResult br2 = new BlastResult("accession_2", 2e-137, "description_2", 10, 20, 10, 20, 200, 30, "swissprot");
+		BlastResult br3 = new BlastResult("accession_3", 2e-137, "description_3", 10, 20, 10, 20, 200, 30, "swissprot");
 		assertEquals(-1, br1.compareTo(br2));
 		assertEquals(1, br2.compareTo(br1));
 		assertEquals(0, br2.compareTo(br3));
@@ -142,19 +144,21 @@ public class BlastResultTest {
 	@Test
 	public void testFilterBestScoringBlastResults() {
 		List<BlastResult> blastResults = new ArrayList<BlastResult>();
-		blastResults.add(new BlastResult("accession_1", 1.0, "description_1", 10, 20, 10, 20, 200, 30, "swissprot"));
-		blastResults.add(new BlastResult("accession_2", 2.0, "description_2", 10, 20, 10, 20, 200, 30, "swissprot"));
-		blastResults.add(new BlastResult("accession_3", 3.0, "description_3", 10, 20, 10, 20, 200, 30, "swissprot"));
-		BlastResult br = new BlastResult("accession_4", 4.0, "description_4", 10, 20, 10, 20, 200, 30, "swissprot");
-		blastResults.add(br);
-		blastResults.add(new BlastResult("accession_5", 5.0, "description_5", 10, 20, 10, 20, 200, 30, "swissprot"));
-		blastResults = BlastResult.filterBestScoringBlastResults(blastResults, 4);
-		assertEquals(4, blastResults.size());
-		assertTrue(blastResults.contains(br));
+		blastResults.add(new BlastResult("accession_1", 3e-163, "description_1", 10, 20, 10, 20, 200, 30, "swissprot"));
+		blastResults.add(new BlastResult("accession_2", 3e-163, "description_2", 10, 20, 10, 20, 200, 30, "swissprot"));
+		blastResults.add(new BlastResult("accession_3", 2e-137, "description_3", 10, 20, 10, 20, 200, 30, "swissprot"));
+		blastResults.add(new BlastResult("accession_4", 2e-137, "description_4", 10, 20, 10, 20, 200, 30, "swissprot"));
+		BlastResult br5 = new BlastResult("accession_5", 5.0, "description_5", 10, 20, 10, 20, 200, 30, "swissprot");
+		blastResults.add(br5);
+		List<BlastResult> fltrdBrs = BlastResult.filterBestScoringBlastResults(blastResults, 4);
+		assertNotNull(fltrdBrs);
+		assertEquals(4, fltrdBrs.size());
+		assertTrue(fltrdBrs.containsAll(blastResults.subList(0, 4)));
+		assertTrue(!fltrdBrs.contains(br5));
 	}
 
 	@Test
-	public void testGetShortAccession() {
+	public void testGetShortAccession() throws IOException {
 		BlastResult br = new BlastResult("sp|Q9SXB8|Y1133_ARATH", 1.0, "description_1", 10, 20, 10, 20, 200, 30,
 				"swissprot");
 		assertEquals("Q9SXB8", br.getShortAccession());
@@ -167,7 +171,33 @@ public class BlastResultTest {
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
 		assertNotNull(brs);
+		assertTrue(!brs.isEmpty());
+		// One HSP is double:
+		assertEquals(498, brs.size());
+		assertEquals(5e-107, brs.get("tr|A0A0G4KNA9|A0A0G4KNA9_9PEZI").get(0).getEValue(), 1e-106);
 		assertTrue(brs.containsKey("tr|W9CFB7|W9CFB7_9HELO"));
+		// Verify the BlastResult is valid:
+		assertEquals(1, brs.get("tr|W9CFB7|W9CFB7_9HELO").size());
+		BlastResult br = brs.get("tr|W9CFB7|W9CFB7_9HELO").get(0);
+		assertNotNull(br);
+		assertNotNull(br.getAccession());
+		assertNotNull(br.getBitScore());
+		assertNotNull(br.getQueryEnd());
+		assertNotNull(br.getQueryStart());
+		assertNotNull(br.getEValue());
+		assertEquals(Math.pow(10, -163), br.getEValue(), Math.pow(10, -162));
+		assertNotNull(br.getBlastDatabaseName());
+		assertNotNull(br.getSubjectEnd());
+		assertNotNull(br.getSubjectStart());
+		// The following fields are not yet set, because they have to be read
+		// out of the FASTA database:
+		assertNull(br.getDescription());
+		assertNull(br.getSubjectLength());
+		assertNotNull(br.getTokens());
+		assertTrue(br.getTokens().isEmpty());
+		// Because of the missing field values the BlastResult should not yet be
+		// valid:
+		assertTrue(!br.isValid());
 	}
 
 	@Test
@@ -175,13 +205,44 @@ public class BlastResultTest {
 		TestUtils.initTestSettings();
 		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
 		getSettings().getBlastDbSettings().get("trembl").put("database",
-				"/projects/irg/grp_pcb/projects/AHRD/blast_dbs_15_Oct_2015/uniprot_trembl.fasta");
+				"./test/resources/bgh04634_trembl_database.fasta");
+		getSettings().setPathToGeneOntologyResults(null);
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
 		BlastResult.parseBlastDatabase(protDb, "trembl", brs);
 		Protein p1 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
-		assertTrue(!p1.getBlastResults().get("tair").isEmpty());
-		assertEquals(200, p1.getBlastResults().get("trembl").size());
-		assertEquals("tr|W9CFB7|W9CFB7_9HELO", p1.getBlastResults().get("trembl").get(0).getAccession());
+		assertTrue(!p1.getBlastResults().get("trembl").isEmpty());
+		Map<String, BlastResult> trBrs = new HashMap<String, BlastResult>();
+		for (BlastResult trBr : p1.getBlastResults().get("trembl")) {
+			trBrs.put(trBr.getAccession(), trBr);
+		}
+		// System.out.println(trAccs);
+		assertTrue(trBrs.containsKey("tr|W9CFB7|W9CFB7_9HELO"));
+		BlastResult theBr = trBrs.get("tr|W9CFB7|W9CFB7_9HELO");
+		assertNotNull(theBr);
+		assertNotNull(theBr.getSubjectLength());
+		assertNotNull(theBr.getDescription());
+		assertNotNull(theBr.getTokens());
+		assertEquals(3, theBr.getTokens().size());
+		assertTrue(theBr.isValid());
+	}
+
+	@Test
+	public void testFilterBestScoringBlastResultsLong() throws IOException, MissingProteinException {
+		TestUtils.initTestSettings();
+		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
+		getSettings().getBlastDbSettings().get("trembl").put("database",
+				"./test/resources/bgh04634_trembl_database.fasta");
+		getSettings().setPathToGeneOntologyResults(null);
+		Map<String, Protein> protDb = TestUtils.mockProteinDb();
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
+		BlastResult.parseBlastDatabase(protDb, "trembl", brs);
+		Protein p1 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
+		assertTrue(!p1.getBlastResults().get("trembl").isEmpty());
+		List<BlastResult> filtrdBrs = BlastResult.filterBestScoringBlastResults(p1.getBlastResults().get("trembl"),
+				200);
+		assertNotNull(filtrdBrs);
+		assertEquals(200, filtrdBrs.size());
+		assertEquals("tr|W9CFB7|W9CFB7_9HELO", filtrdBrs.get(0).getAccession());
 	}
 }

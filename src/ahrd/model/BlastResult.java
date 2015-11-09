@@ -120,9 +120,8 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * 
 	 * @return BlastResult
 	 */
-	public BlastResult(String accession, double eValue, int queryStart,
-			int queryEnd, int subjectStart, int subjectEnd, double bitScore,
-			String blastDatabaseName, Protein protein) {
+	public BlastResult(String accession, double eValue, int queryStart, int queryEnd, int subjectStart, int subjectEnd,
+			double bitScore, String blastDatabaseName, Protein protein) {
 		super();
 		setAccession(accession);
 		setEValue(eValue);
@@ -135,9 +134,8 @@ public class BlastResult implements Comparable<BlastResult> {
 		setProtein(protein);
 	}
 
-	public BlastResult(String accession, double eValue, String description,
-			int queryStart, int queryEnd, int subjectStart, int subjectEnd,
-			int subjectLength, double bitScore, String blastDatabaseName) {
+	public BlastResult(String accession, double eValue, String description, int queryStart, int queryEnd,
+			int subjectStart, int subjectEnd, int subjectLength, double bitScore, String blastDatabaseName) {
 		super();
 		setAccession(accession);
 		setEValue(eValue);
@@ -174,11 +172,9 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * @throws IOException
 	 * @throws MissingProteinException
 	 */
-	public static void readBlastResults(Map<String, Protein> proteinDb,
-			String blastDbName, Set<String> uniqueAccessions)
-			throws MissingProteinException, IOException {
-		Map<String, List<BlastResult>> brs = parseBlastResults(proteinDb,
-				blastDbName, uniqueAccessions);
+	public static void readBlastResults(Map<String, Protein> proteinDb, String blastDbName,
+			Set<String> uniqueAccessions) throws MissingProteinException, IOException {
+		Map<String, List<BlastResult>> brs = parseBlastResults(proteinDb, blastDbName, uniqueAccessions);
 		parseBlastDatabase(proteinDb, blastDbName, brs);
 	}
 
@@ -199,51 +195,32 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * @throws MissingProteinException
 	 * @throws IOException
 	 */
-	public static Map<String, List<BlastResult>> parseBlastResults(
-			Map<String, Protein> proteinDb, String blastDbName,
-			Set<String> uniqueShortAccessions) throws MissingProteinException,
-			IOException {
+	public static Map<String, List<BlastResult>> parseBlastResults(Map<String, Protein> proteinDb, String blastDbName,
+			Set<String> uniqueShortAccessions) throws MissingProteinException, IOException {
 		Map<String, List<BlastResult>> brs = new HashMap<String, List<BlastResult>>();
 		BufferedReader fastaIn = null;
 		try {
-			fastaIn = new BufferedReader(new FileReader(getSettings()
-					.getPathToBlastResults(blastDbName)));
+			fastaIn = new BufferedReader(new FileReader(getSettings().getPathToBlastResults(blastDbName)));
 			String str;
 			while ((str = fastaIn.readLine()) != null) {
 				// Only evaluate current line, either if there is no
 				// comment-line-regex given, or if it is given AND it does not
 				// match:
 				if (getSettings().getSeqSimSearchTableCommentLineRegex() == null
-						|| !getSettings()
-								.getSeqSimSearchTableCommentLineRegex()
-								.matcher(str).matches()) {
-					String[] brFields = str.split(getSettings()
-							.getSeqSimSearchTableSep());
-					if (!proteinDb.containsKey(brFields[getSettings()
-							.getSeqSimSearchTableQueryCol()])) {
-						throw new MissingProteinException(
-								"Could not find Protein for Accession '"
-										+ brFields[getSettings()
-												.getSeqSimSearchTableQueryCol()]
-										+ "' in Protein Database.");
-					}// ELSE
-					BlastResult br = new BlastResult(
-							brFields[getSettings()
-									.getSeqSimSearchTableSubjectCol()],
-							Double.parseDouble(validateDouble(brFields[getSettings()
-									.getSeqSimSearchTableEValueCol()])),
-							Integer.parseInt(brFields[getSettings()
-									.getSeqSimSearchTableQueryStartCol()]),
-							Integer.parseInt(brFields[getSettings()
-									.getSeqSimSearchTableQueryEndCol()]),
-							Integer.parseInt(brFields[getSettings()
-									.getSeqSimSearchTableSubjectStartCol()]),
-							Integer.parseInt(brFields[getSettings()
-									.getSeqSimSearchTableSubjectEndCol()]),
-							Double.parseDouble(brFields[getSettings()
-									.getSeqSimSearchTableBitScoreCol()]),
-							blastDbName, proteinDb.get(brFields[getSettings()
-									.getSeqSimSearchTableQueryCol()]));
+						|| !getSettings().getSeqSimSearchTableCommentLineRegex().matcher(str).matches()) {
+					String[] brFields = str.split(getSettings().getSeqSimSearchTableSep());
+					if (!proteinDb.containsKey(brFields[getSettings().getSeqSimSearchTableQueryCol()])) {
+						throw new MissingProteinException("Could not find Protein for Accession '"
+								+ brFields[getSettings().getSeqSimSearchTableQueryCol()] + "' in Protein Database.");
+					} // ELSE
+					BlastResult br = new BlastResult(brFields[getSettings().getSeqSimSearchTableSubjectCol()],
+							Double.parseDouble(validateDouble(brFields[getSettings().getSeqSimSearchTableEValueCol()])),
+							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableQueryStartCol()]),
+							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableQueryEndCol()]),
+							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableSubjectStartCol()]),
+							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableSubjectEndCol()]),
+							Double.parseDouble(brFields[getSettings().getSeqSimSearchTableBitScoreCol()]), blastDbName,
+							proteinDb.get(brFields[getSettings().getSeqSimSearchTableQueryCol()]));
 					addBlastResult(brs, br, uniqueShortAccessions);
 				}
 			}
@@ -264,8 +241,8 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * @param br
 	 * @param uniqueShortAccessions
 	 */
-	public static void addBlastResult(Map<String, List<BlastResult>> brs,
-			BlastResult br, Set<String> uniqueShortAccessions) {
+	public static void addBlastResult(Map<String, List<BlastResult>> brs, BlastResult br,
+			Set<String> uniqueShortAccessions) {
 		if (brs.containsKey(br.getAccession())) {
 			boolean isMultipleHsp = false;
 			List<BlastResult> sameHitBrs = brs.get(br.getAccession());
@@ -313,8 +290,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * @param hitAALength
 	 * @param hrd
 	 */
-	public static void fastaEntryValuesForBlastHit(
-			Map<String, List<BlastResult>> blastResults, String fastaAccession,
+	public static void fastaEntryValuesForBlastHit(Map<String, List<BlastResult>> blastResults, String fastaAccession,
 			Integer hitAALength, String hrd) {
 		for (BlastResult br : blastResults.get(fastaAccession)) {
 			br.setSubjectLength(hitAALength);
@@ -336,17 +312,14 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * @param blastResults
 	 * @throws IOException
 	 */
-	public static void parseBlastDatabase(Map<String, Protein> proteinDb,
-			String blastDbName, Map<String, List<BlastResult>> blastResults)
-			throws IOException {
+	public static void parseBlastDatabase(Map<String, Protein> proteinDb, String blastDbName,
+			Map<String, List<BlastResult>> blastResults) throws IOException {
 		// Parse line by line FASTA Blast search DB. Extract Subject Lengths and
 		// Subject HRDs.
 		BufferedReader fastaIn = null;
 		try {
-			fastaIn = new BufferedReader(new FileReader(getSettings()
-					.getPathToBlastDatabase(blastDbName)));
+			fastaIn = new BufferedReader(new FileReader(getSettings().getPathToBlastDatabase(blastDbName)));
 			String str, hrd = new String();
-			StringBuffer hitAASeq = new StringBuffer();
 			String acc = "";
 			Integer hitAALength = new Integer(0);
 			boolean hit = false;
@@ -355,42 +328,31 @@ public class BlastResult implements Comparable<BlastResult> {
 					// Finished reading in the original Fasta-Entry of a
 					// Blast-Hit? If so, process it:
 					if (hit) {
-						fastaEntryValuesForBlastHit(blastResults, acc,
-						 		hitAALength, hrd);
-						System.out.println(">" + acc + " " + hrd + "\n" + hitAASeq.toString());
+						fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
 						// Clean up to enable processing the next Hit
 						hitAALength = new Integer(0);
-						hitAASeq = new StringBuffer();
 						// Note, that the boolean 'hit' will be set in the
 						// following If-Else-Block.
-						
+
 					}
 
 					// Process the current Fasta-Header-Line:
-					Matcher m = getSettings().getFastaHeaderRegex(blastDbName)
-							.matcher(str);
+					Matcher m = getSettings().getFastaHeaderRegex(blastDbName).matcher(str);
 					if (!m.matches()) {
 						// Provided REGEX to parse FASTA header does not work in
 						// this case:
-						System.err
-								.println("WARNING: FASTA header line\n"
-										+ str.trim()
-										+ "\ndoes not match provided regular expression\n"
-										+ getSettings().getFastaHeaderRegex(
-												blastDbName).toString()
-										+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
-										+ "To fix this, please use - Bast database specific - parameter "
-										+ Settings.FASTA_HEADER_REGEX_KEY
-										+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
-										+ blastDbName + "'.");
-					} else if (blastResults.containsKey(m.group(
-							FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
+						System.err.println("WARNING: FASTA header line\n" + str.trim()
+								+ "\ndoes not match provided regular expression\n"
+								+ getSettings().getFastaHeaderRegex(blastDbName).toString()
+								+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
+								+ "To fix this, please use - Bast database specific - parameter "
+								+ Settings.FASTA_HEADER_REGEX_KEY
+								+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
+								+ blastDbName + "'.");
+					} else if (blastResults.containsKey(m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
 						// Found the next Blast HIT:
-						acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME)
-								.trim();
-						hrd = m.group(
-								FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME)
-								.trim();
+						acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim();
+						hrd = m.group(FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME).trim();
 						// Following lines, until the next header, contain
 						// information to be collected:
 						hit = true;
@@ -403,8 +365,6 @@ public class BlastResult implements Comparable<BlastResult> {
 					// Process non header-line, if and only if, we are reading
 					// the sequence of a Blast-Hit:
 					hitAALength += str.trim().length();
-					// Debug:
-					hitAASeq.append(str.trim());
 				}
 			}
 			// Was the last read FASTA entry a Blast-Hit? If so, it needs
@@ -416,14 +376,11 @@ public class BlastResult implements Comparable<BlastResult> {
 		}
 	}
 
-	public static List<BlastResult> filterBestScoringBlastResults(
-			List<BlastResult> blastResults, int howMany) {
+	public static List<BlastResult> filterBestScoringBlastResults(List<BlastResult> blastResults, int howMany) {
 		if (blastResults.size() > howMany) {
-			List<BlastResult> sortedBlastResults = new ArrayList<BlastResult>(
-					blastResults);
+			List<BlastResult> sortedBlastResults = new ArrayList<BlastResult>(blastResults);
 			Collections.sort(sortedBlastResults);
-			blastResults = sortedBlastResults.subList(sortedBlastResults.size()
-					- howMany - 1, sortedBlastResults.size() - 1);
+			blastResults = sortedBlastResults.subList(0, howMany);
 		}
 		return blastResults;
 	}
@@ -448,10 +405,8 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public void tokenize() {
-		List<String> tknBlackList = getSettings().getTokenBlackList(
-				getBlastDatabaseName());
-		for (String tokenCandidate : new HashSet<String>(
-				Arrays.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
+		List<String> tknBlackList = getSettings().getTokenBlackList(getBlastDatabaseName());
+		for (String tokenCandidate : new HashSet<String>(Arrays.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
 			tokenCandidate = tokenCandidate.toLowerCase();
 			if (tokenPassesBlacklist(tokenCandidate, tknBlackList))
 				getTokens().add(tokenCandidate);
@@ -459,10 +414,9 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public boolean passesBlacklist(String blastResultDescriptionLine) {
-		boolean passesBlacklist = (blastResultDescriptionLine != null && !blastResultDescriptionLine
-				.equals(""));
-		for (Iterator<String> i = getSettings().getBlastResultsBlackList(
-				getBlastDatabaseName()).iterator(); (i.hasNext() && passesBlacklist);) {
+		boolean passesBlacklist = (blastResultDescriptionLine != null && !blastResultDescriptionLine.equals(""));
+		for (Iterator<String> i = getSettings().getBlastResultsBlackList(getBlastDatabaseName()).iterator(); (i
+				.hasNext() && passesBlacklist);) {
 			Pattern p = Pattern.compile(i.next());
 			Matcher m = p.matcher(blastResultDescriptionLine);
 			passesBlacklist = !m.find();
@@ -472,8 +426,8 @@ public class BlastResult implements Comparable<BlastResult> {
 
 	public String filter(String blastResultDescriptionLine) {
 		String filteredDescLine = blastResultDescriptionLine;
-		for (Iterator<String> i = getSettings().getBlastResultsFilter(
-				getBlastDatabaseName()).iterator(); i.hasNext();) {
+		for (Iterator<String> i = getSettings().getBlastResultsFilter(getBlastDatabaseName()).iterator(); i
+				.hasNext();) {
 			Pattern p = Pattern.compile(i.next());
 			// Replace with whitespace, so word-boundaries are kept up
 			filteredDescLine = p.matcher(filteredDescLine).replaceAll(" ");
@@ -498,15 +452,13 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public boolean isValid() {
-		return (getAccession() != null && (!getAccession().equals(""))
-				&& getBitScore() != null && getDescription() != null
-				&& (!getDescription().equals("")) && getQueryEnd() != null
-				&& getQueryStart() != null && (getQueryStart() < getQueryEnd())
-				&& getSubjectEnd() != null && getSubjectStart() != null
-				&& (getSubjectEnd() > getSubjectStart())
-				&& getSubjectLength() != null && getEValue() != null
-				&& getTokens() != null && getTokens().size() > 0 && getSettings()
-				.getBlastDatabases().contains(getBlastDatabaseName()));
+		return (getAccession() != null && (!getAccession().equals("")) && getBitScore() != null
+				&& getDescription() != null && (!getDescription().equals("")) && getQueryEnd() != null
+				&& getQueryStart() != null && (getQueryStart() < getQueryEnd()) && getSubjectEnd() != null
+				&& getSubjectStart() != null && (getSubjectEnd() > getSubjectStart()) && getSubjectLength() != null
+				&& getEValue() != null && getTokens() != null && getTokens().size() > 0
+				&& getBlastDatabaseName() != null
+				&& getSettings().getBlastDatabases().contains(getBlastDatabaseName()));
 	}
 
 	/**
@@ -523,11 +475,9 @@ public class BlastResult implements Comparable<BlastResult> {
 	 *         descriptionScore, tokens and evaluationScore.
 	 */
 	public BlastResult clone() {
-		return new BlastResult(new String(this.getAccession()), new Double(
-				eValue), new String(description), new Integer(queryStart),
-				new Integer(queryEnd), new Integer(subjectStart), new Integer(
-						subjectEnd), new Integer(subjectLength), new Double(
-						bitScore), new String(blastDatabaseName));
+		return new BlastResult(new String(this.getAccession()), new Double(eValue), new String(description),
+				new Integer(queryStart), new Integer(queryEnd), new Integer(subjectStart), new Integer(subjectEnd),
+				new Integer(subjectLength), new Double(bitScore), new String(blastDatabaseName));
 	}
 
 	/**
@@ -547,8 +497,7 @@ public class BlastResult implements Comparable<BlastResult> {
 			theClone.setDescription(filter(theClone.getDescription()));
 			// Tokenize without filtering tokens through the Blacklist:
 			theClone.setTokens(tokenizeDescription(theClone.getDescription()));
-			getProtein().getEvaluationScoreCalculator()
-					.addUnchangedBlastResult(getBlastDatabaseName(), theClone);
+			getProtein().getEvaluationScoreCalculator().addUnchangedBlastResult(getBlastDatabaseName(), theClone);
 		}
 		if (passesBlacklist(getDescription())) {
 			// Pass bestScoringHSP through filter:
@@ -580,17 +529,13 @@ public class BlastResult implements Comparable<BlastResult> {
 	 */
 	public String getShortAccession() {
 		if (shortAccession == null) {
-			Pattern p = getSettings().getShortAccessionRegex(
-					getBlastDatabaseName());
+			Pattern p = getSettings().getShortAccessionRegex(getBlastDatabaseName());
 			Matcher m = p.matcher(getAccession());
 			shortAccession = getAccession();
 			if (!m.find()) {
-				System.err
-						.println("WARNING: Regular Expression '"
-								+ p.toString()
-								+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '"
-								+ getAccession()
-								+ "' - continuing with the original accession. This might lead to unrecognized reference GO annotations!");
+				System.err.println("WARNING: Regular Expression '" + p.toString()
+						+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '" + getAccession()
+						+ "' - continuing with the original accession. This might lead to unrecognized reference GO annotations!");
 			} else {
 				shortAccession = m.group(SHORT_ACCESSION_GROUP_NAME);
 			}
@@ -668,8 +613,7 @@ public class BlastResult implements Comparable<BlastResult> {
 
 	public void setBlastDatabaseName(String blastDatabaseName) {
 		if (blastDatabaseName == null)
-			throw new IllegalArgumentException(
-					"Blast-Database-Name must not be NULL.");
+			throw new IllegalArgumentException("Blast-Database-Name must not be NULL.");
 		this.blastDatabaseName = blastDatabaseName;
 	}
 
