@@ -81,9 +81,8 @@ public class BlastResult implements Comparable<BlastResult> {
 		setBlastDatabaseName(blastDatabaseName);
 	}
 
-	public BlastResult(String accession, double eValue, String description,
-			int queryStart, int queryEnd, int subjectStart, int subjectEnd,
-			int subjectLength, double bitScore, String blastDatabaseName) {
+	public BlastResult(String accession, double eValue, String description, int queryStart, int queryEnd,
+			int subjectStart, int subjectEnd, int subjectLength, double bitScore, String blastDatabaseName) {
 		super();
 		setAccession(accession);
 		setEValue(eValue);
@@ -110,12 +109,10 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * 
 	 * Example code taken from biojava.org.
 	 */
-	public static void parseBlastResults(Map<String, Protein> proteinDb,
-			String blastDbName) throws MissingProteinException, SAXException,
-			IOException {
+	public static void parseBlastResults(Map<String, Protein> proteinDb, String blastDbName)
+			throws MissingProteinException, SAXException, IOException {
 		// get the Blast input as a Stream
-		InputStream is = new FileInputStream(getSettings()
-				.getPathToBlastResults(blastDbName));
+		InputStream is = new FileInputStream(getSettings().getPathToBlastResults(blastDbName));
 		// make a BlastLikeSAXParser
 		BlastLikeSAXParser parser = new BlastLikeSAXParser();
 		// try to parse, even if the blast version is not recognized.
@@ -125,22 +122,18 @@ public class BlastResult implements Comparable<BlastResult> {
 		// set the parsers SAX event adapter
 		parser.setContentHandler(adapter);
 		// register builder with custom adapter
-		SearchContentHandler scHandler = new BlastSearchContentAdapter(
-				proteinDb, blastDbName);
+		SearchContentHandler scHandler = new BlastSearchContentAdapter(proteinDb, blastDbName);
 		adapter.setSearchContentHandler(scHandler);
 		// parse the file, after this the result List will be populated with
 		// SeqSimilaritySearchResults
 		parser.parse(new InputSource(is));
 	}
 
-	public static List<BlastResult> filterBestScoringBlastResults(
-			List<BlastResult> blastResults, int howMany) {
+	public static List<BlastResult> filterBestScoringBlastResults(List<BlastResult> blastResults, int howMany) {
 		if (blastResults.size() > howMany) {
-			List<BlastResult> sortedBlastResults = new ArrayList<BlastResult>(
-					blastResults);
+			List<BlastResult> sortedBlastResults = new ArrayList<BlastResult>(blastResults);
 			Collections.sort(sortedBlastResults);
-			blastResults = sortedBlastResults.subList(sortedBlastResults.size()
-					- howMany - 1, sortedBlastResults.size() - 1);
+			blastResults = sortedBlastResults.subList(0, howMany);
 		}
 		return blastResults;
 	}
@@ -165,10 +158,8 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public void tokenize() {
-		List<String> tknBlackList = getSettings().getTokenBlackList(
-				getBlastDatabaseName());
-		for (String tokenCandidate : new HashSet<String>(
-				Arrays.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
+		List<String> tknBlackList = getSettings().getTokenBlackList(getBlastDatabaseName());
+		for (String tokenCandidate : new HashSet<String>(Arrays.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
 			tokenCandidate = tokenCandidate.toLowerCase();
 			if (passesBlacklist(tokenCandidate, tknBlackList))
 				getTokens().add(tokenCandidate);
@@ -190,15 +181,12 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	public boolean isValid() {
-		return (getAccession() != null && (!getAccession().equals(""))
-				&& getBitScore() != null && getDescription() != null
-				&& (!getDescription().equals("")) && getQueryEnd() != null
-				&& getQueryStart() != null && (getQueryStart() < getQueryEnd())
-				&& getSubjectEnd() != null && getSubjectStart() != null
-				&& (getSubjectEnd() > getSubjectStart())
-				&& getSubjectLength() != null && getEValue() != null
-				&& getTokens() != null && getTokens().size() > 0 && getSettings()
-				.getBlastDatabases().contains(getBlastDatabaseName()));
+		return (getAccession() != null && (!getAccession().equals("")) && getBitScore() != null
+				&& getDescription() != null && (!getDescription().equals("")) && getQueryEnd() != null
+				&& getQueryStart() != null && (getQueryStart() < getQueryEnd()) && getSubjectEnd() != null
+				&& getSubjectStart() != null && (getSubjectEnd() > getSubjectStart()) && getSubjectLength() != null
+				&& getEValue() != null && getTokens() != null && getTokens().size() > 0
+				&& getSettings().getBlastDatabases().contains(getBlastDatabaseName()));
 	}
 
 	/**
@@ -215,11 +203,9 @@ public class BlastResult implements Comparable<BlastResult> {
 	 *         descriptionScore, tokens and evaluationScore.
 	 */
 	public BlastResult clone() {
-		return new BlastResult(new String(this.getAccession()), new Double(
-				eValue), new String(description), new Integer(queryStart),
-				new Integer(queryEnd), new Integer(subjectStart), new Integer(
-						subjectEnd), new Integer(subjectLength), new Double(
-						bitScore), new String(blastDatabaseName));
+		return new BlastResult(new String(this.getAccession()), new Double(eValue), new String(description),
+				new Integer(queryStart), new Integer(queryEnd), new Integer(subjectStart), new Integer(subjectEnd),
+				new Integer(subjectLength), new Double(bitScore), new String(blastDatabaseName));
 	}
 
 	public String getAccession() {
@@ -292,8 +278,7 @@ public class BlastResult implements Comparable<BlastResult> {
 
 	public void setBlastDatabaseName(String blastDatabaseName) {
 		if (blastDatabaseName == null)
-			throw new IllegalArgumentException(
-					"Blast-Database-Name must not be NULL.");
+			throw new IllegalArgumentException("Blast-Database-Name must not be NULL.");
 		this.blastDatabaseName = blastDatabaseName;
 	}
 
