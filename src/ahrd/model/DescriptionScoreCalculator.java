@@ -29,14 +29,14 @@ public class DescriptionScoreCalculator {
 			for (BlastResult iterBlastResult : getProtein().getBlastResults().get(blastDb)) {
 				getProtein().getDescriptionScoreCalculator().calcDescriptionScore(iterBlastResult);
 				// Print out Accession, HRD, Overlap-, and Description Score:
-				if (getProtein().getAccession() == "bgh02285_polypeptide") {
+				if (getProtein().getAccession().equals("bgh02285_polypeptide")) {
 					System.out.println(iterBlastResult.getAccession() + "\t" + iterBlastResult.getDescription() + "\t"
 							+ TokenScoreCalculator.overlapScore(iterBlastResult.getQueryStart(),
 									iterBlastResult.getQueryEnd(), getProtein().getSequenceLength(),
 									iterBlastResult.getSubjectStart(), iterBlastResult.getSubjectEnd(),
 									iterBlastResult.getSubjectLength())
 							+ "\t" + iterBlastResult.getDescriptionScore());
-				} else System.out.print(getProtein().getAccession() + " ");
+				}
 				// Only take Description-Lines into account
 				// that have at least a single non-blacklisted Token:
 				if (iterBlastResult.getTokens().size() > 0)
