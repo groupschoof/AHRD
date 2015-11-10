@@ -36,7 +36,7 @@ public class DescriptionScoreCalculator {
 									iterBlastResult.getSubjectStart(), iterBlastResult.getSubjectEnd(),
 									iterBlastResult.getSubjectLength())
 							+ "\t" + iterBlastResult.getDescriptionScore());
-				}
+				} else System.out.print(getProtein().getAccession() + " ");
 				// Only take Description-Lines into account
 				// that have at least a single non-blacklisted Token:
 				if (iterBlastResult.getTokens().size() > 0)
