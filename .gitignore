@@ -31,3 +31,5 @@ junitvmwatcher*
 # Ignore test output files
 ahrd_extended_go_table.tsv
 ahrd_output.csv
+ahrd_extended_go_table.tsv
+ahrd_output.csv
