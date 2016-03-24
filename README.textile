@@ -67,7 +67,7 @@ There are _three_ template AHRD input files provided that you should use accordi
 | Annotate your Query proteins with HRD _and_ Gene Ontology (GO) terms | @./test/resources/ahrd_example_input_go_prediction.yml@ |
 | Annotate your Query proteins with HRD, GO terms, _and_ generate an extended GO annotation table | @./test/resources/ahrd_example_input_go_prediction_extended.yml@ |
 
-_Note_: For details on extended GO annotation tables please refer to section 3.3.3.2 
+_Note_: For details on extended GO annotation tables please refer to section 3.3.2.2 
 
 h3. 2.2 Input
 
@@ -91,7 +91,7 @@ blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -ou
 
 h4. 2.2.2 Optional input data
 
-If you want AHRD to predict your query protein's functions with Gene Ontology (GO) terms, you need to provide the GO annotations of reference proteins. See section 3.3.3 for more details.
+If you want AHRD to predict your query protein's functions with Gene Ontology (GO) terms, you need to provide the GO annotations of reference proteins. See section 3.3.2 for more details.
 
 h4. 2.2.3 Required config files
 
@@ -250,7 +250,7 @@ h3. 3.3 Parameters
 Above formulae use the following parameters as given in *./ahrd_example_input.yml*.
 These parameters can either be used as provided or can be adapted to your needs.
 
-h4. 3.3.1 The weights in formula Token-Score are
+The weights in the above formulae are
 
 <pre>token_score_bit_score_weight: 0.468
 token_score_database_score_weight: 0.2098
@@ -261,7 +261,7 @@ and Blast-Database specific, for example for UniprotKB/Swissprot:
 <pre>weight: 653
 description_score_bit_score_weight: 2.717061 </pre>
 
-h4. 3.3.2 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)
+h4. 3.3.1 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)
 
 AHRD has been designed to work with tabular sequence similarity search results in tabular format. By default it parses the tabular "Blast 8" output:
 
@@ -286,13 +286,13 @@ The following paramters can be set optionally, if your tabular sequence similari
 
 _NOTE:_ All above column numbers start counting with zero, i.e. the first column has number 0.
 
-h4. 3.3.3 Parameters controlling Gene Ontology term annotations
+h4. 3.3.2 Parameters controlling Gene Ontology term annotations
 
 AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @gene_association.goa_uniprot.gz@ (last visit March 24th 2015)
 
 To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter @gene_ontology_result@. See example file @./test/resources/ahrd_input_seq_sim_table_go_prediction.yml@ for more details.
 
-h5. 3.3.3.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
+h5. 3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
 
 Unfortunately UniprotKB GOA files use short protein accessions like @W9QFR0@, while the UniprotKB FASTA databases use the long protein accessions with pipes like this @tr|W9QFR0|W9QFR0_9ROSA@. In order to enable AHRD to match the correct short and long accessions, and thus the reference GO annotations it uses regular expressions to parse both the long accessions and the GOA files. By default AHRD is setup to hanlde Uniprot formats, but you can provide custom regular expressions for your own custom GOA files:
 
@@ -301,7 +301,7 @@ Unfortunately UniprotKB GOA files use short protein accessions like @W9QFR0@, wh
 
 _Note:_ You must provide the above named match groups @shortAccession@ and @goTerm@, respectively.
 
-h5. 3.3.3.2 Have AHRD extend predicted GO terms with semantically included GO terms
+h5. 3.3.2.2 Have AHRD extend predicted GO terms with semantically included GO terms
 
 The Gene Ontology is organised in a graph. GO terms can have ancestors of three different relationship types: "is_a", "kind_of", and "part_of". Because with increasing depth GO terms are more precise and accurate descriptions ancestal terms are semantically included. If you choose AHRD can annotate your proteins with all GO terms ancestral to the ones it already has selected. This option will write a second TAB-delimited output file with four columns:
 
@@ -317,7 +317,7 @@ To have AHRD generate this extended GO annotation table, just provide an output 
 <pre>extended_go_result_table: ./ahrd_extended_go_table.tsv
 </pre>
 
-h6. 3.3.3.2.1 Custom Gene Ontology Database
+h6. 3.3.2.2.1 Custom Gene Ontology Database
 
 As mentioned above AHRD needs an instance of the Gene Ontology MySQL database, if you want it to generate an extended GO annotation table. Instead of using the default public database provided by the EBI, you can set the connection parameters to your own database:
 
