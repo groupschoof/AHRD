@@ -33,7 +33,7 @@ import ahrd.view.OutputWriter;
 
 public class AHRD {
 
-	public static final String VERSION = "3.1";
+	public static final String VERSION = "3.11";
 
 	private Map<String, Protein> proteins;
 	private Map<String, Double> descriptionScoreBitScoreWeights = new HashMap<String, Double>();
