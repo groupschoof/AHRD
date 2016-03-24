@@ -256,8 +256,8 @@ h4. 3.3.1 The weights in formula Token-Score are
 token_score_database_score_weight: 0.2098
 token_score_overlap_score_weight: 0.3221 </pre>
 and Blast-Database specific, for example for UniprotKB/Swissprot:
-<pre>weight:  653
-description_score_bit_score_weight: 2.717061</pre>
+<pre>weight: 653
+description_score_bit_score_weight: 2.717061 </pre>
 
 h4. 3.3.2 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)
 
