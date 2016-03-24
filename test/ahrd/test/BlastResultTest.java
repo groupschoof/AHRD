@@ -1,7 +1,9 @@
 package ahrd.test;
 
+import static ahrd.controller.Settings.getSettings;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import static ahrd.controller.Settings.getSettings;
@@ -9,12 +11,13 @@ import static ahrd.controller.Settings.getSettings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
@@ -24,6 +27,11 @@ public class BlastResultTest {
 
 	public BlastResultTest() {
 		super();
+	}
+
+	@Before
+	public void setUp() throws IOException {
+		TestUtils.initTestSettings();
 	}
 
 	@Test
@@ -36,7 +44,6 @@ public class BlastResultTest {
 
 	@Test
 	public void testTokenize() throws IOException {
-		TestUtils.initTestSettings();
 		BlastResult br = new BlastResult("accession_1", 1.0, "one tWo Three protein homolog putative", 10, 20, 10, 20,
 				200, 30, "swissprot");
 		br.tokenize();
@@ -47,49 +54,90 @@ public class BlastResultTest {
 		assertTrue(br.getTokens().contains("three"));
 	}
 
-	/**
-	 * TODO: Remove overlapping tests with AhrdTest.testAhrdParsesBlast
-	 * 
-	 * @throws MissingProteinException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
 	@Test
-	public void testParseBlastResultsOfQueryProteins() throws MissingProteinException, SAXException, IOException {
-		// Strangely the following line missing causes a NPE in Java 7:
-		TestUtils.initTestSettings();
+	public void testAddBlastResult() throws IOException {
+		Map<String, Protein> proteinDb = TestUtils.mockProteinDb();
+		Protein p1 = proteinDb.get("gene:chr01.502:mRNA:chr01.502");
+		Protein p2 = proteinDb.get("gene:chr01.1056:mRNA:chr01.1056");
+		Map<String, List<BlastResult>> blastResults = new HashMap<String, List<BlastResult>>();
+		BlastResult.addBlastResult(blastResults,
+				new BlastResult("accession_1", 1.0, 10, 20, 10, 20, 200, "swissprot", p1), null);
+		assertEquals(1, blastResults.size());
+		assertEquals(1, blastResults.get("accession_1").size());
+		BlastResult.addBlastResult(blastResults,
+				new BlastResult("accession_1", 1.0, 10, 20, 10, 20, 300, "swissprot", p1), null);
+		assertEquals(1, blastResults.size());
+		assertEquals(1, blastResults.get("accession_1").size());
+		assertEquals(new Double(300), blastResults.get("accession_1").get(0).getBitScore());
+		BlastResult.addBlastResult(blastResults,
+				new BlastResult("accession_1", 1.0, 10, 20, 10, 20, 300, "swissprot", p2), null);
+		assertEquals(1, blastResults.size());
+		assertEquals(2, blastResults.get("accession_1").size());
+		assertEquals(new Double(300), blastResults.get("accession_1").get(1).getBitScore());
+		assertEquals(p2, blastResults.get("accession_1").get(1).getProtein());
+		BlastResult.addBlastResult(blastResults,
+				new BlastResult("accession_2", 1.0, 10, 20, 10, 20, 300, "swissprot", p2), null);
+		assertEquals(2, blastResults.size());
+		assertEquals(1, blastResults.get("accession_2").size());
+	}
+
+	@Test
+	public void testParseBlastResults() throws MissingProteinException, IOException {
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
-		assertTrue(protDb.containsKey("gene:chr01.1056:mRNA:chr01.1056"));
-		assertTrue(protDb.containsKey("gene:chr01.502:mRNA:chr01.502"));
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "tair", null);
+		assertNotNull(brs);
+		assertTrue(brs.containsKey("AT3G03300.2"));
+		assertTrue(brs.containsKey("AT3G03300.1"));
+		assertTrue(brs.containsKey("AT3G43920.1"));
+		assertTrue(brs.containsKey("AT3G43920.2"));
+		assertTrue(brs.containsKey("AT3G43920.3"));
+		assertTrue(brs.containsKey("AT5G20320.1"));
+		assertTrue(brs.containsKey("AT1G01040.1"));
+		assertEquals(brs.get("AT3G03300.2").get(0).getProtein(), protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT3G03300.1").get(0).getProtein(), protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT3G43920.1").get(0).getProtein(), protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT3G43920.2").get(0).getProtein(), protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT3G43920.3").get(0).getProtein(), protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT5G20320.1").get(0).getProtein(), protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		assertEquals(brs.get("AT1G01040.1").get(0).getProtein(), protDb.get("gene:chr01.502:mRNA:chr01.502"));
+		BlastResult br = brs.get("AT3G03300.2").get(0);
+		assertEquals(br.getAccession(), "AT3G03300.2");
+		assertEquals(br.getBitScore(), new Double(94.4), 0.0000001);
+		assertEquals(br.getBlastDatabaseName(), "tair");
+		assertNull(br.getDescription());
+		assertEquals(br.getEValue(), Math.pow(10, -20), Math.pow(10, -21));
+		assertEquals(br.getQueryEnd(), new Integer(99));
+		assertEquals(br.getQueryStart(), new Integer(1));
+		assertEquals(br.getSubjectEnd(), new Integer(1067));
+		assertEquals(br.getSubjectStart(), new Integer(969));
+		assertNull(br.getSubjectLength());
+		// Assert that multiple High Scoring Pairs are read out as a single Hit,
+		// that is the one with the best Bit-Score:
+		assertEquals(brs.size(), 207);
+	}
 
-		BlastResult.parseBlastResults(protDb, "swissprot");
-		assertNotNull(protDb.get("gene:chr01.1056:mRNA:chr01.1056").getBlastResults().get("swissprot"));
-		assertEquals(108, protDb.get("gene:chr01.1056:mRNA:chr01.1056").getBlastResults().get("swissprot").size());
-		assertEquals(16, protDb.get("gene:chr01.502:mRNA:chr01.502").getBlastResults().get("swissprot").size());
-
-		BlastResult br = (BlastResult) protDb.get("gene:chr01.1056:mRNA:chr01.1056").getBlastResults().get("swissprot")
-				.get(0);
-		assertEquals("sp|Q9SCZ4|FERON_ARATH", br.getAccession());
-		assertEquals(0.0, br.getEValue(), 0.0);
-		assertEquals(1095, br.getBitScore(), 0.0);
-		assertEquals(30.0, br.getQueryStart(), 0.0);
-		assertEquals(828.0, br.getQueryEnd(), 0.0);
-		assertEquals("Receptor-like protein kinase FERONIA", br.getDescription());
-		// While parsing the BlastResults for a Protein, the
-		// frequencies of each Description-Line should be
-		// measured. This is after the Description-Line
-		// passes the blacklist-check and has it's "bad
-		// tokens" filtered out.
-		Protein p = protDb.get("gene:chr01.502:mRNA:chr01.502");
-		// Test for maximum Bit-Score being saved:
-		assertEquals(94.4, p.getDescriptionScoreCalculator().getMaxBitScore(), 0.0);
+	@Test
+	public void testParseBlastDatabase() throws IOException, MissingProteinException {
+		Map<String, Protein> protDb = TestUtils.mockProteinDb();
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "tair", null);
+		BlastResult.parseBlastDatabase(protDb, "tair", brs);
+		Protein p1 = protDb.get("gene:chr01.502:mRNA:chr01.502");
+		Protein p2 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
+		assertTrue(!p1.getBlastResults().get("tair").isEmpty());
+		assertEquals(7, p1.getBlastResults().get("tair").size());
+		assertEquals("AT3G03300.2", p1.getBlastResults().get("tair").get(0).getAccession());
+		assertEquals(new Integer(1375), p1.getBlastResults().get("tair").get(0).getSubjectLength());
+		assertTrue(!p2.getBlastResults().get("tair").isEmpty());
+		assertEquals(200, p2.getBlastResults().get("tair").size());
+		assertEquals("AT3G45420.1", p2.getBlastResults().get("tair").get(199).getAccession());
+		assertEquals(new Integer(668), p2.getBlastResults().get("tair").get(199).getSubjectLength());
 	}
 
 	@Test
 	public void testCompareBlastResultsBasedOnTheirEvalues() {
-		BlastResult br1 = new BlastResult("accession_1", 1.0, "description_1", 10, 20, 10, 20, 200, 30, "swissprot");
-		BlastResult br2 = new BlastResult("accession_2", 2.0, "description_2", 10, 20, 10, 20, 200, 30, "swissprot");
-		BlastResult br3 = new BlastResult("accession_3", 2.0, "description_3", 10, 20, 10, 20, 200, 30, "swissprot");
+		BlastResult br1 = new BlastResult("accession_1", 3e-163, "description_1", 10, 20, 10, 20, 200, 30, "swissprot");
+		BlastResult br2 = new BlastResult("accession_2", 2e-137, "description_2", 10, 20, 10, 20, 200, 30, "swissprot");
+		BlastResult br3 = new BlastResult("accession_3", 2e-137, "description_3", 10, 20, 10, 20, 200, 30, "swissprot");
 		assertEquals(-1, br1.compareTo(br2));
 		assertEquals(1, br2.compareTo(br1));
 		assertEquals(0, br2.compareTo(br3));
@@ -98,40 +146,123 @@ public class BlastResultTest {
 	@Test
 	public void testFilterBestScoringBlastResults() {
 		List<BlastResult> blastResults = new ArrayList<BlastResult>();
-		blastResults.add(new BlastResult("accession_1", 1.0, "description_1", 10, 20, 10, 20, 200, 30, "swissprot"));
-		blastResults.add(new BlastResult("accession_2", 2.0, "description_2", 10, 20, 10, 20, 200, 30, "swissprot"));
-		blastResults.add(new BlastResult("accession_3", 3.0, "description_3", 10, 20, 10, 20, 200, 30, "swissprot"));
-		BlastResult br = new BlastResult("accession_4", 4.0, "description_4", 10, 20, 10, 20, 200, 30, "swissprot");
-		blastResults.add(br);
-		blastResults.add(new BlastResult("accession_5", 5.0, "description_5", 10, 20, 10, 20, 200, 30, "swissprot"));
-		blastResults = BlastResult.filterBestScoringBlastResults(blastResults, 4);
-		assertEquals(4, blastResults.size());
-		assertTrue(blastResults.contains(br));
+		blastResults.add(new BlastResult("accession_1", 3e-163, "description_1", 10, 20, 10, 20, 200, 30, "swissprot"));
+		blastResults.add(new BlastResult("accession_2", 3e-163, "description_2", 10, 20, 10, 20, 200, 30, "swissprot"));
+		blastResults.add(new BlastResult("accession_3", 2e-137, "description_3", 10, 20, 10, 20, 200, 30, "swissprot"));
+		blastResults.add(new BlastResult("accession_4", 2e-137, "description_4", 10, 20, 10, 20, 200, 30, "swissprot"));
+		BlastResult br5 = new BlastResult("accession_5", 5.0, "description_5", 10, 20, 10, 20, 200, 30, "swissprot");
+		blastResults.add(br5);
+		List<BlastResult> fltrdBrs = BlastResult.filterBestScoringBlastResults(blastResults, 4);
+		assertNotNull(fltrdBrs);
+		assertEquals(4, fltrdBrs.size());
+		assertTrue(fltrdBrs.containsAll(blastResults.subList(0, 4)));
+		assertTrue(!fltrdBrs.contains(br5));
 	}
 
 	@Test
-	public void testGenerateHRDCandidateForProtein() throws IOException, MissingProteinException, SAXException {
+	public void testGetShortAccession() throws IOException {
+		BlastResult br = new BlastResult("sp|Q9SXB8|Y1133_ARATH", 1.0, "description_1", 10, 20, 10, 20, 200, 30,
+				"swissprot");
+		assertEquals("Q9SXB8", br.getShortAccession());
+	}
+
+	@Test
+	public void testParseLongBlastResults() throws IOException, MissingProteinException {
 		TestUtils.initTestSettings();
+		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
+		Map<String, Protein> protDb = TestUtils.mockProteinDb();
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
+		assertNotNull(brs);
+		assertTrue(!brs.isEmpty());
+		// One HSP is double:
+		assertEquals(498, brs.size());
+		assertEquals(5e-107, brs.get("tr|A0A0G4KNA9|A0A0G4KNA9_9PEZI").get(0).getEValue(), 1e-106);
+		assertTrue(brs.containsKey("tr|W9CFB7|W9CFB7_9HELO"));
+		// Verify the BlastResult is valid:
+		assertEquals(1, brs.get("tr|W9CFB7|W9CFB7_9HELO").size());
+		BlastResult br = brs.get("tr|W9CFB7|W9CFB7_9HELO").get(0);
+		assertNotNull(br);
+		assertNotNull(br.getAccession());
+		assertNotNull(br.getBitScore());
+		assertNotNull(br.getQueryEnd());
+		assertNotNull(br.getQueryStart());
+		assertNotNull(br.getEValue());
+		assertEquals(Math.pow(10, -163), br.getEValue(), Math.pow(10, -162));
+		assertNotNull(br.getBlastDatabaseName());
+		assertNotNull(br.getSubjectEnd());
+		assertNotNull(br.getSubjectStart());
+		// The following fields are not yet set, because they have to be read
+		// out of the FASTA database:
+		assertNull(br.getDescription());
+		assertNull(br.getSubjectLength());
+		assertNotNull(br.getTokens());
+		assertTrue(br.getTokens().isEmpty());
+		// Because of the missing field values the BlastResult should not yet be
+		// valid:
+		assertTrue(!br.isValid());
+	}
+
+	@Test
+	public void testParseLongBlastDatabase() throws IOException, MissingProteinException {
+		TestUtils.initTestSettings();
+		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
+		getSettings().getBlastDbSettings().get("trembl").put("database",
+				"./test/resources/bgh04634_trembl_database.fasta");
+		getSettings().setPathToGeneOntologyResults(null);
+		Map<String, Protein> protDb = TestUtils.mockProteinDb();
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
+		BlastResult.parseBlastDatabase(protDb, "trembl", brs);
+		Protein p1 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
+		assertTrue(!p1.getBlastResults().get("trembl").isEmpty());
+		Map<String, BlastResult> trBrs = new HashMap<String, BlastResult>();
+		for (BlastResult trBr : p1.getBlastResults().get("trembl")) {
+			trBrs.put(trBr.getAccession(), trBr);
+		}
+		// System.out.println(trAccs);
+		assertTrue(trBrs.containsKey("tr|W9CFB7|W9CFB7_9HELO"));
+		BlastResult theBr = trBrs.get("tr|W9CFB7|W9CFB7_9HELO");
+		assertNotNull(theBr);
+		assertNotNull(theBr.getSubjectLength());
+		assertNotNull(theBr.getDescription());
+		assertNotNull(theBr.getTokens());
+		assertEquals(3, theBr.getTokens().size());
+		assertTrue(theBr.isValid());
+	}
+
+	@Test
+	public void testFilterBestScoringBlastResultsLong() throws IOException, MissingProteinException {
+		TestUtils.initTestSettings();
+		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
+		getSettings().getBlastDbSettings().get("trembl").put("database",
+				"./test/resources/bgh04634_trembl_database.fasta");
+		getSettings().setPathToGeneOntologyResults(null);
+		Map<String, Protein> protDb = TestUtils.mockProteinDb();
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
+		BlastResult.parseBlastDatabase(protDb, "trembl", brs);
+		Protein p1 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
+		assertTrue(!p1.getBlastResults().get("trembl").isEmpty());
+		List<BlastResult> filtrdBrs = BlastResult.filterBestScoringBlastResults(p1.getBlastResults().get("trembl"),
+				200);
+		assertNotNull(filtrdBrs);
+		assertEquals(200, filtrdBrs.size());
+		assertEquals("tr|W9CFB7|W9CFB7_9HELO", filtrdBrs.get(0).getAccession());
+	}
+
+	@Test
+	public void testGenerateHRDCandidateForProtein() throws IOException, MissingProteinException {
+		TestUtils.initTestSettings();
+		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
+		getSettings().getBlastDbSettings().get("trembl").put("database",
+				"./test/resources/bgh04634_trembl_database.fasta");
+		getSettings().setPathToGeneOntologyResults(null);
 		getSettings().setWriteBestBlastHitsToOutput(true);
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
-		assertTrue(protDb.containsKey("gene:chr01.1056:mRNA:chr01.1056"));
-		assertTrue(protDb.containsKey("gene:chr01.502:mRNA:chr01.502"));
-
-		BlastResult.parseBlastResults(protDb, "swissprot");
-		assertNotNull(protDb.get("gene:chr01.1056:mRNA:chr01.1056").getBlastResults().get("swissprot"));
-		assertEquals(108, protDb.get("gene:chr01.1056:mRNA:chr01.1056").getBlastResults().get("swissprot").size());
-		assertEquals(16, protDb.get("gene:chr01.502:mRNA:chr01.502").getBlastResults().get("swissprot").size());
-
-		Protein p1 = protDb.get("gene:chr01.502:mRNA:chr01.502");
-		assertNotNull(p1.getEvaluationScoreCalculator().getUnchangedBlastResults());
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
+		BlastResult.parseBlastDatabase(protDb, "trembl", brs);
+		Protein p1 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
 		assertTrue(!p1.getEvaluationScoreCalculator().getUnchangedBlastResults().isEmpty());
-		assertEquals("sp|Q3EBC8|DCL2_ARATH",
-				p1.getEvaluationScoreCalculator().getUnchangedBlastResults().get("swissprot").getAccession());
-
-		Protein p2 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
-		assertNotNull(p2.getEvaluationScoreCalculator().getUnchangedBlastResults());
-		assertTrue(!p2.getEvaluationScoreCalculator().getUnchangedBlastResults().isEmpty());
-		assertEquals("sp|Q9SCZ4|FERON_ARATH",
-				p2.getEvaluationScoreCalculator().getUnchangedBlastResults().get("swissprot").getAccession());
+		assertNotNull(p1.getEvaluationScoreCalculator().getUnchangedBlastResults().get("trembl"));
+		assertEquals("tr|W9CFB7|W9CFB7_9HELO",
+				p1.getEvaluationScoreCalculator().getUnchangedBlastResults().get("trembl").getAccession());
 	}
 }

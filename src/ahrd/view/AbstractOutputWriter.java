@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import ahrd.model.BlastResult;
-import ahrd.model.GeneOntologyResult;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import ahrd.model.TokenScoreCalculator;
@@ -59,12 +58,11 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 		}
 		descLine += seperator;
 		// Gene-Ontology-Results:
-		List<GeneOntologyResult> sortedGOs = new ArrayList<GeneOntologyResult>(
-				protein.getGoResults());
+		List<String> sortedGOs = new ArrayList<String>(protein.getGoResults());
 		Collections.sort(sortedGOs);
-		for (Iterator<GeneOntologyResult> i = sortedGOs.iterator(); i.hasNext();) {
-			GeneOntologyResult gor = i.next();
-			descLine += gor.getAcc() + " (" + gor.getName() + ")";
+		for (Iterator<String> i = sortedGOs.iterator(); i.hasNext();) {
+			String gor = i.next();
+			descLine += gor;
 			if (i.hasNext())
 				descLine += ", ";
 		}
@@ -99,11 +97,8 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 		// Position 3
 		qc += (p.getDescriptionScoreCalculator().getDescriptionHighScore() >= 0.5) ? "*"
 				: "-";
-		// Position 4
-		qc += (p.getLexicalScoreCalculator().geneOntologyScore(hsbr) > 0.0) ? "*"
-				: "-";
 		// Internal DescriptionScore:
-		//qc += "[" + FRMT.format(hsbr.getDescriptionScore()) + "]";
+		// qc += "[" + FRMT.format(hsbr.getDescriptionScore()) + "]";
 
 		return qc;
 	}

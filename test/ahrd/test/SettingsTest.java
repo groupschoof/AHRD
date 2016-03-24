@@ -1,11 +1,14 @@
 package ahrd.test;
 
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.controller.Settings.setSettings;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +37,66 @@ public class SettingsTest {
 		assertEquals(
 				"Test-Temperature in input.yml is set to 10 and should have been initialized correctly.",
 				new Integer(10), getSettings().getTemperature());
+	}
+
+	@Test
+	public void testAhrdLoadsSequenceSimilaritySearchTableSettings()
+			throws IOException {
+		// Assert default values:
+		assertNull(getSettings().getSeqSimSearchTableCommentLineRegex());
+		assertEquals("\t", getSettings().getSeqSimSearchTableSep());
+		assertEquals(new Integer(0), getSettings()
+				.getSeqSimSearchTableQueryCol());
+		assertEquals(new Integer(1), getSettings()
+				.getSeqSimSearchTableSubjectCol());
+		assertEquals(new Integer(6), getSettings()
+				.getSeqSimSearchTableQueryStartCol());
+		assertEquals(new Integer(7), getSettings()
+				.getSeqSimSearchTableQueryEndCol());
+		assertEquals(new Integer(8), getSettings()
+				.getSeqSimSearchTableSubjectStartCol());
+		assertEquals(new Integer(9), getSettings()
+				.getSeqSimSearchTableSubjectEndCol());
+		assertEquals(new Integer(10), getSettings()
+				.getSeqSimSearchTableEValueCol());
+		assertEquals(new Integer(11), getSettings()
+				.getSeqSimSearchTableBitScoreCol());
+		assertEquals(
+				Pattern.compile(
+						"^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
+						.toString(), getSettings().getFastaHeaderRegex("tair")
+						.toString());
+		assertEquals(Settings.DEFAULT_FASTA_HEADER_REGEX.toString(),
+				getSettings().getFastaHeaderRegex("trembl").toString());
+		// Assert custom values:
+		setSettings(new Settings(
+				"./test/resources/ahrd_input_seq_sim_table.yml"));
+		assertEquals(Pattern.compile("#").toString(), getSettings()
+				.getSeqSimSearchTableCommentLineRegex().toString());
+		assertEquals("\t", getSettings().getSeqSimSearchTableSep());
+		assertEquals(new Integer(10), getSettings()
+				.getSeqSimSearchTableQueryCol());
+		assertEquals(new Integer(11), getSettings()
+				.getSeqSimSearchTableSubjectCol());
+		assertEquals(new Integer(16), getSettings()
+				.getSeqSimSearchTableQueryStartCol());
+		assertEquals(new Integer(17), getSettings()
+				.getSeqSimSearchTableQueryEndCol());
+		assertEquals(new Integer(18), getSettings()
+				.getSeqSimSearchTableSubjectStartCol());
+		assertEquals(new Integer(19), getSettings()
+				.getSeqSimSearchTableSubjectEndCol());
+		assertEquals(new Integer(20), getSettings()
+				.getSeqSimSearchTableEValueCol());
+		assertEquals(new Integer(21), getSettings()
+				.getSeqSimSearchTableBitScoreCol());
+		assertEquals(
+				Pattern.compile(
+						"^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$")
+						.toString(), getSettings().getFastaHeaderRegex("tair")
+						.toString());
+		assertEquals(Settings.DEFAULT_FASTA_HEADER_REGEX.toString(),
+				getSettings().getFastaHeaderRegex("trembl").toString());
 	}
 
 	@Test
@@ -87,16 +150,6 @@ public class SettingsTest {
 		assertTrue(!getSettings().hasInterproAnnotations());
 		getSettings().setPathToInterproResults("/not/existing/path.raw");
 		assertTrue(!getSettings().hasInterproAnnotations());
-	}
-
-	@Test
-	public void testHasGeneOntologyAnnotations() {
-		// Should have GO-Annotations with default test-Settings:
-		assertTrue(getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyResults(null);
-		assertTrue(!getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyResults("/not/existing/path.raw");
-		assertTrue(!getSettings().hasGeneOntologyAnnotations());
 	}
 
 	@Test

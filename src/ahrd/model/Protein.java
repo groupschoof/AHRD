@@ -1,8 +1,10 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +20,7 @@ public class Protein {
 	private Integer sequenceLength;
 	private Map<String, List<BlastResult>> blastResults;
 	private Set<InterproResult> interproResults = new HashSet<InterproResult>();
-	private Set<GeneOntologyResult> goResults = new HashSet<GeneOntologyResult>();
+	private Set<String> goResults = new HashSet<String>();
 	private TokenScoreCalculator tokenScoreCalculator;
 	private LexicalScoreCalculator lexicalScoreCalculator;
 	private DescriptionScoreCalculator descriptionScoreCalculator;
@@ -110,6 +112,21 @@ public class Protein {
 	}
 
 	/**
+	 * Extracts all unique Gene Ontology (GO) terms annotated to the Proteins in
+	 * argument prots.
+	 * 
+	 * @param prots
+	 * @return Set<String>
+	 */
+	public static Set<String> uniqueGOaccessions(Collection<Protein> prots) {
+		Set<String> ugt = new HashSet<String>();
+		for (Protein prot : prots) {
+			ugt.addAll(prot.getGoResults());
+		}
+		return ugt;
+	}
+
+	/**
 	 * Adds the BlastResult to the Protein's set and measures the cumulative and
 	 * total scores later needed to calculate the Token-Scores. Also finds the
 	 * highest BitScore and Description-Line-Frequency. The argument BlastResult
@@ -156,11 +173,11 @@ public class Protein {
 		this.interproResults = interproResults;
 	}
 
-	public Set<GeneOntologyResult> getGoResults() {
+	public Set<String> getGoResults() {
 		return goResults;
 	}
 
-	public void setGoResults(Set<GeneOntologyResult> goResults) {
+	public void setGoResults(Set<String> goResults) {
 		this.goResults = goResults;
 	}
 

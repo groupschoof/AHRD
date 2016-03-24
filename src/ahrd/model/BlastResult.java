@@ -1,25 +1,25 @@
 package ahrd.model;
 
-import static ahrd.model.ReferenceDescription.tokenizeDescription;
-import static ahrd.model.TokenScoreCalculator.passesBlacklist;
 import static ahrd.controller.Settings.getSettings;
-import java.io.FileInputStream;
+import static ahrd.model.ReferenceDescription.tokenizeDescription;
+import static ahrd.model.TokenScoreCalculator.tokenPassesBlacklist;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.biojava.bio.program.sax.BlastLikeSAXParser;
-import org.biojava.bio.program.ssbind.SeqSimilarityAdapter;
-import org.biojava.bio.search.SearchContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
+import ahrd.controller.Settings;
 import ahrd.exception.MissingProteinException;
 
 /**
@@ -31,8 +31,13 @@ import ahrd.exception.MissingProteinException;
 public class BlastResult implements Comparable<BlastResult> {
 
 	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
+	public static final String FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME = "accession";
+	public static final String FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME = "description";
+	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
+	public static final String GO_TERM_GROUP_NAME = "goTerm";
 
 	private String accession;
+	private String shortAccession;
 	private Double eValue;
 	private String description;
 	/**
@@ -75,10 +80,58 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * is obtained from.
 	 */
 	private Set<String> evaluationTokens;
+	/**
+	 * The query accession is only stored during the parsing of tabular sequence
+	 * similarity search results. It should only be used in that context.
+	 */
+	private Protein protein;
+
+	/**
+	 * Makes a double string representation parseable by Double.parseDouble(…).
+	 * 
+	 * @param input
+	 * @return String
+	 */
+	public static String validateDouble(String input) {
+		if (input.startsWith("e") || input.startsWith("E"))
+			input = "1" + input;
+		return input;
+	}
 
 	public BlastResult(String blastDatabaseName) {
 		super();
 		setBlastDatabaseName(blastDatabaseName);
+	}
+
+	/**
+	 * Constructor missing only Subject-Length and the Human Readable
+	 * Description, both of which will be obtained from the original Database in
+	 * FASTA format.
+	 * 
+	 * @param accession
+	 * @param eValue
+	 * @param queryStart
+	 * @param queryEnd
+	 * @param subjectStart
+	 * @param subjectEnd
+	 * @param bitScore
+	 * @param blastDatabaseName
+	 * @param protein
+	 * 
+	 * @return BlastResult
+	 */
+	public BlastResult(String accession, double eValue, int queryStart, int queryEnd, int subjectStart, int subjectEnd,
+			double bitScore, String blastDatabaseName, Protein protein) {
+		super();
+		setAccession(accession);
+		setEValue(eValue);
+		setQueryStart(queryStart);
+		setQueryEnd(queryEnd);
+		setSubjectStart(subjectStart);
+		setSubjectEnd(subjectEnd);
+		setBitScore(bitScore);
+		setBlastDatabaseName(blastDatabaseName);
+		setProtein(protein);
 	}
 
 	public BlastResult(String accession, double eValue, String description, int queryStart, int queryEnd,
@@ -104,29 +157,223 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	/**
-	 * Reads in BlastResults and assigns them to the Proteins in argument
-	 * proteinDb.
+	 * Wraps up two steps:
+	 * <ul>
+	 * <li>Parse tabular Sequence Similarity Search Results</li>
+	 * <li>Extract Human Readable Descriptions (HRDs) and Sequence Lengths from
+	 * Protein Database in FASTA format</li>
+	 * </ul>
 	 * 
-	 * Example code taken from biojava.org.
+	 * @param proteinDb
+	 * @param blastDbName
+	 * @param uniqueShortAccessions
+	 *            - Used only if AHRD is requested to generate Gene Ontology
+	 *            term annotations
+	 * @throws IOException
+	 * @throws MissingProteinException
 	 */
-	public static void parseBlastResults(Map<String, Protein> proteinDb, String blastDbName)
-			throws MissingProteinException, SAXException, IOException {
-		// get the Blast input as a Stream
-		InputStream is = new FileInputStream(getSettings().getPathToBlastResults(blastDbName));
-		// make a BlastLikeSAXParser
-		BlastLikeSAXParser parser = new BlastLikeSAXParser();
-		// try to parse, even if the blast version is not recognized.
-		parser.setModeLazy();
-		// make the SAX event adapter that will pass events to a Handler.
-		SeqSimilarityAdapter adapter = new SeqSimilarityAdapter();
-		// set the parsers SAX event adapter
-		parser.setContentHandler(adapter);
-		// register builder with custom adapter
-		SearchContentHandler scHandler = new BlastSearchContentAdapter(proteinDb, blastDbName);
-		adapter.setSearchContentHandler(scHandler);
-		// parse the file, after this the result List will be populated with
-		// SeqSimilaritySearchResults
-		parser.parse(new InputSource(is));
+	public static void readBlastResults(Map<String, Protein> proteinDb, String blastDbName,
+			Set<String> uniqueAccessions) throws MissingProteinException, IOException {
+		Map<String, List<BlastResult>> brs = parseBlastResults(proteinDb, blastDbName, uniqueAccessions);
+		parseBlastDatabase(proteinDb, blastDbName, brs);
+	}
+
+	/**
+	 * Reads in BlastResults, or any other results from sequence similarity
+	 * searches, and assigns them to the Proteins in argument proteinDb. The
+	 * result file is expected to be in tabular format, that is each line is
+	 * supposed to contain a single High Scoring Pair (HSP). Preferred format is
+	 * 'Blast8' (-m 8).
+	 * 
+	 * @param proteinDb
+	 * @param blastDbName
+	 * @param uniqueShortAccessions
+	 *            - Used only if AHRD is requested to generate Gene Ontology
+	 *            term annotations
+	 * @return Map<String,List<BlastResult>> Set of Hit-Accessions (Key) to the
+	 *         full BlastResult(s) (Value)
+	 * @throws MissingProteinException
+	 * @throws IOException
+	 */
+	public static Map<String, List<BlastResult>> parseBlastResults(Map<String, Protein> proteinDb, String blastDbName,
+			Set<String> uniqueShortAccessions) throws MissingProteinException, IOException {
+		Map<String, List<BlastResult>> brs = new HashMap<String, List<BlastResult>>();
+		BufferedReader fastaIn = null;
+		try {
+			fastaIn = new BufferedReader(new FileReader(getSettings().getPathToBlastResults(blastDbName)));
+			String str;
+			while ((str = fastaIn.readLine()) != null) {
+				// Only evaluate current line, either if there is no
+				// comment-line-regex given, or if it is given AND it does not
+				// match:
+				if (getSettings().getSeqSimSearchTableCommentLineRegex() == null
+						|| !getSettings().getSeqSimSearchTableCommentLineRegex().matcher(str).matches()) {
+					String[] brFields = str.split(getSettings().getSeqSimSearchTableSep());
+					if (!proteinDb.containsKey(brFields[getSettings().getSeqSimSearchTableQueryCol()])) {
+						throw new MissingProteinException("Could not find Protein for Accession '"
+								+ brFields[getSettings().getSeqSimSearchTableQueryCol()] + "' in Protein Database.");
+					} // ELSE
+					BlastResult br = new BlastResult(brFields[getSettings().getSeqSimSearchTableSubjectCol()],
+							Double.parseDouble(validateDouble(brFields[getSettings().getSeqSimSearchTableEValueCol()])),
+							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableQueryStartCol()]),
+							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableQueryEndCol()]),
+							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableSubjectStartCol()]),
+							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableSubjectEndCol()]),
+							Double.parseDouble(brFields[getSettings().getSeqSimSearchTableBitScoreCol()]), blastDbName,
+							proteinDb.get(brFields[getSettings().getSeqSimSearchTableQueryCol()]));
+					addBlastResult(brs, br, uniqueShortAccessions);
+				}
+			}
+		} finally {
+			fastaIn.close();
+		}
+		return brs;
+	}
+
+	/**
+	 * The argument BlastResult is added to the argument Map of BlastResults. If
+	 * a BlastResult of same accession and for the same query protein is already
+	 * present, and the argument BlastResult has a better Bit-Score, it replaces
+	 * the one of worse Bit-Score. If this is a so far not seen BlastResult,
+	 * regarding Hit-Accession and Query-Accession, it will simply be added.
+	 * 
+	 * @param brs
+	 * @param br
+	 * @param uniqueShortAccessions
+	 */
+	public static void addBlastResult(Map<String, List<BlastResult>> brs, BlastResult br,
+			Set<String> uniqueShortAccessions) {
+		if (brs.containsKey(br.getAccession())) {
+			boolean isMultipleHsp = false;
+			List<BlastResult> sameHitBrs = brs.get(br.getAccession());
+			for (BlastResult iterBr : sameHitBrs) {
+				// If and only if there is a BlastResult of same Hit and Query
+				// that also has a better Bit-Score, replace the one of lower
+				// Bit-Score with the higher one:
+				if (iterBr.getProtein().equals(br.getProtein())) {
+					isMultipleHsp = true;
+					if (iterBr.getBitScore() < br.getBitScore()) {
+						sameHitBrs.remove(iterBr);
+						sameHitBrs.add(br);
+					}
+				}
+			}
+			// If this a Hit for another Protein, add it:
+			if (!isMultipleHsp) {
+				sameHitBrs.add(br);
+			}
+
+		} else {
+			// Add a new List<BlastResult> containing the argument BlastResult
+			// br to the argument Map brs:
+			List<BlastResult> sameHitBrs = new ArrayList<BlastResult>();
+			sameHitBrs.add(br);
+			brs.put(br.getAccession(), sameHitBrs);
+		}
+		// Finally, if AHRD is requested to annotate Gene Ontology Terms, we
+		// need to extract all unique short reference protein (BlastResult)
+		// accessions:
+		if (getSettings().hasGeneOntologyAnnotations()) {
+			uniqueShortAccessions.add(br.getShortAccession());
+		}
+	}
+
+	/**
+	 * Adds the sequence length and Human Readable Description (HRD) to all
+	 * matching BlastHits found in the argument Map 'blastResults'. Afterwards
+	 * the respective BlastResult instances are added to their respective
+	 * Proteins. See function <code>generateHRDCandidateForProtein(…)</code> for
+	 * more details.
+	 * 
+	 * @param blastResults
+	 * @param fastaAccession
+	 * @param hitAALength
+	 * @param hrd
+	 */
+	public static void fastaEntryValuesForBlastHit(Map<String, List<BlastResult>> blastResults, String fastaAccession,
+			Integer hitAALength, String hrd) {
+		for (BlastResult br : blastResults.get(fastaAccession)) {
+			br.setSubjectLength(hitAALength);
+			br.setDescription(hrd);
+			br.generateHRDCandidateForProtein();
+		}
+	}
+
+	/**
+	 * Extracts from the provided protein database in FASTA format the length
+	 * and human readable descriptions of those Proteins that are Hits
+	 * (Subjects) in the argument blastResults. Each time such a Hit is found
+	 * the mentioned measurements are set in the respective instance of
+	 * BlastResult and subsequently the method 'Protein.addBlastResult(…)' is
+	 * invoked.
+	 * 
+	 * @param proteinDb
+	 * @param blastDbName
+	 * @param blastResults
+	 * @throws IOException
+	 */
+	public static void parseBlastDatabase(Map<String, Protein> proteinDb, String blastDbName,
+			Map<String, List<BlastResult>> blastResults) throws IOException {
+		// Parse line by line FASTA Blast search DB. Extract Subject Lengths and
+		// Subject HRDs.
+		BufferedReader fastaIn = null;
+		try {
+			fastaIn = new BufferedReader(new FileReader(getSettings().getPathToBlastDatabase(blastDbName)));
+			String str, hrd = new String();
+			String acc = "";
+			Integer hitAALength = new Integer(0);
+			boolean hit = false;
+			while ((str = fastaIn.readLine()) != null) {
+				if (str.startsWith(">")) {
+					// Finished reading in the original Fasta-Entry of a
+					// Blast-Hit? If so, process it:
+					if (hit) {
+						fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
+						// Clean up to enable processing the next Hit
+						hitAALength = new Integer(0);
+						// Note, that the boolean 'hit' will be set in the
+						// following If-Else-Block.
+
+					}
+
+					// Process the current Fasta-Header-Line:
+					Matcher m = getSettings().getFastaHeaderRegex(blastDbName).matcher(str);
+					if (!m.matches()) {
+						// Provided REGEX to parse FASTA header does not work in
+						// this case:
+						System.err.println("WARNING: FASTA header line\n" + str.trim()
+								+ "\ndoes not match provided regular expression\n"
+								+ getSettings().getFastaHeaderRegex(blastDbName).toString()
+								+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
+								+ "To fix this, please use - Bast database specific - parameter "
+								+ Settings.FASTA_HEADER_REGEX_KEY
+								+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
+								+ blastDbName + "'.");
+					} else if (blastResults.containsKey(m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
+						// Found the next Blast HIT:
+						acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim();
+						hrd = m.group(FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME).trim();
+						// Following lines, until the next header, contain
+						// information to be collected:
+						hit = true;
+					} else {
+						// Found a Protein in the FASTA database, that is of no
+						// relevance within this context:
+						hit = false;
+					}
+				} else if (hit) {
+					// Process non header-line, if and only if, we are reading
+					// the sequence of a Blast-Hit:
+					hitAALength += str.trim().length();
+				}
+			}
+			// Was the last read FASTA entry a Blast-Hit? If so, it needs
+			// processing:
+			if (hit)
+				fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
+		} finally {
+			fastaIn.close();
+		}
 	}
 
 	public static List<BlastResult> filterBestScoringBlastResults(List<BlastResult> blastResults, int howMany) {
@@ -161,9 +408,33 @@ public class BlastResult implements Comparable<BlastResult> {
 		List<String> tknBlackList = getSettings().getTokenBlackList(getBlastDatabaseName());
 		for (String tokenCandidate : new HashSet<String>(Arrays.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
 			tokenCandidate = tokenCandidate.toLowerCase();
-			if (passesBlacklist(tokenCandidate, tknBlackList))
+			if (tokenPassesBlacklist(tokenCandidate, tknBlackList))
 				getTokens().add(tokenCandidate);
 		}
+	}
+
+	public boolean passesBlacklist(String blastResultDescriptionLine) {
+		boolean passesBlacklist = (blastResultDescriptionLine != null && !blastResultDescriptionLine.equals(""));
+		for (Iterator<String> i = getSettings().getBlastResultsBlackList(getBlastDatabaseName()).iterator(); (i
+				.hasNext() && passesBlacklist);) {
+			Pattern p = Pattern.compile(i.next());
+			Matcher m = p.matcher(blastResultDescriptionLine);
+			passesBlacklist = !m.find();
+		}
+		return passesBlacklist;
+	}
+
+	public String filter(String blastResultDescriptionLine) {
+		String filteredDescLine = blastResultDescriptionLine;
+		for (Iterator<String> i = getSettings().getBlastResultsFilter(getBlastDatabaseName()).iterator(); i
+				.hasNext();) {
+			Pattern p = Pattern.compile(i.next());
+			// Replace with whitespace, so word-boundaries are kept up
+			filteredDescLine = p.matcher(filteredDescLine).replaceAll(" ");
+		}
+		// Condense multiple whitespaces into one and trim the description-line:
+		filteredDescLine = filteredDescLine.replaceAll("\\s{2,}", " ").trim();
+		return filteredDescLine;
 	}
 
 	/**
@@ -186,6 +457,7 @@ public class BlastResult implements Comparable<BlastResult> {
 				&& getQueryStart() != null && (getQueryStart() < getQueryEnd()) && getSubjectEnd() != null
 				&& getSubjectStart() != null && (getSubjectEnd() > getSubjectStart()) && getSubjectLength() != null
 				&& getEValue() != null && getTokens() != null && getTokens().size() > 0
+				&& getBlastDatabaseName() != null
 				&& getSettings().getBlastDatabases().contains(getBlastDatabaseName()));
 	}
 
@@ -206,6 +478,69 @@ public class BlastResult implements Comparable<BlastResult> {
 		return new BlastResult(new String(this.getAccession()), new Double(eValue), new String(description),
 				new Integer(queryStart), new Integer(queryEnd), new Integer(subjectStart), new Integer(subjectEnd),
 				new Integer(subjectLength), new Double(bitScore), new String(blastDatabaseName));
+	}
+
+	/**
+	 * Investigates this instance's properties, especially the Description. If
+	 * the instance is valid and its description passes the Blacklist, it will
+	 * be added as a candidate HRD to the respective query Protein's
+	 * BlastResults.
+	 */
+	public void generateHRDCandidateForProtein() {
+		// For Training-Purposes:
+		if (getSettings().getWriteBestBlastHitsToOutput()) {
+			// Of course we do have to treat this best-blast-hit
+			// differently than the further to process one below, so
+			// clone:
+			BlastResult theClone = clone();
+			// Pass best Blast-Hit's Description through filter:
+			theClone.setDescription(filter(theClone.getDescription()));
+			// Tokenize without filtering tokens through the Blacklist:
+			theClone.setTokens(tokenizeDescription(theClone.getDescription()));
+			getProtein().getEvaluationScoreCalculator().addUnchangedBlastResult(getBlastDatabaseName(), theClone);
+		}
+		if (passesBlacklist(getDescription())) {
+			// Pass bestScoringHSP through filter:
+			setDescription(filter(getDescription()));
+			// Tokenize the filtered Description-Line:
+			tokenize();
+			// Pass bestScoringHSP through Blacklist and add it, if it
+			// is still valid:
+			if (isValid()) {
+				// Generate the pattern of the Description's unique
+				// tokens:
+				patternize();
+				// Adds the BlastResult to the getProtein()'s set and
+				// measures the cumulative and total scores later needed
+				// to calculate the Token-Scores:
+				getProtein().addBlastResult(this);
+			}
+		}
+	}
+
+	/**
+	 * Extracts from the possibly longer Accession the shorter one which is used
+	 * in the reference Gene Ontology Annotation (GOA) file. This is required
+	 * due to the fact that UniprotKB uses short accessions in the GOA files but
+	 * provides long accessions in the Blast Databases. A very unfortunate lack
+	 * of standardization, indeed!
+	 * 
+	 * @return String
+	 */
+	public String getShortAccession() {
+		if (shortAccession == null) {
+			Pattern p = getSettings().getShortAccessionRegex(getBlastDatabaseName());
+			Matcher m = p.matcher(getAccession());
+			shortAccession = getAccession();
+			if (!m.find()) {
+				System.err.println("WARNING: Regular Expression '" + p.toString()
+						+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '" + getAccession()
+						+ "' - continuing with the original accession. This might lead to unrecognized reference GO annotations!");
+			} else {
+				shortAccession = m.group(SHORT_ACCESSION_GROUP_NAME);
+			}
+		}
+		return (shortAccession);
 	}
 
 	public String getAccession() {
@@ -321,4 +656,13 @@ public class BlastResult implements Comparable<BlastResult> {
 	public void setSubjectLength(Integer subjectLength) {
 		this.subjectLength = subjectLength;
 	}
+
+	public Protein getProtein() {
+		return protein;
+	}
+
+	public void setProtein(Protein protein) {
+		this.protein = protein;
+	}
+
 }

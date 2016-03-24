@@ -76,6 +76,15 @@ public class BatcherTest {
 				sprotBlastDb.get(Settings.TOKEN_BLACKLIST_KEY));
 		assertEquals("./test/resources/sprot_blast_results/batch001.pairwise",
 				sprotBlastDb.get(Settings.BLAST_RESULT_FILE_KEY));
+		assertEquals("./test/resources/swissprot_blast_db.fasta",
+				sprotBlastDb.get(Settings.BLAST_DATABASE_KEY));
+		// Verify, that optional FASTA_HEADER_REGEX parameters are also passed
+		// on:
+		assertEquals(
+				"^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$",
+				((Map<String, String>) ((Map<String, Object>) batchYml
+						.get(Settings.BLAST_DBS_KEY)).get("tair"))
+						.get(Settings.FASTA_HEADER_REGEX_KEY));
 		// Interpro:
 		assertEquals("./test/resources/interpro_31.xml",
 				batchYml.get(Settings.INTERPRO_DATABASE_KEY).toString());

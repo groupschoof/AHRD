@@ -11,6 +11,7 @@ token_score_overlap_score_weight: 0.2
 blast_dbs:
   swissprot:
     dir: /projects/irg/grp_pcb/projects/ITAG/pipe001/release2_3/release2_3/blast/sprot_pairwise/
+    database: ./test/resources/swissprot_blast_db.fasta
     weight: 100
     blacklist: ./solyc_test_run/input/filter_blacklists/blacklist_descline.txt
     filter: ./solyc_test_run/input/filter_blacklists/filter_descline_sprot.txt
@@ -19,6 +20,8 @@ blast_dbs:
 
   tair:
     dir: /projects/irg/grp_pcb/projects/ITAG/pipe001/release2_3/release2_3/blast/tair_pairwise/
+    database: ./test/resources/tair_blast_db.fasta
+    fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
     weight: 50
     blacklist: ./solyc_test_run/input/filter_blacklists/blacklist_descline.txt
     filter: ./solyc_test_run/input/filter_blacklists/filter_descline_tair.txt
@@ -27,6 +30,7 @@ blast_dbs:
 
   trembl:
     dir: /projects/irg/grp_pcb/projects/ITAG/pipe001/release2_3/release2_3/blast/trembl_pairwise/
+    database: ./test/resources/trembl_blast_db.fasta
     weight: 10
     blacklist: ./solyc_test_run/input/filter_blacklists/blacklist_descline.txt
     filter: ./solyc_test_run/input/filter_blacklists/filter_descline_trembl.txt

@@ -12,7 +12,7 @@ public class DescriptionScoreCalculator {
 	private double maxBitScore = 0.0;
 	private BlastResult highestScoringBlastResult;
 	private Double descriptionHighScore;
-	
+
 	public DescriptionScoreCalculator(Protein protein) {
 		super();
 		setProtein(protein);
@@ -26,15 +26,13 @@ public class DescriptionScoreCalculator {
 		BlastResult bestScoringBr = null;
 		Map<Double, BlastResult> scoreRanking = new HashMap<Double, BlastResult>();
 		for (String blastDb : getProtein().getBlastResults().keySet()) {
-			for (BlastResult iterBlastResult : getProtein().getBlastResults()
-					.get(blastDb)) {
-				getProtein().getDescriptionScoreCalculator()
-						.calcDescriptionScore(iterBlastResult);
+			for (BlastResult iterBlastResult : getProtein().getBlastResults().get(blastDb)) {
+				getProtein().getDescriptionScoreCalculator().calcDescriptionScore(iterBlastResult);
 				// Only take Description-Lines into account
 				// that have at least a single non-blacklisted Token:
-				if (iterBlastResult.getTokens().size() > 0)
-					scoreRanking.put(iterBlastResult.getDescriptionScore(),
-							iterBlastResult);
+				if (iterBlastResult.getTokens().size() > 0) {
+					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
+				}
 			}
 		}
 		if (scoreRanking.size() > 0) {
@@ -45,15 +43,13 @@ public class DescriptionScoreCalculator {
 	}
 
 	public void calcDescriptionScore(BlastResult blastResult) {
-		blastResult.setDescriptionScore(getProtein()
-				.getLexicalScoreCalculator().lexicalScore(blastResult)
-				+ relativeBlastScore(blastResult));
+		blastResult.setDescriptionScore(
+				getProtein().getLexicalScoreCalculator().lexicalScore(blastResult) + relativeBlastScore(blastResult));
 	}
 
 	public double relativeBlastScore(BlastResult br) {
-		return getSettings().getDescriptionScoreBitScoreWeight(
-				br.getBlastDatabaseName())
-				* br.getBitScore() / getMaxBitScore();
+		return getSettings().getDescriptionScoreBitScoreWeight(br.getBlastDatabaseName()) * br.getBitScore()
+				/ getMaxBitScore();
 	}
 
 	public void measureMaxBitScore(double bitScore) {
@@ -103,8 +99,7 @@ public class DescriptionScoreCalculator {
 		return highestScoringBlastResult;
 	}
 
-	public void setHighestScoringBlastResult(
-			BlastResult highestScoringBlastResult) {
+	public void setHighestScoringBlastResult(BlastResult highestScoringBlastResult) {
 		this.highestScoringBlastResult = highestScoringBlastResult;
 	}
 

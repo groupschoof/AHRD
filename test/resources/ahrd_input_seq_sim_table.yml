@@ -31,6 +31,7 @@ blast_dbs:
 
 interpro_database: ./test/resources/interpro_31.xml
 interpro_result: ./test/resources/interpro_result.raw
+gene_ontology_result: ./test/resources/go_results.csv
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
@@ -41,3 +42,13 @@ output: ./ahrd_output.csv
 references_fasta: ./test/resources/references.fasta
 blast2go: ./test/resources/blast2go_out.annot
 remember_simulated_annealing_path: true
+seq_sim_search_table_comment_line_regex: "#"
+seq_sim_search_table_sep: "\t"
+seq_sim_search_table_query_col: 10
+seq_sim_search_table_subject_col: 11
+seq_sim_search_table_query_start_col: 16
+seq_sim_search_table_query_end_col: 17
+seq_sim_search_table_subject_start_col: 18
+seq_sim_search_table_subject_end_col: 19
+seq_sim_search_table_e_value_col: 20
+seq_sim_search_table_bit_score_col: 21

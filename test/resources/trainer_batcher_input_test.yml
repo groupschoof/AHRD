@@ -12,17 +12,17 @@ find_highest_possible_evaluation_score: true
 output_dir: ./test/resources/
 blast_dbs:
   swissprot:
-    file: ./test/resources/swissprot.pairwise
+    file: ./test/resources/swissprot_blast8_tabular.txt
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_sprot.txt
     token_blacklist: ./test/resources/blacklist_token.txt
   tair:
-    file: ./test/resources/tair.pairwise
+    file: ./test/resources/tair_blast8_tabular.txt
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_tair.txt
     token_blacklist: ./test/resources/blacklist_token.txt
   trembl:
-    file: ./test/resources/trembl.pairwise
+    file: ./test/resources/trembl_blast8_tabular.txt
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_trembl.txt
     token_blacklist: ./test/resources/blacklist_token.txt

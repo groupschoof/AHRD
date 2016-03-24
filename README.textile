@@ -18,7 +18,7 @@ h2. 1 Getting started
 
 h3. 1.1 Requirements
 
-AHRD is a Java-Program which requires Java 1.5 or higher and ant.
+AHRD is a Java-Program which requires Java 1.7 or higher and ant.
 
 
 h3. 1.2 Installation
@@ -27,14 +27,11 @@ h4. 1.2.1 Get AHRD
 
 Copy (clone) AHRD to your computer using git via command-line:
 <pre>git clone git://github.com/groupschoof/AHRD.git
-git checkout tags/2.1-stable</pre>
+git checkout tags/v3.1</pre>
 
 h4. 1.2.2 Build the executable jar
 
 Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
-
-An executable jar (Java 1.6 compiled) of the paper release version can also be downloaded here:
-https://www3.uni-bonn.de/cropbio/tools-and-databases
 
 h2. 2 Usage
 
@@ -56,17 +53,21 @@ Parameters).
 
 In order to parallelize the protein function annotation processes,  
 AHRD can be run on batches of recommended size between 1,000 to 2,000 proteins. 
-If you want to annotate large protein sets use the included Batcher to split your
-input-data into Batches of appropriate size (see section Batcher). 
-As of Java 7 or higher AHRD is quite fast and batching might no longer be necessary.
+If you want to annotate very large protein sets or have low memory capacities 
+use the included Batcher to split your input-data into Batches of appropriate size 
+(see section Batcher). _Note:_ As of Java 7 or higher AHRD is quite fast and batching might 
+no longer be necessary.
 
-h3. 2.1 AHRD Example run
+h3. 2.1 AHRD example usages:
 
-<pre>java -Xmx2g -jar ./dist/ahrd.jar ahrd_example_input.yml </pre>
+There are _three_ template AHRD input files provided that you should use according to your use case. All example input files are stored in @./test/resources@ and are named @ahrd_example_input*.yml@. You can run AHRD on any of these use cases with <pre>java -Xmx2g -jar ./dist/ahrd.jar your_use_case_file.yml</pre>
 
-or just execute
+| *Use Case* | *Template File* |
+| Annotate your Query proteins with Human Readable Descriptions (HRD) | @./test/resources/ahrd_example_input.yml@ |
+| Annotate your Query proteins with HRD _and_ Gene Ontology (GO) terms | @./test/resources/ahrd_example_input_go_prediction.yml@ |
+| Annotate your Query proteins with HRD, GO terms, _and_ generate an extended GO annotation table | @./test/resources/ahrd_example_input_go_prediction_extended.yml@ |
 
-<pre>ant test.run </pre>
+_Note_: For details on extended GO annotation tables please refer to section 3.3.3.2 
 
 h3. 2.2 Input
 
@@ -75,29 +76,22 @@ Example files for all input files can be found under ./test/resources/
 h4. 2.2.1 Required input data
 
 # Protein sequences in fasta format
-# BLAST seach results in pairwise format for protein sequences
+# Sequence Similarity Search (@blastp@ or @blat@) results in tabular format
 
 (If you run AHRD in batches the blast search results need to be batched in the same way as the fasta files.)
 
-Recommended BLAST-Search:
+Recommended Sequence Similarity Search:
 
 For your query proteins you should start independent BLAST searches e.g.
 in the three different databases mentioned above:
 
 <pre>
-blastall -p blastp -i proteins.fasta -o swissprot_blastout.pairwise -d swissprot.fasta -e 0.0001 -v 200 -b 200 -m 0
+blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -out query_vs_swissprot.txt
 </pre>
-
-_Note_ We are currently working on extending AHRD to parse Blast+ output. As of now, legacy blast is still a requirement.
 
 h4. 2.2.2 Optional input data
 
-AHRD optionally considers other protein function annotations. Formerly this was requested in genome projects [1]. We do _not_ recommend their use any more, due to AHRD's excellent performance without this protein function information.
-
-# Domain search results from InterProScan in raw format
-# Gene ontology annotations in csv format
-
-In case InterProScan results are given as input, AHRD needs the Interpro database XML- and dtd-file.
+If you want AHRD to predict your query protein's functions with Gene Ontology (GO) terms, you need to provide the GO annotations of reference proteins. See section 3.3.3 for more details.
 
 h4. 2.2.3 Required config files
 
@@ -126,7 +120,7 @@ The above example demonstrates how the first regular expression does not match a
 
 h3. 2.3 Batcher
 
-AHRD provides a function to generate several input.yml files from large datasets, consisting of _batches_ of query proteins. For each of these batches the user is expected to provide the batch's query proteins in FASTA format, and one Blast result file for each database searched. The AHRD batcher will then generate a unique input.yml file and entry in a batch shell script to execute AHRD on the respective batches in parallel for example on a compute cluster using a batch-system like LSF. We recommend this for genome scale datasets.
+AHRD provides a function to generate several input.yml files from large datasets, consisting of _batches_ of query proteins. For each of these batches the user is expected to provide the batch's query proteins in FASTA format, and one Blast result file for each database searched. The AHRD batcher will then generate a unique input.yml file and entry in a batch shell script to execute AHRD on the respective batches in parallel for example on a compute cluster using a batch-system like LSF. We recommend this for very large datasets (more than a genome) or computers with low RAM.
 
 To generate the mentioned input.yml files and batcher shell script that can subsequently be used to start AHRD in parallel use the batcher function as follows:
 <pre>java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./batcher_input_example.yml</pre>
@@ -156,9 +150,9 @@ AHRD writes out a CSV table with the following columns:
 # AHRD-Quality-Code -- explained below
 # Human-Readable-Description -- The assigned HRD
 # Interpro-ID (Description) -- If AHRD was started with InterProScan-Results, they are appended here.
-# Gene-Ontology-ID (Name) -- If AHRD was started with Gene-Ontology-Annotations, they are appended here.
+# Gene-Ontology-ID -- If AHRD was requested to generate Gene-Ontology-Annotations, they are appended here.
 
-AHRD's quality-code consists of a four character string, where each character
+AHRD's quality-code consists of a three character string, where each character
 is either <strong>'*'</strong> if the respective criteria is met or *'-'*
 otherwise. Their meaning is explained in the following table:
 
@@ -166,7 +160,6 @@ otherwise. Their meaning is explained in the following table:
 | 1 | Bit score of the blast result is >50 and e-value is <e-10 |
 | 2 | Overlap of the blast result is >60% |
 | 3 | Top token score of assigned HRD is >0.5 |
-| 4 | Gene ontology terms found in description line |
 
 h4. 2.4.2 Fasta-Format
 
@@ -202,7 +195,7 @@ token_score_overlap_score_weight: 0.0</pre>
 h2. 3 Algorithm
 
 Based on e-values the 200 best scoring blast results are chosen from each
-database-search (e.g. Swissprot, TAIR, trEMBL). For all 600 resulting candidate
+database-search (e.g. Swissprot, TAIR, trEMBL). For all resulting candidate
 description lines a score is calculated using a lexical approach. First each
 description line is passed through two regular expression filters. The first
 filter discards any matching description line in order to ignore descriptions
@@ -236,7 +229,7 @@ reflects the significance of the assigned human readable description.
 
 h3. 3.1 Pseudo-Code
 
-# Choose 600 best scoring blast results
+# Choose best scoring blast results, 200 from each database searched
 # Filter description lines of above blast-results using regular expressions:
 ## Reject those matched by any regex given in e.g. ./test/resources/blacklist_descline.txt,
 ## Delete those parts of each description line, matching any regex in e.g. ./test/resources/filter_descline_sprot.txt. 
@@ -259,19 +252,85 @@ These parameters can either be used as provided or can be adapted to your needs.
 
 h4. 3.3.1 The weights in formula Token-Score are
 
-<pre>token_score_bit_score_weight: 0.5
-token_score_database_score_weight: 0.3
-token_score_overlap_score_weight: 0.2 </pre>
-and Blast-Database specific:
-<pre>weight: 100 </pre>
+<pre>token_score_bit_score_weight: 0.468
+token_score_database_score_weight: 0.2098
+token_score_overlap_score_weight: 0.3221 </pre>
+and Blast-Database specific, for example for UniprotKB/Swissprot:
+<pre>weight:  653</pre>
+<pre>description_score_bit_score_weight: 2.717061 </pre>
 
-h4. 3.3.2 The weight in formula Description-Score also is Blast-database specific
+h4. 3.3.2 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)
 
-<pre>description_score_bit_score_weight: 0.2 </pre>
+AHRD has been designed to work with tabular sequence similarity search results in tabular format. By default it parses the tabular "Blast 8" output:
+
+| Sequence Similarity Search Tool | recommended output format (@command line switch@) |
+| Blast+ | @-outfmt 6@ |
+| legacy Blast | @-m 8@ |
+| Blat | @-out=blast8@ |
+
+The following paramters can be set optionally, if your tabular sequence similarity search result deviates from the above "Blast 8" format. See example file @./test/resources/ahrd_input_seq_sim_table.yml@ for more details.
+
+| Optional Parameter | example | meaning of parameter |
+| seq_sim_search_table_comment_line_regex | @"#"@ | single character that starts a to be ignored comment line |
+| seq_sim_search_table_sep | @"\t"@ | single character that separates columns |
+| seq_sim_search_table_query_col | @10@ | number of column holding the query protein's accession |
+| seq_sim_search_table_subject_col | @11@ | number of column holding the Hit protein's accession |
+| seq_sim_search_table_query_start_col | @16@ | number of column holding the query's start amino acid position in the local alignment |
+| seq_sim_search_table_query_end_col | @17@ | number of column holding the query's end amino acid position in the local alignment |
+| seq_sim_search_table_subject_start_col | @18@ | number of column holding the Hit's start amino acid position in the local alignment |
+| seq_sim_search_table_subject_end_col | @19@ | number of column holding the Hit's end amino acid position in the local alignment |
+| seq_sim_search_table_e_value_col | @20@ | number of column holding the Hit's E-Value |
+| seq_sim_search_table_bit_score_col | @21@ | number of column holding the Hit's Bit-Score |
+
+_NOTE:_ All above column numbers start counting with zero, i.e. the first column has number 0.
+
+h4. 3.3.3 Parameters controlling Gene Ontology term annotations
+
+AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @gene_association.goa_uniprot.gz@ (last visit March 24th 2015)
+
+To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter @gene_ontology_result@. See example file @./test/resources/ahrd_input_seq_sim_table_go_prediction.yml@ for more details.
+
+h5. 3.3.3.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
+
+Unfortunately UniprotKB GOA files use short protein accessions like @W9QFR0@, while the UniprotKB FASTA databases use the long protein accessions with pipes like this @tr|W9QFR0|W9QFR0_9ROSA@. In order to enable AHRD to match the correct short and long accessions, and thus the reference GO annotations it uses regular expressions to parse both the long accessions and the GOA files. By default AHRD is setup to hanlde Uniprot formats, but you can provide custom regular expressions for your own custom GOA files:
+
+# Set the regular expression to extract short protein accessions mapped to GO terms from the reference GOA using @reference_go_regex@, e.g. @reference_go_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})@
+# Set the Blast database specific regular expression, used to extract the short accessions from logn ones with @short_accession_regex:@ For example for TAIR10, use @short_accession_regex: "^(?<shortAccession>.+)$"@.
+
+_Note:_ You must provide the above named match groups @shortAccession@ and @goTerm@, respectively.
+
+h5. 3.3.3.2 Have AHRD extend predicted GO terms with semantically included GO terms
+
+The Gene Ontology is organised in a graph. GO terms can have ancestors of three different relationship types: "is_a", "kind_of", and "part_of". Because with increasing depth GO terms are more precise and accurate descriptions ancestal terms are semantically included. If you choose AHRD can annotate your proteins with all GO terms ancestral to the ones it already has selected. This option will write a second TAB-delimited output file with four columns:
+
+1. Protein accession
+2. GO term accession, e.g. @GO:0070887@
+3. GO ontology - one of @Biological Process@, @Cellular Component@, or @Molecular Function@
+4. GO name, e.g. @cellular response to chemical stimulus@
+
+_Note_: Choosing this option will also provide you with a more detailled GO annotation, because it includes the GO term names and ontologies and not only their accessions. Also note, that AHRD needs access to an instance of the Gene Ontology MySQL database. By default it will use the instance provided by the European Bioinformatics Institute (EBI). See next section for more details.
+
+To have AHRD generate this extended GO annotation table, just provide an output path to it in your @input.yml@:
+
+<pre>extended_go_result_table: ./ahrd_extended_go_table.tsv
+</pre>
+
+h6. 3.3.3.2.1 Custom Gene Ontology Database
+
+As mentioned above AHRD needs an instance of the Gene Ontology MySQL database, if you want it to generate an extended GO annotation table. Instead of using the default public database provided by the EBI, you can set the connection parameters to your own database:
+
+<pre>go_db_url: jdbc:mysql://mysql.ebi.ac.uk:4085/go_latest
+go_db_user: go_select
+go_db_password: amigo
+</pre>
+
+_Note_, that the values above are the default parameters, connecting to the EBI's instance of the GO MySQL database.
 
 h2. 4 Testing
 
 If you want to run the complete JUnit Test-Suite execute: <pre>ant</pre>
+
+If you want to execute a test run on example proteins use: <pre>ant test.run</pre>
 
 h2. 5 License
 
@@ -279,7 +338,7 @@ See attached file LICENSE.txt for details.
 
 h2. 6 Authors
 
-Asis Hallab, Kathrin Klee, Sri Girish, and Prof. Dr. Heiko Schoof
+Dr. Asis Hallab, Kathrin Klee, Florian Boecker, Sri Girish, and Prof. Dr. Heiko Schoof
 
 INRES Crop Bioinformatics
 University of Bonn
@@ -289,4 +348,19 @@ Germany
 
 h2. References
 
+High quality genomes that have been annotated with AHRD:
+
 fn1. Young, Nevin D., Frédéric Debellé, Giles E. D. Oldroyd, Rene Geurts, Steven B. Cannon, Michael K. Udvardi, Vagner A. Benedito, et al. “The Medicago Genome Provides Insight into the Evolution of Rhizobial Symbioses.” Nature 480, no. 7378 (December 22, 2011): 520–24. doi:10.1038/nature10625.
+
+fn2. The Tomato Genome Consortium. “The Tomato Genome Sequence Provides Insights into Fleshy Fruit Evolution.” Nature 485, no. 7400 (May 31, 2012): 635–41. doi:10.1038/nature11119.
+
+fn3. International Wheat Genome Sequencing Consortium (IWGSC). “A Chromosome-Based Draft Sequence of the Hexaploid Bread Wheat (Triticum Aestivum) Genome.” Science (New York, N.Y.) 345, no. 6194 (July 18, 2014): 1251788. doi:10.1126/science.1251788.
+
+fn4. International Barley Genome Sequencing Consortium, Klaus F. X. Mayer, Robbie Waugh, John W. S. Brown, Alan Schulman, Peter Langridge, Matthias Platzer, et al. “A Physical, Genetic and Functional Sequence Assembly of the Barley Genome.” Nature 491, no. 7426 (November 29, 2012): 711–16. doi:10.1038/nature11543.
+
+fn5. Wang, W., G. Haberer, H. Gundlach, C. Gläßer, T. Nussbaumer, M. C. Luo, A. Lomsadze, et al. “The Spirodela Polyrhiza Genome Reveals Insights into Its Neotenous Reduction Fast Growth and Aquatic Lifestyle.” Nature Communications 5 (2014): 3311. doi:10.1038/ncomms4311.
+
+AHRD was applied on all plant genomes present in the public database *PlantsDB*:
+
+fn6. Spannagl, Manuel, Thomas Nussbaumer, Kai C. Bader, Mihaela M. Martis, Michael Seidel, Karl G. Kugler, Heidrun Gundlach, and Klaus F. X. Mayer. “PGSB PlantsDB: Updates to the Database Framework for Comparative Plant Genome Research.” Nucleic Acids Research 44, no. D1 (January 4, 2016): D1141–47. doi:10.1093/nar/gkv1130.
+

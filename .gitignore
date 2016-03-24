@@ -1,5 +1,6 @@
 # Ignore everything in directory ./classes 
 classes/**/*
+.settings
 
 # Ignore Batcher-Tests:
 start_ahrd_batched.sh
@@ -21,3 +22,12 @@ ahrd_evaluator_output.csv
 
 # Ignore junit file generated, when JUnit is interrupted with Ctrl-C
 junitvmwatcher*
+
+# Ignore output files from formatting Blast Databases:
+*.phr
+*.pin
+*.psq
+
+# Ignore test output files
+ahrd_extended_go_table.tsv
+ahrd_output.csv

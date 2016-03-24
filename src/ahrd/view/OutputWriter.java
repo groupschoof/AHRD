@@ -30,7 +30,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		// Column-Names:
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
-		bw.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-ID (Name)");
+		bw.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-Term");
 
 		if (getSettings().isInTrainingMode()) {
 			bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
@@ -42,7 +42,7 @@ public class OutputWriter extends AbstractOutputWriter {
 			bw.write("\t\"Tokens (tkn->score)\"");
 		}
 		if (getSettings().getWriteScoresToOutput()) {
-			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tGO-Score\tLexical-Score\tRelativeBitScore");
+			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tLexical-Score\tRelativeBitScore");
 		}
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
@@ -229,9 +229,6 @@ public class OutputWriter extends AbstractOutputWriter {
 			csvCells += "\t"
 					+ FRMT.format(prot.getLexicalScoreCalculator()
 							.correctionFactor(hsbr));
-			csvCells += "\t"
-					+ FRMT.format(prot.getLexicalScoreCalculator()
-							.geneOntologyScore(hsbr));
 			csvCells += "\t"
 					+ FRMT.format(prot.getLexicalScoreCalculator()
 							.lexicalScore(hsbr));

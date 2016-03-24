@@ -1,6 +1,5 @@
 package ahrd.model;
 
-import java.util.regex.Pattern;
 
 public class LexicalScoreCalculator {
 
@@ -11,12 +10,12 @@ public class LexicalScoreCalculator {
 	}
 
 	public double sumTokenScoresDividebByHighScore(BlastResult br) {
-		TokenScoreCalculator tsc = getProtein().getTokenScoreCalculator();		
+		TokenScoreCalculator tsc = getProtein().getTokenScoreCalculator();
 		return tsc.sumOfAllTokenScores(br) / tsc.getTokenHighScore();
 	}
 
 	public double lexicalScore(BlastResult br) {
-		return ((sumTokenScoresDividebByHighScore(br) / correctionFactor(br) + geneOntologyScore(br)));
+		return ((sumTokenScoresDividebByHighScore(br) / correctionFactor(br)));
 	}
 
 	/**
@@ -31,24 +30,6 @@ public class LexicalScoreCalculator {
 				noInformativeTokens += 1.0;
 		}
 		return (new Double(br.getTokens().size()).doubleValue() / noInformativeTokens);
-	}
-
-	/**
-	 * For each blastResult's token find GeneOntologyResults, where the token
-	 * appears in the GO's name. Return the sum of those GeneOntologyResults'
-	 * probabilities as geneOntologyScore.
-	 */
-	public double geneOntologyScore(BlastResult blastResult) {
-		double goScore = 0.0;
-		for (String token : blastResult.getTokens()) {
-			for (GeneOntologyResult goResult : getProtein().getGoResults()) {
-				Pattern p = Pattern.compile(Pattern.quote(token),
-						Pattern.CASE_INSENSITIVE);
-				if (p.matcher(goResult.getName()).find())
-					goScore += goResult.getProbability();
-			}
-		}
-		return goScore;
 	}
 
 	public Protein getProtein() {
