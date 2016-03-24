@@ -26,7 +26,7 @@ h3. 1.2 Installation
 h4. 1.2.1 Get AHRD
 
 Copy (clone) AHRD to your computer using git via command-line:
-<pre>git clone git://github.com/groupschoof/AHRD.git
+<pre>git clone https://github.com/groupschoof/AHRD.git
 git checkout tags/v3.11</pre>
 
 h4. 1.2.2 Build the executable jar
