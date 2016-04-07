@@ -395,7 +395,7 @@ See attached file LICENSE.txt for details.
 
 h2. 6 Authors
 
-Dr. Asis Hallab, Kathrin Klee, Florian Boecker, Sri Girish, and Prof. Dr. Heiko Schoof
+Dr. Asis Hallab, Kathrin Klee, Florian Boecker, Dr. Sri Girish, and Prof. Dr. Heiko Schoof
 
 INRES Crop Bioinformatics
 University of Bonn
