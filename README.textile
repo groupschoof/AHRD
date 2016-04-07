@@ -192,6 +192,20 @@ resulting parameter configuration could look like this:
 token_score_database_score_weight: 0.4
 token_score_overlap_score_weight: 0.0</pre>
 
+h3. 2.6 Parameter Optimization
+
+If you have well annotated reference proteins from an organism closely realted to the proteins you want to annotate, you can optimize AHRD's parameters to reproduce protein function predictions more alike to your references. In order to do so you need to start a simulated annealing approach:
+
+<pre>java -cp dist/ahrd.jar ahrd.controller.Trainer trainer_example_input.yml</pre>
+
+_Note:_ See @./test/resources/trainer_example_input.yml@ for details.
+
+Basically the input file is almost identical to the standard AHRD run. Only the following additional parameters are available:
+
+| Parameter | required? | Description |
+| @path_log: your_log_file.tsv@ | no | Stores the parameters evaluated in any optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set. |
+
+
 h2. 3 Algorithm
 
 Based on e-values the 200 best scoring blast results are chosen from each
