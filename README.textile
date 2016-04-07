@@ -202,15 +202,14 @@ _Note:_ See @./test/resources/trainer_example_input.yml@ for details.
 
 Basically the input file is almost identical to the standard AHRD run. Only the following additional parameters are available; all numeric values given show the _default_ used for the respective parameter:
 
-| Parameter | Description |
-| @references_fasta: path_to_your_references.fasta@ | _Required_ parameter pointing to the fasta formatted file containing the reference proteins _including_ the reference Human Readable Descriptions. (See @./test/resources/references.fasta@ for details.) |
-| @path_log: your_log_file.tsv@ | Stores the parameters evaluated in any optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set. |
-| @temperature: 75000@ | Temperature used in _simulated annealing_ |
-| @cool_down_by: 1@ | Dimish temperature by this value after each simulated annealing iteration |
-| @optimization_acceptance_probability_scaling_factor: 2500000000.0@ | Used to scale the probability of accepting a currently evaluated parameter set. @P(Accept) := exp(-delta_scores*scaling_factor/current-temperature)@ |
-| @mutator_mean: 0.25@ | Mutate a randomly selected parameter by value gaussian normal distributed with this mean |
-| @mutator_deviation: 0.15@ | Mutate a randomly selected parameter by value gaussian normal distributed with this standard deviation |
-| @remember_simulated_annealing_path: false@ | Set to @true@, if you want the optimization to remember already visited parameter sets and their performance. This increases memory usage but improves final results. | 
+# @references_fasta: path_to_your_references.fasta@  _Required_ parameter pointing to the fasta formatted file containing the reference proteins _including_ the reference Human Readable Descriptions. (See @./test/resources/references.fasta@ for details.) 
+# @path_log: your_log_file.tsv@  Stores the parameters evaluated in any optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set. 
+# @temperature: 75000@  Temperature used in _simulated annealing_ 
+# @cool_down_by: 1@  Dimish temperature by this value after each simulated annealing iteration 
+# @optimization_acceptance_probability_scaling_factor: 2500000000.0@  Used to scale the probability of accepting a currently evaluated parameter set. @P(Accept) := exp(-delta_scores*scaling_factor/current-temperature)@ 
+# @mutator_mean: 0.25@  Mutate a randomly selected parameter by value gaussian normal distributed with this mean 
+# @mutator_deviation: 0.15@  Mutate a randomly selected parameter by value gaussian normal distributed with this standard deviation 
+# @remember_simulated_annealing_path: false@  Set to @true@, if you want the optimization to remember already visited parameter sets and their performance. This increases memory usage but improves final results.  
 
 h4. 2.6.1 Optimization in parallel (Trainer-Batcher)
 
@@ -220,10 +219,9 @@ Simulated Annealing is a time and resource consuming process. Because AHRD uses 
 
 The following three parameters are specific to the Trainer-Batcher:
 
-| Parameter | Description |
-| @no_start_positions_in_parameter_space: 1024@ | Defines how many parallel optimization runs you want to start. |
-| @batch_ymls_dir: ./trainer_batch_ymls@ | Path to the directory in which to store the generated Trainer input files. |
-| @output_dir: ./trainer_results@ | Path to the directory in which to store each Trainer run's output(s). |
+ # @no_start_positions_in_parameter_space: 1024@  Defines how many parallel optimization runs you want to start. 
+ # @batch_ymls_dir: ./trainer_batch_ymls@  Path to the directory in which to store the generated Trainer input files. 
+ # @output_dir: ./trainer_results@  Path to the directory in which to store each Trainer run's output(s). 
 
 _Note_, that the Trainer-Batcher works very much like the AHRD-Batcher (section 2.3). Particularly you need to respect the _batch-name requirements_ explained there.
 
