@@ -26,8 +26,11 @@ h3. 1.2 Installation
 h4. 1.2.1 Get AHRD
 
 Copy (clone) AHRD to your computer using git via command-line:
-<pre>git clone https://github.com/groupschoof/AHRD.git
-git checkout tags/v3.11</pre>
+@git clone https://github.com/groupschoof/AHRD.git@
+Change into AHRD's directory:
+@cd AHRD@
+Use the latest stable version:
+@git checkout tags/v3.11@
 
 h4. 1.2.2 Build the executable jar
 
@@ -36,8 +39,8 @@ Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 h2. 2 Usage
 
 All AHRD-Inputs are passed to AHRD in a single YML-File.
-See ./ahrd_example_input.yml for details.
-(About YAML-Format see <a href="http://en.wikipedia.org/wiki/YAML">Wikipedia</a>)
+See @./ahrd_example_input.yml@ for details.
+(About YAML-Format see <a href="http://en.wikipedia.org/wiki/YAML">Wikipedia/YAML</a>)
 
 Basically AHRD needs a FASTA-File of amino acid sequences and different files
 containing the results from the respective BLAST searches, in our example we
@@ -71,7 +74,7 @@ _Note_: For details on extended GO annotation tables please refer to section 3.3
 
 h3. 2.2 Input
 
-Example files for all input files can be found under ./test/resources/
+Example files for all input files can be found under @./test/resources/@. _NOTE:_ Only files containing @example@ in their filename should be used as template input files. Other YAML files are used for testing purposes.
 
 h4. 2.2.1 Required input data
 
