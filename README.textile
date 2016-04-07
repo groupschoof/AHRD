@@ -220,9 +220,8 @@ h3. 3.1 Pseudo-Code
 ## In terms of score ignore any tokens matching regexs given e.g. in ./test/resources/blacklist_token.txt.
 # Token score (calculated from: bitscore, database weight, overlap score)
 # Lexical score (calculated from: Token score, High score factor, Pattern factor, Correction factor)
-# Description score (calculated from: Lexical score, GO score, Blast score)
+# Description score (calculated from: Lexical score and Blast score)
 # Choose best scoring description line
-# Append InterProScan description to chosen description line if available
 
 h3. 3.2 Used Formulae and Parameters
 
