@@ -1,24 +1,12 @@
 h1. Automated Assignment of Human Readable Descriptions (AHRD)
 
-Protein function has often been transferred from characterized proteins to
-novel proteins based on sequence similarity, e.g. using the best BLAST hit. To
-assign human readable descriptions to predicted proteins we developed a new
-program called Automatic assignment of human readable descriptions (AHRD). We
-aim to select descriptions that are concise and informative, precise in regard
-to function and use standard nomenclature. AHRD scores BLAST hits taken from
-searches against different databases on the basis of the trust put into these
-databases and the local alignment quality. The BLAST hit descriptions are
-tokenized into informative words and a lexical analysis scores these tokens
-according to their frequency and the quality of the BLAST hits they occur in.
-Shared tokens with Gene-Ontology Annotations increase the description-scoring
-in order to use standard nomenclature where possible. Finally the best scoring
-description is assigned.
+Short descriptions in sequence databases are useful to quickly gain insight into important information about a sequence, for example in search results. We developed a new program called “Automatic assignment of Human Readable Descriptions” (AHRD) with the aim to select descriptions and Gene Ontology terms that are concise, informative and precise. AHRD outperforms competing methods and can overcome problems caused by wrong annotations, lack of similar sequences and partial alignments.
 
 h2. 1 Getting started
 
 h3. 1.1 Requirements
 
-AHRD is a Java-Program which requires Java 1.7 or higher and ant.
+AHRD is a Java-Program which requires @Java 1.7@ or higher and @ant@.
 
 
 h3. 1.2 Installation
@@ -36,28 +24,13 @@ Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
 
 h2. 2 Usage
 
-All AHRD-Inputs are passed to AHRD in a single YML-File.
-See @./ahrd_example_input.yml@ for details.
-(About YAML-Format see <a href="http://en.wikipedia.org/wiki/YAML">Wikipedia/YAML</a>)
+All AHRD-Inputs are passed to AHRD in a single YML-File.  See @./ahrd_example_input.yml@ for details.  (About YAML-Format see <a href="http://en.wikipedia.org/wiki/YAML">Wikipedia/YAML</a>)
 
-Basically AHRD needs a FASTA-File of amino acid sequences and different files
-containing the results from the respective BLAST searches, in our example we
-searched three databases: Uniprot/trEMBL, Uniprot/Swissprot and TAIR10. Note,
-that AHRD is generic and can make use of any number of different Blast
-databases that do not necessarily have to be the above ones. If e.g. annotating
-genes from a fungal genome searching yeast databases might be more
-recommendable than using TAIR (_Arabidopsis thaliana_).
+Basically AHRD needs a FASTA-File of amino acid sequences and different files containing the results from the respective BLAST searches, in our example we searched three databases: Uniprot/trEMBL, Uniprot/Swissprot and TAIR10. Note, that AHRD is generic and can make use of any number of different Blast databases that do not necessarily have to be the above ones. If e.g. annotating genes from a fungal genome searching yeast databases might be more recommendable than using TAIR (_Arabidopsis thaliana_).
 
-All parameters can be set manually, or the default ones can be used as given in
-the example input file ./test/resources/ahrd_input_test_run.yml (see section
-Parameters).
+All parameters can be set manually, or the default ones can be used as given in the example input file ./test/resources/ahrd_input_test_run.yml (see section Parameters).
 
-In order to parallelize the protein function annotation processes,  
-AHRD can be run on batches of recommended size between 1,000 to 2,000 proteins. 
-If you want to annotate very large protein sets or have low memory capacities 
-use the included Batcher to split your input-data into Batches of appropriate size 
-(see section Batcher). _Note:_ As of Java 7 or higher AHRD is quite fast and batching might 
-no longer be necessary.
+In order to parallelize the protein function annotation processes,  AHRD can be run on batches of recommended size between 1,000 to 2,000 proteins.  If you want to annotate very large protein sets or have low memory capacities use the included Batcher to split your input-data into Batches of appropriate size (see section Batcher). _Note:_ As of Java 7 or higher AHRD is quite fast and batching might no longer be necessary.
 
 h3. 2.1 AHRD example usages:
 
@@ -83,8 +56,7 @@ h4. 2.2.1 Required input data
 
 Recommended Sequence Similarity Search:
 
-For your query proteins you should start independent BLAST searches e.g.
-in the three different databases mentioned above:
+For your query proteins you should start independent BLAST searches e.g.  in the three different databases mentioned above:
 
 <pre>
 blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -out query_vs_swissprot.txt
@@ -92,7 +64,7 @@ blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -ou
 
 h4. 2.2.2 Optional input data
 
-If you want AHRD to predict your query protein's functions with Gene Ontology (GO) terms, you need to provide the GO annotations of reference proteins. See section 3.3.2 for more details.
+If you want AHRD to predict your query protein's functions with Gene Ontology (GO) terms, you need to provide the GO annotations of reference proteins. See section 3.3.2 for more details.  
 
 h4. 2.2.3 Required config files
 
@@ -153,9 +125,7 @@ AHRD writes out a CSV table with the following columns:
 # Interpro-ID (Description) -- If AHRD was started with InterProScan-Results, they are appended here.
 # Gene-Ontology-ID -- If AHRD was requested to generate Gene-Ontology-Annotations, they are appended here.
 
-AHRD's quality-code consists of a three character string, where each character
-is either <strong>'*'</strong> if the respective criteria is met or *'-'*
-otherwise. Their meaning is explained in the following table:
+AHRD's quality-code consists of a three character string, where each character is either <strong>'*'</strong> if the respective criteria is met or *'-'* otherwise. Their meaning is explained in the following table:
 
 | Position | Criteria |
 | 1 | Bit score of the blast result is >50 and e-value is <e-10 |
@@ -170,25 +140,17 @@ To set AHRD to write its output in FASTA-Format set the following switch in the 
 output_fasta: true
 </pre>
 
-AHRD will write a valid FASTA-File of your query-proteins where the Header will
-be composed of the same parts as above, but here separated by whitespaces.
+AHRD will write a valid FASTA-File of your query-proteins where the Header will be composed of the same parts as above, but here separated by whitespaces.
 
 h3. 2.5 AHRD run using BLASTX results
 
-In order to run AHRD on BLASTX results instead of BLASTP results you have to
-modify the following parameters in the ahrd_example_input.yml:
+In order to run AHRD on BLASTX results instead of BLASTP results you have to modify the following parameters in the ahrd_example_input.yml:
 
 <pre>token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2</pre>
 
-Since the algorithm is based on protein sequences and the BLASTX searches are
-based on nucleotide sequence there will be a problem calculating the overlap
-score of the blast result.  To overcome this problem the
-token_score_overlap_score_weight has to be set to 0.0. Therefore the other two
-scores have to be raised. These three parameters have to sum up to 1. The
-resulting parameter configuration could look like this:
-
+Since the algorithm is based on protein sequences and the BLASTX searches are based on nucleotide sequence there will be a problem calculating the overlap score of the blast result.  To overcome this problem the token_score_overlap_score_weight has to be set to 0.0. Therefore the other two scores have to be raised. These three parameters have to sum up to 1. The resulting parameter configuration could look like this: 
 <pre>token_score_bit_score_weight: 0.6
 token_score_database_score_weight: 0.4
 token_score_overlap_score_weight: 0.0</pre>
@@ -250,38 +212,7 @@ Parameters specific to the Evaluator function are:
 
 h2. 3 Algorithm
 
-Based on e-values the 200 best scoring blast results are chosen from each
-database-search (e.g. Swissprot, TAIR, trEMBL). For all resulting candidate
-description lines a score is calculated using a lexical approach. First each
-description line is passed through two regular expression filters. The first
-filter discards any matching description line in order to ignore descriptions
-like e.g. 'Whole genome shotgun sequence', while the second filter tailors the
-description lines deleting matching parts, in order to discard e.g. the
-trailing Species-Descriptions 'OS=Arabidopsis thaliana [...]". In the second
-step the scoring each description line is split into single tokens, which are
-passed through a blacklist filter, ignoring all matching tokens in terms of
-score. Tokens are sequences of characters with a collective meaning. For each
-token a score is calculated from three single scores with different weights,
-the bit score, the database score and the overlap score. The bit score is
-provided within the blast result. The database score is a fixed score for each
-blast database, based on the description quality of the database. The overlap
-score reflects the overlap of the query and subject sequence. In the second
-step the sum of all token scores from a description line is divided by a
-correction factor that avoids the scoring system from being biased towards
-longer or shorter description lines. In the third step the predicted gene
-ontology terms, if available, are used to evaluate the description lines and to
-get a better ranking. Therefore only gene ontology terms with a probability
-greater than 0.4 are used. From this ranking now the best scoring description
-line can be chosen. In the last step a domain name provided by InterProScan
-results, if available, is extracted and appended to the best scoring
-description line for each uncharacterized protein.
-
-In the end for each uncharacterized protein a description line is selected that
-comes from a high-scoring BLAST match, that contains words occurring frequently
-in the descriptions of highest scoring BLAST matches and that does not contain
-meaningless "fill words". If available an assigned Interpro domain is appended
-to the description line and each line will contain an evaluation section that
-reflects the significance of the assigned human readable description.
+Based on e-values the 200 best scoring blast results are chosen from each database-search (e.g. Swissprot, TAIR, trEMBL). For all resulting candidate description lines a score is calculated using a lexical approach. First each description line is passed through two regular expression filters. The first filter discards any matching description line in order to ignore descriptions like e.g. 'Whole genome shotgun sequence', while the second filter tailors the description lines deleting matching parts, in order to discard e.g. the trailing Species-Descriptions 'OS=Arabidopsis thaliana [...]". In the second step the scoring each description line is split into single tokens, which are passed through a blacklist filter, ignoring all matching tokens in terms of score. Tokens are sequences of characters with a collective meaning. For each token a score is calculated from three single scores with different weights, the bit score, the database score and the overlap score. The bit score is provided within the blast result. The database score is a fixed score for each blast database, based on the description quality of the database. The overlap score reflects the overlap of the query and subject sequence. In the second step the sum of all token scores from a description line is divided by a correction factor that avoids the scoring system from being biased towards longer or shorter description lines. In the third step the predicted gene ontology terms, if available, are used to evaluate the description lines and to get a better ranking. Therefore only gene ontology terms with a probability greater than 0.4 are used. From this ranking now the best scoring description line can be chosen. In the last step a domain name provided by InterProScan results, if available, is extracted and appended to the best scoring description line for each uncharacterized protein. In the end for each uncharacterized protein a description line is selected that comes from a high-scoring BLAST match, that contains words occurring frequently in the descriptions of highest scoring BLAST matches and that does not contain meaningless "fill words". If available an assigned Interpro domain is appended to the description line and each line will contain an evaluation section that reflects the significance of the assigned human readable description.  
 
 h3. 3.1 Pseudo-Code
 
@@ -303,8 +234,7 @@ h3. 3.2 Used Formulae and Parameters
 
 h3. 3.3 Parameters
 
-Above formulae use the following parameters as given in *./ahrd_example_input.yml*.
-These parameters can either be used as provided or can be adapted to your needs.
+Above formulae use the following parameters as given in *./ahrd_example_input.yml*. These parameters can either be used as provided or can be adapted to your needs.
 
 The weights in the above formulae are
 
