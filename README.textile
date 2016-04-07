@@ -104,8 +104,6 @@ You will have to edit @./batcher_input_example.yml@ and provide the following ar
 # @proteins_dir:@ The path to the directory the query protein batches are stored in.
 # @batch_ymls_dir:@ The path to the directory the AHRD-Batcher should store the generated input.yml files in.
 # @dir:@ Each database entry requires this argument, the path to the directory each batch's blast result file from searches in the corresponding Blast-database is located.
-# @interpro_results_dir:@ The directory in which each Batch's @interproscan@ result file is located.
-# @gene_ontology_results_dir:@ The directory in which each Batch's Gene Ontology annotation file is stored.
 # @output_dir:@ The directory each AHRD run should create a subdirectory with the output for the processed batch.
 
 _Batch-Name requirement:_ All above explained files belonging to the same Batch _must_ have the same name. This name must start with alpha-numeric characters and may finish with digits indicating the Batch's number. File extensions are allowed to be varying. 
