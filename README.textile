@@ -28,7 +28,7 @@ All AHRD-Inputs are passed to AHRD in a single YML-File.  See @./ahrd_example_in
 
 Basically AHRD needs a FASTA-File of amino acid sequences and different files containing the results from the respective BLAST searches, in our example we searched three databases: Uniprot/trEMBL, Uniprot/Swissprot and TAIR10. Note, that AHRD is generic and can make use of any number of different Blast databases that do not necessarily have to be the above ones. If e.g. annotating genes from a fungal genome searching yeast databases might be more recommendable than using TAIR (_Arabidopsis thaliana_).
 
-All parameters can be set manually, or the default ones can be used as given in the example input file ./test/resources/ahrd_input_test_run.yml (see section Parameters).
+All parameters can be set manually, or the default ones can be used as given in the example input file @ahrd_example_input.yml@ (see section 2.1 and 3.2 for more details).
 
 In order to parallelize the protein function annotation processes,  AHRD can be run on batches of recommended size between 1,000 to 2,000 proteins.  If you want to annotate very large protein sets or have low memory capacities use the included Batcher to split your input-data into Batches of appropriate size (see section Batcher). _Note:_ As of Java 7 or higher AHRD is quite fast and batching might no longer be necessary.
 
@@ -120,7 +120,6 @@ AHRD writes out a CSV table with the following columns:
 # Blast-Hit-Accession -- The Accession of the Protein the assigned description was taken from.
 # AHRD-Quality-Code -- explained below
 # Human-Readable-Description -- The assigned HRD
-# Interpro-ID (Description) -- If AHRD was started with InterProScan-Results, they are appended here.
 # Gene-Ontology-ID -- If AHRD was requested to generate Gene-Ontology-Annotations, they are appended here.
 
 AHRD's quality-code consists of a three character string, where each character is either <strong>'*'</strong> if the respective criteria is met or *'-'* otherwise. Their meaning is explained in the following table:
