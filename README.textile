@@ -330,7 +330,7 @@ Germany
 
 h2. References
 
-High quality genomes that have been annotated with AHRD:
+High quality genome projects that used AHRD:
 
 fn1. Young, Nevin D., Frédéric Debellé, Giles E. D. Oldroyd, Rene Geurts, Steven B. Cannon, Michael K. Udvardi, Vagner A. Benedito, et al. “The Medicago Genome Provides Insight into the Evolution of Rhizobial Symbioses.” Nature 480, no. 7378 (December 22, 2011): 520–24. doi:10.1038/nature10625.
 
@@ -342,7 +342,9 @@ fn4. International Barley Genome Sequencing Consortium, Klaus F. X. Mayer, Robbi
 
 fn5. Wang, W., G. Haberer, H. Gundlach, C. Gläßer, T. Nussbaumer, M. C. Luo, A. Lomsadze, et al. “The Spirodela Polyrhiza Genome Reveals Insights into Its Neotenous Reduction Fast Growth and Aquatic Lifestyle.” Nature Communications 5 (2014): 3311. doi:10.1038/ncomms4311.
 
+fn6. Guo, Shaogui, Jianguo Zhang, Honghe Sun, Jerome Salse, William J. Lucas, Haiying Zhang, Yi Zheng, et al. “The Draft Genome of Watermelon (Citrullus Lanatus) and Resequencing of 20 Diverse Accessions.” Nature Genetics 45, no. 1 (January 2013): 51–58. doi:10.1038/ng.2470.
+
 AHRD was applied on all plant genomes present in the public database *PlantsDB*:
 
-fn6. Spannagl, Manuel, Thomas Nussbaumer, Kai C. Bader, Mihaela M. Martis, Michael Seidel, Karl G. Kugler, Heidrun Gundlach, and Klaus F. X. Mayer. “PGSB PlantsDB: Updates to the Database Framework for Comparative Plant Genome Research.” Nucleic Acids Research 44, no. D1 (January 4, 2016): D1141–47. doi:10.1093/nar/gkv1130.
+fn7. Spannagl, Manuel, Thomas Nussbaumer, Kai C. Bader, Mihaela M. Martis, Michael Seidel, Karl G. Kugler, Heidrun Gundlach, and Klaus F. X. Mayer. “PGSB PlantsDB: Updates to the Database Framework for Comparative Plant Genome Research.” Nucleic Acids Research 44, no. D1 (January 4, 2016): D1141–47. doi:10.1093/nar/gkv1130.
 
