@@ -2,6 +2,43 @@ h1. Automated Assignment of Human Readable Descriptions (AHRD)
 
 Short descriptions in sequence databases are useful to quickly gain insight into important information about a sequence, for example in search results. We developed a new program called “Automatic assignment of Human Readable Descriptions” (AHRD) with the aim to select descriptions and Gene Ontology terms that are concise, informative and precise. AHRD outperforms competing methods and can overcome problems caused by wrong annotations, lack of similar sequences and partial alignments.
 
+h2. Table of contents
+
+* "1 Getting started":#1-getting-started
+* "1.1 Requirements":#1.1-requirements
+* "1.2 Installation":#1.2-installation
+* "1.2.1 Get AHRD":#1.2.1-get-ahrd
+* "1.2.2 Build the executable jar":#1.2.2-build-the-executable-jar
+* "2 Usage":#2-usage
+* "2.1 AHRD example usages:":#2.1-ahrd-example-usages:
+* "2.2 Input":#2.2-input
+* "2.2.1 Required input data":#2.2.1-required-input-data
+* "2.2.2 Optional input data":#2.2.2-optional-input-data
+* "2.2.3 Required config files":#2.2.3-required-config-files
+* "2.2.3.1 Test custom blacklists and filters":#2.2.3.1-test-custom-blacklists-and-filters
+* "2.3 Batcher":#2.3-batcher
+* "2.4 Output":#2.4-output
+* "2.4.1 Tab-Delimited Table":#2.4.1-tab-delimited-table
+* "2.4.2 Fasta-Format":#2.4.2-fasta-format
+* "2.5 AHRD run using BLASTX results":#2.5-ahrd-run-using-blastx-results
+* "2.6 Parameter Optimization":#2.6-parameter-optimization
+* "2.6.1 Optimization in parallel (Trainer-Batcher)":#2.6.1-optimization-in-parallel-(trainer-batcher)
+* "2.7 Computing F-Scores for selected parameter sets (AHRD-Evaluator)":#2.7-computing-f-scores-for-selected-parameter-sets-(ahrd-evaluator)
+* "3 Algorithm":#3-algorithm
+* "3.1 Pseudo-Code":#3.1-pseudo-code
+* "3.2 Used Formulae and Parameters":#3.2-used-formulae-and-parameters
+* "3.3 Parameters":#3.3-parameters
+* "3.3.1 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)":#3.3.1-parameters-controlling-the-parsing-of-tabular-sequence-similarity-search-result-tables-(legacy-blast,-blast+,-and-blat)
+* "3.3.2 Parameters controlling Gene Ontology term annotations":#3.3.2-parameters-controlling-gene-ontology-term-annotations
+* "3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)":#3.3.2.1-custom-reference-gene-ontology-annotations-(non-uniprotkb-goa)
+* "3.3.2.2 Have AHRD extend predicted GO terms with semantically included GO terms":#3.3.2.2-have-ahrd-extend-predicted-go-terms-with-semantically-included-go-terms
+* "3.3.2.2.1 Custom Gene Ontology Database":#3.3.2.2.1-custom-gene-ontology-database
+* "4 Testing":#4-testing
+* "5 License":#5-license
+* "6 Authors":#6-authors
+* "references":#references
+
+
 h2. 1 Getting started
 
 h3. 1.1 Requirements
