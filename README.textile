@@ -4,42 +4,42 @@ Short descriptions in sequence databases are useful to quickly gain insight into
 
 h2. Table of contents
 
-"1 Getting started":#1-getting-started
-"1.1 Requirements":#11-requirements
-"1.2 Installation":#12-installation
-"1.2.1 Get AHRD":#121-get-ahrd
-"1.2.2 Build the executable jar":#122-build-the-executable-jar
-"2 Usage":#2-usage
-"2.1 AHRD example usages":#21-ahrd-example-usages
-"2.2 Input":#22-input
-"2.2.1 Required input data":#221-required-input-data
-"2.2.2 Optional input data":#222-optional-input-data
-"2.2.3 Required config files":#223-required-config-files
-"2.2.3.1 Test custom blacklists and filters":#2231-test-custom-blacklists-and-filters
-"2.3 Batcher":#23-batcher
-"2.4 Output":#24-output
-"2.4.1 Tab-Delimited Table":#241-tab-delimited-table
-"2.4.2 Fasta-Format":#242-fasta-format
-"2.5 AHRD run using BLASTX results":#25-ahrd-run-using-blastx-results
-"2.6 Parameter Optimization":#26-parameter-optimization
-"2.6.1 Optimization in parallel (Trainer-Batcher)":#261-optimization-in-parallel-(trainer-batcher)
-"2.7 Computing F-Scores for selected parameter sets (AHRD-Evaluator)":#27-computing-f-scores-for-selected-parameter-sets-(ahrd-evaluator)
-"3 Algorithm":#3-algorithm
-"3.1 Pseudo-Code":#31-pseudo-code
-"3.2 Used Formulae and Parameters":#32-used-formulae-and-parameters
-"3.3 Parameters":#33-parameters
-"3.3.1 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)":#331-parameters-controlling-the-parsing-of-tabular-sequence-similarity-search-result-tables-(legacy-blast,-blast+,-and-blat)
-"3.3.2 Parameters controlling Gene Ontology term annotations":#332-parameters-controlling-gene-ontology-term-annotations
-"3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)":#3321-custom-reference-gene-ontology-annotations-(non-uniprotkb-goa)
-"3.3.2.2 Have AHRD extend predicted GO terms with semantically included GO terms":#3322-have-ahrd-extend-predicted-go-terms-with-semantically-included-go-terms
-"3.3.2.2.1 Custom Gene Ontology Database":#33221-custom-gene-ontology-database
-"4 Testing":#4-testing
-"5 License":#5-license
-"6 Authors":#6-authors
-"References":#references
+# "Getting started":#1-getting-started
+## "Requirements":#11-requirements
+## "Installation":#12-installation
+### "Get AHRD":#121-get-ahrd
+### "Build the executable jar":#122-build-the-executable-jar
+# "Usage":#2-usage
+## "AHRD example usages":#21-ahrd-example-usages
+## "Input":#22-input
+### "Required input data":#221-required-input-data
+### "Optional input data":#222-optional-input-data
+### "Required config files":#223-required-config-files
+#### "Test custom blacklists and filters":#2231-test-custom-blacklists-and-filters
+## "Batcher":#23-batcher
+## "Output":#24-output
+### "Tab-Delimited Table":#241-tab-delimited-table
+### "Fasta-Format":#242-fasta-format
+## "AHRD run using BLASTX results":#25-ahrd-run-using-blastx-results
+## "Parameter Optimization":#26-parameter-optimization
+### "Optimization in parallel (Trainer-Batcher)":#261-optimization-in-parallel-(trainer-batcher)
+## "Computing F-Scores for selected parameter sets (AHRD-Evaluator)":#27-computing-f-scores-for-selected-parameter-sets-(ahrd-evaluator)
+# "Algorithm":#3-algorithm
+## "Pseudo-Code":#31-pseudo-code
+## "Used Formulae and Parameters":#32-used-formulae-and-parameters
+## "Parameters":#33-parameters
+### "Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)":#331-parameters-controlling-the-parsing-of-tabular-sequence-similarity-search-result-tables-(legacy-blast,-blast+,-and-blat)
+### "Parameters controlling Gene Ontology term annotations":#332-parameters-controlling-gene-ontology-term-annotations
+#### "Custom reference Gene Ontology annotations (non UniprotKB GOA)":#3321-custom-reference-gene-ontology-annotations-(non-uniprotkb-goa)
+#### "Have AHRD extend predicted GO terms with semantically included GO terms":#3322-have-ahrd-extend-predicted-go-terms-with-semantically-included-go-terms
+##### "Custom Gene Ontology Database":#33221-custom-gene-ontology-database
+# "Testing":#4-testing
+# "License":#5-license
+# "Authors":#6-authors
+# "References":#references
 
 
-h2. 1 Getting started
+2. h1 Getting started
 
 h3. 1.1 Requirements
 
@@ -365,7 +365,7 @@ Katzenburgweg 2
 53115 Bonn
 Germany
 
-h2. References
+h2. 7 References
 
 High quality genome projects that used AHRD:
 
