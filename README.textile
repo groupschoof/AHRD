@@ -65,9 +65,9 @@ All AHRD-Inputs are passed to AHRD in a single YML-File.  See @./ahrd_example_in
 
 Basically AHRD needs a FASTA-File of amino acid sequences and different files containing the results from the respective BLAST searches, in our example we searched three databases: Uniprot/trEMBL, Uniprot/Swissprot and TAIR10. Note, that AHRD is generic and can make use of any number of different Blast databases that do not necessarily have to be the above ones. If e.g. annotating genes from a fungal genome searching yeast databases might be more recommendable than using TAIR (_Arabidopsis thaliana_).
 
-All parameters can be set manually, or the default ones can be used as given in the example input file @ahrd_example_input.yml@ (see section 2.1 and 3.2 for more details).
+All parameters can be set manually, or the default ones can be used as given in the example input file @ahrd_example_input.yml@ (see sections "2.1":#21-ahrd-example-usages and "3.2":#32-used-formulae-and-parameters for more details).
 
-In order to parallelize the protein function annotation processes,  AHRD can be run on batches of recommended size between 1,000 to 2,000 proteins.  If you want to annotate very large protein sets or have low memory capacities use the included Batcher to split your input-data into Batches of appropriate size (see section Batcher). _Note:_ As of Java 7 or higher AHRD is quite fast and batching might no longer be necessary.
+In order to parallelize the protein function annotation processes,  AHRD can be run on batches of recommended size between 1,000 to 2,000 proteins.  If you want to annotate very large protein sets or have low memory capacities use the included Batcher to split your input-data into Batches of appropriate size (see section "2.3":#23-batcher). _Note:_ As of Java 7 or higher AHRD is quite fast and batching might no longer be necessary.
 
 h3. 2.1 AHRD example usages
 
@@ -101,7 +101,7 @@ blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -ou
 
 h4. 2.2.2 Optional input data
 
-If you want AHRD to predict your query protein's functions with Gene Ontology (GO) terms, you need to provide the GO annotations of reference proteins. See section 3.3.2 for more details.  
+If you want AHRD to predict your query protein's functions with Gene Ontology (GO) terms, you need to provide the GO annotations of reference proteins. See section "3.3.2":#332-parameters-controlling-gene-ontology-term-annotations for more details.  
 
 h4. 2.2.3 Required config files
 
@@ -240,7 +240,7 @@ Parameters specific to the Evaluator function are:
 # @find_highest_possible_evaluation_score: false@ Set to @true@ if you want to see how the best fitting candidate description among the sequence similarity search hits performs. This gives you the theoretical best possible performance.
 # @write_scores_to_output: false@ Set to @true@ if you want to see all internal intermediate scores: Token-Scores, Lexical-Scores, and Description-Scores. Use with extreme caution, because this option is meant for developers _only_.
 # @write_best_blast_hits_to_output: false@ Set to @true@ if you want to see the respective best sequence similarity search Hits and their performances.
-# @f_measure_beta_parameter: 1.0@ This parameter is also used by AHRD-Trainer. See section 2.6 for details.
+# @f_measure_beta_parameter: 1.0@ This parameter is also used by AHRD-Trainer. See section "2.6":#26-parameter-optimization for details.
 
 h2. 3 Algorithm
 
@@ -327,7 +327,7 @@ The Gene Ontology is organised in a graph. GO terms can have ancestors of three 
 3. GO ontology - one of @Biological Process@, @Cellular Component@, or @Molecular Function@
 4. GO name, e.g. @cellular response to chemical stimulus@
 
-_Note_: Choosing this option will also provide you with a more detailled GO annotation, because it includes the GO term names and ontologies and not only their accessions. Also note, that AHRD needs access to an instance of the Gene Ontology MySQL database. By default it will use the instance provided by the European Bioinformatics Institute (EBI). See next section for more details.
+_Note_: Choosing this option will also provide you with a more detailled GO annotation, because it includes the GO term names and ontologies and not only their accessions. Also note, that AHRD needs access to an instance of the Gene Ontology MySQL database. By default it will use the instance provided by the European Bioinformatics Institute (EBI). See "next section":#33221-custom-gene-ontology-database for more details.
 
 To have AHRD generate this extended GO annotation table, just provide an output path to it in your @input.yml@:
 
