@@ -39,7 +39,7 @@ h2. Table of contents
 # "References":#references
 
 
-2. h1 Getting started
+h2. Getting started
 
 h3. 1.1 Requirements
 
