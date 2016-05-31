@@ -225,7 +225,7 @@ The following parameters are specific to the Trainer-Batcher:
 
 _Note_, that the Trainer-Batcher works very much like the AHRD-Batcher (section 2.3). Particularly you need to respect the _batch-name requirements_ explained there.
 
-The above Trainer-Batcher example input shows how to automatically generated a desired number of input files with different starting points in parameter space. These input files can then directly be used with the above documented AHRD Trainer (section 2.6). 
+The above Trainer-Batcher example input shows how to automatically generated a desired number of input files with different starting points in parameter space. These input files can then directly be used with the above documented AHRD Trainer (section "2.6":#26-parameter-optimization). 
 
 h3. 2.7 Computing F-Scores for selected parameter sets (AHRD-Evaluator)
 
