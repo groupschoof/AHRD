@@ -78,7 +78,7 @@ There are _three_ template AHRD input files provided that you should use accordi
 | Annotate your Query proteins with HRD _and_ Gene Ontology (GO) terms | @./test/resources/ahrd_example_input_go_prediction.yml@ |
 | Annotate your Query proteins with HRD, GO terms, _and_ generate an extended GO annotation table | @./test/resources/ahrd_example_input_go_prediction_extended.yml@ |
 
-_Note_: For details on extended GO annotation tables please refer to section 3.3.2.2 
+_Note_: For details on extended GO annotation tables please refer to section "3.3.2.2":#3322-have-ahrd-extend-predicted-go-terms-with-semantically-included-go-terms
 
 h3. 2.2 Input
 
@@ -223,7 +223,7 @@ The following parameters are specific to the Trainer-Batcher:
 # @batch_ymls_dir: ./trainer_batch_ymls@  Path to the directory in which to store the generated Trainer input files. 
 # @output_dir: ./trainer_results@  Path to the directory in which to store each Trainer run's output(s). 
 
-_Note_, that the Trainer-Batcher works very much like the AHRD-Batcher (section 2.3). Particularly you need to respect the _batch-name requirements_ explained there.
+_Note_, that the Trainer-Batcher works very much like the AHRD-Batcher (section "2.3":#23-batcher). Particularly you need to respect the _batch-name requirements_ explained there.
 
 The above Trainer-Batcher example input shows how to automatically generated a desired number of input files with different starting points in parameter space. These input files can then directly be used with the above documented AHRD Trainer (section "2.6":#26-parameter-optimization). 
 
