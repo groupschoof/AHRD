@@ -55,9 +55,15 @@ Copy (clone) AHRD to your computer using git via command-line, then change into 
 cd AHRD
 git checkout tags/v3.11</pre>
 
+Alternativelly without using @git@, you can download AHRD version @v3.11@ ("zip":https://github.com/groupschoof/AHRD/archive/v3.11.zip or "tar.gz":https://github.com/groupschoof/AHRD/archive/v3.11.tar.gz) and extract it.
+
 h4. 1.2.2 Build the executable jar
 
-Running <pre>ant dist</pre> will create the executable JAR-File: ./dist/ahrd.jar
+Running
+
+<pre>ant dist</pre>
+
+will create the executable JAR-File: @./dist/ahrd.jar@
 
 h2. 2 Usage
 
