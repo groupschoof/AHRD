@@ -30,6 +30,7 @@ h2. Table of contents
 ## "Parameters":#33-parameters
 ### "Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)":#331-parameters-controlling-the-parsing-of-tabular-sequence-similarity-search-result-tables-(legacy-blast,-blast+,-and-blat)
 ### "Parameters controlling Gene Ontology term annotations":#332-parameters-controlling-gene-ontology-term-annotations
+#### "Prefer reference proteins as candidates that have GO Term annotations":#3320-prefer-reference-proteins-as-candidates-that-have-GO-Term-annotations
 #### "Custom reference Gene Ontology annotations (non UniprotKB GOA)":#3321-custom-reference-gene-ontology-annotations-(non-uniprotkb-goa)
 #### "Have AHRD extend predicted GO terms with semantically included GO terms":#3322-have-ahrd-extend-predicted-go-terms-with-semantically-included-go-terms
 ##### "Custom Gene Ontology Database":#33221-custom-gene-ontology-database
@@ -314,6 +315,10 @@ h4. 3.3.2 Parameters controlling Gene Ontology term annotations
 AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @goa_uniprot_all.gpa.gz@ (last visit June 22nd 2016)
 
 To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter @gene_ontology_result@. See example file @./test/resources/ahrd_input_seq_sim_table_go_prediction.yml@ for more details.
+
+h5. 3.3.2.0 Prefer reference proteins as candidates that have GO Term annotations
+
+The parameter @prefer_reference_with_go_annos: true@ is highly recommended when aiming to annotate your query proteins with GO Terms. If this parameter is set to true only those candidate references are considered that also have GO Term annotations. However, if you put more emphasis on Human Readable Descriptions and are prepared to accept a couple of your queries to not get any GO Term predictions you can switch this off with @prefer_reference_with_go_annos: false@ or just omit the parameter as by default it is set to @false@.  
 
 h5. 3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
 
