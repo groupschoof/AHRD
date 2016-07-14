@@ -28,10 +28,10 @@ h2. Table of contents
 ## "Pseudo-Code":#31-pseudo-code
 ## "Used Formulae and Parameters":#32-used-formulae-and-parameters
 ## "Parameters":#33-parameters
-### "Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)":#331-parameters-controlling-the-parsing-of-tabular-sequence-similarity-search-result-tables-(legacy-blast,-blast+,-and-blat)
+### "Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)":#331-parameters-controlling-the-parsing-of-tabular-sequence-similarity-search-result-tables-legacy-blast-blast-and-blat
 ### "Parameters controlling Gene Ontology term annotations":#332-parameters-controlling-gene-ontology-term-annotations
-#### "Prefer reference proteins as candidates that have GO Term annotations":#3320-prefer-reference-proteins-as-candidates-that-have-GO-Term-annotations
-#### "Custom reference Gene Ontology annotations (non UniprotKB GOA)":#3321-custom-reference-gene-ontology-annotations-(non-uniprotkb-goa)
+#### "Prefer reference proteins as candidates that have GO Term annotations":#3320-prefer-reference-proteins-as-candidates-that-have-go-Term-annotations
+#### "Custom reference Gene Ontology annotations (non UniprotKB GOA)":#3321-custom-reference-gene-ontology-annotations-non-uniprotkb-goa
 #### "Have AHRD extend predicted GO terms with semantically included GO terms":#3322-have-ahrd-extend-predicted-go-terms-with-semantically-included-go-terms
 ##### "Custom Gene Ontology Database":#33221-custom-gene-ontology-database
 # "Testing":#4-testing
