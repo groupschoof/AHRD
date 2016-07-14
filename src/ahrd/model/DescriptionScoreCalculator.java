@@ -4,7 +4,9 @@ import static ahrd.controller.Settings.getSettings;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class DescriptionScoreCalculator {
 
@@ -21,9 +23,17 @@ public class DescriptionScoreCalculator {
 	/**
 	 * Assigns each BlastResult's Description-Line its AHRD-Score and then finds
 	 * the highest scoring one.
+	 * 
+	 * @param referenceGoAnnotations
+	 *            Map of BlastResults' shortAccesions as keys and their Sets of
+	 *            annotated GO Terms as values. If NOT null and any of the query
+	 *            proteins' hits of GO Term annotations, AHRD will use the
+	 *            highest scoring BlastResult with GO Terms to annotate the
+	 *            query.
 	 */
-	public void findHighestScoringBlastResult() {
+	public void findHighestScoringBlastResult(Map<String, Set<String>> referenceGoAnnotations) {
 		BlastResult bestScoringBr = null;
+		Set<Double> scoreRankingWithGoAnnos = new HashSet<Double>();
 		Map<Double, BlastResult> scoreRanking = new HashMap<Double, BlastResult>();
 		for (String blastDb : getProtein().getBlastResults().keySet()) {
 			for (BlastResult iterBlastResult : getProtein().getBlastResults().get(blastDb)) {
@@ -32,11 +42,16 @@ public class DescriptionScoreCalculator {
 				// that have at least a single non-blacklisted Token:
 				if (iterBlastResult.getTokens().size() > 0) {
 					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
+					if (referenceGoAnnotations != null && !referenceGoAnnotations.isEmpty()
+							&& referenceGoAnnotations.containsKey(iterBlastResult.getShortAccession()))
+						scoreRankingWithGoAnnos.add(iterBlastResult.getDescriptionScore());
 				}
 			}
 		}
 		if (scoreRanking.size() > 0) {
-			setDescriptionHighScore(Collections.max(scoreRanking.keySet()));
+			Set<Double> usedScoreRankin = scoreRankingWithGoAnnos.isEmpty() ? scoreRanking.keySet()
+					: scoreRankingWithGoAnnos;
+			setDescriptionHighScore(Collections.max(usedScoreRankin));
 			bestScoringBr = scoreRanking.get(getDescriptionHighScore());
 		}
 		setHighestScoringBlastResult(bestScoringBr);

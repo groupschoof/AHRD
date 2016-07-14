@@ -242,7 +242,7 @@ public class AHRD {
 			// currentScore - (Token-High-Score / 2)
 			prot.getTokenScoreCalculator().filterTokenScores();
 			// Find the highest scoring Blast-Result:
-			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult();
+			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult(this.getReferenceGoAnnotations());
 			// If AHRD is requested to annotate Gene Ontology Terms, do so:
 			if (getSettings().hasGeneOntologyAnnotations()
 					&& prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null

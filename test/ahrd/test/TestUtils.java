@@ -19,8 +19,7 @@ import ahrd.model.Protein;
 public class TestUtils {
 
 	// Mock Classes:
-	protected static class LexicalScoreCalculatorMock extends
-			LexicalScoreCalculator {
+	protected static class LexicalScoreCalculatorMock extends LexicalScoreCalculator {
 
 		public LexicalScoreCalculatorMock(Protein protein) {
 			super(protein);
@@ -31,8 +30,7 @@ public class TestUtils {
 		}
 	}
 
-	protected static class LexicalScoreCalculatorFixedGoScoreMock extends
-			LexicalScoreCalculator {
+	protected static class LexicalScoreCalculatorFixedGoScoreMock extends LexicalScoreCalculator {
 
 		public LexicalScoreCalculatorFixedGoScoreMock(Protein protein) {
 			super(protein);
@@ -56,13 +54,10 @@ public class TestUtils {
 		setSettings(new Settings("./test/resources/ahrd_input.yml"));
 	}
 
-	public static BlastResult mockBlastResult(String acc, Double eValue,
-			String descLine, int queryStart, int queryEnd, int subjectStart,
-			int subjectEnd, int subjectLength, Double bitScore, String dbName,
-			Set<String> tokens) {
-		BlastResult br = new BlastResult(acc, eValue, descLine, queryStart,
-				queryEnd, subjectStart, subjectEnd, subjectLength, bitScore,
-				dbName);
+	public static BlastResult mockBlastResult(String acc, Double eValue, String descLine, int queryStart, int queryEnd,
+			int subjectStart, int subjectEnd, int subjectLength, Double bitScore, String dbName, Set<String> tokens) {
+		BlastResult br = new BlastResult(acc, eValue, descLine, queryStart, queryEnd, subjectStart, subjectEnd,
+				subjectLength, bitScore, dbName);
 		br.setTokens(tokens);
 		return br;
 	}
@@ -79,56 +74,29 @@ public class TestUtils {
 
 	public static List<BlastResult> mockBlastResults() {
 		List<BlastResult> blastResults = new ArrayList<BlastResult>();
-		blastResults.add(new BlastResult("accession_1", 1.0, "description One",
-				10, 20, 10, 20, 200, 30, "swissprot"));
-		blastResults.add(new BlastResult("accession_2", 2.0, "description Two",
-				10, 20, 10, 20, 200, 30, "swissprot"));
-		blastResults.add(new BlastResult("accession_3", 3.0,
-				"Putative - sUbFaMilY;, \" activity|, bad", 10, 20, 10, 20,
+		blastResults.add(new BlastResult("accession_1", 1.0, "description One", 10, 20, 10, 20, 200, 30, "swissprot"));
+		blastResults.add(new BlastResult("accession_2", 2.0, "description Two", 10, 20, 10, 20, 200, 30, "swissprot"));
+		blastResults.add(new BlastResult("accession_3", 3.0, "Putative - sUbFaMilY;, \" activity|, bad", 10, 20, 10, 20,
 				200, 30, "swissprot"));
-		blastResults.add(new BlastResult("accession_4", 4.0,
-				"family subfamily activity NADH-Dehydrogenase", 10, 20, 10, 20,
-				200, 30, "swissprot"));
-		blastResults.add(new BlastResult("accession_5", 5.0,
-				"description_5 Fly-Wing formation", 10, 20, 10, 20, 200, 30,
-				"swissprot"));
+		blastResults.add(new BlastResult("accession_4", 4.0, "family subfamily activity NADH-Dehydrogenase", 10, 20, 10,
+				20, 200, 30, "swissprot"));
+		blastResults.add(new BlastResult("accession_5", 5.0, "description_5 Fly-Wing formation", 10, 20, 10, 20, 200,
+				30, "swissprot"));
 		return blastResults;
 	}
 
 	public static List<BlastResult> mockBlastResultsForDescCalcTest() {
 		List<BlastResult> blastResults = new ArrayList<BlastResult>();
-		blastResults.add(mockBlastResult("accession_1", 1.0, "description One",
-				10, 20, 10, 20, 200, 30.0, "swissprot", new HashSet<String>(
-						Arrays.asList("description", "one"))));
-		blastResults.add(mockBlastResult("accession_2", 2.0, "description Two",
-				10, 20, 10, 20, 200, 30.0, "swissprot", new HashSet<String>(
-						Arrays.asList("description", "two"))));
-		blastResults.add(mockBlastResult(
-				"accession_3",
-				3.0,
-				"Putative - sUbFaMilY;, \" activity|, bad",
-				10,
-				20,
-				10,
-				20,
-				200,
-				30.0,
-				"swissprot",
-				new HashSet<String>(Arrays.asList("putative", "subfamily",
-						"activity", "bad"))));
-		blastResults.add(mockBlastResult(
-				"accession_4",
-				4.0,
-				"family subfamily activity NADH-Dehydrogenase",
-				10,
-				20,
-				10,
-				20,
-				200,
-				30.0,
-				"swissprot",
-				new HashSet<String>(Arrays.asList("family", "subfamily",
-						"activity", "nadh", "dehydrogenase"))));
+		blastResults.add(mockBlastResult("accession_1", 1.0, "description One", 10, 20, 10, 20, 200, 30.0, "swissprot",
+				new HashSet<String>(Arrays.asList("description", "one"))));
+		blastResults.add(mockBlastResult("accession_2", 2.0, "description Two", 10, 20, 10, 20, 200, 30.0, "swissprot",
+				new HashSet<String>(Arrays.asList("description", "two"))));
+		blastResults.add(mockBlastResult("accession_3", 3.0, "Putative - sUbFaMilY;, \" activity|, bad", 10, 20, 10, 20,
+				200, 30.0, "swissprot",
+				new HashSet<String>(Arrays.asList("putative", "subfamily", "activity", "bad"))));
+		blastResults.add(mockBlastResult("accession_4", 4.0, "family subfamily activity NADH-Dehydrogenase", 10, 20, 10,
+				20, 200, 30.0, "swissprot",
+				new HashSet<String>(Arrays.asList("family", "subfamily", "activity", "nadh", "dehydrogenase"))));
 		return blastResults;
 	}
 
@@ -164,10 +132,8 @@ public class TestUtils {
 
 	public static List<BlastResult> mockBlastResultsWithTokens() {
 		List<BlastResult> blastResults = new ArrayList<BlastResult>();
-		BlastResult one = new BlastResult("accession_1", 1.0, "one two", 10,
-				20, 10, 20, 200, 30, "swissprot");
-		BlastResult two = new BlastResult("accession_2", 2.0, "three", 10, 20,
-				10, 20, 200, 30, "swissprot");
+		BlastResult one = new BlastResult("accession_1", 1.0, "one two", 10, 20, 10, 20, 200, 30, "swissprot");
+		BlastResult two = new BlastResult("accession_2", 2.0, "three", 10, 20, 10, 20, 200, 30, "swissprot");
 		String elements1[] = { "one", "two" };
 		String elements2[] = { "three" };
 		Set<String> tokens1 = new HashSet<String>(Arrays.asList(elements1));
@@ -181,19 +147,14 @@ public class TestUtils {
 		return blastResults;
 	}
 
-	public static void mockCumulativeTokenScores(Protein p, String token,
-			double mockBase) {
-		p.getTokenScoreCalculator().getCumulativeTokenBitScores()
-				.put(token, 5 * mockBase);
-		p.getTokenScoreCalculator().getCumulativeTokenBlastDatabaseScores()
-				.put(token, 10 * mockBase);
-		p.getTokenScoreCalculator().getCumulativeTokenOverlapScores()
-				.put(token, 0.05 * mockBase);
+	public static void mockCumulativeTokenScores(Protein p, String token, double mockBase) {
+		p.getTokenScoreCalculator().getCumulativeTokenBitScores().put(token, 5 * mockBase);
+		p.getTokenScoreCalculator().getCumulativeTokenBlastDatabaseScores().put(token, 10 * mockBase);
+		p.getTokenScoreCalculator().getCumulativeTokenOverlapScores().put(token, 0.05 * mockBase);
 	}
 
 	public static BlastResult mockBlastResult() {
-		BlastResult br = new BlastResult("accession_1", 1.0, "one two three",
-				10, 20, 10, 20, 200, 30, "swissprot");
+		BlastResult br = new BlastResult("accession_1", 1.0, "one two three", 10, 20, 10, 20, 200, 30, "swissprot");
 		br.getTokens().add("one");
 		br.getTokens().add("two");
 		br.getTokens().add("three");
@@ -207,5 +168,31 @@ public class TestUtils {
 	 */
 	public static Protein mockProtein() {
 		return new Protein("sweet_sheep_protein", 200);
+	}
+
+	/**
+	 * Used in test functions in class DescriptionScoreCalculatorTest
+	 * 
+	 * @return new Protein
+	 */
+	public static Protein mockProteinAndBlastResultsForDescriptionScoreCalculatorTest() {
+		Protein p = mockProtein();
+		// Sprot
+		p.getBlastResults().put("swissprot", TestUtils.mockBlastResultsForDescCalcTest());
+		// trEMBL
+		p.getBlastResults().put("trembl",
+				Arrays.asList(mockBlastResult("accession_5", 5.0, "description_5 Fly-Wing formation", 10, 20, 10, 20,
+						200, 30.0, "trembl",
+						new HashSet<String>(Arrays.asList("description", "5", "fly", "wing", "formation")))));
+		p.setLexicalScoreCalculator(new LexicalScoreCalculatorMock(p));
+		p.getDescriptionScoreCalculator().setMaxBitScore(30.0);
+		return p;
+	}
+
+	public static Map<String, Set<String>> mockReferenceGoAnnotationsForDescriptionScoreCalculatorTest() {
+		Map<String, Set<String>> refGos = new HashMap<String, Set<String>>();
+		refGos.put("accession_1", new HashSet<String>(Arrays.asList("GO:1234567", "GO:7654321")));
+		refGos.put("accession_5", new HashSet<String>(Arrays.asList("GO:1726354", "GO:7162534")));
+		return refGos;
 	}
 }

@@ -89,8 +89,7 @@ public class Settings implements Cloneable {
 	public static final Pattern DEFAULT_FASTA_HEADER_REGEX = Pattern
 			.compile("^>(?<accession>\\S+)\\s+(?<description>.+?)\\s+(((OS|os)=.+)|((GN|gn)=.+))?$");
 	public static final String SHORT_ACCESSION_REGEX_KEY = "short_accession_regex";
-	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern
-			.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
+	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
 	public static final String REFERENCE_GO_REGEX_KEY = "reference_go_regex";
 	public static final Pattern DEFAULT_REFERENCE_GO_REGEX = Pattern
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
@@ -98,6 +97,7 @@ public class Settings implements Cloneable {
 	public static final String GO_DB_URL_KEY = "go_db_url";
 	public static final String GO_DB_USER_KEY = "go_db_user";
 	public static final String GO_DB_PASSWORD_KEY = "go_db_password";
+	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 
 	/**
 	 * Constant parameters
@@ -222,6 +222,12 @@ public class Settings implements Cloneable {
 	private String goDbURL = "jdbc:mysql://mysql.ebi.ac.uk:4085/go_latest";
 	private String goDbUser = "go_select";
 	private String goDbPassword = "amigo";
+	/**
+	 * If set to true AHRD will choose the highest scoring BlastResult WITH GO
+	 * Annotations as donor for a query protein's HRD. If no BlastResult has GO
+	 * annotations AHRD works "as normal".
+	 */
+	private Boolean preferReferenceWithGoAnnos = false;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -242,149 +248,116 @@ public class Settings implements Cloneable {
 	public void initialize(String pathToYml) throws IOException {
 		YamlReader reader = new YamlReader(new FileReader(pathToYml));
 		Map<String, Object> input = (Map<String, Object>) reader.read();
-		this.blastDbSettings = (Map<String, Map<String, String>>) input
-				.get(BLAST_DBS_KEY);
+		this.blastDbSettings = (Map<String, Map<String, String>>) input.get(BLAST_DBS_KEY);
 		setPathToProteinsFasta((String) input.get(PROTEINS_FASTA_KEY));
 		setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
 		setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
-		setPathToGeneOntologyResults((String) input
-				.get(GENE_ONTOLOGY_RESULT_KEY));
+		setPathToGeneOntologyResults((String) input.get(GENE_ONTOLOGY_RESULT_KEY));
 		setPathToOutput((String) input.get(OUTPUT_KEY));
-		if (input.get(HRD_SCORES_OUTPUT_PATH) != null
-				&& !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
+		if (input.get(HRD_SCORES_OUTPUT_PATH) != null && !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
 			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH));
 		// Trainer logs path through parameter-space here:
 		if (input.get(SIMULATED_ANNEALING_PATH_LOG_KEY) != null)
-			setPathToSimulatedAnnealingPathLog((String) input
-					.get(SIMULATED_ANNEALING_PATH_LOG_KEY));
-		setTokenScoreBitScoreWeight(Double.parseDouble((String) input
-				.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
-		setTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input
-				.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
-		setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input
-				.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
-		setWriteTokenSetToOutput(Boolean.parseBoolean((String) input
-				.get(WRITE_TOKEN_SET_TO_OUTPUT)));
-		setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input
-				.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
-		setWriteScoresToOutput(Boolean.parseBoolean((String) input
-				.get(WRITE_SCORES_TO_OUTPUT)));
-		setOutputFasta(Boolean.parseBoolean((String) input
-				.get(OUTPUT_FASTA_KEY)));
+			setPathToSimulatedAnnealingPathLog((String) input.get(SIMULATED_ANNEALING_PATH_LOG_KEY));
+		setTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
+		setTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
+		setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
+		setWriteTokenSetToOutput(Boolean.parseBoolean((String) input.get(WRITE_TOKEN_SET_TO_OUTPUT)));
+		setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
+		setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
+		setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
 		// Generate the Blacklists and Filters for each Blast-Database from
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
-			this.blastResultsBlacklists
-					.put(blastDatabaseName,
-							fromFile(getPathToBlastResultsBlackList(blastDatabaseName)));
-			this.blastResultsFilter.put(blastDatabaseName,
-					fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
-			this.tokenBlacklists.put(blastDatabaseName,
-					fromFile(getPathToTokenBlacklist(blastDatabaseName)));
+			this.blastResultsBlacklists.put(blastDatabaseName,
+					fromFile(getPathToBlastResultsBlackList(blastDatabaseName)));
+			this.blastResultsFilter.put(blastDatabaseName, fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
+			this.tokenBlacklists.put(blastDatabaseName, fromFile(getPathToTokenBlacklist(blastDatabaseName)));
 			// Set Database-Weights and Description-Score-Bit-Score-Weight:
-			this.getParameters().setBlastDbWeight(
-					blastDatabaseName,
-					this.getBlastDbSettings(blastDatabaseName).get(
-							Settings.BLAST_DB_WEIGHT_KEY));
-			this.getParameters().setDescriptionScoreBitScoreWeight(
-					blastDatabaseName,
-					this.getBlastDbSettings(blastDatabaseName).get(
-							Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
+			this.getParameters().setBlastDbWeight(blastDatabaseName,
+					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
+			this.getParameters().setDescriptionScoreBitScoreWeight(blastDatabaseName,
+					this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
 		}
 		// If started to train the algorithm references are stored in this file:
 		setPathToReferencesFasta((String) input.get(REFERENCES_FASTA_KEY));
 		// If started in training-mode the F-Measure's Beta-Parameter can be set
 		// to some other value than 1.0
 		if (input.get(F_MEASURE_BETA_PARAM_KEY) != null)
-			this.fMeasureBetaParameter = Double.parseDouble((String) input
-					.get(F_MEASURE_BETA_PARAM_KEY));
+			this.fMeasureBetaParameter = Double.parseDouble((String) input.get(F_MEASURE_BETA_PARAM_KEY));
 		// If started to compare AHRD with Blast2Go, enable reading of
 		// B2G-Annotations:
 		if (input.get(BLAST_2_GO_ANNOT_FILE_KEY) != null)
-			this.pathToBlast2GoAnnotations = (String) input
-					.get(BLAST_2_GO_ANNOT_FILE_KEY);
+			this.pathToBlast2GoAnnotations = (String) input.get(BLAST_2_GO_ANNOT_FILE_KEY);
 		// Simulated Annealing can be started with custom temperature and value
 		// it is cooled-down by each step:
 		if (input.get(TEMPERATURE_KEY) != null)
-			setTemperature(Integer
-					.parseInt((String) input.get(TEMPERATURE_KEY)));
+			setTemperature(Integer.parseInt((String) input.get(TEMPERATURE_KEY)));
 		if (input.get(COOL_DOWN_BY_KEY) != null)
-			this.coolDownBy = Integer.parseInt((String) input
-					.get(COOL_DOWN_BY_KEY));
+			this.coolDownBy = Integer.parseInt((String) input.get(COOL_DOWN_BY_KEY));
 		if (input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY) != null)
-			setOptimizationAcceptanceProbabilityScalingFactor(Double
-					.parseDouble((String) input
-							.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY)));
+			setOptimizationAcceptanceProbabilityScalingFactor(
+					Double.parseDouble((String) input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY)));
 		if (input.get(MUTATOR_MEAN_KEY) != null)
-			setMutatorMean(Double.parseDouble((String) input
-					.get(MUTATOR_MEAN_KEY)));
+			setMutatorMean(Double.parseDouble((String) input.get(MUTATOR_MEAN_KEY)));
 		if (input.get(MUTATOR_DEVIATION_KEY) != null)
-			setMutatorDeviation(Double.parseDouble((String) input
-					.get(MUTATOR_DEVIATION_KEY)));
+			setMutatorDeviation(Double.parseDouble((String) input.get(MUTATOR_DEVIATION_KEY)));
 		if (input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY) != null
-				&& Boolean.parseBoolean(input.get(
-						REMEMBER_SIMULATED_ANNEALING_PATH_KEY).toString()))
+				&& Boolean.parseBoolean(input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY).toString()))
 			this.rememberSimulatedAnnealingPath = true;
 		if (input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY) != null)
-			setpMutateSameParameterScale(Double.parseDouble((String) input
-					.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY)));
+			setpMutateSameParameterScale(Double.parseDouble((String) input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY)));
 		// Evaluation or Optimization might be interested in the highest
 		// possibly achievable evaluation-score:
 		if (input.get(FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY) != null
-				&& Boolean.parseBoolean(input.get(
-						FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY).toString()))
+				&& Boolean.parseBoolean(input.get(FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY).toString()))
 			this.findHighestPossibleEvaluationScore = true;
 		// Set any non default parameters controlling, how sequence similarity
 		// search result tables are parsed:
 		if (input.get(SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY) != null) {
-			setSeqSimSearchTableCommentLineRegex(Pattern.compile(input.get(
-					SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY).toString()));
+			setSeqSimSearchTableCommentLineRegex(
+					Pattern.compile(input.get(SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SEP_KEY) != null) {
-			setSeqSimSearchTableSep(input.get(SEQ_SIM_SEARCH_TABLE_SEP_KEY)
-					.toString());
+			setSeqSimSearchTableSep(input.get(SEQ_SIM_SEARCH_TABLE_SEP_KEY).toString());
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY) != null) {
-			setSeqSimSearchTableQueryCol(Integer.parseInt(input.get(
-					SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY).toString()));
+			setSeqSimSearchTableQueryCol(Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY) != null) {
-			setSeqSimSearchTableSubjectCol(Integer.parseInt(input.get(
-					SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY).toString()));
+			setSeqSimSearchTableSubjectCol(
+					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY) != null) {
-			setSeqSimSearchTableQueryStartCol(Integer.parseInt(input.get(
-					SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY).toString()));
+			setSeqSimSearchTableQueryStartCol(
+					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY) != null) {
-			setSeqSimSearchTableQueryEndCol(Integer.parseInt(input.get(
-					SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY).toString()));
+			setSeqSimSearchTableQueryEndCol(
+					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_START_COL_KEY) != null) {
-			setSeqSimSearchTableSubjectStartCol(Integer.parseInt(input.get(
-					SEQ_SIM_SEARCH_TABLE_SUBJECT_START_COL_KEY).toString()));
+			setSeqSimSearchTableSubjectStartCol(
+					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_START_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY) != null) {
-			setSeqSimSearchTableSubjectEndCol(Integer.parseInt(input.get(
-					SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY).toString()));
+			setSeqSimSearchTableSubjectEndCol(
+					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY) != null) {
-			setSeqSimSearchTableEValueCol(Integer.parseInt(input.get(
-					SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY).toString()));
+			setSeqSimSearchTableEValueCol(Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY) != null) {
-			setSeqSimSearchTableBitScoreCol(Integer.parseInt(input.get(
-					SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
+			setSeqSimSearchTableBitScoreCol(
+					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
 		}
 		// Enable parsing of custom (non UniprotKB) go annotation (GOA) files:
 		if (input.get(REFERENCE_GO_REGEX_KEY) != null) {
-			setReferenceGoRegex(Pattern.compile(input.get(
-					REFERENCE_GO_REGEX_KEY).toString()));
+			setReferenceGoRegex(Pattern.compile(input.get(REFERENCE_GO_REGEX_KEY).toString()));
 		}
 		// Enable generation of an extended GO result table:
 		if (input.get(EXTENDED_GO_RESULT_TABLE_KEY) != null) {
-			setExtendedGoResultTablePath(input
-					.get(EXTENDED_GO_RESULT_TABLE_KEY).toString());
+			setExtendedGoResultTablePath(input.get(EXTENDED_GO_RESULT_TABLE_KEY).toString());
 		}
 		if (input.get(GO_DB_URL_KEY) != null) {
 			this.goDbURL = input.get(GO_DB_URL_KEY).toString();
@@ -394,6 +367,9 @@ public class Settings implements Cloneable {
 		}
 		if (input.get(GO_DB_PASSWORD_KEY) != null) {
 			this.goDbPassword = input.get(GO_DB_PASSWORD_KEY).toString();
+		}
+		if (input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY) != null) {
+			this.preferReferenceWithGoAnnos = true;
 		}
 	}
 
@@ -428,14 +404,12 @@ public class Settings implements Cloneable {
 	}
 
 	public boolean hasValidInterproDatabaseAndResultFile() {
-		if (getPathToInterproDatabase() == null
-				|| getPathToInterproResults() == null)
+		if (getPathToInterproDatabase() == null || getPathToInterproResults() == null)
 			return false;
 		// ELSE:
 		File iprDb = new File(getPathToInterproDatabase());
 		File iprRes = new File(getPathToInterproResults());
-		return (iprDb.canRead() && iprDb.length() > 0 && iprRes.canRead() && iprRes
-				.length() > 0);
+		return (iprDb.canRead() && iprDb.length() > 0 && iprRes.canRead() && iprRes.length() > 0);
 	}
 
 	/**
@@ -472,8 +446,7 @@ public class Settings implements Cloneable {
 	public List<String> getSortedBlastDatabases() {
 		// Only sort ONCE:
 		if (this.sortedBlastDatabaseNames == null) {
-			this.sortedBlastDatabaseNames = new ArrayList<String>(
-					getBlastDatabases());
+			this.sortedBlastDatabaseNames = new ArrayList<String>(getBlastDatabases());
 			Collections.sort(this.sortedBlastDatabaseNames);
 		}
 		return this.sortedBlastDatabaseNames;
@@ -488,14 +461,11 @@ public class Settings implements Cloneable {
 	}
 
 	public Double getDescriptionScoreBitScoreWeight(String blastDatabaseName) {
-		return getParameters().getDescriptionScoreBitScoreWeight(
-				blastDatabaseName);
+		return getParameters().getDescriptionScoreBitScoreWeight(blastDatabaseName);
 	}
 
-	public void setDescriptionScoreBitScoreWeight(String blastDatabaseName,
-			String dsbsw) {
-		getParameters().setDescriptionScoreBitScoreWeight(blastDatabaseName,
-				dsbsw);
+	public void setDescriptionScoreBitScoreWeight(String blastDatabaseName, String dsbsw) {
+		getParameters().setDescriptionScoreBitScoreWeight(blastDatabaseName, dsbsw);
 	}
 
 	public String getPathToBlastResults(String blastDatabaseName) {
@@ -507,18 +477,14 @@ public class Settings implements Cloneable {
 	}
 
 	public Pattern getFastaHeaderRegex(String blastDatabaseName) {
-		return (getBlastDbSettings(blastDatabaseName)
-				.containsKey(FASTA_HEADER_REGEX_KEY)) ? Pattern
-				.compile(getBlastDbSettings(blastDatabaseName).get(
-						FASTA_HEADER_REGEX_KEY).toString())
+		return (getBlastDbSettings(blastDatabaseName).containsKey(FASTA_HEADER_REGEX_KEY))
+				? Pattern.compile(getBlastDbSettings(blastDatabaseName).get(FASTA_HEADER_REGEX_KEY).toString())
 				: DEFAULT_FASTA_HEADER_REGEX;
 	}
 
 	public Pattern getShortAccessionRegex(String blastDatabaseName) {
-		return (getBlastDbSettings(blastDatabaseName)
-				.containsKey(SHORT_ACCESSION_REGEX_KEY)) ? Pattern
-				.compile(getBlastDbSettings(blastDatabaseName).get(
-						SHORT_ACCESSION_REGEX_KEY).toString())
+		return (getBlastDbSettings(blastDatabaseName).containsKey(SHORT_ACCESSION_REGEX_KEY))
+				? Pattern.compile(getBlastDbSettings(blastDatabaseName).get(SHORT_ACCESSION_REGEX_KEY).toString())
 				: DEFAULT_SHORT_ACCESSION_REGEX;
 	}
 
@@ -579,10 +545,8 @@ public class Settings implements Cloneable {
 	}
 
 	public boolean hasInterproAnnotations() {
-		return getPathToInterproDatabase() != null
-				&& (new File(getPathToInterproDatabase())).exists()
-				&& getPathToInterproResults() != null
-				&& (new File(getPathToInterproResults())).exists();
+		return getPathToInterproDatabase() != null && (new File(getPathToInterproDatabase())).exists()
+				&& getPathToInterproResults() != null && (new File(getPathToInterproResults())).exists();
 	}
 
 	public void setPathToInterproResults(String pathToInterproResults) {
@@ -594,8 +558,7 @@ public class Settings implements Cloneable {
 	}
 
 	public boolean hasGeneOntologyAnnotations() {
-		return getPathToGeneOntologyResults() != null
-				&& (new File(getPathToGeneOntologyResults())).exists();
+		return getPathToGeneOntologyResults() != null && (new File(getPathToGeneOntologyResults())).exists();
 	}
 
 	public void setPathToGeneOntologyResults(String pathToGeneOntologyResults) {
@@ -615,28 +578,23 @@ public class Settings implements Cloneable {
 	}
 
 	public void setTokenScoreBitScoreWeight(Double tokenScoreBitScoreWeight) {
-		this.getParameters().setTokenScoreBitScoreWeight(
-				tokenScoreBitScoreWeight);
+		this.getParameters().setTokenScoreBitScoreWeight(tokenScoreBitScoreWeight);
 	}
 
 	public Double getTokenScoreDatabaseScoreWeight() {
 		return getParameters().getTokenScoreDatabaseScoreWeight();
 	}
 
-	public void setTokenScoreDatabaseScoreWeight(
-			Double tokenScoreDatabaseScoreWeight) {
-		this.getParameters().setTokenScoreDatabaseScoreWeight(
-				tokenScoreDatabaseScoreWeight);
+	public void setTokenScoreDatabaseScoreWeight(Double tokenScoreDatabaseScoreWeight) {
+		this.getParameters().setTokenScoreDatabaseScoreWeight(tokenScoreDatabaseScoreWeight);
 	}
 
 	public Double getTokenScoreOverlapScoreWeight() {
 		return getParameters().getTokenScoreOverlapScoreWeight();
 	}
 
-	public void setTokenScoreOverlapScoreWeight(
-			Double tokenScoreOverlapScoreWeight) {
-		this.getParameters().setTokenScoreOverlapScoreWeight(
-				tokenScoreOverlapScoreWeight);
+	public void setTokenScoreOverlapScoreWeight(Double tokenScoreOverlapScoreWeight) {
+		this.getParameters().setTokenScoreOverlapScoreWeight(tokenScoreOverlapScoreWeight);
 	}
 
 	public Boolean getWriteTokenSetToOutput() {
@@ -667,8 +625,7 @@ public class Settings implements Cloneable {
 		return blastDbSettings;
 	}
 
-	public void setBlastDbSettings(
-			Map<String, Map<String, String>> blastDbSettings) {
+	public void setBlastDbSettings(Map<String, Map<String, String>> blastDbSettings) {
 		this.blastDbSettings = blastDbSettings;
 	}
 
@@ -785,8 +742,7 @@ public class Settings implements Cloneable {
 		return pathToSimulatedAnnealingPathLog;
 	}
 
-	public void setPathToSimulatedAnnealingPathLog(
-			String pathToSimulatedAnnealingPathLog) {
+	public void setPathToSimulatedAnnealingPathLog(String pathToSimulatedAnnealingPathLog) {
 		this.pathToSimulatedAnnealingPathLog = pathToSimulatedAnnealingPathLog;
 	}
 
@@ -807,8 +763,7 @@ public class Settings implements Cloneable {
 	}
 
 	public Boolean doWriteHRDScoresToOutput() {
-		return getPathToHRDScoresOutput() != null
-				&& !getPathToHRDScoresOutput().equals("");
+		return getPathToHRDScoresOutput() != null && !getPathToHRDScoresOutput().equals("");
 	}
 
 	public Integer getSeqSimSearchTableQueryCol() {
@@ -823,8 +778,7 @@ public class Settings implements Cloneable {
 		return seqSimSearchTableSubjectCol;
 	}
 
-	public void setSeqSimSearchTableSubjectCol(
-			Integer seqSimSearchTableSubjectCol) {
+	public void setSeqSimSearchTableSubjectCol(Integer seqSimSearchTableSubjectCol) {
 		this.seqSimSearchTableSubjectCol = seqSimSearchTableSubjectCol;
 	}
 
@@ -832,8 +786,7 @@ public class Settings implements Cloneable {
 		return seqSimSearchTableQueryStartCol;
 	}
 
-	public void setSeqSimSearchTableQueryStartCol(
-			Integer seqSimSearchTableQueryStartCol) {
+	public void setSeqSimSearchTableQueryStartCol(Integer seqSimSearchTableQueryStartCol) {
 		this.seqSimSearchTableQueryStartCol = seqSimSearchTableQueryStartCol;
 	}
 
@@ -841,8 +794,7 @@ public class Settings implements Cloneable {
 		return seqSimSearchTableQueryEndCol;
 	}
 
-	public void setSeqSimSearchTableQueryEndCol(
-			Integer seqSimSearchTableQueryEndCol) {
+	public void setSeqSimSearchTableQueryEndCol(Integer seqSimSearchTableQueryEndCol) {
 		this.seqSimSearchTableQueryEndCol = seqSimSearchTableQueryEndCol;
 	}
 
@@ -850,8 +802,7 @@ public class Settings implements Cloneable {
 		return seqSimSearchTableSubjectStartCol;
 	}
 
-	public void setSeqSimSearchTableSubjectStartCol(
-			Integer seqSimSearchTableSubjectStartCol) {
+	public void setSeqSimSearchTableSubjectStartCol(Integer seqSimSearchTableSubjectStartCol) {
 		this.seqSimSearchTableSubjectStartCol = seqSimSearchTableSubjectStartCol;
 	}
 
@@ -859,8 +810,7 @@ public class Settings implements Cloneable {
 		return seqSimSearchTableSubjectEndCol;
 	}
 
-	public void setSeqSimSearchTableSubjectEndCol(
-			Integer seqSimSearchTableSubjectEndCol) {
+	public void setSeqSimSearchTableSubjectEndCol(Integer seqSimSearchTableSubjectEndCol) {
 		this.seqSimSearchTableSubjectEndCol = seqSimSearchTableSubjectEndCol;
 	}
 
@@ -868,8 +818,7 @@ public class Settings implements Cloneable {
 		return seqSimSearchTableCommentLineRegex;
 	}
 
-	public void setSeqSimSearchTableCommentLineRegex(
-			Pattern seqSimSearchTableCommentLineRegex) {
+	public void setSeqSimSearchTableCommentLineRegex(Pattern seqSimSearchTableCommentLineRegex) {
 		this.seqSimSearchTableCommentLineRegex = seqSimSearchTableCommentLineRegex;
 	}
 
@@ -893,8 +842,7 @@ public class Settings implements Cloneable {
 		return seqSimSearchTableBitScoreCol;
 	}
 
-	public void setSeqSimSearchTableBitScoreCol(
-			Integer seqSimSearchTableBitScoreCol) {
+	public void setSeqSimSearchTableBitScoreCol(Integer seqSimSearchTableBitScoreCol) {
 		this.seqSimSearchTableBitScoreCol = seqSimSearchTableBitScoreCol;
 	}
 
@@ -906,8 +854,7 @@ public class Settings implements Cloneable {
 	 * @return Pattern
 	 */
 	public Pattern getReferenceGoRegex() {
-		return this.referenceGoRegex != null ? referenceGoRegex
-				: DEFAULT_REFERENCE_GO_REGEX;
+		return this.referenceGoRegex != null ? referenceGoRegex : DEFAULT_REFERENCE_GO_REGEX;
 	}
 
 	public void setReferenceGoRegex(Pattern referenceGoRegex) {
@@ -936,6 +883,14 @@ public class Settings implements Cloneable {
 
 	public void setExtendedGoResultTablePath(String extendedGoResultTablePath) {
 		this.extendedGoResultTablePath = extendedGoResultTablePath;
+	}
+
+	public Boolean getPreferReferenceWithGoAnnos() {
+		return preferReferenceWithGoAnnos;
+	}
+
+	public void setPreferReferenceWithGoAnnos(Boolean preferReferenceWithGoAnnos) {
+		this.preferReferenceWithGoAnnos = preferReferenceWithGoAnnos;
 	}
 
 }

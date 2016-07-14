@@ -1,5 +1,6 @@
 package ahrd.test;
 
+import static ahrd.controller.Settings.getSettings;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -33,8 +34,7 @@ public class DescriptionScoreCalculatorTest {
 		BlastResult br = TestUtils.mockBlastResult();
 		p.getDescriptionScoreCalculator().setMaxBitScore(60.0);
 		// test: (0.2 * 30.0 / 60.0)
-		assertEquals(0.1,
-				p.getDescriptionScoreCalculator().relativeBlastScore(br), 0.0);
+		assertEquals(0.1, p.getDescriptionScoreCalculator().relativeBlastScore(br), 0.0);
 	}
 
 	@Test
@@ -42,9 +42,8 @@ public class DescriptionScoreCalculatorTest {
 		Protein p = new Protein("sweet_sheep_protein", 200);
 		// and mock LexicalScoreCalculator
 		p.setLexicalScoreCalculator(new TestUtils.LexicalScoreCalculatorMock(p));
-		BlastResult br = TestUtils.mockBlastResult("accession", 1.0,
-				"goat sheep wool", 10, 20, 10, 20, 200, 30.0, "swissprot",
-				new HashSet<String>(Arrays.asList("goat", "sheep", "wool")));
+		BlastResult br = TestUtils.mockBlastResult("accession", 1.0, "goat sheep wool", 10, 20, 10, 20, 200, 30.0,
+				"swissprot", new HashSet<String>(Arrays.asList("goat", "sheep", "wool")));
 		List<BlastResult> brs = new ArrayList<BlastResult>();
 		brs.add(br);
 		p.getBlastResults().put("swissprot", brs);
@@ -59,36 +58,25 @@ public class DescriptionScoreCalculatorTest {
 
 	@Test
 	public void testFindHighestScoringBlastResult() {
-		Protein p = TestUtils.mockProtein();
-		// Sprot
-		p.getBlastResults().put("swissprot",
-				TestUtils.mockBlastResultsForDescCalcTest());
-		// trEMBL
-		p.getBlastResults().put(
-				"trembl",
-				Arrays.asList(TestUtils.mockBlastResult(
-						"accession_5",
-						5.0,
-						"description_5 Fly-Wing formation",
-						10,
-						20,
-						10,
-						20,
-						200,
-						30.0,
-						"trembl",
-						new HashSet<String>(Arrays.asList("description", "5",
-								"fly", "wing", "formation")))));
-		p.setLexicalScoreCalculator(new TestUtils.LexicalScoreCalculatorMock(p));
-		p.getDescriptionScoreCalculator().setMaxBitScore(30.0);
+		Protein p = TestUtils.mockProteinAndBlastResultsForDescriptionScoreCalculatorTest();
 		// Token-Scores are not needed, as the lexical score is mocked!
 		// test
-		p.getDescriptionScoreCalculator().findHighestScoringBlastResult();
+		p.getDescriptionScoreCalculator().findHighestScoringBlastResult(null);
 		// 0.7 (mocked) + 0.4 * 30/30
-		assertEquals(1.1, p.getDescriptionScoreCalculator()
-				.getDescriptionHighScore(), 0.0000001);
-		assertEquals("description_5 Fly-Wing formation", p
-				.getDescriptionScoreCalculator().getHighestScoringBlastResult()
-				.getDescription());
+		assertEquals(1.1, p.getDescriptionScoreCalculator().getDescriptionHighScore(), 0.0000001);
+		assertEquals("description_5 Fly-Wing formation",
+				p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescription());
+	}
+
+	@Test
+	public void testFindHighestScoringBlastResultWithGOAnnos() {
+		getSettings().setPreferReferenceWithGoAnnos(true);
+		Protein p = TestUtils.mockProteinAndBlastResultsForDescriptionScoreCalculatorTest();
+		// NO GOAS present, AHRD should work "as normal":
+		p.getDescriptionScoreCalculator().findHighestScoringBlastResult(null);
+		// 0.7 (mocked) + 0.4 * 30/30
+		assertEquals(1.1, p.getDescriptionScoreCalculator().getDescriptionHighScore(), 0.0000001);
+		assertEquals("description_5 Fly-Wing formation",
+				p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescription());
 	}
 }
