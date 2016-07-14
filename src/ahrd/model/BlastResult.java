@@ -531,7 +531,7 @@ public class BlastResult implements Comparable<BlastResult> {
 		if (shortAccession == null) {
 			Pattern p = getSettings().getShortAccessionRegex(getBlastDatabaseName());
 			Matcher m = p.matcher(getAccession());
-			shortAccession = getAccession();
+			setShortAccession(getAccession());
 			if (!m.find()) {
 				System.err.println("WARNING: Regular Expression '" + p.toString()
 						+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '" + getAccession()
@@ -541,6 +541,10 @@ public class BlastResult implements Comparable<BlastResult> {
 			}
 		}
 		return (shortAccession);
+	}
+	
+	public void setShortAccession(String shortAccession) {
+		this.shortAccession = shortAccession;
 	}
 
 	public String getAccession() {

@@ -6,8 +6,11 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -78,5 +81,23 @@ public class DescriptionScoreCalculatorTest {
 		assertEquals(1.1, p.getDescriptionScoreCalculator().getDescriptionHighScore(), 0.0000001);
 		assertEquals("description_5 Fly-Wing formation",
 				p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescription());
+		// GOAS present, AHRD should choose highest scoring BlastResult WITH GO
+		// Terms
+		p.getDescriptionScoreCalculator()
+				.findHighestScoringBlastResult(TestUtils.mockReferenceGoAnnotationsForDescriptionScoreCalculatorTest());
+		assertEquals(0.8999999, p.getDescriptionScoreCalculator().getDescriptionHighScore(), 0.0000001);
+		assertEquals("family subfamily activity NADH-Dehydrogenase",
+				p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescription());
+		// GOAS present but not for any BlastResult of the query protein, AHRD
+		// should behave "as normal":
+		Map<String, Set<String>> refGos = new HashMap<String, Set<String>>();
+		refGos.put("no_blast_hit_acc_1", new HashSet<String>(Arrays.asList("GO:1234567", "GO:7654321")));
+		refGos.put("no_blast_hit_acc_2", new HashSet<String>(Arrays.asList("GO:1726354", "GO:7162534")));
+		p.getDescriptionScoreCalculator()
+				.findHighestScoringBlastResult(refGos);
+		assertEquals(1.1, p.getDescriptionScoreCalculator().getDescriptionHighScore(), 0.0000001);
+		assertEquals("description_5 Fly-Wing formation",
+				p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescription());
+
 	}
 }

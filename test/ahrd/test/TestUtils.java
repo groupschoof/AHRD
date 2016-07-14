@@ -58,6 +58,7 @@ public class TestUtils {
 			int subjectStart, int subjectEnd, int subjectLength, Double bitScore, String dbName, Set<String> tokens) {
 		BlastResult br = new BlastResult(acc, eValue, descLine, queryStart, queryEnd, subjectStart, subjectEnd,
 				subjectLength, bitScore, dbName);
+		br.setShortAccession(acc);
 		br.setTokens(tokens);
 		return br;
 	}
@@ -192,7 +193,7 @@ public class TestUtils {
 	public static Map<String, Set<String>> mockReferenceGoAnnotationsForDescriptionScoreCalculatorTest() {
 		Map<String, Set<String>> refGos = new HashMap<String, Set<String>>();
 		refGos.put("accession_1", new HashSet<String>(Arrays.asList("GO:1234567", "GO:7654321")));
-		refGos.put("accession_5", new HashSet<String>(Arrays.asList("GO:1726354", "GO:7162534")));
+		refGos.put("accession_4", new HashSet<String>(Arrays.asList("GO:1726354", "GO:7162534")));
 		return refGos;
 	}
 }
