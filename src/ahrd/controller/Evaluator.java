@@ -9,6 +9,7 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
+import ahrd.view.ExtendedGOAnnotationTableWriter;
 import ahrd.view.OutputWriter;
 
 public class Evaluator extends AHRD {
@@ -18,35 +19,28 @@ public class Evaluator extends AHRD {
 	}
 
 	public void setupReferences() throws IOException, MissingAccessionException {
-		List<String> fastaEntries = Protein.splitFasta(getSettings()
-				.getReferencesFasta());
+		List<String> fastaEntries = Protein.splitFasta(getSettings().getReferencesFasta());
 		for (String fastaEntry : fastaEntries) {
 			if (fastaEntry != null && !fastaEntry.trim().equals("")) {
-				ReferenceDescription rd = ReferenceDescription
-						.constructFromFastaEntry(fastaEntry.trim());
+				ReferenceDescription rd = ReferenceDescription.constructFromFastaEntry(fastaEntry.trim());
 				Protein p = getProteins().get(rd.getAccession());
 				if (p == null)
 					throw new MissingAccessionException(
-							"Could not find Protein for Accession '"
-									+ rd.getAccession() + "'");
+							"Could not find Protein for Accession '" + rd.getAccession() + "'");
 				p.getEvaluationScoreCalculator().setReferenceDescription(rd);
 			}
 		}
 	}
 
-	public void setupBlast2GoAnnots() throws IOException,
-			MissingAccessionException {
+	public void setupBlast2GoAnnots() throws IOException, MissingAccessionException {
 		if (getSettings().getPathToBlast2GoAnnotations() != null
 				&& !getSettings().getPathToBlast2GoAnnotations().equals("")) {
-			for (String blast2GoResultEntry : getSettings()
-					.getBlast2GoAnnotations()) {
-				Blast2GoAnnot b2ga = Blast2GoAnnot
-						.fromBlast2GoEntry(blast2GoResultEntry);
+			for (String blast2GoResultEntry : getSettings().getBlast2GoAnnotations()) {
+				Blast2GoAnnot b2ga = Blast2GoAnnot.fromBlast2GoEntry(blast2GoResultEntry);
 				Protein p = getProteins().get(b2ga.getAccession());
 				if (p == null)
 					throw new MissingAccessionException(
-							"Could not find Protein for Accession '"
-									+ b2ga.getAccession() + "'");
+							"Could not find Protein for Accession '" + b2ga.getAccession() + "'");
 				p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2ga);
 			}
 		}
@@ -56,8 +50,7 @@ public class Evaluator extends AHRD {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out
-				.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.Evaluator input.yml\n");
+		System.out.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.Evaluator input.yml\n");
 
 		try {
 			Evaluator evaluator = new Evaluator(args[0]);
@@ -80,8 +73,14 @@ public class Evaluator extends AHRD {
 			// Generate Output:
 			OutputWriter ow = new OutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
-			System.out.println("Written output into:\n"
-					+ getSettings().getPathToOutput());
+			System.out.println("Written output into:\n" + getSettings().getPathToOutput());
+			// If requested, write extended Gene Ontology (GO) annotation table:
+			if (getSettings().generateExtendedGoResultTable()) {
+				ExtendedGOAnnotationTableWriter gw = new ExtendedGOAnnotationTableWriter(
+						evaluator.getProteins().values(), evaluator.getGoDB());
+				gw.writeOutput();
+				System.out.println("Wrote extended GO table.");
+			}
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
@@ -113,8 +112,7 @@ public class Evaluator extends AHRD {
 	 */
 	public void findHighestPossibleEvaluationScores() {
 		for (Protein prot : getProteins().values()) {
-			prot.getEvaluationScoreCalculator()
-					.findHighestPossibleEvaluationScore();
+			prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
 		}
 	}
 
