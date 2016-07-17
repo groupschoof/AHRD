@@ -140,7 +140,7 @@ public class GOdbSQL {
 	 */
 	public static String goTermAccessionsForAccsOrSynonyms(Collection<String> goTermAccs) {
 		String catGoAccs = catGoTermAccessions(goTermAccs);
-		return "SElECT t.acc FROM term t LEFT JOIN term_synonym s ON t.id = s.term_id WHERE t.acc in (" + catGoAccs
+		return "SELECT t.acc FROM term t LEFT JOIN term_synonym s ON t.id = s.term_id WHERE t.acc in (" + catGoAccs
 				+ ") OR s.term_synonym in (" + catGoAccs + ")";
 	}
 }
