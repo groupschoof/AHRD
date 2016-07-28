@@ -123,7 +123,7 @@ public class EvaluationScoreCalculator {
 	 * Recall is identical with the True-Positive-Rate: recall (rc) :=
 	 * true-positives / #reference-tokens
 	 * 
-	 * f-beta-score := (1+beta²) * (pr * rc) / (beta²*pr + rc)
+	 * f-beta-score := (1+beta^2) * (pr * rc) / ((beta^2)*pr + rc)
 	 * 
 	 * @param assignedTkns
 	 *            - Tokens of the Description assigned by AHRD or a
