@@ -96,14 +96,6 @@ public class Settings implements Cloneable {
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 
 	/**
-	 * Constant parameters
-	 */
-	public static final String GO_DB_TERM_TBL_ACCESSION_KEY = "acc";
-	public static final String GO_DB_TERM_TBL_NAME_KEY = "name";
-	public static final String GO_DB_TERM_TBL_ONTOLOGY_KEY = "term_type";
-	public static final String GO_DB_DESCENDANT_TERM_TBL_ACC_KEY = "desc_acc";
-
-	/**
 	 * Fields:
 	 */
 	private String pathToProteinsFasta;
