@@ -87,7 +87,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	private Protein protein;
 
 	/**
-	 * Makes a double string representation parseable by Double.parseDouble(…).
+	 * Makes a double string representation parseable by Double.parseDouble
 	 * 
 	 * @param input
 	 * @return String
@@ -282,7 +282,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * Adds the sequence length and Human Readable Description (HRD) to all
 	 * matching BlastHits found in the argument Map 'blastResults'. Afterwards
 	 * the respective BlastResult instances are added to their respective
-	 * Proteins. See function <code>generateHRDCandidateForProtein(…)</code> for
+	 * Proteins. See function <code>generateHRDCandidateForProtein</code> for
 	 * more details.
 	 * 
 	 * @param blastResults
@@ -304,7 +304,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * and human readable descriptions of those Proteins that are Hits
 	 * (Subjects) in the argument blastResults. Each time such a Hit is found
 	 * the mentioned measurements are set in the respective instance of
-	 * BlastResult and subsequently the method 'Protein.addBlastResult(…)' is
+	 * BlastResult and subsequently the method 'Protein.addBlastResult' is
 	 * invoked.
 	 * 
 	 * @param proteinDb
