@@ -32,7 +32,6 @@ h2. Table of contents
 ### "Parameters controlling Gene Ontology term annotations":#332-parameters-controlling-gene-ontology-term-annotations
 #### "Prefer reference proteins as candidates that have GO Term annotations":#3320-prefer-reference-proteins-as-candidates-that-have-go-term-annotations
 #### "Custom reference Gene Ontology annotations (non UniprotKB GOA)":#3321-custom-reference-gene-ontology-annotations-non-uniprotkb-goa
-#### "Have AHRD extend predicted GO terms with semantically included GO terms":#3322-have-ahrd-extend-predicted-go-terms-with-semantically-included-go-terms
 ##### "Custom Gene Ontology Database":#33221-custom-gene-ontology-database
 # "Testing":#4-testing
 # "License":#5-license
@@ -83,9 +82,6 @@ There are _three_ template AHRD input files provided that you should use accordi
 | *Use Case* | *Template File* |
 | Annotate your Query proteins with Human Readable Descriptions (HRD) | @./test/resources/ahrd_example_input.yml@ |
 | Annotate your Query proteins with HRD _and_ Gene Ontology (GO) terms | @./test/resources/ahrd_example_input_go_prediction.yml@ |
-| Annotate your Query proteins with HRD, GO terms, _and_ generate an extended GO annotation table | @./test/resources/ahrd_example_input_go_prediction_extended.yml@ |
-
-_Note_: For details on extended GO annotation tables please refer to section "3.3.2.2":#3322-have-ahrd-extend-predicted-go-terms-with-semantically-included-go-terms
 
 h3. 2.2 Input
 
@@ -328,33 +324,6 @@ Unfortunately UniprotKB GOA files use short protein accessions like @W9QFR0@, wh
 # Set the Blast database specific regular expression, used to extract the short accessions from logn ones with @short_accession_regex:@ For example for TAIR10, use @short_accession_regex: "^(?<shortAccession>.+)$"@.
 
 _Note:_ You must provide the above named match groups @shortAccession@ and @goTerm@, respectively.
-
-h5. 3.3.2.2 Have AHRD extend predicted GO terms with semantically included GO terms
-
-The Gene Ontology is organised in a graph. GO terms can have ancestors of three different relationship types: "is_a", "kind_of", and "part_of". Because with increasing depth GO terms are more precise and accurate descriptions ancestal terms are semantically included. If you choose AHRD can annotate your proteins with all GO terms ancestral to the ones it already has selected. This option will write a second TAB-delimited output file with four columns:
-
-1. Protein accession
-2. GO term accession, e.g. @GO:0070887@
-3. GO ontology - one of @Biological Process@, @Cellular Component@, or @Molecular Function@
-4. GO name, e.g. @cellular response to chemical stimulus@
-
-_Note_: Choosing this option will also provide you with a more detailled GO annotation, because it includes the GO term names and ontologies and not only their accessions. Also note, that AHRD needs access to an instance of the Gene Ontology MySQL database. By default it will use the instance provided by the European Bioinformatics Institute (EBI). See "next section":#33221-custom-gene-ontology-database for more details.
-
-To have AHRD generate this extended GO annotation table, just provide an output path to it in your @input.yml@:
-
-<pre>extended_go_result_table: ./ahrd_extended_go_table.tsv
-</pre>
-
-h6. 3.3.2.2.1 Custom Gene Ontology Database
-
-As mentioned above AHRD needs an instance of the Gene Ontology MySQL database, if you want it to generate an extended GO annotation table. Instead of using the default public database provided by the EBI, you can set the connection parameters to your own database:
-
-<pre>go_db_url: jdbc:mysql://mysql.ebi.ac.uk:4085/go_latest
-go_db_user: go_select
-go_db_password: amigo
-</pre>
-
-_Note_, that the values above are the default parameters, connecting to the EBI's instance of the GO MySQL database.
 
 h2. 4 Testing
 

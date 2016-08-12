@@ -5,7 +5,6 @@ import static ahrd.controller.Settings.setSettings;
 import static ahrd.model.ReferenceGoAnnotations.parseReferenceGoAnnotations;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
@@ -14,22 +13,19 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import nu.xom.ParsingException;
-
 import org.xml.sax.SAXException;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
-import ahrd.model.GOdbSQL;
 import ahrd.model.GOterm;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
-import ahrd.view.ExtendedGOAnnotationTableWriter;
 import ahrd.view.FastaOutputWriter;
 import ahrd.view.IOutputWriter;
 import ahrd.view.OutputWriter;
+import nu.xom.ParsingException;
 
 public class AHRD {
 
@@ -81,16 +77,7 @@ public class AHRD {
 			// Log
 			System.out.println("Wrote output in " + ahrd.takeTime() + "sec, currently occupying "
 					+ ahrd.takeMemoryUsage() + " MB");
-			// If requested, write extended Gene Ontology (GO) annotation table:
-			if (getSettings().generateExtendedGoResultTable()) {
-				System.out.println("Writing extended Gene Ontology (GO) term annotation table to '"
-						+ getSettings().getExtendedGoResultTablePath() + "'.");
-				ExtendedGOAnnotationTableWriter gw = new ExtendedGOAnnotationTableWriter(ahrd.getProteins().values(),
-						ahrd.getGoDB());
-				gw.writeOutput();
-				System.out.println("Wrote extended GO table in " + ahrd.takeTime() + "sec, currently occupying "
-						+ ahrd.takeMemoryUsage() + " MB");
-			}
+			
 			System.out.println("\n\nDONE");
 		} catch (Exception e) {
 			System.err.println("We are sorry, an un-expected ERROR occurred:");
@@ -254,41 +241,7 @@ public class AHRD {
 			// filter for each protein's most-informative
 			// interpro-results
 			InterproResult.filterForMostInforming(prot);
-		}
-		try {
-			if (getSettings().generateExtendedGoResultTable())
-				extendGOtermAnnotationsWithParentalTerms();
-		} catch (SQLException e) {
-			System.err
-					.println("An un-expected error occurred when generating the _extended_ GO term annotation table.");
-			e.printStackTrace(System.err);
-			System.err.println("AHRD will still generate its normal results.");
-		}
-	}
-
-	/**
-	 * Extends each Proteins' Gene Ontology (GO) terms with their respective
-	 * parental terms. Per protein each respective GO term is only annotated
-	 * once.
-	 * 
-	 * @throws SQLException
-	 */
-	public void extendGOtermAnnotationsWithParentalTerms() throws SQLException {
-		// Initialize the in memory Gene Ontology (GO) database:
-		Set<String> gts = Protein.uniqueGOaccessions(getProteins().values());
-		Connection goCon = null;
-		try {
-			goCon = GOdbSQL.connectToGeneOntologyDb();
-			setGoDB(GOdbSQL.parentGoTermsForAccessions(gts, goCon));
-		} finally {
-			goCon.close();
-		}
-		// Extend each Proteins' GO results with their parental terms:
-		for (Protein p : getProteins().values()) {
-			Collection<String> gos = p.getGoResults();
-			if (gos != null)
-				p.setGoResults(GOdbSQL.uniqueGOAccessions(gos, getGoDB()));
-		}
+		}		
 	}
 
 	public Map<String, Protein> getProteins() {

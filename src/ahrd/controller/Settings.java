@@ -93,10 +93,6 @@ public class Settings implements Cloneable {
 	public static final String REFERENCE_GO_REGEX_KEY = "reference_go_regex";
 	public static final Pattern DEFAULT_REFERENCE_GO_REGEX = Pattern
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
-	public static final String EXTENDED_GO_RESULT_TABLE_KEY = "extended_go_result_table";
-	public static final String GO_DB_URL_KEY = "go_db_url";
-	public static final String GO_DB_USER_KEY = "go_db_user";
-	public static final String GO_DB_PASSWORD_KEY = "go_db_password";
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 
 	/**
@@ -218,10 +214,6 @@ public class Settings implements Cloneable {
 	private Integer seqSimSearchTableEValueCol = 10;
 	private Integer seqSimSearchTableBitScoreCol = 11;
 	private Pattern referenceGoRegex;
-	private String extendedGoResultTablePath;
-	private String goDbURL = "jdbc:mysql://mysql.ebi.ac.uk:4085/go_latest";
-	private String goDbUser = "go_select";
-	private String goDbPassword = "amigo";
 	/**
 	 * If set to true AHRD will choose the highest scoring BlastResult WITH GO
 	 * Annotations as donor for a query protein's HRD. If no BlastResult has GO
@@ -354,19 +346,6 @@ public class Settings implements Cloneable {
 		// Enable parsing of custom (non UniprotKB) go annotation (GOA) files:
 		if (input.get(REFERENCE_GO_REGEX_KEY) != null) {
 			setReferenceGoRegex(Pattern.compile(input.get(REFERENCE_GO_REGEX_KEY).toString()));
-		}
-		// Enable generation of an extended GO result table:
-		if (input.get(EXTENDED_GO_RESULT_TABLE_KEY) != null) {
-			setExtendedGoResultTablePath(input.get(EXTENDED_GO_RESULT_TABLE_KEY).toString());
-		}
-		if (input.get(GO_DB_URL_KEY) != null) {
-			this.goDbURL = input.get(GO_DB_URL_KEY).toString();
-		}
-		if (input.get(GO_DB_USER_KEY) != null) {
-			this.goDbUser = input.get(GO_DB_USER_KEY).toString();
-		}
-		if (input.get(GO_DB_PASSWORD_KEY) != null) {
-			this.goDbPassword = input.get(GO_DB_PASSWORD_KEY).toString();
 		}
 		if (input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY) != null) {
 			this.preferReferenceWithGoAnnos = true;
@@ -859,30 +838,6 @@ public class Settings implements Cloneable {
 
 	public void setReferenceGoRegex(Pattern referenceGoRegex) {
 		this.referenceGoRegex = referenceGoRegex;
-	}
-
-	public Boolean generateExtendedGoResultTable() {
-		return getExtendedGoResultTablePath() != null;
-	}
-
-	public String getGoDbURL() {
-		return goDbURL;
-	}
-
-	public String getGoDbUser() {
-		return goDbUser;
-	}
-
-	public String getGoDbPassword() {
-		return goDbPassword;
-	}
-
-	public String getExtendedGoResultTablePath() {
-		return extendedGoResultTablePath;
-	}
-
-	public void setExtendedGoResultTablePath(String extendedGoResultTablePath) {
-		this.extendedGoResultTablePath = extendedGoResultTablePath;
 	}
 
 	public Boolean getPreferReferenceWithGoAnnos() {

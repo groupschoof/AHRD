@@ -9,7 +9,6 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
-import ahrd.view.ExtendedGOAnnotationTableWriter;
 import ahrd.view.OutputWriter;
 
 public class Evaluator extends AHRD {
@@ -74,13 +73,6 @@ public class Evaluator extends AHRD {
 			OutputWriter ow = new OutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
 			System.out.println("Written output into:\n" + getSettings().getPathToOutput());
-			// If requested, write extended Gene Ontology (GO) annotation table:
-			if (getSettings().generateExtendedGoResultTable()) {
-				ExtendedGOAnnotationTableWriter gw = new ExtendedGOAnnotationTableWriter(
-						evaluator.getProteins().values(), evaluator.getGoDB());
-				gw.writeOutput();
-				System.out.println("Wrote extended GO table.");
-			}
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
