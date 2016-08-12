@@ -77,7 +77,7 @@ In order to parallelize the protein function annotation processes,  AHRD can be 
 
 h3. 2.1 AHRD example usages
 
-There are _three_ template AHRD input files provided that you should use according to your use case. All example input files are stored in @./test/resources@ and are named @ahrd_example_input*.yml@. You can run AHRD on any of these use cases with <pre>java -Xmx2g -jar ./dist/ahrd.jar your_use_case_file.yml</pre>
+There are _two_ template AHRD input files provided that you should use according to your use case. All example input files are stored in @./test/resources@ and are named @ahrd_example_input*.yml@. You can run AHRD on any of these use cases with <pre>java -Xmx2g -jar ./dist/ahrd.jar your_use_case_file.yml</pre>
 
 | *Use Case* | *Template File* |
 | Annotate your Query proteins with Human Readable Descriptions (HRD) | @./test/resources/ahrd_example_input.yml@ |
