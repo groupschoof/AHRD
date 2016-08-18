@@ -1,7 +1,8 @@
 package ahrd.model;
 
-import static ahrd.model.ReferenceDescription.tokenizeDescription;
+import static ahrd.model.TokenScoreCalculator.tokenize;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 public class Blast2GoAnnot implements Comparable<Blast2GoAnnot> {
@@ -17,8 +18,7 @@ public class Blast2GoAnnot implements Comparable<Blast2GoAnnot> {
 		String accession = vals[0].trim();
 		// GO-Term-Accession is in position 2, which is ignored here.
 		String description = vals[2].trim();
-		if (accession != null && description != null && !accession.equals("")
-				&& !description.equals(""))
+		if (accession != null && description != null && !accession.equals("") && !description.equals(""))
 			res = new Blast2GoAnnot(accession, description);
 		return res;
 	}
@@ -27,7 +27,7 @@ public class Blast2GoAnnot implements Comparable<Blast2GoAnnot> {
 		super();
 		setAccession(accession);
 		setDescription(description);
-		setEvaluationTokens(tokenizeDescription(getDescription()));
+		setEvaluationTokens(tokenize(getDescription(), new ArrayList<String>()));
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.getSettings;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,29 +23,27 @@ public class ReferenceDescription {
 		rd.setAccession(fastaData[0].split(" ")[0].trim());
 		// Everything after the Accession is considered the description-line:
 		rd.setDescription(fastaData[0].replace(rd.getAccession(), "").trim());
-		// Tokenize description and filter out tokens matching any regex in the
-		// blacklist:
-		rd.setTokens(tokenizeDescription(rd.getDescription()));
-
-		return rd;
-	}
-
-	/**
-	 * Tokenizes a String using Blastresult.TOKEN_SPLITTER_REGEX and returns all
-	 * resulting unique tokens.
-	 * 
-	 * @param description
-	 * @param blacklist
-	 * @return Set<String>
-	 */
-	public static Set<String> tokenizeDescription(String description) {
-		Set<String> tkns = new HashSet<String>();
-		for (String tkn : description.split(BlastResult.TOKEN_SPLITTER_REGEX)) {
-			String tokenCandidate = tkn.trim().toLowerCase();
-			if (tokenCandidate != null && !tokenCandidate.equals(""))
-				tkns.add(tokenCandidate);
+		// Process the reference's human readable description as requested by
+		// the user (Settings) -
+		// NOTE, if the HRD passes the Blacklist and no filtering is
+		// requested the HRD does not have to be processed any further.
+		if (getSettings().getReferencesDescriptionBlacklist() != null
+				&& !getSettings().getReferencesDescriptionBlacklist().isEmpty()) {
+			if (!DescriptionScoreCalculator.passesBlacklist(rd.getDescription(),
+					getSettings().getReferencesDescriptionBlacklist())) {
+				// Does NOT pass blacklist
+				rd.setDescription("");
+			} else if (getSettings().getReferencesDescriptionFilter() != null
+					&& !getSettings().getReferencesDescriptionFilter().isEmpty()) {
+				// Passes Blacklist AND is requested to be filtered:
+				rd.setDescription(DescriptionScoreCalculator.filter(rd.getDescription(),
+						getSettings().getReferencesDescriptionFilter()));
+			}
 		}
-		return tkns;
+		// Tokenize, and if requested in Settings retain only those tokens that
+		// pass the Blacklist:
+		rd.setTokens(TokenScoreCalculator.tokenize(rd.getDescription(), getSettings().getReferencesTokenBlacklist()));
+		return rd;
 	}
 
 	public Set<String> getTokens() {

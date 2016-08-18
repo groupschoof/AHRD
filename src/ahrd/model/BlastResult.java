@@ -1,18 +1,14 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
-import static ahrd.model.ReferenceDescription.tokenizeDescription;
-import static ahrd.model.TokenScoreCalculator.tokenPassesBlacklist;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -404,51 +400,58 @@ public class BlastResult implements Comparable<BlastResult> {
 		return pattern;
 	}
 
+	/**
+	 * Splits the Human Readable Description into single tokens and stores them
+	 * in this' tokens field.
+	 */
 	public void tokenize() {
 		List<String> tknBlackList = getSettings().getTokenBlackList(getBlastDatabaseName());
-		for (String tokenCandidate : new HashSet<String>(Arrays.asList(getDescription().split(TOKEN_SPLITTER_REGEX)))) {
-			tokenCandidate = tokenCandidate.toLowerCase();
-			if (tokenPassesBlacklist(tokenCandidate, tknBlackList))
-				getTokens().add(tokenCandidate);
-		}
-	}
-
-	public boolean passesBlacklist(String blastResultDescriptionLine) {
-		boolean passesBlacklist = (blastResultDescriptionLine != null && !blastResultDescriptionLine.equals(""));
-		for (Iterator<String> i = getSettings().getBlastResultsBlackList(getBlastDatabaseName()).iterator(); (i
-				.hasNext() && passesBlacklist);) {
-			Pattern p = Pattern.compile(i.next());
-			Matcher m = p.matcher(blastResultDescriptionLine);
-			passesBlacklist = !m.find();
-		}
-		return passesBlacklist;
-	}
-
-	public String filter(String blastResultDescriptionLine) {
-		String filteredDescLine = blastResultDescriptionLine;
-		for (Iterator<String> i = getSettings().getBlastResultsFilter(getBlastDatabaseName()).iterator(); i
-				.hasNext();) {
-			Pattern p = Pattern.compile(i.next());
-			// Replace with whitespace, so word-boundaries are kept up
-			filteredDescLine = p.matcher(filteredDescLine).replaceAll(" ");
-		}
-		// Condense multiple whitespaces into one and trim the description-line:
-		filteredDescLine = filteredDescLine.replaceAll("\\s{2,}", " ").trim();
-		return filteredDescLine;
+		this.setTokens(TokenScoreCalculator.tokenize(this.getDescription(), tknBlackList));
 	}
 
 	/**
-	 * Evaluation Tokens are <i>not</i> filtered with the TOKEN-BLACKLIST, as ee
+	 * Checks if this' human readable description passes the blacklist
+	 * associated with this' sequence database name.
+	 * 
+	 * @param blastResultDescriptionLine
+	 * @return boolean TRUE if and only if the human readable description passes
+	 *         the respective blacklist. FALSE otherwise.
+	 */
+	public boolean passesBlacklist(String blastResultDescriptionLine) {
+		List<String> blacklist = getSettings().getBlastResultsBlackList(getBlastDatabaseName());
+		return DescriptionScoreCalculator.passesBlacklist(blastResultDescriptionLine, blacklist);
+	}
+
+	/**
+	 * Filters this' human readable description using the global filter
+	 * implemented in <code>DescriptionScoreCalculator.filter(...)</code>
+	 * 
+	 * @param blastResultDescriptionLine
+	 * @return String the modified version of this' human readable description,
+	 *         in which all matches to the respective filters are deleted.
+	 */
+	public String filter(String blastResultDescriptionLine) {
+		List<String> filter = getSettings().getBlastResultsFilter(getBlastDatabaseName());
+		return DescriptionScoreCalculator.filter(blastResultDescriptionLine, filter);
+	}
+
+	/**
+	 * Evaluation Tokens are <i>not</i> filtered with the TOKEN-BLACKLIST, as we
 	 * want to evaluate <i>all</i> tokens, that are printed out, too. This set
 	 * of evaluation-tokens is set if and only if, AHRD is run in Evaluator-Mode
 	 * and this BlastResult is the best scoring of the Blast-Search-Result, it
-	 * is obtained from.
+	 * is obtained from. You can evaluate AHRD based <i>only<\i> on tokens that
+	 * passed the Blacklist and Filtering with the correct input parameter. See
+	 * <code>Settings.evaluateValidTokens</code> for details.
 	 * 
 	 * @Note: This method uses the static respective static method from
 	 *        Model-Class ReferenceDescription.
 	 */
 	public void tokenizeForEvaluation() {
-		setEvaluationTokens(tokenizeDescription(getDescription()));
+		if (getSettings().getEvaluateValidTokens())
+			setEvaluationTokens(getTokens());
+		else
+			setEvaluationTokens(TokenScoreCalculator.tokenize(getDescription(), new ArrayList<String>()));
 	}
 
 	public boolean isValid() {
@@ -496,7 +499,7 @@ public class BlastResult implements Comparable<BlastResult> {
 			// Pass best Blast-Hit's Description through filter:
 			theClone.setDescription(filter(theClone.getDescription()));
 			// Tokenize without filtering tokens through the Blacklist:
-			theClone.setTokens(tokenizeDescription(theClone.getDescription()));
+			theClone.setTokens(TokenScoreCalculator.tokenize(theClone.getDescription(), new ArrayList<String>()));
 			getProtein().getEvaluationScoreCalculator().addUnchangedBlastResult(getBlastDatabaseName(), theClone);
 		}
 		if (passesBlacklist(getDescription())) {
@@ -542,7 +545,7 @@ public class BlastResult implements Comparable<BlastResult> {
 		}
 		return (shortAccession);
 	}
-	
+
 	public void setShortAccession(String shortAccession) {
 		this.shortAccession = shortAccession;
 	}

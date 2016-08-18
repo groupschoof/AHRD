@@ -63,6 +63,9 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT = "token_score_overlap_score_weight";
 	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT = "description_score_bit_score_weight";
 	public static final String REFERENCES_FASTA_KEY = "references_fasta";
+	public static final String REFERENCES_DESCRIPTION_FILTER_KEY = "references_description_filter";
+	public static final String REFERENCES_DESCRIPTION_BLACKLIST_KEY = "references_description_blacklist";
+	public static final String REFERENCES_TOKEN_BLACKLIST_KEY = "references_token_blacklist";
 	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
 	public static final String BLAST_2_GO_ANNOT_FILE_KEY = "blast2go";
 	public static final String TEMPERATURE_KEY = "temperature";
@@ -94,12 +97,19 @@ public class Settings implements Cloneable {
 	public static final Pattern DEFAULT_REFERENCE_GO_REGEX = Pattern
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
+	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
 
 	/**
 	 * Fields:
 	 */
 	private String pathToProteinsFasta;
 	private String pathToReferencesFasta;
+	private String pathToReferencesDescriptionBlacklist;
+	private List<String> referencesDescriptionBlacklist;
+	private String pathToReferencesDescriptionFilter;
+	private List<String> referencesDescriptionFilter;
+	private String pathToReferencesTokenBlacklist;
+	private List<String> referencesTokenBlacklist = new ArrayList<String>();
 	private String pathToInterproDatabase;
 	private String pathToInterproResults;
 	private String pathToGeneOntologyResults;
@@ -212,6 +222,11 @@ public class Settings implements Cloneable {
 	 * annotations AHRD works "as normal".
 	 */
 	private Boolean preferReferenceWithGoAnnos = false;
+	/**
+	 * If set to TRUE the AHRD Evaluation Score is based ONLY on tokens that
+	 * pass the Blacklisting. Otherwise all Tokens are submitted to evaluation.
+	 */
+	private Boolean evaluateValidTokens = true;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -341,6 +356,21 @@ public class Settings implements Cloneable {
 		}
 		if (input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY) != null) {
 			this.preferReferenceWithGoAnnos = true;
+		}
+		if (input.get(EVALUATE_VALID_TAKENS_KEY) != null) {
+			this.setEvaluateValidTokens(true);
+		}
+		if (input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY) != null) {
+			this.setPathToReferencesDescriptionBlacklist(input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY).toString());
+			this.setReferencesDescriptionBlacklist(fromFile(getPathToReferencesDescriptionBlacklist()));
+		}
+		if (input.get(REFERENCES_DESCRIPTION_FILTER_KEY) != null) {
+			this.setPathToReferencesDescriptionFilter(input.get(REFERENCES_DESCRIPTION_FILTER_KEY).toString());
+			this.setReferencesDescriptionFilter(fromFile(getPathToReferencesDescriptionFilter()));
+		}
+		if (input.get(REFERENCES_TOKEN_BLACKLIST_KEY) != null) {
+			this.setPathToReferencesTokenBlacklist(input.get(REFERENCES_TOKEN_BLACKLIST_KEY).toString());
+			this.setReferencesTokenBlacklist(fromFile(getPathToReferencesTokenBlacklist()));
 		}
 	}
 
@@ -840,4 +870,59 @@ public class Settings implements Cloneable {
 		this.preferReferenceWithGoAnnos = preferReferenceWithGoAnnos;
 	}
 
+	public Boolean getEvaluateValidTokens() {
+		return evaluateValidTokens;
+	}
+
+	public void setEvaluateValidTokens(Boolean evaluateValidTokens) {
+		this.evaluateValidTokens = evaluateValidTokens;
+	}
+
+	public String getPathToReferencesDescriptionFilter() {
+		return pathToReferencesDescriptionFilter;
+	}
+
+	public void setPathToReferencesDescriptionFilter(String pathToReferencesDescriptionFilter) {
+		this.pathToReferencesDescriptionFilter = pathToReferencesDescriptionFilter;
+	}
+
+	public String getPathToReferencesDescriptionBlacklist() {
+		return pathToReferencesDescriptionBlacklist;
+	}
+
+	public void setPathToReferencesDescriptionBlacklist(String pathToReferencesDescriptionBlacklist) {
+		this.pathToReferencesDescriptionBlacklist = pathToReferencesDescriptionBlacklist;
+	}
+
+	public String getPathToReferencesTokenBlacklist() {
+		return pathToReferencesTokenBlacklist;
+	}
+
+	public void setPathToReferencesTokenBlacklist(String pathToReferencesTokenBlacklist) {
+		this.pathToReferencesTokenBlacklist = pathToReferencesTokenBlacklist;
+	}
+
+	public List<String> getReferencesDescriptionBlacklist() {
+		return referencesDescriptionBlacklist;
+	}
+
+	public void setReferencesDescriptionBlacklist(List<String> referencesDescriptionBlacklist) {
+		this.referencesDescriptionBlacklist = referencesDescriptionBlacklist;
+	}
+
+	public List<String> getReferencesDescriptionFilter() {
+		return referencesDescriptionFilter;
+	}
+
+	public void setReferencesDescriptionFilter(List<String> referencesDescriptionFilter) {
+		this.referencesDescriptionFilter = referencesDescriptionFilter;
+	}
+
+	public List<String> getReferencesTokenBlacklist() {
+		return referencesTokenBlacklist;
+	}
+
+	public void setReferencesTokenBlacklist(List<String> referencesTokenBlacklist) {
+		this.referencesTokenBlacklist = referencesTokenBlacklist;
+	}
 }

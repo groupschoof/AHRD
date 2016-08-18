@@ -5,10 +5,54 @@ import static ahrd.controller.Settings.getSettings;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DescriptionScoreCalculator {
+
+	/**
+	 * Global implementation of the Description Blacklist.
+	 * 
+	 * @param description
+	 * @param blacklist
+	 * @return TRUE if and only if none of the regular expressions in blacklist
+	 *         matches the argument description. FALSE otherwise.
+	 */
+	public static boolean passesBlacklist(String description, List<String> blacklist) {
+		boolean passesBlacklist = (description != null && !description.equals(""));
+		for (Iterator<String> i = blacklist.iterator(); (i.hasNext() && passesBlacklist);) {
+			Pattern p = Pattern.compile(i.next());
+			Matcher m = p.matcher(description);
+			passesBlacklist = !m.find();
+		}
+		return passesBlacklist;
+	}
+
+	/**
+	 * Global implementation of the filter Description function.
+	 * 
+	 * @param description
+	 * @param filter
+	 * @return A modified version of argument description in which all matches
+	 *         to any of the regular expressions in argument filter are deleted.
+	 *         Finally the filtered description is trimmed and multiple
+	 *         white-spaces are condensed into a single white-spaces.
+	 */
+	public static String filter(String description, List<String> filter) {
+		String filteredDescLine = description;
+		for (Iterator<String> i = filter.iterator(); i.hasNext();) {
+			Pattern p = Pattern.compile(i.next());
+			// Replace with whitespace, so word-boundaries are kept up
+			filteredDescLine = p.matcher(filteredDescLine).replaceAll(" ");
+		}
+		// Condense multiple whitespaces into one and trim the description-line:
+		filteredDescLine = filteredDescLine.replaceAll("\\s{2,}", " ").trim();
+		return filteredDescLine;
+	}
 
 	private Protein protein;
 	private double maxBitScore = 0.0;
