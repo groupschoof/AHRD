@@ -50,6 +50,13 @@ public class BlastResultTest {
 		assertTrue(br.getTokens().contains("one"));
 		assertTrue(br.getTokens().contains("two"));
 		assertTrue(br.getTokens().contains("three"));
+
+		br = new BlastResult("accession_2", 1.0, "Flavohemoprotein-1", 10, 20, 10, 20, 200, 30, "swissprot");
+		br.tokenize();
+		// test:
+		assertEquals(2.0, br.getTokens().size(), 0.0);
+		assertTrue(br.getTokens().contains("1"));
+		assertTrue(br.getTokens().contains("flavohemoprotein"));
 	}
 
 	@Test
