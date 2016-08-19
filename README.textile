@@ -36,7 +36,7 @@ h2. Table of contents
 # "Testing":#4-testing
 # "License":#5-license
 # "Authors":#6-authors
-# "References":#references
+# "References":#7-references
 
 
 h2. 1 Getting started
