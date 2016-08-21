@@ -102,7 +102,6 @@ public class Settings implements Cloneable {
 	private String pathToReferencesFasta;
 	private String pathToInterproDatabase;
 	private String pathToInterproResults;
-	private String pathToGeneOntologyResults;
 	private String pathToOutput;
 	/**
 	 * File to write the AHRD-Scores of each BlastHit's Description into, if
@@ -236,7 +235,6 @@ public class Settings implements Cloneable {
 		setPathToProteinsFasta((String) input.get(PROTEINS_FASTA_KEY));
 		setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
 		setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
-		setPathToGeneOntologyResults((String) input.get(GENE_ONTOLOGY_RESULT_KEY));
 		setPathToOutput((String) input.get(OUTPUT_KEY));
 		if (input.get(HRD_SCORES_OUTPUT_PATH) != null && !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
 			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH));
@@ -524,16 +522,23 @@ public class Settings implements Cloneable {
 		this.pathToInterproResults = pathToInterproResults;
 	}
 
-	public String getPathToGeneOntologyResults() {
-		return pathToGeneOntologyResults;
+	public String getPathToGeneOntologyResults(String blastDatabaseName) {
+		return getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_RESULT_KEY);
 	}
 
 	public boolean hasGeneOntologyAnnotations() {
-		return getPathToGeneOntologyResults() != null && (new File(getPathToGeneOntologyResults())).exists();
+		boolean result = false;
+		for (String blastDatabaseName : getBlastDatabases()) {
+			if (getPathToGeneOntologyResults(blastDatabaseName) != null 
+					&& new File(getPathToGeneOntologyResults(blastDatabaseName)).exists()) {
+				result = true;
+			}
+		}
+		return result;
 	}
-
+	// TODO Needs to be removed!? Check call hierarchy!
 	public void setPathToGeneOntologyResults(String pathToGeneOntologyResults) {
-		this.pathToGeneOntologyResults = pathToGeneOntologyResults;
+		/*this.pathToGeneOntologyResults = pathToGeneOntologyResults;*/
 	}
 
 	public String getPathToOutput() {
