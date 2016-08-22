@@ -36,23 +36,27 @@ public class ReferenceGoAnnotations {
 			Set<String> uniqueShortAccessions) throws IOException {
 		Map<String, Set<String>> goa = new HashMap<String, Set<String>>();
 		BufferedReader goaIn = null;
-		try {
-			goaIn = new BufferedReader(new FileReader(getSettings()
-					.getPathToGeneOntologyResults()));
-			Pattern p = getSettings().getReferenceGoRegex();
-			String line, shortAcc, goTerm = "";
-			while ((line = goaIn.readLine()) != null) {
-				Matcher m = p.matcher(line);
-				if (m.find()) {
-					shortAcc = m.group(SHORT_ACCESSION_GROUP_NAME);
-					if (uniqueShortAccessions.contains(shortAcc)) {
-						goTerm = m.group(GO_TERM_GROUP_NAME);
-						addGoAnnotation(goa, shortAcc, goTerm);
+		for (String blastDatabaseName : getSettings().getBlastDatabases()) {
+			if (getSettings().hasGeneOntologyAnnotation(blastDatabaseName)) {
+				try {
+					goaIn = new BufferedReader(new FileReader(getSettings()
+							.getPathToGeneOntologyResults(blastDatabaseName)));
+					Pattern p = getSettings().getReferenceGoRegex(blastDatabaseName);
+					String line, shortAcc, goTerm = "";
+					while ((line = goaIn.readLine()) != null) {
+						Matcher m = p.matcher(line);
+						if (m.find()) {
+							shortAcc = m.group(SHORT_ACCESSION_GROUP_NAME);
+							if (uniqueShortAccessions.contains(shortAcc)) {
+								goTerm = m.group(GO_TERM_GROUP_NAME);
+								addGoAnnotation(goa, shortAcc, goTerm);
+							}
+						}
 					}
+				} finally {
+					goaIn.close();
 				}
 			}
-		} finally {
-			goaIn.close();
 		}
 		return goa;
 	}

@@ -333,10 +333,6 @@ public class Settings implements Cloneable {
 			setSeqSimSearchTableBitScoreCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
 		}
-		// Enable parsing of custom (non UniprotKB) go annotation (GOA) files:
-		if (input.get(REFERENCE_GO_REGEX_KEY) != null) {
-			setReferenceGoRegex(Pattern.compile(input.get(REFERENCE_GO_REGEX_KEY).toString()));
-		}
 		if (input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY) != null) {
 			this.preferReferenceWithGoAnnos = true;
 		}
@@ -536,6 +532,15 @@ public class Settings implements Cloneable {
 		}
 		return result;
 	}
+	
+	public boolean hasGeneOntologyAnnotation(String blastDatabaseName) {
+		if (getPathToGeneOntologyResults(blastDatabaseName) != null
+				&& new File(getPathToGeneOntologyResults(blastDatabaseName)).exists()) {
+			return true;
+		}
+		return false;
+	}
+	
 	// TODO Needs to be removed!? Check call hierarchy!
 	public void setPathToGeneOntologyResults(String pathToGeneOntologyResults) {
 		/*this.pathToGeneOntologyResults = pathToGeneOntologyResults;*/
@@ -829,14 +834,13 @@ public class Settings implements Cloneable {
 	 * 
 	 * @return Pattern
 	 */
-	public Pattern getReferenceGoRegex() {
-		return this.referenceGoRegex != null ? referenceGoRegex : DEFAULT_REFERENCE_GO_REGEX;
+	public Pattern getReferenceGoRegex(String blastDatabaseName) {
+		if (getBlastDbSettings(blastDatabaseName).get(REFERENCE_GO_REGEX_KEY) != null) {
+			return Pattern.compile(getBlastDbSettings(blastDatabaseName).get(REFERENCE_GO_REGEX_KEY).toString());
+		}
+		return DEFAULT_REFERENCE_GO_REGEX;
 	}
-
-	public void setReferenceGoRegex(Pattern referenceGoRegex) {
-		this.referenceGoRegex = referenceGoRegex;
-	}
-
+	
 	public Boolean getPreferReferenceWithGoAnnos() {
 		return preferReferenceWithGoAnnos;
 	}

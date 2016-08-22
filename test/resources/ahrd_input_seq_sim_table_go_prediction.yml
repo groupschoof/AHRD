@@ -1,5 +1,4 @@
 proteins_fasta: ./test/resources/proteins.fasta
-gene_ontology_result: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
@@ -24,6 +23,8 @@ blast_dbs:
     filter: ./test/resources/filter_descline_tair.txt
     token_blacklist: ./test/resources/blacklist_token.txt
     description_score_bit_score_weight: 0.4
+    gene_ontology_result: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
+    reference_go_regex: "^TAIR\\s+\\S+\\s+\\S+\\s+(?<goTerm>GO:\\d{7})\\s+\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+(?<shortAccession>\\S+)"
 
   trembl:
     weight: 10
@@ -33,3 +34,4 @@ blast_dbs:
     filter: ./test/resources/filter_descline_trembl.txt
     token_blacklist: ./test/resources/blacklist_token.txt
     description_score_bit_score_weight: 0.4
+    gene_ontology_result: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
