@@ -204,7 +204,6 @@ public class Settings implements Cloneable {
 	private Integer seqSimSearchTableSubjectEndCol = 9;
 	private Integer seqSimSearchTableEValueCol = 10;
 	private Integer seqSimSearchTableBitScoreCol = 11;
-	private Pattern referenceGoRegex;
 	/**
 	 * If set to true AHRD will choose the highest scoring BlastResult WITH GO
 	 * Annotations as donor for a query protein's HRD. If no BlastResult has GO
