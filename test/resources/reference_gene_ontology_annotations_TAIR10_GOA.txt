@@ -1,26 +1,2 @@
-!GOC Validation Date: 04/15/2016 $
-!Submission Date: 4/1/2016
-!
-! The above "Submission Date" is when the annotation project provided
-! this file to the Gene Ontology Consortium (GOC).  The "GOC Validation
-! Date" indicates when this file was last changed as a result of a GOC
-! validation and filtering process.  
-!
-! Note: The contents of this file may differ from that submitted to the
-! GOC. The identifiers and syntax of the file have been checked, rows of
-! data not meeting the standards set by the GOC have been removed. This
-! file may also have annotations removed because the annotations for the
-! listed Taxonomy identifier are only allowed in a file provided by
-! another annotation project.  The original submitted file is available from:
-!  http://www.geneontology.org/gene-associations/submission/
-!
-! For information on which taxon are allowed in which files please see:
-!  http://www.geneontology.org/GO.annotation.shtml#script
-!
-!gaf-version: 2.0
-!Project_name: The Arabidopsis Information Resource (TAIR)
-!URL: http://www.arabidopsis.org
-!Contact Email: curator@arabidopsis.org
-!Funding: NSF grants DBI-9978564 and DBI-0417062
-TAIR    locus:2200960   DCL1            GO:0003677      TAIR:AnalysisReference:501756966        IEA     InterPro:IPR006935      F       AT1G01040       AT1G01040|DCL1|CAF|SUS1|SIN1|ASU1|EMB76|EMB60|ATDCL1|dicer-like 1|CARPEL FACTORY|SUSPENSOR 1|SHORT INTEGUMENTS 1|ABNORMAL SUSPENSOR 1|EMBRYO DEFECTIVE 76|EMBRYO DEFECTIVE 60|T25K16.4|T25K16_4 protein taxon:3702      20160113        TAIR            TAIR:locus:2200960
-TAIR    locus:2200960   DCL1            GO:0004386      TAIR:AnalysisReference:501756968        IEA     UniProtKB-KW:KW-0347    F       AT1G01040       AT1G01040|DCL1|CAF|SUS1|SIN1|ASU1|EMB76|EMB60|ATDCL1|dicer-like 1|CARPEL FACTORY|SUSPENSOR 1|SHORT INTEGUMENTS 1|ABNORMAL SUSPENSOR 1|EMBRYO DEFECTIVE 76|EMBRYO DEFECTIVE 60|T25K16.4|T25K16_4 protein taxon:3702      20160113        UniProtKB               TAIR:locus:2200960
+AT1G01040	gene:2200959	AT1G01040.1	located in	nucleus	GO:0005634	537	C	nucleus	ISM	predicted protein features		AnalysisReference:501750651	rkaundal	2012-08-31
+AT1G01040	locus:2200960	AT1G01040	has	ATP-dependent helicase activity	GO:0008026	897	F	hydrolase activity	ISS	manually reviewed TIGR computational analysis	INTERPRO:IPR001410	Communication:501714663	TIGR	2002-04-11

@@ -540,6 +540,15 @@ public class Settings implements Cloneable {
 		return false;
 	}
 	
+	public void setPathToGeneOntologyResult(String blastDatabaseName, String path) {
+		getBlastDbSettings(blastDatabaseName).put(GENE_ONTOLOGY_RESULT_KEY, path);
+	}
+	
+	public void removeAllPathToGeneOntologyResults() {
+		for (String blastDatabaseName : getBlastDatabases()) {
+			getBlastDbSettings(blastDatabaseName).remove(GENE_ONTOLOGY_RESULT_KEY);
+		}
+	}
 	// TODO Needs to be removed!? Check call hierarchy!
 	public void setPathToGeneOntologyResults(String pathToGeneOntologyResults) {
 		/*this.pathToGeneOntologyResults = pathToGeneOntologyResults;*/
