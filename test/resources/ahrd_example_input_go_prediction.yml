@@ -2,7 +2,6 @@ proteins_fasta: ./test/resources/proteins.fasta
 token_score_bit_score_weight: 0.468
 token_score_database_score_weight: 0.2098
 token_score_overlap_score_weight: 0.3221
-gene_ontology_result: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
 prefer_reference_with_go_annos: true
 output: ./ahrd_output.csv
 blast_dbs:
