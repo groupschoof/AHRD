@@ -549,10 +549,6 @@ public class Settings implements Cloneable {
 			getBlastDbSettings(blastDatabaseName).remove(GENE_ONTOLOGY_RESULT_KEY);
 		}
 	}
-	// TODO Needs to be removed!? Check call hierarchy!
-	public void setPathToGeneOntologyResults(String pathToGeneOntologyResults) {
-		/*this.pathToGeneOntologyResults = pathToGeneOntologyResults;*/
-	}
 
 	public String getPathToOutput() {
 		return pathToOutput;
