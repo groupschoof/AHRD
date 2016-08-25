@@ -321,7 +321,7 @@ h5. 3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
 Unfortunately UniprotKB GOA files use short protein accessions like @W9QFR0@, while the UniprotKB FASTA databases use the long protein accessions with pipes like this @tr|W9QFR0|W9QFR0_9ROSA@. In order to enable AHRD to match the correct short and long accessions, and thus the reference GO annotations it uses regular expressions to parse both the long accessions and the GOA files. By default AHRD is setup to handle Uniprot formats, but you can provide custom regular expressions for your own custom GOA files:
 
 # Set the regular expression to extract short protein accessions mapped to GO terms from the reference GOA using @reference_go_regex@, e.g. @reference_go_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})@
-# Set the Blast database specific regular expression, used to extract the short accessions from logn ones with @short_accession_regex:@ For example for TAIR10, use @short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"@.
+# Set the Blast database specific regular expression, used to extract the short accessions from long ones with @short_accession_regex:@ For example for TAIR10, use @short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"@.
 
 _Note:_ You must provide the above named match groups @shortAccession@ and @goTerm@, respectively.
 
