@@ -341,7 +341,7 @@ public class BlastResult implements Comparable<BlastResult> {
 								+ "\ndoes not match provided regular expression\n"
 								+ getSettings().getFastaHeaderRegex(blastDbName).toString()
 								+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
-								+ "To fix this, please use - Bast database specific - parameter "
+								+ "To fix this, please use - Blast database specific - parameter "
 								+ Settings.FASTA_HEADER_REGEX_KEY
 								+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
 								+ blastDbName + "'.");
