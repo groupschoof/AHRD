@@ -36,14 +36,14 @@
 
 	<target name="compile" depends="init" description="compile the source ">
 		<!-- Compile the java code from ${src} into ${classes} -->
-		<javac srcdir="${src}" destdir="${classes}" includeAntRuntime="yes" nowarn="off">
+		<javac srcdir="${src}" destdir="${classes}" includeAntRuntime="yes" nowarn="off" debug="true">
 			<compilerarg value="-Xlint:unchecked" />
 			<classpath refid="classpath.compile" />
 		</javac>
 	</target>
 
 	<target name="compile.test" depends="compile" description="compile the test-classes">
-		<javac srcdir="${src.test}" destdir="${classes}" includeAntRuntime="yes" nowarn="off">
+		<javac srcdir="${src.test}" destdir="${classes}" includeAntRuntime="yes" nowarn="off" debug="true">	
 			<compilerarg value="-Xlint:unchecked" />
 			<classpath refid="classpath.test" />
 		</javac>

@@ -112,7 +112,6 @@ public class Settings implements Cloneable {
 	private List<String> referencesTokenBlacklist = new ArrayList<String>();
 	private String pathToInterproDatabase;
 	private String pathToInterproResults;
-	private String pathToGeneOntologyResults;
 	private String pathToOutput;
 	/**
 	 * File to write the AHRD-Scores of each BlastHit's Description into, if
@@ -215,7 +214,6 @@ public class Settings implements Cloneable {
 	private Integer seqSimSearchTableSubjectEndCol = 9;
 	private Integer seqSimSearchTableEValueCol = 10;
 	private Integer seqSimSearchTableBitScoreCol = 11;
-	private Pattern referenceGoRegex;
 	/**
 	 * If set to true AHRD will choose the highest scoring BlastResult WITH GO
 	 * Annotations as donor for a query protein's HRD. If no BlastResult has GO
@@ -251,7 +249,6 @@ public class Settings implements Cloneable {
 		setPathToProteinsFasta((String) input.get(PROTEINS_FASTA_KEY));
 		setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
 		setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
-		setPathToGeneOntologyResults((String) input.get(GENE_ONTOLOGY_RESULT_KEY));
 		setPathToOutput((String) input.get(OUTPUT_KEY));
 		if (input.get(HRD_SCORES_OUTPUT_PATH) != null && !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
 			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH));
@@ -349,10 +346,6 @@ public class Settings implements Cloneable {
 		if (input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY) != null) {
 			setSeqSimSearchTableBitScoreCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
-		}
-		// Enable parsing of custom (non UniprotKB) go annotation (GOA) files:
-		if (input.get(REFERENCE_GO_REGEX_KEY) != null) {
-			setReferenceGoRegex(Pattern.compile(input.get(REFERENCE_GO_REGEX_KEY).toString()));
 		}
 		if (input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY) != null) {
 			this.preferReferenceWithGoAnnos = true;
@@ -554,16 +547,37 @@ public class Settings implements Cloneable {
 		this.pathToInterproResults = pathToInterproResults;
 	}
 
-	public String getPathToGeneOntologyResults() {
-		return pathToGeneOntologyResults;
+	public String getPathToGeneOntologyResults(String blastDatabaseName) {
+		return getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_RESULT_KEY);
 	}
 
 	public boolean hasGeneOntologyAnnotations() {
-		return getPathToGeneOntologyResults() != null && (new File(getPathToGeneOntologyResults())).exists();
+		boolean result = false;
+		for (String blastDatabaseName : getBlastDatabases()) {
+			if (getPathToGeneOntologyResults(blastDatabaseName) != null 
+					&& new File(getPathToGeneOntologyResults(blastDatabaseName)).exists()) {
+				result = true;
+			}
+		}
+		return result;
 	}
-
-	public void setPathToGeneOntologyResults(String pathToGeneOntologyResults) {
-		this.pathToGeneOntologyResults = pathToGeneOntologyResults;
+	
+	public boolean hasGeneOntologyAnnotation(String blastDatabaseName) {
+		if (getPathToGeneOntologyResults(blastDatabaseName) != null
+				&& new File(getPathToGeneOntologyResults(blastDatabaseName)).exists()) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void setPathToGeneOntologyResult(String blastDatabaseName, String path) {
+		getBlastDbSettings(blastDatabaseName).put(GENE_ONTOLOGY_RESULT_KEY, path);
+	}
+	
+	public void removeAllPathToGeneOntologyResults() {
+		for (String blastDatabaseName : getBlastDatabases()) {
+			getBlastDbSettings(blastDatabaseName).remove(GENE_ONTOLOGY_RESULT_KEY);
+		}
 	}
 
 	public String getPathToOutput() {
@@ -854,14 +868,13 @@ public class Settings implements Cloneable {
 	 * 
 	 * @return Pattern
 	 */
-	public Pattern getReferenceGoRegex() {
-		return this.referenceGoRegex != null ? referenceGoRegex : DEFAULT_REFERENCE_GO_REGEX;
+	public Pattern getReferenceGoRegex(String blastDatabaseName) {
+		if (getBlastDbSettings(blastDatabaseName).get(REFERENCE_GO_REGEX_KEY) != null) {
+			return Pattern.compile(getBlastDbSettings(blastDatabaseName).get(REFERENCE_GO_REGEX_KEY).toString());
+		}
+		return DEFAULT_REFERENCE_GO_REGEX;
 	}
-
-	public void setReferenceGoRegex(Pattern referenceGoRegex) {
-		this.referenceGoRegex = referenceGoRegex;
-	}
-
+	
 	public Boolean getPreferReferenceWithGoAnnos() {
 		return preferReferenceWithGoAnnos;
 	}

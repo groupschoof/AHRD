@@ -1,0 +1,2 @@
+AT1G01040	gene:2200959	AT1G01040.1	located in	nucleus	GO:0005634	537	C	nucleus	ISM	predicted protein features		AnalysisReference:501750651	rkaundal	2012-08-31
+AT1G01040	locus:2200960	AT1G01040	has	ATP-dependent helicase activity	GO:0008026	897	F	hydrolase activity	ISS	manually reviewed TIGR computational analysis	INTERPRO:IPR001410	Communication:501714663	TIGR	2002-04-11

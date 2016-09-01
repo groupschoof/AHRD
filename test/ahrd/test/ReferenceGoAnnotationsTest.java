@@ -37,10 +37,12 @@ public class ReferenceGoAnnotationsTest {
 	public void testHasGeneOntologyAnnotations() {
 		// Should have GO-Annotations with default test-Settings:
 		assertTrue(getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyResults(null);
+		getSettings().removeAllPathToGeneOntologyResults();
 		assertTrue(!getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyResults("/not/existing/path.raw");
+		getSettings().setPathToGeneOntologyResult("swissprot","/not/existing/path.raw");
 		assertTrue(!getSettings().hasGeneOntologyAnnotations());
+		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt");
+		assertTrue(getSettings().hasGeneOntologyAnnotations());
 	}
 
 	@Test
@@ -72,9 +74,9 @@ public class ReferenceGoAnnotationsTest {
 		assertTrue(!ahrd.getReferenceGoAnnotations().isEmpty());
 		assertEquals(4, ahrd.getReferenceGoAnnotations().size());
 		Set<String> refGos = ahrd.getReferenceGoAnnotations()
-				.get("AT1G01040.1");
-		assertTrue(refGos.contains("GO:0003824"));
-		assertTrue(refGos.contains("GO:0003870"));
+				.get("AT1G01040");
+		assertTrue(refGos.contains("GO:0005634"));
+		assertTrue(refGos.contains("GO:0008026"));
 	}
 
 	@Test

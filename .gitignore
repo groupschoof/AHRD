@@ -36,3 +36,4 @@ ahrd_output.csv
 trainer_batch_ymls
 .externalToolBuilders/
 .project
+/classes/
