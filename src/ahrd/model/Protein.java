@@ -68,7 +68,7 @@ public class Protein {
 
 	public static Protein constructFromFastaEntry(String fastaEntry)
 			throws MissingAccessionException {
-		String[] fasta_data = fastaEntry.split("\n");
+		String[] fasta_data = fastaEntry.split("\r?\n");
 		String accession = fasta_data[0].split(" ")[0];
 		if (accession == null || accession.equals("")) {
 			throw new MissingAccessionException(
