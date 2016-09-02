@@ -98,6 +98,7 @@ public class Settings implements Cloneable {
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
+	public static final String DEFAULT_LINE_SEP = "(\r|\n)+"; 
 
 	/**
 	 * Fields:
