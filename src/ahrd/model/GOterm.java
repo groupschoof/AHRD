@@ -9,20 +9,24 @@ public class GOterm {
 	private String accession;
 	private String name;
 	private String ontology;
+	private Integer frequency;
+	private Double probability;
+	private Double informationContent; 
 	/**
 	 * Parental Gene Ontology (GO) term accessions include the accession of the
 	 * GOterm instance. A GOterm is also parental to itself.
 	 */
-	private Set<String> parentAccessions;
+	private Set<GOterm> ancestry;
 
 	public GOterm(String accession, String name, String ontology) {
 		super();
 		this.setAccession(accession);
 		this.setName(name);
 		this.setOntology(ontology);
-		Set<String> p = new HashSet<String>();
-		p.add(accession);
-		this.setParentAccessions(p);
+		this.setFrequency(0);
+		this.setProbability(0.0);
+		this.setInformationContent(Double.POSITIVE_INFINITY);
+		this.ancestry = new HashSet<GOterm>();
 	}
 
 	/**
@@ -63,16 +67,44 @@ public class GOterm {
 		this.ontology = ontology;
 	}
 
+	public Integer getFrequency() {
+		return frequency;
+	}
+
+	public void setFrequency(Integer frequency) {
+		this.frequency = frequency;
+	}
+
+	public Double getProbability() {
+		return probability;
+	}
+
+	public void setProbability(Double probability) {
+		this.probability = probability;
+	}
+
+	public Double getInformationContent() {
+		return informationContent;
+	}
+
+	public void setInformationContent(Double informationContent) {
+		this.informationContent = informationContent;
+	}
+
 	/**
 	 * Parental Gene Ontology (GO) term accessions include the accession of the
 	 * GOterm instance. A GOterm is also parental to itself.
 	 */
-	public Set<String> getParentAccessions() {
-		return parentAccessions;
+	public Set<GOterm> getAncestry() {
+		return ancestry;
 	}
 
-	public void setParentAccessions(Set<String> parentAccessions) {
-		this.parentAccessions = parentAccessions;
+	public void setAncestry(Set<GOterm> ancestry) {
+		this.ancestry = ancestry;
+	}
+	
+	public void addTermToAncestry(GOterm term) {
+		this.ancestry.add(term);
 	}
 
 }
