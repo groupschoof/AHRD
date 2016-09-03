@@ -9,24 +9,26 @@ public class GOterm {
 	private String accession;
 	private String name;
 	private String ontology;
-	private Integer frequency;
-	private Double probability;
-	private Double informationContent; 
+	private Boolean obsolete = false;
+	private Integer frequency = 0;
+	private Double probability = 0.0;
+	private Double informationContent = Double.POSITIVE_INFINITY; 
 	/**
-	 * Parental Gene Ontology (GO) term accessions include the accession of the
-	 * GOterm instance. A GOterm is also parental to itself.
+	 * Ancestral Gene Ontology (GO) terms of a particular GOterm include the GOterm instance itself.
+	 * A GOterm is also parental to itself.
 	 */
-	private Set<GOterm> ancestry;
+	private Set<GOterm> ancestry = new HashSet<GOterm>();
 
 	public GOterm(String accession, String name, String ontology) {
 		super();
 		this.setAccession(accession);
 		this.setName(name);
 		this.setOntology(ontology);
-		this.setFrequency(0);
-		this.setProbability(0.0);
-		this.setInformationContent(Double.POSITIVE_INFINITY);
-		this.ancestry = new HashSet<GOterm>();
+	}
+	
+	public GOterm(String accession, String name, String ontology, Boolean obsolete) {
+		this(accession, name, ontology);
+		this.setObsolete(obsolete);
 	}
 
 	/**
@@ -67,6 +69,14 @@ public class GOterm {
 		this.ontology = ontology;
 	}
 
+	public Boolean getObsolete() {
+		return obsolete;
+	}
+
+	public void setObsolete(Boolean obsolete) {
+		this.obsolete = obsolete;
+	}
+
 	public Integer getFrequency() {
 		return frequency;
 	}
@@ -92,8 +102,8 @@ public class GOterm {
 	}
 
 	/**
-	 * Parental Gene Ontology (GO) term accessions include the accession of the
-	 * GOterm instance. A GOterm is also parental to itself.
+	 * Ancestral Gene Ontology (GO) terms of a particular GOterm include the GOterm instance itself.
+	 * A GOterm is also parental to itself.
 	 */
 	public Set<GOterm> getAncestry() {
 		return ancestry;
