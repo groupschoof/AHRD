@@ -99,6 +99,7 @@ public class Settings implements Cloneable {
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
 	public static final String DEFAULT_LINE_SEP = "(\r|\n)+"; 
+	public static final String DEBUG_REGEX_KEY = "debug_regex"; 
 
 	/**
 	 * Fields:
@@ -115,6 +116,7 @@ public class Settings implements Cloneable {
 	private String pathToInterproResults;
 	private String pathToGeneOntologyResults;
 	private String pathToOutput;
+	private Boolean debugRegex = false;
 	/**
 	 * File to write the AHRD-Scores of each BlastHit's Description into, if
 	 * requested.
@@ -266,6 +268,7 @@ public class Settings implements Cloneable {
 		setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
 		setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
 		setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
+		setDebugRegex(Boolean.parseBoolean((String) input.get(DEBUG_REGEX_KEY)));
 		// Generate the Blacklists and Filters for each Blast-Database from
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
@@ -926,4 +929,12 @@ public class Settings implements Cloneable {
 	public void setReferencesTokenBlacklist(List<String> referencesTokenBlacklist) {
 		this.referencesTokenBlacklist = referencesTokenBlacklist;
 	}
+	public boolean debugRegex() {
+		return this.debugRegex;
+	} 
+	public void setDebugRegex(Boolean debug) {
+		if (debug != null) {
+			this.debugRegex = debug;
+		}
+	} 
 }
