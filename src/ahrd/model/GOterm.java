@@ -4,8 +4,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GOterm {
+public class GOterm implements java.io.Serializable {
 
+	// Used during deserialization to verify that the sender and receiver of a
+	// serialized object have loaded classes for that object that are compatible
+	// with respect to serialization.
+	private static final long serialVersionUID = 1L;
 	private String accession;
 	private String name;
 	private String ontology;

@@ -6,10 +6,8 @@ import java.nio.channels.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.archivers.tar.*;
@@ -30,7 +28,6 @@ public class GoDbBuilder {
 	private static final String bpRootAcc = "GO:0008150";
 	private static final String ccRootAcc = "GO:0005575";
 	private static final String mfRootAcc = "GO:0003674";
-	private static Map<String, Integer> annotations = new HashMap<String, Integer>();
 	private static Map<Integer, GOterm> idGoDb = new HashMap<Integer, GOterm>();
 	private static Map<String, GOterm> accGoDb = new HashMap<String, GOterm>();
 	private static int bpCount = 0;
@@ -38,56 +35,45 @@ public class GoDbBuilder {
 	private static int mfCount = 0;
 	
 	public static void main(String[] args) throws IOException {
-		// Download swiss prot if not already on drive
+		// Download SwissProt if not already on drive
 		if (!new File(reviewedUniProtFilePath).exists()) {
-			System.out.println("Downloading " + reviewedUniProtURL); 
+			System.out.println("Downloading " + reviewedUniProtURL + " (aprox. 550MB)."); 
 			download(reviewedUniProtURL, reviewedUniProtFilePath);
 		}
 		// Download gene ontology mysql data base dump if not alrady on drive
 		if (!new File(geneOntologyMYSQLdumpFilePath).exists()) {
-			System.out.println("Downloading " + geneOntologyMYSQLdumpURL);
+			System.out.println("Downloading " + geneOntologyMYSQLdumpURL + " (aprox. 12MB).");
 			download(geneOntologyMYSQLdumpURL, geneOntologyMYSQLdumpFilePath);
 		}
 		
-		// Count swiss prot annotations per GO term
-		countSwissProtAnnoations();
-		
-		// Read term table and fill goDB
+		// Read term table and fill ID based GO database
 		readTermTable();
 		
-		// Read graph path table and fill the terms ancestry in goDB
+		// Read graph path table and fill the terms ancestry in ID based GO database
 		readGraphPath();
-		
-		// Sum annotation counts to term frequencies
-		sumCounts();
-		
-		// Calculate term probabilities from the term frequencies
-		// Calculate the information content from the term probabilities
-		// Store terms in accession based GO database  
-		calculateInfoContent();
+
+		// Builds an accession based GO database
+		buildAccGoDb();
 		
 		// Read in term synonyms and add them to accession based GO database
 		readTermSynonyms();
+
+		// Read in SwissProt annotations
+		// Count each annotation towards a GO term and its ancestry  
+		countAnnotations();
+		
+		// Calculate term probabilities from the term frequencies
+		// Calculate the information content from the term probabilities
+		calculateInfoContent();
 		
 		System.out.println("Size of accGoDb: " + accGoDb.size());
 		
 		// Check consistency of root term annotation count and information content
 		checkConsistency();
 		
-		// for testing
-//		BufferedWriter out = null;
-//		System.out.println("Size of GO annotation map: " + annotations.size());
-//		try {
-//			out = new BufferedWriter(new FileWriter("data/annotations.csv"));
-//		    Iterator<Entry<String, Integer>> it = annotations.entrySet().iterator();
-//		    while (it.hasNext()) {
-//		        Map.Entry<String, Integer> pair = it.next();
-//		        out.write(pair.getKey() + "," + pair.getValue() + "\n");
-//
-//		    }
-//		} finally {
-//			out.close();
-//		}
+		// Serialize accession based GO database and write it to file
+		serializeAccGoDb();
+		
 		System.out.println("Done!");
 	}
 	
@@ -99,29 +85,7 @@ public class GoDbBuilder {
 		fos.close();
 	}
 	
-	//Count swiss prot annotations per GO term
-	private static void countSwissProtAnnoations() throws FileNotFoundException, IOException {
-		String spline, go = new String();
-		BufferedReader swissProtIn = null;
-		try {
-			swissProtIn = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(reviewedUniProtFilePath))));
-			while ((spline = swissProtIn.readLine()) != null) {
-				Matcher m = reviewedUniProtGoAnnotationRegex.matcher(spline);
-				if (m.matches()) {
-					go = m.group("goTerm");
-					if (annotations.containsKey(go)) {
-						annotations.put(go, annotations.get(go) + 1);
-					} else {
-						annotations.put(go, 1);
-					}
-				}
-			}
-		} finally {
-			swissProtIn.close();
-		}
-	}
-	
-	// Read term table and fill goDB 
+	// Read term table and fill ID based GO term database
 	private static void readTermTable() throws FileNotFoundException, IOException {
 		TarArchiveInputStream godbtis = null;
 		try {
@@ -170,7 +134,6 @@ public class GoDbBuilder {
 					String line = new String();
 					Integer linecount = 0;
 					Integer matchcount = 0;
-					Integer failcount = 0;
 					while ((line = br.readLine()) != null) {
 						linecount++;
 						Matcher m = geneOntologyMYSQLdumpGraphPathRegex.matcher(line);
@@ -178,15 +141,10 @@ public class GoDbBuilder {
 							matchcount++;
 							GOterm term = idGoDb.get(Integer.parseInt(m.group("term2id")));
 							GOterm parent = idGoDb.get(Integer.parseInt(m.group("term1id")));
-							if (term != null && parent != null) {
-								term.addTermToAncestry(parent);	
-							} else {
-								failcount++;
-							}
+							term.addTermToAncestry(parent);	
 						}
 					}
-					System.out.println(matchcount + " of " + linecount + " lines matched");
-					System.out.println("Failcount: "+ failcount);
+					System.out.println(matchcount + " of " + linecount + " graph path lines matched.");
 				}
 				entry = tais.getNextTarEntry();
 			}
@@ -194,83 +152,14 @@ public class GoDbBuilder {
 			tais.close();
 		}
 	}
-	
-	// Sum annotation counts to term frequencies
-	private static void sumCounts() {
+
+	// Builds an accession based GO database
+	private static void buildAccGoDb() {
 		Iterator<Map.Entry<Integer, GOterm>> mapIter = idGoDb.entrySet().iterator();
-		GOterm term = null;
-		Set<GOterm> ancestry = null;
-		String acc = new String();
-		int count = 0;
-		int missingRootCount = 0;
 		while (mapIter.hasNext()) {
 			Map.Entry<Integer, GOterm> entry = mapIter.next();
-			term = entry.getValue();
-			if (!term.getObsolete()) {
-				acc = term.getAccession();
-				if (annotations.containsKey(acc)) {
-					count = annotations.get(acc);
-					switch(term.getOntology()) {
-					case "biological_process":	bpCount = bpCount + count;
-												break;
-					case "cellular_component":	ccCount = ccCount + count;
-												break;
-					case "molecular_function":	mfCount = mfCount + count;
-												break;
-					default: 					break; //meta term: Not counted towards any of the three ontologies
-					}
-					ancestry = term.getAncestry();
-					// Because each term is part of its own ancestry, its annotation count does not have to be increase separately
-					boolean missesRoot = true;
-					for(GOterm parent : ancestry) {
-						parent.setFrequency(parent.getFrequency() + count);
-						if (parent.getAccession().equals(bpRootAcc) | parent.getAccession().equals(ccRootAcc) | parent.getAccession().equals(mfRootAcc)) {
-							missesRoot = false;
-						}
-					}
-					if (missesRoot) {
-						System.out.println("Missing root term in ancestry of: " + term.getAccession());
-						missingRootCount++;
-					}
-				}
-			}
+			accGoDb.put(entry.getValue().getAccession(), entry.getValue());
 		}
-		System.out.println("bpCount: " + bpCount);
-		System.out.println("ccCount: " + ccCount);
-		System.out.println("mfCount: " + mfCount);
-		System.out.println("missingRootCount: " + missingRootCount);
-	}
-	
-	// Calculate term probabilities from the term frequencies
-	// Calculate the information content from the term probabilities
-	// Store terms in accession based GO database
-	private static void calculateInfoContent() {
-		Iterator<Map.Entry<Integer, GOterm>> mapIter = idGoDb.entrySet().iterator();
-		GOterm term = null;
-		int metacount = 0;
-		while (mapIter.hasNext()) {
-			Map.Entry<Integer, GOterm> entry = mapIter.next();
-			term = entry.getValue();
-			switch(term.getOntology()) {
-			case "biological_process":	term.setProbability((double)term.getFrequency()/bpCount);
-										term.setInformationContent(-1*Math.log(term.getProbability()));
-										accGoDb.put(term.getAccession(), term);
-										break;
-			case "cellular_component":	term.setProbability((double)term.getFrequency()/ccCount);
-										term.setInformationContent(-1*Math.log(term.getProbability()));
-										accGoDb.put(term.getAccession(), term);
-										break;
-			case "molecular_function":	term.setProbability((double)term.getFrequency()/mfCount);
-										term.setInformationContent(-1*Math.log(term.getProbability()));
-										accGoDb.put(term.getAccession(), term);
-										break;
-			default: 					metacount++;//meta term: Not counted towards any of the three ontologies; omit storing in accession based term database  
-										break;
-			}
-			
-		}
-		System.out.println("metacount: " + metacount);
-		System.out.println("Finished calculating information content");
 	}
 	
 	// Read in term synonyms and add them to accession based GO database
@@ -291,17 +180,107 @@ public class GoDbBuilder {
 						Matcher m = geneOntologyMYSQLdumpTermSynonymRegex.matcher(line);
 						if (m.matches()) {
 							matchcount++;
-							accGoDb.put(m.group("accsynonym"), idGoDb.get(m.group("termid")));
+							accGoDb.put(m.group("accsynonym"), idGoDb.get(Integer.parseInt(m.group("termid"))));
 						}
 					}
-					System.out.println(matchcount + " of " + linecount + " lines matched");
+					System.out.println(matchcount + " of " + linecount + " synonym table lines matched.");
 				}
 				entry = tais.getNextTarEntry();
 			}
 		} finally {
 			tais.close();
 		}
-		System.out.println("Finished reading and adding term synonyms");
+	}
+
+	// Read in SwissProt annotations
+	// Counts each annotation towards a GO term and its complete ancestry  
+	private static void countAnnotations() throws FileNotFoundException, IOException {
+		System.out.println("Reading and counting aprox 2.7 million SwissProt annoations ...");
+		String line, termAcc= new String();
+		Integer linecount = 0;
+		Integer matchcount = 0;
+		BufferedReader br = null;
+		GOterm term = null;
+		Set<GOterm> ancestry = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(reviewedUniProtFilePath))));
+			while ((line = br.readLine()) != null) {
+				linecount++;
+				Matcher m = reviewedUniProtGoAnnotationRegex.matcher(line);
+				if (m.matches()) {
+					matchcount++;
+					termAcc = m.group("goTerm");
+					term = accGoDb.get(termAcc);
+					if (term == null) {
+						System.out.println("Error: GO-accession of SwissProt annotation not found in Gene Ontology.");
+					} else {
+						ancestry = term.getAncestry();
+						if (!term.getObsolete()) {
+							switch(term.getOntology()) {
+							case "biological_process":
+								bpCount++;
+								for(GOterm parent : ancestry) {
+									parent.setFrequency(parent.getFrequency() + 1);
+									}
+								break;
+							case "cellular_component":
+								ccCount++;
+								for(GOterm parent : ancestry) {
+									parent.setFrequency(parent.getFrequency() + 1);
+								}
+								break;
+							case "molecular_function":
+								mfCount++;
+								for(GOterm parent : ancestry) {
+									parent.setFrequency(parent.getFrequency() + 1);
+								}
+								break;
+							default:
+								break; //meta term: Not counted towards any of the three ontologies
+							}
+
+						}
+					}
+				}
+			}
+		} finally {
+			br.close();
+		}
+		System.out.println(matchcount + " of " + linecount + " SwissProt lines matched.");
+		System.out.println("bpCount: " + bpCount);
+		System.out.println("ccCount: " + ccCount);
+		System.out.println("mfCount: " + mfCount);
+	}
+	
+	// Calculate the information content from the term probabilities
+	private static void calculateInfoContent() {
+		Iterator<Map.Entry<Integer, GOterm>> mapIter = idGoDb.entrySet().iterator();
+		GOterm term = null;
+		int metacount = 0;
+		while (mapIter.hasNext()) {
+			Map.Entry<Integer, GOterm> entry = mapIter.next();
+			term = entry.getValue();
+			switch(term.getOntology()) {
+			case "biological_process":
+				term.setProbability((double)term.getFrequency()/bpCount);
+				term.setInformationContent(-1*Math.log(term.getProbability()));
+				break;
+			case "cellular_component":
+				term.setProbability((double)term.getFrequency()/ccCount);
+				term.setInformationContent(-1*Math.log(term.getProbability()));
+				break;
+			case "molecular_function":
+				term.setProbability((double)term.getFrequency()/mfCount);
+				term.setInformationContent(-1*Math.log(term.getProbability()));
+				break;
+			default:
+				metacount++;//meta term: Not counted towards any of the three ontologies; omit storing in accession based term database  
+				break;
+			}
+			
+		}
+		System.out.println("metacount: " + metacount);
+		System.out.println("Finished calculating information content.");
 	}
 	
 	// Check consistency of root term annotation count and information content
@@ -326,6 +305,19 @@ public class GoDbBuilder {
 		}
 		if (accGoDb.get(mfRootAcc).getInformationContent() != 0.0) {
 			System.out.println("Root term of molecular function ontology has a non zero information content: " + accGoDb.get(mfRootAcc).getInformationContent());
+		}
+	}
+	// Serialize accession based GO database and write it to file	
+	private static void serializeAccGoDb() {
+		try {
+			FileOutputStream fileOut = new FileOutputStream("data/accGoDb.ser");
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(accGoDb);
+			out.close();
+			fileOut.close();
+			System.out.println("Serialized data is saved in data/accGoDb.ser (aprox. 11MB)");
+		} catch (IOException i) {
+			i.printStackTrace();
 		}
 	}
 }
