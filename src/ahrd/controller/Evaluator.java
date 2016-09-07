@@ -2,11 +2,13 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
+import ahrd.model.GOdatabase;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
 import ahrd.view.OutputWriter;
@@ -42,6 +44,12 @@ public class Evaluator extends AHRD {
 							"Could not find Protein for Accession '" + b2ga.getAccession() + "'");
 				p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2ga);
 			}
+		}
+	}
+	
+	public void setupGoDb() throws FileNotFoundException, IOException {
+		if (getSettings().hasGeneOntologyAnnotations()) {
+			goDB = new GOdatabase().getMap();
 		}
 	}
 

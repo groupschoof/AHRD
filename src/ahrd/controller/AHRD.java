@@ -37,7 +37,7 @@ public class AHRD {
 	private Set<String> uniqueBlastResultShortAccessions;
 	private long timestamp;
 	private long memorystamp;
-	private Map<String, GOterm> goDB;
+	protected Map<String, GOterm> goDB;
 
 	protected long takeTime() {
 		// Measure time:

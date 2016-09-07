@@ -98,6 +98,7 @@ public class Settings implements Cloneable {
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
+	public static final String GO_DB_PATH_KEY = "go_db_bath";
 
 	/**
 	 * Fields:
@@ -225,7 +226,14 @@ public class Settings implements Cloneable {
 	 * pass the Blacklisting. Otherwise all Tokens are submitted to evaluation.
 	 */
 	private Boolean evaluateValidTokens = true;
-
+	/**
+	 * The path in witch to keep:
+	 * - Downloaded reviewed part of Uniprot
+	 * - Downloaded Gene Ontology mysql database dump
+	 * - Serialized copy of the GOdatabase, generated when it was needed the for first time  
+	 */
+	private String pathToGoDatabase;
+	
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
 	 * 
@@ -364,6 +372,9 @@ public class Settings implements Cloneable {
 		if (input.get(REFERENCES_TOKEN_BLACKLIST_KEY) != null) {
 			this.setPathToReferencesTokenBlacklist(input.get(REFERENCES_TOKEN_BLACKLIST_KEY).toString());
 			this.setReferencesTokenBlacklist(fromFile(getPathToReferencesTokenBlacklist()));
+		}
+		if (input.get(GO_DB_PATH_KEY) != null) {
+			this.setPathToGoDatabase(input.get(GO_DB_PATH_KEY).toString());
 		}
 	}
 
@@ -937,5 +948,13 @@ public class Settings implements Cloneable {
 
 	public void setReferencesTokenBlacklist(List<String> referencesTokenBlacklist) {
 		this.referencesTokenBlacklist = referencesTokenBlacklist;
+	}
+
+	public String getPathToGoDatabase() {
+		return pathToGoDatabase;
+	}
+
+	public void setPathToGoDatabase(String pathToGoDatabase) {
+		this.pathToGoDatabase = pathToGoDatabase;
 	}
 }
