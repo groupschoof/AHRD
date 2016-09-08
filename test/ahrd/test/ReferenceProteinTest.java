@@ -1,8 +1,8 @@
 package ahrd.test;
 
-import static ahrd.model.AhrdDb.close;
+import static ahrd.model.AhrdDb.closeDb;
 import static ahrd.model.AhrdDb.getReferenceProteinDAO;
-import static ahrd.model.AhrdDb.initialize;
+import static ahrd.model.AhrdDb.initializeDb;
 import static ahrd.test.TestUtils.initTestSettings;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+import ahrd.exception.MissingProteinException;
 import ahrd.model.ReferenceProtein;
 
 public class ReferenceProteinTest {
@@ -60,17 +61,36 @@ public class ReferenceProteinTest {
 	public void testLoadReferenceProteins() throws IOException {
 		initTestSettings();
 		try {
-			initialize(false);
+			initializeDb(false);
 			// Create ReferenceProteins in AHRD's DB:
 			loadReferenceProteins();
 			// Test their existence:
 			testReferenceProteins();
 			// Test their PERSISTENT existence:
-			close();
-			initialize(true);
+			closeDb();
+			initializeDb(true);
 			testReferenceProteins();
 		} finally {
-			close();
+			closeDb();
+		}
+	}
+
+	@Test
+	public void testParseBlastDatabase() throws IOException, MissingProteinException {
+		initTestSettings();
+		try {
+			initializeDb(false);
+			ReferenceProtein.parseBlastDatabase("swissprot");
+			assertNotNull(getReferenceProteinDAO().byShortAccession.get("Q9ZWC8"));
+			ReferenceProtein rp1 = getReferenceProteinDAO().byAccession.get("sp|Q9LRP3|Y3174_ARATH");
+			assertNotNull(rp1);
+			assertEquals("Q9LRP3", rp1.getShortAccession());
+			assertEquals("Probable receptor-like protein kinase At3g17420", rp1.getHrd());
+			assertEquals("swissprot", rp1.getBlastDatabaseName());
+			assertEquals(new Long(467), rp1.getSequenceLength());
+			assertNull(getReferenceProteinDAO().byAccession.get("sp|ThisAccessionDoesNotExists|it's_true_believe_me"));
+		} finally {
+			closeDb();
 		}
 	}
 

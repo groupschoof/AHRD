@@ -54,7 +54,7 @@ public class AhrdDb {
 	 * @throws DatabaseException
 	 * @throws IOException
 	 */
-	public static void initialize(boolean readonly) throws DatabaseException, IOException {
+	public static void initializeDb(boolean readonly) throws DatabaseException, IOException {
 		EnvironmentConfig envConfig = new EnvironmentConfig();
 		envConfig.setAllowCreate(!readonly);
 		envConfig.setTransactional(!readonly);
@@ -72,7 +72,7 @@ public class AhrdDb {
 	/**
 	 * Cleans up and closes the connection to the Database-File.
 	 */
-	public static void close() {
+	public static void closeDb() {
 		if (ahrdStore.get() != null) {
 			ahrdStore.get().close();
 			ahrdStore.set(null);

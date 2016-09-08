@@ -11,8 +11,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,11 +58,9 @@ public class ReferenceProtein {
 	 * invoked.
 	 * 
 	 * @param blastDbName
-	 * @param blastResults
 	 * @throws IOException
 	 */
-	public static void parseBlastDatabase(String blastDbName, Map<String, List<BlastResult>> blastResults)
-			throws IOException {
+	public static void parseBlastDatabase(String blastDbName) throws IOException {
 		// Parse line by line FASTA Blast search DB. Extract Subject Lengths and
 		// Subject HRDs.
 		BufferedReader fastaIn = null;
