@@ -26,12 +26,6 @@ import ahrd.exception.MissingProteinException;
  */
 public class BlastResult implements Comparable<BlastResult> {
 
-	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
-	public static final String FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME = "accession";
-	public static final String FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME = "description";
-	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
-	public static final String GO_TERM_GROUP_NAME = "goTerm";
-
 	private String accession;
 	private String shortAccession;
 	private Double eValue;

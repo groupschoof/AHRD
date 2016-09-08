@@ -21,5 +21,6 @@
 	<classpathentry kind="lib" path="lib/xom-1.2.6.jar"/>
 	<classpathentry kind="lib" path="lib/yamlbeans-1.06.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.35-bin.jar"/>
+	<classpathentry kind="lib" path="/Users/asis/projects/AHRD/lib/je-7.0.6.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
