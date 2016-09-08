@@ -68,6 +68,8 @@ public class Evaluator extends AHRD {
 			// Blast2GO is another competitor in the field of annotation of
 			// predicted Proteins. AHRD might be compared with B2Gs performance:
 			evaluator.setupBlast2GoAnnots();
+			// Load a Map of all GO terms
+			evaluator.setupGoDb();
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			evaluator.assignHumanReadableDescriptions();

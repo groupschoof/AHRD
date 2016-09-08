@@ -1,7 +1,7 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
-import static ahrd.controller.Utils.getJarDir;
+import static ahrd.controller.Utils.getAHRDdir;
 
 import java.io.*;
 import java.net.URL;
@@ -37,9 +37,12 @@ public class GOdatabase {
 		if (getSettings().getPathToGoDatabase() != null) {
 			pathToGoDatabase = getSettings().getPathToGoDatabase();
 		} else {
-			pathToGoDatabase = getJarDir(this.getClass());
+			pathToGoDatabase = getAHRDdir(this.getClass()) + "data/";
 		}
-		String serializedAccGoDBFilePath = pathToGoDatabase + "/" + serializedAccGoDBFileName;
+		if (!pathToGoDatabase.endsWith("/")) {
+			pathToGoDatabase = pathToGoDatabase + "/";
+		}
+		String serializedAccGoDBFilePath = pathToGoDatabase + serializedAccGoDBFileName;
 		if (new File(serializedAccGoDBFilePath).exists()) {
 			goDb = deserializeAccGoDb(serializedAccGoDBFilePath);
 		} else {
@@ -72,16 +75,17 @@ public class GOdatabase {
 	}
 
 	private HashMap<String, GOterm> buildGoDbFromFile(String pathToGoDatabase) throws FileNotFoundException, IOException {
+		System.out.println("Building GO database:");
 		HashMap<String, GOterm> accGoDb = new HashMap<String, GOterm>();
 
-		String reviewedUniProtFilePath =  pathToGoDatabase + "/" + reviewedUniProtFileName;		
+		String reviewedUniProtFilePath =  pathToGoDatabase + reviewedUniProtFileName;		
 		// Download SwissProt if not already on drive
 		if (!new File(reviewedUniProtFilePath).exists()) {
 			System.out.println("Downloading reviewed Uniprot (aprox. 550MB) from:\n"+ reviewedUniProtURL); 
 			download(reviewedUniProtURL, reviewedUniProtFilePath);
 		}
 
-		String geneOntologyMYSQLdumpFilePath = pathToGoDatabase + "/" + geneOntologyMYSQLdumpFileName;
+		String geneOntologyMYSQLdumpFilePath = pathToGoDatabase + geneOntologyMYSQLdumpFileName;
 		// Download gene ontology mysql data base dump if not alrady on drive
 		if (!new File(geneOntologyMYSQLdumpFilePath).exists()) {
 			System.out.println("Downloading GO databese (aprox. 12MB) from:\n" + geneOntologyMYSQLdumpURL);
@@ -303,13 +307,13 @@ public class GOdatabase {
 
 		// Serialize accession based GO database and write it to file	
 		try {
-			String serializedAccGoDBFilePath = pathToGoDatabase + "/" + serializedAccGoDBFileName;
+			String serializedAccGoDBFilePath = pathToGoDatabase + serializedAccGoDBFileName;
 			FileOutputStream fileOut = new FileOutputStream(serializedAccGoDBFilePath);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(accGoDb);
 			out.close();
 			fileOut.close();
-			System.out.println("Serialized data is saved in data/accGoDb.ser (aprox. 11MB)");
+			System.out.println("Serialized data (aprox. 11MB) saved in: " + serializedAccGoDBFilePath);
 		} catch (IOException i) {
 			i.printStackTrace();
 		}

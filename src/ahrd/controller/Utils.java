@@ -118,7 +118,7 @@ public class Utils {
 	 *         which is the directory containing what will be in the jar.
 	 */
 	@SuppressWarnings("rawtypes")
-	public static String getJarDir(Class aclass) {
+	public static String getAHRDdir(Class aclass) {
 		URL url;
 		String extURL; // url.toExternalForm();
 
@@ -127,7 +127,7 @@ public class Utils {
 			url = aclass.getProtectionDomain().getCodeSource().getLocation();
 			// url is in one of two forms
 			// ./build/classes/ NetBeans test
-			// jardir/JarName.jar froma jar
+			// jardir/JarName.jar from a jar
 		} catch (SecurityException ex) {
 			url = aclass.getResource(aclass.getSimpleName() + ".class");
 			// url is in one of two forms, both ending
@@ -141,29 +141,28 @@ public class Utils {
 
 		// prune for various cases
 		if (extURL.endsWith(".jar")) // from getCodeSource
-			extURL = extURL.substring(0, extURL.lastIndexOf("/"));
+			extURL = extURL.substring(0, extURL.lastIndexOf("dist/"));
 		else { // from getResource
-			String suffix = "/" + (aclass.getName()).replace(".", "/") + ".class";
-			extURL = extURL.replace(suffix, "");
+			String suffix = (aclass.getName()).replace(".", "/") + ".class";
+			extURL = replaceLast(extURL, suffix , "");
+			//extURL = extURL.replace(suffix, "");
+			suffix = "classes/";
+			extURL = replaceLast(extURL, suffix , "");
 			if (extURL.startsWith("jar:") && extURL.endsWith(".jar!"))
-				extURL = extURL.substring(4, extURL.lastIndexOf("/"));
+				extURL = extURL.substring(4, extURL.lastIndexOf("dist/"));
 		}
-		
-		return extURL;
-		
-//		// convert back to url
-//		try {
-//			url = new URL(extURL);
-//		} catch (MalformedURLException mux) {
-//			// leave url unchanged; probably does not happen
-//		}
-//
-//		// convert url to File
-//		try {
-//			return new File(url.toURI());
-//		} catch (URISyntaxException ex) {
-//			return new File(url.getPath());
-//		}
-	}
 
+		// convert back to url
+		try {
+			url = new URL(extURL);
+		} catch (MalformedURLException mux) {
+			// leave url unchanged; probably does not happen
+		}
+
+		return url.getPath();
+	}
+	
+	public static String replaceLast(String text, String regex, String replacement) {
+        return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
+    }
 }
