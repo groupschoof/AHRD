@@ -1,9 +1,13 @@
 package ahrd.test;
 
+import static ahrd.controller.Settings.setSettings;
 import static ahrd.model.AhrdDb.closeDb;
 import static ahrd.model.AhrdDb.getReferenceProteinDAO;
 import static ahrd.model.AhrdDb.initializeDb;
+import static ahrd.model.ReferenceProtein.parseBlastDatabase;
+import static ahrd.model.ReferenceProtein.parseReferenceGoAnnotations;
 import static ahrd.test.TestUtils.initTestSettings;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -11,9 +15,13 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.xml.sax.SAXException;
 
+import ahrd.controller.Settings;
+import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.ReferenceProtein;
+import nu.xom.ParsingException;
 
 public class ReferenceProteinTest {
 
@@ -28,7 +36,7 @@ public class ReferenceProteinTest {
 	}
 
 	/**
-	 * Helper method to check wether the expected ReferenceProteins are in the
+	 * Helper method to check whether the expected ReferenceProteins are in the
 	 * (persistent) AHRD-Database.
 	 */
 	private void testReferenceProteins() {
@@ -80,7 +88,7 @@ public class ReferenceProteinTest {
 		initTestSettings();
 		try {
 			initializeDb(false);
-			ReferenceProtein.parseBlastDatabase("swissprot");
+			parseBlastDatabase("swissprot");
 			assertNotNull(getReferenceProteinDAO().byShortAccession.get("Q9ZWC8"));
 			ReferenceProtein rp1 = getReferenceProteinDAO().byAccession.get("sp|Q9LRP3|Y3174_ARATH");
 			assertNotNull(rp1);
@@ -94,4 +102,38 @@ public class ReferenceProteinTest {
 		}
 	}
 
+	@Test
+	public void testParseReferenceGoAnnotations()
+			throws IOException, MissingAccessionException, MissingProteinException, SAXException, ParsingException {
+		setSettings(new Settings("./test/resources/ahrd_input_seq_sim_table_go_prediction.yml"));
+		try {
+			initializeDb(false);
+			parseBlastDatabase("swissprot");
+			parseBlastDatabase("trembl");
+			parseBlastDatabase("tair");
+			parseReferenceGoAnnotations();
+			ReferenceProtein rp1 = getReferenceProteinDAO().byShortAccession.get("W9QFR0");
+			assertNotNull("ReferenceProtein 'W9QFR0' should be in the Database, but is null!", rp1);
+			assertNotNull("ReferenceProtein 'W9QFR0' should have GO terms assigned, but its GO term set is null!",
+					rp1.getGoTerms());
+			assertTrue("ReferenceProtein 'W9QFR0' should have GO terms assigned, but its GO term set is empty!",
+					!rp1.getGoTerms().isEmpty());
+			assertTrue("ReferenceProtein 'W9QFR0' should have GO term 'GO:0009058' assigned, but has not!",
+					rp1.getGoTerms().contains("GO:0009058"));
+			assertTrue("ReferenceProtein 'W9QFR0' should have GO term 'GO:0030170' assigned, but has not!",
+					rp1.getGoTerms().contains("GO:0030170"));
+			ReferenceProtein rp2 = getReferenceProteinDAO().byShortAccession.get("AT1G01040.1");
+			assertNotNull("ReferenceProtein 'AT1G01040.1' should be in the Database, but is null!", rp2);
+			assertNotNull("ReferenceProtein 'AT1G01040.1' should have GO terms assigned, but its GO term set is null!",
+					rp2.getGoTerms());
+			assertTrue("ReferenceProtein 'AT1G01040.1' should have GO terms assigned, but its GO term set is empty!",
+					!rp2.getGoTerms().isEmpty());
+			assertTrue("ReferenceProtein 'AT1G01040.1' should have GO term 'GO:0003824' assigned, but has not!",
+					rp2.getGoTerms().contains("GO:0003824"));
+			assertTrue("ReferenceProtein 'AT1G01040.1' should have GO term 'GO:0003870' assigned, but has not!",
+					rp2.getGoTerms().contains("GO:0003870"));
+		} finally {
+			closeDb();
+		}
+	}
 }

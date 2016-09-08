@@ -2,6 +2,7 @@ package ahrd.model;
 
 import static ahrd.controller.Settings.FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME;
 import static ahrd.controller.Settings.FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME;
+import static ahrd.controller.Settings.GO_TERM_GROUP_NAME;
 import static ahrd.controller.Settings.SHORT_ACCESSION_GROUP_NAME;
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.model.AhrdDb.getReferenceProteinDAO;
@@ -115,6 +116,58 @@ public class ReferenceProtein {
 		} finally {
 			fastaIn.close();
 		}
+	}
+
+	/**
+	 * Parses the tabular reference Gene Ontology term annotations (GOA) for
+	 * proteins in the searched Blast databases. These GOAs will then be used to
+	 * annotate the query proteins with GO terms. The important restriction is,
+	 * that only those reference GO annotations will be extracted that match one
+	 * of the BlastResults found in the respective Blast searches
+	 * <code>uniqueShortAccessions</code>.
+	 * 
+	 * @param Set
+	 *            <String> uniqueShortAccessions - The unique short accessions
+	 *            of BlastResults found in the respective Blast searches
+	 * @throws IOException
+	 */
+	public static void parseReferenceGoAnnotations() throws IOException {
+		BufferedReader goaIn = null;
+		try {
+			goaIn = new BufferedReader(new FileReader(getSettings().getPathToGeneOntologyResults()));
+			Pattern p = getSettings().getReferenceGoRegex();
+			String line, shortAcc, goTerm = "";
+			while ((line = goaIn.readLine()) != null) {
+				Matcher m = p.matcher(line);
+				if (m.find()) {
+					shortAcc = m.group(SHORT_ACCESSION_GROUP_NAME);
+					goTerm = m.group(GO_TERM_GROUP_NAME);
+					addGoAnnotation(shortAcc, goTerm);
+				}
+			}
+		} finally {
+			goaIn.close();
+		}
+	}
+
+	/**
+	 * Adds the Gene Ontology term <code>goTerm</code> to the Set of the
+	 * BlastResult's GO term annotations. In this, the BlastResult is identified
+	 * by its short accession <code>brShortAccession</code>.
+	 * 
+	 * @param brShortAccession
+	 * @param goTerm
+	 */
+	protected static void addGoAnnotation(String brShortAccession, String goTerm) {
+		ReferenceProtein rp = getReferenceProteinDAO().byShortAccession.get(brShortAccession);
+		if (null != rp) {
+			// Add Go Term
+			rp.getGoTerms().add(goTerm);
+			// Update Database-Entry:
+			getReferenceProteinDAO().byAccession.put(rp);
+		} else
+			System.err.println("WARNING: Could not find Reference-Protein for SHORT-ACCESSION '" + brShortAccession
+					+ "' in the AHRD Database. But found GO-Terms for it. Discarding them...");
 	}
 
 	@PrimaryKey
