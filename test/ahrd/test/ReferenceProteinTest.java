@@ -16,6 +16,9 @@ import ahrd.model.ReferenceProtein;
 
 public class ReferenceProteinTest {
 
+	/**
+	 * Helper method to create ReferenceProteins in AHRD's Database.
+	 */
 	private void loadReferenceProteins() {
 		getReferenceProteinDAO().byAccession.put(new ReferenceProtein("sp|acc_1|accession_one",
 				"HumanReadableDescription_1", new Long(123), "swissprot"));
@@ -23,6 +26,10 @@ public class ReferenceProteinTest {
 				"HumanReadableDescription_2", new Long(321), "swissprot"));
 	}
 
+	/**
+	 * Helper method to check wether the expected ReferenceProteins are in the
+	 * (persistent) AHRD-Database.
+	 */
 	private void testReferenceProteins() {
 		ReferenceProtein p1 = getReferenceProteinDAO().byAccession.get("sp|acc_1|accession_one");
 		assertNotNull(p1);
@@ -43,6 +50,12 @@ public class ReferenceProteinTest {
 				getReferenceProteinDAO().byShortAccession.get("acc_1").getShortAccession());
 	}
 
+	/**
+	 * Test creation, retrieval and persistence of ReferenceProeins with AHRD's
+	 * Database.
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void testLoadReferenceProteins() throws IOException {
 		initTestSettings();
@@ -54,7 +67,7 @@ public class ReferenceProteinTest {
 			testReferenceProteins();
 			// Test their PERSISTENT existence:
 			close();
-			initialize(false);
+			initialize(true);
 			testReferenceProteins();
 		} finally {
 			close();
