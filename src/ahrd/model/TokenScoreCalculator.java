@@ -1,5 +1,6 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.TOKEN_SPLITTER_REGEX;
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Utils.roundToNDecimalPlaces;
 
@@ -53,8 +54,7 @@ public class TokenScoreCalculator {
 	 */
 	public static Set<String> tokenize(String description, List<String> tokenBlacklist) {
 		Set<String> tkns = new HashSet<String>();
-		for (String tokenCandidate : new HashSet<String>(
-				Arrays.asList(description.split(BlastResult.TOKEN_SPLITTER_REGEX)))) {
+		for (String tokenCandidate : new HashSet<String>(Arrays.asList(description.split(TOKEN_SPLITTER_REGEX)))) {
 			tokenCandidate = tokenCandidate.toLowerCase();
 			if (tokenCandidate != null && !tokenCandidate.equals("")
 					&& tokenPassesBlacklist(tokenCandidate, tokenBlacklist))

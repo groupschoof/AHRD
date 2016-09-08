@@ -3,6 +3,7 @@ package ahrd.model;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
@@ -18,7 +19,7 @@ public class AhrdDb {
 	 * An Accessor to handle storage and retrieval of ReferenceProteins with
 	 * Berkeley-DB.
 	 */
-	static class ReferenceProteinAccessor {
+	public static class ReferenceProteinAccessor {
 		public PrimaryIndex<String, ReferenceProtein> byAccession;
 		public SecondaryIndex<String, String, ReferenceProtein> byShortAccession;
 
@@ -51,11 +52,16 @@ public class AhrdDb {
 	 *            should be the case if AHRD is run after Database-Setup has
 	 *            been executed.
 	 * @throws DatabaseException
+	 * @throws IOException
 	 */
-	public static void initialize(boolean readonly) throws DatabaseException {
+	public static void initialize(boolean readonly) throws DatabaseException, IOException {
 		EnvironmentConfig envConfig = new EnvironmentConfig();
-		envConfig.setAllowCreate(true);
-		ahrdDbEnv.set(new Environment(new File(getSettings().getAhrd_db()), envConfig));
+		envConfig.setAllowCreate(!readonly);
+		envConfig.setTransactional(!readonly);
+		File ahrdDbFile = new File(getSettings().getAhrd_db());
+		if (!ahrdDbFile.exists())
+			ahrdDbFile.mkdirs();
+		ahrdDbEnv.set(new Environment(ahrdDbFile, envConfig));
 		StoreConfig storeConfig = new StoreConfig();
 		storeConfig.setAllowCreate(!readonly);
 		storeConfig.setTransactional(!readonly);

@@ -1,5 +1,8 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME;
+import static ahrd.controller.Settings.FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME;
+import static ahrd.controller.Settings.SHORT_ACCESSION_GROUP_NAME;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.BufferedReader;

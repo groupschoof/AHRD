@@ -243,9 +243,9 @@ public class Settings implements Cloneable {
 	private Boolean evaluateValidTokens = true;
 
 	/**
-	 * This is the path to the file in which the AHRD data is stored.
+	 * This is the path to the directory in which the AHRD data is stored.
 	 */
-	private String ahrd_db = "AHRD_DB.txt";
+	private String ahrd_db = "AHRD_DB";
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.

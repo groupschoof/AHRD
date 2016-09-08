@@ -5,6 +5,7 @@ import static ahrd.controller.Settings.FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NA
 import static ahrd.controller.Settings.SHORT_ACCESSION_GROUP_NAME;
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.model.AhrdDb.getReferenceProteinDAO;
+import static com.sleepycat.persist.model.Relationship.ONE_TO_ONE;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
 
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;
+import com.sleepycat.persist.model.SecondaryKey;
 
 import ahrd.controller.Settings;
 
@@ -121,6 +123,7 @@ public class ReferenceProtein {
 
 	@PrimaryKey
 	private String accession;
+	@SecondaryKey(relate = ONE_TO_ONE)
 	private String shortAccession;
 	private String hrd;
 	private Long sequenceLength;
@@ -143,11 +146,11 @@ public class ReferenceProtein {
 	public ReferenceProtein(String accession, String hrd, Long sequenceLength, String blastDatabaseName) {
 		super();
 		setAccession(accession);
-		// Initializes the short accession:
-		getShortAccession();
 		setHrd(hrd);
 		setSequenceLength(sequenceLength);
 		setBlastDatabaseName(blastDatabaseName);
+		// Extract the short accession from the long one:
+		initShortAccession();
 	}
 
 	/**
@@ -156,23 +159,22 @@ public class ReferenceProtein {
 	 * due to the fact that UniprotKB uses short accessions in the GOA files but
 	 * provides long accessions in the Blast Databases. A very unfortunate lack
 	 * of standardization, indeed!
-	 * 
-	 * @return String
 	 */
-	public String getShortAccession() {
-		if (shortAccession == null) {
-			Pattern p = getSettings().getShortAccessionRegex(getBlastDatabaseName());
-			Matcher m = p.matcher(getAccession());
-			setShortAccession(getAccession());
-			if (!m.find()) {
-				System.err.println("WARNING: Regular Expression '" + p.toString()
-						+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '" + getAccession()
-						+ "' - continuing with the original accession. This might lead to unrecognized reference GO annotations!");
-			} else {
-				shortAccession = m.group(SHORT_ACCESSION_GROUP_NAME);
-			}
+	public void initShortAccession() {
+		Pattern p = getSettings().getShortAccessionRegex(getBlastDatabaseName());
+		Matcher m = p.matcher(getAccession());
+		setShortAccession(getAccession());
+		if (!m.find()) {
+			System.err.println("WARNING: Regular Expression '" + p.toString()
+					+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '" + getAccession()
+					+ "' - continuing with the original accession. This might lead to unrecognized reference GO annotations!");
+		} else {
+			setShortAccession(m.group(SHORT_ACCESSION_GROUP_NAME));
 		}
-		return (shortAccession);
+	}
+
+	public String getShortAccession() {
+		return this.shortAccession;
 	}
 
 	public void setShortAccession(String shortAccession) {
