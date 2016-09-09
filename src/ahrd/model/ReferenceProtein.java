@@ -69,7 +69,7 @@ public class ReferenceProtein {
 			fastaIn = new BufferedReader(new FileReader(getSettings().getPathToBlastDatabase(blastDbName)));
 			String str, hrd = new String();
 			String acc = "";
-			Long hitAALength = new Long(0);
+			Integer hitAALength = new Integer(0);
 			boolean hit = false;
 			while ((str = fastaIn.readLine()) != null) {
 				if (str.startsWith(">")) {
@@ -78,7 +78,7 @@ public class ReferenceProtein {
 					if (hit) {
 						put(new ReferenceProtein(acc, hrd, hitAALength, blastDbName));
 						// Clean up to enable processing the next Hit
-						hitAALength = new Long(0);
+						hitAALength = new Integer(0);
 						// Note, that the boolean 'hit' will be set in the
 						// following If-Else-Block.
 					}
@@ -165,9 +165,7 @@ public class ReferenceProtein {
 			rp.getGoTerms().add(goTerm);
 			// Update Database-Entry:
 			getReferenceProteinDAO().byAccession.put(rp);
-		} else
-			System.err.println("WARNING: Could not find Reference-Protein for SHORT-ACCESSION '" + brShortAccession
-					+ "' in the AHRD Database. But found GO-Terms for it. Discarding them...");
+		} // Maybe we should write out a warning in the else-case?
 	}
 
 	@PrimaryKey
@@ -175,7 +173,7 @@ public class ReferenceProtein {
 	@SecondaryKey(relate = ONE_TO_ONE)
 	private String shortAccession;
 	private String hrd;
-	private Long sequenceLength;
+	private Integer sequenceLength;
 	String blastDatabaseName;
 	private Set<String> goTerms = new HashSet<String>();
 
@@ -192,7 +190,7 @@ public class ReferenceProtein {
 	 * @param hrd
 	 * @param sequenceLength
 	 */
-	public ReferenceProtein(String accession, String hrd, Long sequenceLength, String blastDatabaseName) {
+	public ReferenceProtein(String accession, String hrd, Integer sequenceLength, String blastDatabaseName) {
 		super();
 		setAccession(accession);
 		setHrd(hrd);
@@ -246,11 +244,11 @@ public class ReferenceProtein {
 		this.hrd = hrd;
 	}
 
-	public Long getSequenceLength() {
+	public Integer getSequenceLength() {
 		return sequenceLength;
 	}
 
-	public void setSequenceLength(Long sequenceLength) {
+	public void setSequenceLength(Integer sequenceLength) {
 		this.sequenceLength = sequenceLength;
 	}
 

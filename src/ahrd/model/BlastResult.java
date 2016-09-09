@@ -1,9 +1,8 @@
 package ahrd.model;
 
-import static ahrd.controller.Settings.FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME;
-import static ahrd.controller.Settings.FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME;
 import static ahrd.controller.Settings.SHORT_ACCESSION_GROUP_NAME;
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.model.AhrdDb.getReferenceProteinDAO;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,7 +17,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ahrd.controller.Settings;
+import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 
 /**
@@ -159,16 +158,14 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * 
 	 * @param proteinDb
 	 * @param blastDbName
-	 * @param uniqueShortAccessions
-	 *            - Used only if AHRD is requested to generate Gene Ontology
-	 *            term annotations
 	 * @throws IOException
 	 * @throws MissingProteinException
+	 * @throws MissingAccessionException
 	 */
-	public static void readBlastResults(Map<String, Protein> proteinDb, String blastDbName,
-			Set<String> uniqueAccessions) throws MissingProteinException, IOException {
-		Map<String, List<BlastResult>> brs = parseBlastResults(proteinDb, blastDbName, uniqueAccessions);
-		parseBlastDatabase(proteinDb, blastDbName, brs);
+	public static void readBlastResults(Map<String, Protein> proteinDb, String blastDbName)
+			throws MissingProteinException, IOException, MissingAccessionException {
+		Map<String, List<BlastResult>> brs = parseBlastResults(proteinDb, blastDbName);
+		parseBlastDatabase(brs);
 	}
 
 	/**
@@ -180,16 +177,13 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * 
 	 * @param proteinDb
 	 * @param blastDbName
-	 * @param uniqueShortAccessions
-	 *            - Used only if AHRD is requested to generate Gene Ontology
-	 *            term annotations
 	 * @return Map<String,List<BlastResult>> Set of Hit-Accessions (Key) to the
 	 *         full BlastResult(s) (Value)
 	 * @throws MissingProteinException
 	 * @throws IOException
 	 */
-	public static Map<String, List<BlastResult>> parseBlastResults(Map<String, Protein> proteinDb, String blastDbName,
-			Set<String> uniqueShortAccessions) throws MissingProteinException, IOException {
+	public static Map<String, List<BlastResult>> parseBlastResults(Map<String, Protein> proteinDb, String blastDbName)
+			throws MissingProteinException, IOException {
 		Map<String, List<BlastResult>> brs = new HashMap<String, List<BlastResult>>();
 		BufferedReader fastaIn = null;
 		try {
@@ -214,7 +208,7 @@ public class BlastResult implements Comparable<BlastResult> {
 							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableSubjectEndCol()]),
 							Double.parseDouble(brFields[getSettings().getSeqSimSearchTableBitScoreCol()]), blastDbName,
 							proteinDb.get(brFields[getSettings().getSeqSimSearchTableQueryCol()]));
-					addBlastResult(brs, br, uniqueShortAccessions);
+					addBlastResult(brs, br);
 				}
 			}
 		} finally {
@@ -232,10 +226,8 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * 
 	 * @param brs
 	 * @param br
-	 * @param uniqueShortAccessions
 	 */
-	public static void addBlastResult(Map<String, List<BlastResult>> brs, BlastResult br,
-			Set<String> uniqueShortAccessions) {
+	public static void addBlastResult(Map<String, List<BlastResult>> brs, BlastResult br) {
 		if (brs.containsKey(br.getAccession())) {
 			boolean isMultipleHsp = false;
 			List<BlastResult> sameHitBrs = brs.get(br.getAccession());
@@ -263,109 +255,48 @@ public class BlastResult implements Comparable<BlastResult> {
 			sameHitBrs.add(br);
 			brs.put(br.getAccession(), sameHitBrs);
 		}
-		// Finally, if AHRD is requested to annotate Gene Ontology Terms, we
-		// need to extract all unique short reference protein (BlastResult)
-		// accessions:
-		if (getSettings().hasGeneOntologyAnnotations()) {
-			uniqueShortAccessions.add(br.getShortAccession());
-		}
 	}
 
 	/**
-	 * Adds the sequence length and Human Readable Description (HRD) to all
-	 * matching BlastHits found in the argument Map 'blastResults'. Afterwards
-	 * the respective BlastResult instances are added to their respective
-	 * Proteins. See function <code>generateHRDCandidateForProtein</code> for
-	 * more details.
+	 * Extracts from AHRD's persistent database the length and human readable
+	 * descriptions of those Proteins that are Hits (Subjects) in the argument
+	 * blastResults. Each time such a Hit is found the mentioned measurements
+	 * are set in the respective instance of BlastResult and subsequently the
+	 * method 'Protein.addBlastResult' is invoked.
 	 * 
 	 * @param blastResults
-	 * @param fastaAccession
-	 * @param hitAALength
-	 * @param hrd
+	 * @throws MissingAccessionException
 	 */
-	public static void fastaEntryValuesForBlastHit(Map<String, List<BlastResult>> blastResults, String fastaAccession,
-			Integer hitAALength, String hrd) {
-		for (BlastResult br : blastResults.get(fastaAccession)) {
-			br.setSubjectLength(hitAALength);
-			br.setDescription(hrd);
-			br.generateHRDCandidateForProtein();
-		}
-	}
-
-	/**
-	 * Extracts from the provided protein database in FASTA format the length
-	 * and human readable descriptions of those Proteins that are Hits
-	 * (Subjects) in the argument blastResults. Each time such a Hit is found
-	 * the mentioned measurements are set in the respective instance of
-	 * BlastResult and subsequently the method 'Protein.addBlastResult' is
-	 * invoked.
-	 * 
-	 * @param proteinDb
-	 * @param blastDbName
-	 * @param blastResults
-	 * @throws IOException
-	 */
-	public static void parseBlastDatabase(Map<String, Protein> proteinDb, String blastDbName,
-			Map<String, List<BlastResult>> blastResults) throws IOException {
-		// Parse line by line FASTA Blast search DB. Extract Subject Lengths and
-		// Subject HRDs.
-		BufferedReader fastaIn = null;
-		try {
-			fastaIn = new BufferedReader(new FileReader(getSettings().getPathToBlastDatabase(blastDbName)));
-			String str, hrd = new String();
-			String acc = "";
-			Integer hitAALength = new Integer(0);
-			boolean hit = false;
-			while ((str = fastaIn.readLine()) != null) {
-				if (str.startsWith(">")) {
-					// Finished reading in the original Fasta-Entry of a
-					// Blast-Hit? If so, process it:
-					if (hit) {
-						fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
-						// Clean up to enable processing the next Hit
-						hitAALength = new Integer(0);
-						// Note, that the boolean 'hit' will be set in the
-						// following If-Else-Block.
-
-					}
-
-					// Process the current Fasta-Header-Line:
-					Matcher m = getSettings().getFastaHeaderRegex(blastDbName).matcher(str);
-					if (!m.matches()) {
-						// Provided REGEX to parse FASTA header does not work in
-						// this case:
-						System.err.println("WARNING: FASTA header line\n" + str.trim()
-								+ "\ndoes not match provided regular expression\n"
-								+ getSettings().getFastaHeaderRegex(blastDbName).toString()
-								+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
-								+ "To fix this, please use - Blast database specific - parameter "
-								+ Settings.FASTA_HEADER_REGEX_KEY
-								+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
-								+ blastDbName + "'.");
-					} else if (blastResults.containsKey(m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
-						// Found the next Blast HIT:
-						acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim();
-						hrd = m.group(FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME).trim();
-						// Following lines, until the next header, contain
-						// information to be collected:
-						hit = true;
-					} else {
-						// Found a Protein in the FASTA database, that is of no
-						// relevance within this context:
-						hit = false;
-					}
-				} else if (hit) {
-					// Process non header-line, if and only if, we are reading
-					// the sequence of a Blast-Hit:
-					hitAALength += str.trim().length();
-				}
+	public static void parseBlastDatabase(Map<String, List<BlastResult>> blastResults)
+			throws MissingAccessionException {
+		ReferenceProtein rp;
+		for (String accession : blastResults.keySet()) {
+			rp = getReferenceProteinDAO().byAccession.get(accession);
+			if (rp == null) {
+				throw new MissingAccessionException("Found Blast-Hits to reference protein '" + accession
+						+ "' but could not find the matching Reference-Protein in AHRD's persistent Database."
+						+ " Please update it accordingly.");
 			}
-			// Was the last read FASTA entry a Blast-Hit? If so, it needs
-			// processing:
-			if (hit)
-				fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
-		} finally {
-			fastaIn.close();
+			setReferenceProteinValuesInBlastHits(rp, blastResults.get(accession));
+		}
+	}
+
+	/**
+	 * Populates all BlastResults (Hits) referring to the argument reference
+	 * protein <code>rp</code> with information extracted from the original
+	 * sequence database in Fasta-Format, i.e. the description and the sequence
+	 * (Hit) total length. After doing so prepares the Hit to be processed by
+	 * AHRD, i.e. passes it through the Blacklist, Filtering, and Tokenizing
+	 * (see <code>generateHRDCandidateForProtein</code> for more details).
+	 * 
+	 * @param rp
+	 * @param hits
+	 */
+	public static void setReferenceProteinValuesInBlastHits(ReferenceProtein rp, List<BlastResult> hits) {
+		for (BlastResult blastResult : hits) {
+			blastResult.setDescription(rp.getHrd());
+			blastResult.setSubjectLength(rp.getSequenceLength());
+			blastResult.generateHRDCandidateForProtein();
 		}
 	}
 
