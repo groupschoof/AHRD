@@ -1,0 +1,11 @@
+ahrd_db: ./AHRD_DB
+gene_ontology_result: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
+blast_dbs:
+  swissprot:
+    database: ./test/resources/swissprot_blast_db.fasta
+  trembl:
+    database: ./test/resources/trembl_blast_db.fasta
+  tair:
+    database: ./test/resources/tair_blast_db.fasta
+    fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
+    short_accession_regex: "^(?<shortAccession>.+)$"
