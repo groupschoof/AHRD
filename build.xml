@@ -90,6 +90,7 @@
 			<formatter type="plain" usefile="false" />
 			<test name="ahrd.test.AhrdTestRun" />
 		</junit>
+		<delete dir="AHRD_DB" />
 	</target>
 
 	<target name="test.regexs" depends="compile.test">
