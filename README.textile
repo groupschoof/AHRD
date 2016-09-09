@@ -11,6 +11,7 @@ h2. Table of contents
 ### "Build the executable jar":#122-build-the-executable-jar
 # "Usage":#2-usage
 ## "AHRD example usages":#21-ahrd-example-usages
+### "AHRD's Database":#211-ahrds-database
 ## "Input":#22-input
 ### "Required input data":#221-required-input-data
 ### "Optional input data":#222-optional-input-data
@@ -75,6 +76,8 @@ All parameters can be set manually, or the default ones can be used as given in 
 
 In order to parallelize the protein function annotation processes,  AHRD can be run on batches of recommended size between 1,000 to 2,000 proteins.  If you want to annotate very large protein sets or have low memory capacities use the included Batcher to split your input-data into Batches of appropriate size (see section "2.3":#23-batcher). _Note:_ As of Java 7 or higher AHRD is quite fast and batching might no longer be necessary.
 
+AHRD extracts some information about the reference proteins into a persitent database. As in tabular sequence similarity search outputs (Blast, Blat, Diamand etc) the description lines and the reference (Hit) lengths are not stored, this information has to be extracted from the original reference protein databases (in Fasta Format). Furthermore the user can provide a _single_ Gene Ontology Annotation (GOA) file for _all_ reference proteins, which will be parsed, too. If GOAs are available for the reference proteins AHRD will also annotate the query proteins with GO Terms (see section "3.3.1":#331-parameters-controlling-the-parsing-of-tabular-sequence-similarity-search-result-tables-legacy-blast-blast-and-blat).
+
 h3. 2.1 AHRD example usages
 
 There are _two_ template AHRD input files provided that you should use according to your use case. All example input files are stored in @./test/resources@ and are named @ahrd_example_input*.yml@. You can run AHRD on any of these use cases with <pre>java -Xmx2g -jar ./dist/ahrd.jar your_use_case_file.yml</pre>
@@ -82,6 +85,18 @@ There are _two_ template AHRD input files provided that you should use according
 | *Use Case* | *Template File* |
 | Annotate your Query proteins with Human Readable Descriptions (HRD) | @./test/resources/ahrd_example_input.yml@ |
 | Annotate your Query proteins with HRD _and_ Gene Ontology (GO) terms | @./test/resources/ahrd_example_input_go_prediction.yml@ |
+
+h4. 2.1.1 AHRD's Database
+
+_Do not worry_: You do not have to take care of or setup AHRD's database - it does that automatically for you. If AHRD does not find a database when run, it will extract all required information from the provided reference sequence databases (Fasta-Format) and optionally the provided Gene Ontology Annotation (GOA) file. By default, extracted information will be stored in the _current working directory_ in the database-directory @AHRD_DB@. You can use an alternative database-directory by providing the optional parameter @ahrd_db: path/2/your_db_dir@. If AHRD is started and finds an existing database it will not parse the reference fasta databases nor the GOA files and will expect to find the required information in the AHRD-Database instead. _Note_, that AHRD will terminate with an error if Blast-Hits are found that are not in its database!
+
+If you want or need to, you can _just_ setup an AHRD-Database without running the analysis. In order to do so use the following command:
+
+<pre>
+java -Xmx20g -cp ./dist/ahrd.jar ahrd.controller.DatabaseSetup ./ahrd_example_database_setup_input.yml
+</pre>
+
+See file @ahrd_example_database_setup_input.yml@ for more details.
 
 h3. 2.2 Input
 
