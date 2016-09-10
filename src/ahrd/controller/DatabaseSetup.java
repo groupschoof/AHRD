@@ -26,7 +26,7 @@ public class DatabaseSetup {
 	public static void main(String[] args) throws DatabaseException, IOException {
 		try {
 			System.out
-					.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.DatabaseSetup databaseSetupInput.yml\n");
+					.println("Usage:\njava -Xmx30g -cp ahrd.jar ahrd.controller.DatabaseSetup databaseSetupInput.yml\n");
 			setSettings(new Settings(args[0]));
 			createOrUpdateAhrdDatabase(true);
 			System.out.println("Parsed and persisted reference sequence information as given in '" + args[0]

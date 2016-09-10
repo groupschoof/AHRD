@@ -100,6 +100,7 @@ public class Settings implements Cloneable {
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
 	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
 	public static final String AHRD_DATABASE_KEY = "ahrd_db";
+	public static final String AHRD_DB_CACHE_PERCENT_KEY = "ahrd_db_cache_percent";
 
 	/*
 	 * CONSTANTS:
@@ -246,6 +247,11 @@ public class Settings implements Cloneable {
 	 * This is the path to the directory in which the AHRD data is stored.
 	 */
 	private String ahrd_db = "AHRD_DB";
+	/**
+	 * The percent of the max memory available in the current JVM to be used for
+	 * caching AHRD's database.
+	 */
+	private int ahrdDbCachePercent = 90;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -393,6 +399,9 @@ public class Settings implements Cloneable {
 		}
 		if (input.get(AHRD_DATABASE_KEY) != null) {
 			this.setAhrd_db(input.get(AHRD_DATABASE_KEY).toString());
+		}
+		if (input.get(AHRD_DB_CACHE_PERCENT_KEY) != null) {
+			this.setAhrdDbCachePercent(new Integer(input.get(AHRD_DB_CACHE_PERCENT_KEY).toString()));
 		}
 	}
 
@@ -954,5 +963,15 @@ public class Settings implements Cloneable {
 
 	public void setAhrd_db(String ahrd_db) {
 		this.ahrd_db = ahrd_db;
+	}
+
+	public int getAhrdDbCachePercent() {
+		return ahrdDbCachePercent;
+	}
+
+	public void setAhrdDbCachePercent(int ahrdDbCachePercent) {
+		if (ahrdDbCachePercent > 90)
+			ahrdDbCachePercent = 90;
+		this.ahrdDbCachePercent = ahrdDbCachePercent;
 	}
 }

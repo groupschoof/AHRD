@@ -4,6 +4,12 @@ import static ahrd.controller.Settings.getSettings;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
@@ -16,7 +22,7 @@ import com.sleepycat.persist.StoreConfig;
 public class AhrdDb {
 
 	/**
-	 * An Accessor to handle storage and retrieval of ReferenceProteins with
+	 * An accessor to handle storage and retrieval of ReferenceProteins with
 	 * Berkeley-DB.
 	 */
 	public static class ReferenceProteinAccessor {
@@ -39,6 +45,10 @@ public class AhrdDb {
 	public static ReferenceProteinAccessor getReferenceProteinDAO() {
 		return referenceProteinDAO.get();
 	}
+
+	public static Environment getAhrdDbEnv() {
+		return ahrdDbEnv.get();
+	}
 	/*
 	 * END Thread-Local-Variables
 	 */
@@ -58,6 +68,7 @@ public class AhrdDb {
 		EnvironmentConfig envConfig = new EnvironmentConfig();
 		envConfig.setAllowCreate(!readonly);
 		envConfig.setTransactional(!readonly);
+		envConfig.setCachePercent(getSettings().getAhrdDbCachePercent());
 		File ahrdDbFile = new File(getSettings().getAhrd_db());
 		if (!ahrdDbFile.exists())
 			ahrdDbFile.mkdirs();
@@ -84,5 +95,33 @@ public class AhrdDb {
 		if (referenceProteinDAO.get() != null) {
 			referenceProteinDAO.set(null);
 		}
+	}
+
+	/**
+	 * Closes all connections to the database and deletes it from the file
+	 * system.
+	 * 
+	 * @throws IOException
+	 */
+	public static void deleteDb() throws IOException {
+		closeDb();
+		Files.walkFileTree(FileSystems.getDefault().getPath(getSettings().getAhrd_db()), new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				Files.delete(file);
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+				if (e == null) {
+					Files.delete(dir);
+					return FileVisitResult.CONTINUE;
+				} else {
+					// directory iteration failed
+					throw e;
+				}
+			}
+		});
 	}
 }

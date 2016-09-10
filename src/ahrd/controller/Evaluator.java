@@ -49,7 +49,7 @@ public class Evaluator extends AHRD {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.Evaluator input.yml\n");
+		System.out.println("Usage:\njava -Xmx30g -cp ahrd.jar ahrd.controller.Evaluator input.yml\n");
 
 		try {
 			Evaluator evaluator = new Evaluator(args[0]);

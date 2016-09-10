@@ -31,7 +31,7 @@ public class Trainer extends Evaluator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.Trainer input.yml\n");
+		System.out.println("Usage:\njava -Xmx30g -cp ahrd.jar ahrd.controller.Trainer input.yml\n");
 
 		try {
 			Trainer trainer = new Trainer(args[0]);
