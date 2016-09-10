@@ -67,15 +67,17 @@ public class AhrdDb {
 	public static void initializeDb(boolean readonly) throws DatabaseException, IOException {
 		EnvironmentConfig envConfig = new EnvironmentConfig();
 		envConfig.setAllowCreate(!readonly);
-		envConfig.setTransactional(!readonly);
+		envConfig.setTransactional(false);
 		envConfig.setCachePercent(getSettings().getAhrdDbCachePercent());
+		envConfig.setConfigParam("je.log.fileMax", "1073741824");
 		File ahrdDbFile = new File(getSettings().getAhrd_db());
 		if (!ahrdDbFile.exists())
 			ahrdDbFile.mkdirs();
 		ahrdDbEnv.set(new Environment(ahrdDbFile, envConfig));
 		StoreConfig storeConfig = new StoreConfig();
 		storeConfig.setAllowCreate(!readonly);
-		storeConfig.setTransactional(!readonly);
+		storeConfig.setTransactional(false);
+		storeConfig.setDeferredWrite(!readonly);
 		ahrdStore.set(new EntityStore(ahrdDbEnv.get(), "AhrdStore", storeConfig));
 		referenceProteinDAO.set(new ReferenceProteinAccessor(ahrdStore.get()));
 	}

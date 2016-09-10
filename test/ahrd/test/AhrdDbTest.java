@@ -24,6 +24,7 @@ public class AhrdDbTest {
 			initializeDb(false);
 			EnvironmentMutableConfig mutableConfig = getAhrdDbEnv().getMutableConfig();
 			assertEquals(getSettings().getAhrdDbCachePercent(), mutableConfig.getCachePercent());
+			//assertEquals(1073741824, mutableConfig.getConfigParam("je.log.fileMax"));
 		} finally {
 			deleteDb();
 		}

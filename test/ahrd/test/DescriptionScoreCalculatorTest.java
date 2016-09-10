@@ -82,7 +82,7 @@ public class DescriptionScoreCalculatorTest {
 	@Test
 	public void testFindHighestScoringBlastResultWithGOAnnos() throws DatabaseException, IOException {
 		try {
-			initializeDb(true);
+			initializeDb(false);
 			getSettings().setPreferReferenceWithGoAnnos(true);
 			Protein p = TestUtils.mockProteinAndBlastResultsForDescriptionScoreCalculatorTest();
 			// NO GOAS present, AHRD should work "as normal":
