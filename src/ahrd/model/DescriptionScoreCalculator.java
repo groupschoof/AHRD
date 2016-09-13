@@ -68,14 +68,14 @@ public class DescriptionScoreCalculator {
 	 * Assigns each BlastResult's Description-Line its AHRD-Score and then finds
 	 * the highest scoring one.
 	 * 
-	 * @param referenceGoAnnotations
+	 * @param databaseGoAnnotations
 	 *            Map of BlastResults' shortAccesions as keys and their Sets of
 	 *            annotated GO Terms as values. If NOT null and any of the query
 	 *            proteins' hits of GO Term annotations, AHRD will use the
 	 *            highest scoring BlastResult with GO Terms to annotate the
 	 *            query.
 	 */
-	public void findHighestScoringBlastResult(Map<String, Set<String>> referenceGoAnnotations) {
+	public void findHighestScoringBlastResult(Map<String, Set<String>> databaseGoAnnotations) {
 		BlastResult bestScoringBr = null;
 		Set<Double> scoreRankingWithGoAnnos = new HashSet<Double>();
 		Map<Double, BlastResult> scoreRanking = new HashMap<Double, BlastResult>();
@@ -86,8 +86,8 @@ public class DescriptionScoreCalculator {
 				// that have at least a single non-blacklisted Token:
 				if (iterBlastResult.getTokens().size() > 0) {
 					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
-					if (referenceGoAnnotations != null && !referenceGoAnnotations.isEmpty()
-							&& referenceGoAnnotations.containsKey(iterBlastResult.getShortAccession()))
+					if (databaseGoAnnotations != null && !databaseGoAnnotations.isEmpty()
+							&& databaseGoAnnotations.containsKey(iterBlastResult.getShortAccession()))
 						scoreRankingWithGoAnnos.add(iterBlastResult.getDescriptionScore());
 				}
 			}

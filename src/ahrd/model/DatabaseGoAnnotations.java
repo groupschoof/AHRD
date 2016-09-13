@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ReferenceGoAnnotations {
+public class DatabaseGoAnnotations {
 
 	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
@@ -32,7 +32,7 @@ public class ReferenceGoAnnotations {
 	 *         Sets of GO terms
 	 * @throws IOException
 	 */
-	public static Map<String, Set<String>> parseReferenceGoAnnotations(
+	public static Map<String, Set<String>> parseDatabaseGoAnnotations(
 			Set<String> uniqueShortAccessions) throws IOException {
 		Map<String, Set<String>> goa = new HashMap<String, Set<String>>();
 		BufferedReader goaIn = null;
@@ -41,7 +41,7 @@ public class ReferenceGoAnnotations {
 				try {
 					goaIn = new BufferedReader(new FileReader(getSettings()
 							.getPathToGeneOntologyResults(blastDatabaseName)));
-					Pattern p = getSettings().getReferenceGoRegex(blastDatabaseName);
+					Pattern p = getSettings().getDatabaseGoRegex(blastDatabaseName);
 					String line, shortAcc, goTerm = "";
 					while ((line = goaIn.readLine()) != null) {
 						Matcher m = p.matcher(line);

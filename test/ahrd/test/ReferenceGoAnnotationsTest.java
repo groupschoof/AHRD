@@ -70,10 +70,10 @@ public class ReferenceGoAnnotationsTest {
 			MissingAccessionException, MissingProteinException, SAXException,
 			ParsingException {
 		ahrd.setup(false);
-		assertNotNull(ahrd.getReferenceGoAnnotations());
-		assertTrue(!ahrd.getReferenceGoAnnotations().isEmpty());
-		assertEquals(4, ahrd.getReferenceGoAnnotations().size());
-		Set<String> refGos = ahrd.getReferenceGoAnnotations()
+		assertNotNull(ahrd.getDatabaseGoAnnotations());
+		assertTrue(!ahrd.getDatabaseGoAnnotations().isEmpty());
+		assertEquals(4, ahrd.getDatabaseGoAnnotations().size());
+		Set<String> refGos = ahrd.getDatabaseGoAnnotations()
 				.get("AT1G01040");
 		assertTrue(refGos.contains("GO:0005634"));
 		assertTrue(refGos.contains("GO:0008026"));
