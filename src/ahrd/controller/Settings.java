@@ -93,8 +93,8 @@ public class Settings implements Cloneable {
 			.compile("^>(?<accession>\\S+)\\s+(?<description>.+?)\\s+(((OS|os)=.+)|((GN|gn)=.+))?$");
 	public static final String SHORT_ACCESSION_REGEX_KEY = "short_accession_regex";
 	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
-	public static final String REFERENCE_GO_REGEX_KEY = "reference_go_regex";
-	public static final Pattern DEFAULT_REFERENCE_GO_REGEX = Pattern
+	public static final String DATABASE_GO_REGEX_KEY = "database_go_regex";
+	public static final Pattern DEFAULT_DATABASE_GO_REGEX = Pattern
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
@@ -874,16 +874,16 @@ public class Settings implements Cloneable {
 
 	/**
 	 * Either returns the custom regular expression pattern used to parse the
-	 * provided reference Gene Ontology annotions (GOA) or returns the default
+	 * provided database Gene Ontology annotions (GOA) or returns the default
 	 * pattern designed to work for UniprotKB GOA files.
 	 * 
 	 * @return Pattern
 	 */
-	public Pattern getReferenceGoRegex(String blastDatabaseName) {
-		if (getBlastDbSettings(blastDatabaseName).get(REFERENCE_GO_REGEX_KEY) != null) {
-			return Pattern.compile(getBlastDbSettings(blastDatabaseName).get(REFERENCE_GO_REGEX_KEY).toString());
+	public Pattern getDatabaseGoRegex(String blastDatabaseName) {
+		if (getBlastDbSettings(blastDatabaseName).get(DATABASE_GO_REGEX_KEY) != null) {
+			return Pattern.compile(getBlastDbSettings(blastDatabaseName).get(DATABASE_GO_REGEX_KEY).toString());
 		}
-		return DEFAULT_REFERENCE_GO_REGEX;
+		return DEFAULT_DATABASE_GO_REGEX;
 	}
 	
 	public Boolean getPreferReferenceWithGoAnnos() {

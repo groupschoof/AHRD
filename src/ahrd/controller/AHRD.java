@@ -2,7 +2,7 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Settings.setSettings;
-import static ahrd.model.ReferenceGoAnnotations.parseReferenceGoAnnotations;
+import static ahrd.model.DatabaseGoAnnotations.parseDatabaseGoAnnotations;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -33,7 +33,7 @@ public class AHRD {
 
 	private Map<String, Protein> proteins;
 	private Map<String, Double> descriptionScoreBitScoreWeights = new HashMap<String, Double>();
-	private Map<String, Set<String>> referenceGoAnnotations;
+	private Map<String, Set<String>> databaseGoAnnotations;
 	private Set<String> uniqueBlastResultShortAccessions;
 	private long timestamp;
 	private long memorystamp;
@@ -98,7 +98,7 @@ public class AHRD {
 	 * Constructor initializes this run's settings as a thread-local variable.
 	 * Also conditionally initializes fields
 	 * <code>uniqueBlastResultShortAccessions</code> and
-	 * <code>referenceGoAnnotations</code> required only if AHRD is requested to
+	 * <code>databaseGoAnnotations</code> required only if AHRD is requested to
 	 * generate Gene Ontology term annotations.
 	 * 
 	 * @param pathToYmlInput
@@ -111,7 +111,7 @@ public class AHRD {
 		// Gene Ontology term annotations:
 		if (getSettings().hasGeneOntologyAnnotations()) {
 			this.setUniqueBlastResultShortAccessions(new HashSet<String>());
-			this.setReferenceGoAnnotations(new HashMap<String, Set<String>>());
+			this.setDatabaseGoAnnotations(new HashMap<String, Set<String>>());
 		}
 	}
 
@@ -148,9 +148,9 @@ public class AHRD {
 	 * 
 	 * @throws IOException
 	 */
-	public void setUpReferenceGoAnnotations() throws IOException {
+	public void setUpDatabaseGoAnnotations() throws IOException {
 		if (getSettings().hasGeneOntologyAnnotations()) {
-			setReferenceGoAnnotations(parseReferenceGoAnnotations(getUniqueBlastResultShortAccessions()));
+			setDatabaseGoAnnotations(parseDatabaseGoAnnotations(getUniqueBlastResultShortAccessions()));
 		}
 	}
 
@@ -191,7 +191,7 @@ public class AHRD {
 
 		// Reference GO Annotations (for Proteins in the searched Blast
 		// Databases)
-		setUpReferenceGoAnnotations();
+		setUpDatabaseGoAnnotations();
 		if (writeLogMsgs) {
 			System.out.println("...parsed reference Gene Ontology Annotations (GOA) in " + takeTime()
 					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
@@ -229,13 +229,13 @@ public class AHRD {
 			// currentScore - (Token-High-Score / 2)
 			prot.getTokenScoreCalculator().filterTokenScores();
 			// Find the highest scoring Blast-Result:
-			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult(this.getReferenceGoAnnotations());
+			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult(this.getDatabaseGoAnnotations());
 			// If AHRD is requested to annotate Gene Ontology Terms, do so:
 			if (getSettings().hasGeneOntologyAnnotations()
 					&& prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null
-					&& getReferenceGoAnnotations().containsKey(
+					&& getDatabaseGoAnnotations().containsKey(
 							prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession())) {
-				prot.setGoResults(getReferenceGoAnnotations()
+				prot.setGoResults(getDatabaseGoAnnotations()
 						.get(prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession()));
 			}
 			// filter for each protein's most-informative
@@ -260,12 +260,12 @@ public class AHRD {
 		this.descriptionScoreBitScoreWeights = descriptionScoreBitScoreWeights;
 	}
 
-	public Map<String, Set<String>> getReferenceGoAnnotations() {
-		return referenceGoAnnotations;
+	public Map<String, Set<String>> getDatabaseGoAnnotations() {
+		return databaseGoAnnotations;
 	}
 
-	public void setReferenceGoAnnotations(Map<String, Set<String>> referenceGoAnnotations) {
-		this.referenceGoAnnotations = referenceGoAnnotations;
+	public void setDatabaseGoAnnotations(Map<String, Set<String>> databaseGoAnnotations) {
+		this.databaseGoAnnotations = databaseGoAnnotations;
 	}
 
 	public Set<String> getUniqueBlastResultShortAccessions() {
