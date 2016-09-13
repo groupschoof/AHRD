@@ -48,7 +48,7 @@ public class ReferenceDescriptionTest {
 			throws IOException, MissingAccessionException, MissingProteinException, SAXException, ParsingException {
 		Evaluator e = new Evaluator("./test/resources/evaluator_filter_references_test.yml");
 		e.initializeProteins();
-		e.setupReferences();
+		e.setupReferenceDescriptions();
 		for (Iterator<Map.Entry<String, Protein>> iterator = e.getProteins().entrySet().iterator(); iterator
 				.hasNext();) {
 			Protein p = iterator.next().getValue();

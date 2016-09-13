@@ -49,10 +49,10 @@ public class EvaluatorTest {
 	}
 
 	@Test
-	public void testSetupReferences() throws IOException,
+	public void testSetupReferenceDescriptions() throws IOException,
 			MissingAccessionException {
 		evaluator.initializeProteins();
-		evaluator.setupReferences();
+		evaluator.setupReferenceDescriptions();
 		assertEquals(2, evaluator.getProteins().size());
 		assertNotNull(evaluator.getProteins()
 				.get("gene:chr01.1056:mRNA:chr01.1056")

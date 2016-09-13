@@ -2,9 +2,11 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
@@ -19,7 +21,7 @@ public class Evaluator extends AHRD {
 		super(pathToInputYml);
 	}
 
-	public void setupReferences() throws IOException, MissingAccessionException {
+	public void setupReferenceDescriptions() throws IOException, MissingAccessionException {
 		List<String> fastaEntries = Protein.splitFasta(getSettings().getReferencesFasta());
 		for (String fastaEntry : fastaEntries) {
 			if (fastaEntry != null && !fastaEntry.trim().equals("")) {
@@ -47,6 +49,23 @@ public class Evaluator extends AHRD {
 		}
 	}
 	
+	public void setupReferenceGoAnnoations() throws IOException, MissingAccessionException {
+		if (getSettings().getPathToReferenceGoAnnotations() != null) {
+			if (new File(getSettings().getPathToReferenceGoAnnotations()).exists()) {
+				for (String referenceGoAnnotationFileEntryLine : getSettings().getReferenceGoAnnotationsFromFile()) {
+					String[] referenceGoAnnotationFileEntry = referenceGoAnnotationFileEntryLine.split("\t");
+					String accession = referenceGoAnnotationFileEntry[0].trim();
+					String term = referenceGoAnnotationFileEntry[1].trim();
+					Protein p = getProteins().get(accession);
+					if (p == null) {
+						throw new MissingAccessionException("Could not find Protein for Accession '" + accession + "'");
+					}
+					p.getEvaluationScoreCalculator().addReferenceGoAnnotation(term);
+				}
+			}
+		}
+	}
+	
 	public void setupGoDb() throws FileNotFoundException, IOException {
 		if (getSettings().hasGeneOntologyAnnotations()) {
 			goDB = new GOdatabase().getMap();
@@ -64,7 +83,7 @@ public class Evaluator extends AHRD {
 			evaluator.setup(false); // false -> Don't log memory and time-usages
 			// After the setup the unique short accessions are no longer needed:
 			evaluator.setUniqueBlastResultShortAccessions(null);
-			evaluator.setupReferences();
+			evaluator.setupReferenceDescriptions();
 			// Blast2GO is another competitor in the field of annotation of
 			// predicted Proteins. AHRD might be compared with B2Gs performance:
 			evaluator.setupBlast2GoAnnots();

@@ -33,7 +33,7 @@ public class TrainerTest {
 			MissingProteinException, SAXException, ParsingException {
 		trainer = new Trainer("./test/resources/trainer_input.yml");
 		trainer.setup(false); // false -> Don't log memory and time-usages
-		trainer.setupReferences();
+		trainer.setupReferenceDescriptions();
 		// Blast2GO is another competitor in the field of annotation of
 		// predicted Proteins. AHRD might be compared with B2Gs performance:
 		trainer.setupBlast2GoAnnots();

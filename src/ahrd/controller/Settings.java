@@ -98,8 +98,9 @@ public class Settings implements Cloneable {
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
-	public static final String GO_DB_PATH_KEY = "go_db_bath";
-
+	public static final String GO_DB_PATH_KEY = "go_db_path";
+	public static final String REFERENCE_GO_ANNOTATIONS_PATH_KEY = "reference_go_annotations";
+	
 	/**
 	 * Fields:
 	 */
@@ -233,6 +234,11 @@ public class Settings implements Cloneable {
 	 * - Serialized copy of the GOdatabase, generated when it was needed the for first time  
 	 */
 	private String pathToGoDatabase;
+	/**
+	 * Path to file containing GO annotations of the query proteins
+	 * Triggers the evaluation of AHRDs GO annotations 
+	 */
+	private String pathToReferenceGoAnnotations;
 	
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -376,6 +382,10 @@ public class Settings implements Cloneable {
 		if (input.get(GO_DB_PATH_KEY) != null) {
 			this.setPathToGoDatabase(input.get(GO_DB_PATH_KEY).toString());
 		}
+		if (input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY) != null) {
+			this.setPathToReferenceGoAnnotations(input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY).toString());
+		}
+		
 	}
 
 	/**
@@ -956,5 +966,17 @@ public class Settings implements Cloneable {
 
 	public void setPathToGoDatabase(String pathToGoDatabase) {
 		this.pathToGoDatabase = pathToGoDatabase;
+	}
+	
+	public String getPathToReferenceGoAnnotations() {
+		return pathToReferenceGoAnnotations;
+	}
+
+	public void setPathToReferenceGoAnnotations(String pathToReferenceGoAnnotations) {
+		this.pathToReferenceGoAnnotations = pathToReferenceGoAnnotations;
+	}
+	
+	public List<String> getReferenceGoAnnotationsFromFile() throws IOException {
+		return fromFile(getPathToReferenceGoAnnotations());
 	}
 }
