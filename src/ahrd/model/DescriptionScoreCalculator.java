@@ -82,7 +82,7 @@ public class DescriptionScoreCalculator {
 				if (iterBlastResult.getTokens().size() > 0) {
 					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
 					rp = getReferenceProteinDAO().byAccession.get(iterBlastResult.getAccession());
-					if (rp != null && !rp.getGoTerms().isEmpty())
+					if (rp != null && !rp.getGoTerms().isEmpty() && getSettings().getPreferReferenceWithGoAnnos())
 						scoreRankingWithGoAnnos.add(iterBlastResult.getDescriptionScore());
 				}
 			}
