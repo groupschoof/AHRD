@@ -5,12 +5,14 @@ import static ahrd.controller.Settings.getSettings;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.GOdatabase;
+import ahrd.model.GOterm;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
 import ahrd.view.OutputWriter;
@@ -49,29 +51,41 @@ public class Evaluator extends AHRD {
 		}
 	}
 	
-	public void setupReferenceGoAnnoations() throws IOException, MissingAccessionException {
-		if (getSettings().getPathToReferenceGoAnnotations() != null) {
-			if (new File(getSettings().getPathToReferenceGoAnnotations()).exists()) {
-				for (String referenceGoAnnotationFileEntryLine : getSettings().getReferenceGoAnnotationsFromFile()) {
-					String[] referenceGoAnnotationFileEntry = referenceGoAnnotationFileEntryLine.split("\t");
-					String accession = referenceGoAnnotationFileEntry[0].trim();
-					String term = referenceGoAnnotationFileEntry[1].trim();
-					Protein p = getProteins().get(accession);
-					if (p == null) {
-						throw new MissingAccessionException("Could not find Protein for Accession '" + accession + "'");
+	public void setupGoAnnotationEvaluation() throws FileNotFoundException, IOException , MissingAccessionException {
+		if (getSettings().hasGeneOntologyAnnotations()
+				&& getSettings().getPathToReferenceGoAnnotations() != null
+				&& new File(getSettings().getPathToReferenceGoAnnotations()).exists()) {
+			// Load a Map of all GO terms
+			goDB = new GOdatabase().getMap();
+			// Load reference GO annotations
+			for (String referenceGoAnnotationFileEntryLine : getSettings().getReferenceGoAnnotationsFromFile()) {
+				String[] referenceGoAnnotationFileEntry = referenceGoAnnotationFileEntryLine.split("\t");
+				String protAcc = referenceGoAnnotationFileEntry[0].trim();
+				String termAcc = referenceGoAnnotationFileEntry[1].trim();
+				Protein p = getProteins().get(protAcc);
+				if (p == null) {
+					throw new MissingAccessionException("Could not find protein for accession '" + protAcc + "'");
+				}
+				GOterm term = goDB.get(termAcc);
+				if (term == null) {
+					throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
+				}
+				p.getEvaluationScoreCalculator().addReferenceGoAnnotation(term);
+			}
+			// Add GOterm objects to predicted annotations
+			for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();) {
+				Protein prot = protIter.next();
+				for (String termAcc : prot.getGoResults()) {
+					GOterm term = goDB.get(termAcc);
+					if (term == null) {
+						throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 					}
-					p.getEvaluationScoreCalculator().addReferenceGoAnnotation(term);
+					prot.getGoResultsTerms().add(term);
 				}
 			}
 		}
 	}
 	
-	public void setupGoDb() throws FileNotFoundException, IOException {
-		if (getSettings().hasGeneOntologyAnnotations()) {
-			goDB = new GOdatabase().getMap();
-		}
-	}
-
 	/**
 	 * @param args
 	 */
@@ -84,15 +98,16 @@ public class Evaluator extends AHRD {
 			// After the setup the unique short accessions are no longer needed:
 			evaluator.setUniqueBlastResultShortAccessions(null);
 			evaluator.setupReferenceDescriptions();
-			evaluator.setupReferenceGoAnnoations();
 			// Blast2GO is another competitor in the field of annotation of
 			// predicted Proteins. AHRD might be compared with B2Gs performance:
 			evaluator.setupBlast2GoAnnots();
-			// Load a Map of all GO terms
-			evaluator.setupGoDb();
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			evaluator.assignHumanReadableDescriptions();
+			// Load a Map of all GO terms
+			// Load reference GO annotations
+			// Add GOterm objects to predicted annotations
+			evaluator.setupGoAnnotationEvaluation();
 			// Evaluate AHRD's performance for each Protein:
 			evaluator.calculateEvaluationScores();
 			// If requested, calculate the highest possibly achievable

@@ -16,6 +16,7 @@ import java.util.Set;
 import ahrd.controller.AHRD;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.BlastResult;
+import ahrd.model.GOterm;
 import ahrd.model.Protein;
 
 public class OutputWriter extends AbstractOutputWriter {
@@ -300,9 +301,13 @@ public class OutputWriter extends AbstractOutputWriter {
 	
 	private String buildReferenceGoAnnotationColumns(Protein prot) {
 		String column = "\t";
-		Set<String> referenceGoAnnotationsSet = prot.getEvaluationScoreCalculator().getReferenceGoAnnoatations();
+		Set<GOterm> referenceGoAnnotationsSet = prot.getEvaluationScoreCalculator().getReferenceGoAnnoatations();
 		if (referenceGoAnnotationsSet != null) {
-			List<String> referenceGoAnnotationsList = new ArrayList<String>(referenceGoAnnotationsSet);
+			List<String> referenceGoAnnotationsList = new ArrayList<String>();
+			for (Iterator<GOterm> referenceGoAnnotationsIter = referenceGoAnnotationsSet.iterator(); referenceGoAnnotationsIter.hasNext();) {
+				GOterm term = referenceGoAnnotationsIter.next();
+				referenceGoAnnotationsList.add(term.getAccession());
+			}
 			Collections.sort(referenceGoAnnotationsList);
 			for (Iterator<String> iter = referenceGoAnnotationsList.iterator(); iter.hasNext();) {
 				String term = iter.next();

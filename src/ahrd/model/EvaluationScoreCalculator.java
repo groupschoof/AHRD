@@ -35,7 +35,7 @@ public class EvaluationScoreCalculator {
 	private Double truePositivesRate;
 	private Double falsePositivesRate;
 	private Double highestPossibleEvaluationScore;
-	private Set<String> referenceGoAnnoatations;
+	private Set<GOterm> referenceGoAnnoatations;
 	private Double goAnnotationScore;
 
 	public EvaluationScoreCalculator(Protein protein) {
@@ -383,17 +383,17 @@ public class EvaluationScoreCalculator {
 		this.highestPossibleEvaluationScore = highestPossibleEvaluationScore;
 	}
 
-	public Set<String> getReferenceGoAnnoatations() {
+	public Set<GOterm> getReferenceGoAnnoatations() {
 		return referenceGoAnnoatations;
 	}
 
-	public void setReferenceGoAnnoatations(Set<String> referenceGoAnnoatations) {
+	public void setReferenceGoAnnoatations(Set<GOterm> referenceGoAnnoatations) {
 		this.referenceGoAnnoatations = referenceGoAnnoatations;
 	}
 	
-	public void addReferenceGoAnnotation(String term) {
+	public void addReferenceGoAnnotation(GOterm term) {
 		if (getReferenceGoAnnoatations() == null)
-			setReferenceGoAnnoatations(new HashSet<String>());
+			setReferenceGoAnnoatations(new HashSet<GOterm>());
 		getReferenceGoAnnoatations().add(term);
 	}
 
