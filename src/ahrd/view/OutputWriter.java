@@ -3,10 +3,15 @@ package ahrd.view;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import ahrd.controller.AHRD;
 import ahrd.model.Blast2GoAnnot;
@@ -51,6 +56,9 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
 			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
 		}
+		if (getSettings().getPathToReferenceGoAnnotations() != null && new File(getSettings().getPathToReferenceGoAnnotations()).exists()) {
+			bw.write("\tReference GO Annotations\tGO Annotation F1 Score");
+		}
 
 		bw.write("\n");
 
@@ -80,7 +88,10 @@ public class OutputWriter extends AbstractOutputWriter {
 			if (getSettings().doFindHighestPossibleEvaluationScore()) {
 				csvRow += buildHighestPossibleEvaluationScoreColumn(prot);
 			}
-
+			if (getSettings().getPathToReferenceGoAnnotations() != null && new File(getSettings().getPathToReferenceGoAnnotations()).exists()) {
+				csvRow += buildReferenceGoAnnotationColumns(prot);
+			}
+			
 			// Write row to CSV:
 			csvRow += "\n";
 			bw.write(csvRow);
@@ -286,4 +297,25 @@ public class OutputWriter extends AbstractOutputWriter {
 		}
 		return csvRow;
 	}
+	
+	private String buildReferenceGoAnnotationColumns(Protein prot) {
+		String column = "\t";
+		Set<String> referenceGoAnnotationsSet = prot.getEvaluationScoreCalculator().getReferenceGoAnnoatations();
+		if (referenceGoAnnotationsSet != null) {
+			List<String> referenceGoAnnotationsList = new ArrayList<String>(referenceGoAnnotationsSet);
+			Collections.sort(referenceGoAnnotationsList);
+			for (Iterator<String> iter = referenceGoAnnotationsList.iterator(); iter.hasNext();) {
+				String term = iter.next();
+				column += term;
+				if (iter.hasNext())
+					column += ", ";
+			}
+		}
+		column += "\t";
+		if(prot.getEvaluationScoreCalculator().getGoAnnotationScore() != null) {
+			column += FRMT.format(prot.getEvaluationScoreCalculator().getGoAnnotationScore());
+		}
+		return column;
+	}
+
 }

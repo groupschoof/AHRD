@@ -36,6 +36,7 @@ public class EvaluationScoreCalculator {
 	private Double falsePositivesRate;
 	private Double highestPossibleEvaluationScore;
 	private Set<String> referenceGoAnnoatations;
+	private Double goAnnotationScore;
 
 	public EvaluationScoreCalculator(Protein protein) {
 		super();
@@ -244,6 +245,14 @@ public class EvaluationScoreCalculator {
 			// Compare AHRD's performance:
 			setEvalScoreMinBestCompScore(getEvalutionScore() - bestCompEvlScr);
 		}
+		// Evaluate GO annotations
+		setGoAnnotationScore(calcGoAnnotationScore());
+	}
+
+	private Double calcGoAnnotationScore() {
+		Double f1 = 0.0;
+		// TODO Auto-generated method stub
+		return f1;
 	}
 
 	/**
@@ -386,5 +395,13 @@ public class EvaluationScoreCalculator {
 		if (getReferenceGoAnnoatations() == null)
 			setReferenceGoAnnoatations(new HashSet<String>());
 		getReferenceGoAnnoatations().add(term);
+	}
+
+	public Double getGoAnnotationScore() {
+		return goAnnotationScore;
+	}
+
+	public void setGoAnnotationScore(Double goAnnotationScore) {
+		this.goAnnotationScore = goAnnotationScore;
 	}
 }

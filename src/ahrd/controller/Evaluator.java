@@ -84,6 +84,7 @@ public class Evaluator extends AHRD {
 			// After the setup the unique short accessions are no longer needed:
 			evaluator.setUniqueBlastResultShortAccessions(null);
 			evaluator.setupReferenceDescriptions();
+			evaluator.setupReferenceGoAnnoations();
 			// Blast2GO is another competitor in the field of annotation of
 			// predicted Proteins. AHRD might be compared with B2Gs performance:
 			evaluator.setupBlast2GoAnnots();
