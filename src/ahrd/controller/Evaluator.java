@@ -7,8 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.GOdatabase;
@@ -70,7 +68,7 @@ public class Evaluator extends AHRD {
 				if (term == null) {
 					throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 				}
-				p.getEvaluationScoreCalculator().addReferenceGoAnnotation(term);
+				p.getEvaluationScoreCalculator().getReferenceGoAnnoatations().add(term);
 			}
 			// Add GOterm objects to predicted annotations
 			for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();) {

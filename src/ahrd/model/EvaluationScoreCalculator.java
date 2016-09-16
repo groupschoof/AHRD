@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class EvaluationScoreCalculator {
 	private Double truePositivesRate;
 	private Double falsePositivesRate;
 	private Double highestPossibleEvaluationScore;
-	private Set<GOterm> referenceGoAnnoatations;
+	private Set<GOterm> referenceGoAnnoatations = new HashSet<GOterm>();
 	private Double goAnnotationScore;
 
 	public EvaluationScoreCalculator(Protein protein) {
@@ -251,7 +252,28 @@ public class EvaluationScoreCalculator {
 
 	private Double calcGoAnnotationScore() {
 		Double f1 = 0.0;
-		// TODO Auto-generated method stub
+		int truePositive = 0;
+		Double recall = 0.0;
+		Double precision = 0.0;
+		if (this.referenceGoAnnoatations.size() > 0 && this.protein.getGoResultsTerms().size() > 0) {
+			for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
+				if (this.protein.getGoResultsTerms().contains(referenceIter.next())) {
+					truePositive ++;
+				}
+			}
+			recall = (double)truePositive/this.referenceGoAnnoatations.size();
+			precision = (double)truePositive/this.protein.getGoResultsTerms().size();
+		} else {
+			if(this.referenceGoAnnoatations.size() == 0) {
+				recall = 1.0;
+			}
+			if(this.protein.getGoResultsTerms().size() == 0) {
+				precision = 1.0;
+			}
+		}
+		if (precision > 0.0 && recall > 0.0) {
+			f1 = 2*precision*recall/(precision+recall);
+		}
 		return f1;
 	}
 
@@ -389,12 +411,6 @@ public class EvaluationScoreCalculator {
 
 	public void setReferenceGoAnnoatations(Set<GOterm> referenceGoAnnoatations) {
 		this.referenceGoAnnoatations = referenceGoAnnoatations;
-	}
-	
-	public void addReferenceGoAnnotation(GOterm term) {
-		if (getReferenceGoAnnoatations() == null)
-			setReferenceGoAnnoatations(new HashSet<GOterm>());
-		getReferenceGoAnnoatations().add(term);
 	}
 
 	public Double getGoAnnotationScore() {
