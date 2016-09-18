@@ -2,6 +2,8 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 
+import static ahrd.model.AhrdDb.closeDb;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -58,8 +60,9 @@ public class Trainer extends Evaluator {
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
+		} finally {
+			closeDb();
 		}
-
 	}
 
 	/**
