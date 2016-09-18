@@ -3,12 +3,15 @@ package ahrd.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
+import static ahrd.controller.Settings.getSettings;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -17,6 +20,7 @@ import org.junit.Test;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.BlastResult;
 import ahrd.model.EvaluationScoreCalculator;
+import ahrd.model.GOterm;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
 
@@ -346,4 +350,103 @@ public class EvaluationScoreCalculatorTest {
 		assertEquals(b2gaThree, rankedB2gas.get(2));
 	}
 
+	@Test
+	public void testCalcSimpleGoAnnotationScore() {
+		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
+		getSettings().setPathToReferenceGoAnnotations("./test/resources/sprot_GO_references.goa");
+		getSettings().setCalculateSimpleGoF1Scores(true);
+		Protein p = TestUtils.mockProtein();
+		p.setEvaluationScoreCalculator(new EvaluationScoreCalculator(p));
+		GOterm bpRoot = new GOterm("GO:0008150", "biological process", "biological_process");
+		GOterm bpCellularProcess = new GOterm("GO:0009987", "cellular process", "biological_process");
+		GOterm bpSingleOrganismProcess = new GOterm("GO:0044699", "single-organism process", "biological_process");
+		// |ref| == 0 && |pred| == 0 -> f1 == 1
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore() == 1.0);
+		// |ref| == 0 && |pred| > 0 -> f1 == 0
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore() == 0.0);
+		// |ref| > 0 && |pred| == 0 -> f1 == 0
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>());
+		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore() == 0.0);
+		// ref == pred -> f1 == 1
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
+		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore() == 1.0);
+		// |ref| > 0 && |pred| > 0 && ref != pred -> f1 == 0
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpSingleOrganismProcess)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore() == 0.0);
+		// |ref| == 2 && |pred| == 2 && |ref^pred| == 1 -> f1 == 2*0.5*0.5/(0.5+0.5) == 0.5
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
+		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpSingleOrganismProcess)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore() == 0.5);
+	}
+	
+	@Test
+	public void testCalcAncestryGoAnnotationScore() {
+		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
+		getSettings().setPathToReferenceGoAnnotations("./test/resources/sprot_GO_references.goa");
+		getSettings().setCalculateAncestryGoF1Scores(true);
+		Protein p = TestUtils.mockProtein();
+		p.setEvaluationScoreCalculator(new EvaluationScoreCalculator(p));
+		GOterm bpRoot = new GOterm("GO:0008150", "biological process", "biological_process");
+		bpRoot.addTermToAncestry(bpRoot);
+		GOterm bpCellularProcess = new GOterm("GO:0009987", "cellular process", "biological_process");
+		bpCellularProcess.addTermToAncestry(bpRoot);
+		bpCellularProcess.addTermToAncestry(bpCellularProcess);
+		GOterm bpSingleOrganismProcess = new GOterm("GO:0044699", "single-organism process", "biological_process");
+		bpSingleOrganismProcess.addTermToAncestry(bpRoot);
+		bpSingleOrganismProcess.addTermToAncestry(bpSingleOrganismProcess);
+		// |ref| == 0 && |pred| == 0 -> f1 == 1
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore() == 1.0);
+		// |ref| == 0 && |pred| > 0 -> f1 == 0
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore() == 0.0);
+		// |ref| > 0 && |pred| == 0 -> f1 == 0
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>());
+		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore() == 0.0);
+		// ref == pred -> f1 == 1
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
+		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore() == 1.0);
+		// |ref| == 1 && |pred| == 1 && ref != pred && |ancestry(ref)| == |ancestry(pred)| == 2 && |ancestry(ref)^ancestry(pred)| == 1 -> f1 == 2*0.5*0.5/(0.5+0.5) == 0.5
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpSingleOrganismProcess)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore() == 0.5);
+		// ref == ancestry(ref) && pred == ancestry(pred) && |ref| == 2 && |pred| == 2 && ref != pred && |ancestry(ref)| == |ancestry(pred)| == 2 && |ancestry(ref)^ancestry(pred)| == 1 -> f1 == 2*0.5*0.5/(0.5+0.5) == 0.5
+		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
+		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpSingleOrganismProcess)));
+		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore() == 0.5);
+	}
+	@Test
+	public void testCalcSemSimGoAnnotationScore() {
+		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
+		getSettings().setPathToReferenceGoAnnotations("./test/resources/sprot_GO_references.goa");
+		getSettings().setCalculateAncestryGoF1Scores(true);
+		Protein p = TestUtils.mockProtein();
+		p.setEvaluationScoreCalculator(new EvaluationScoreCalculator(p));
+		GOterm bpRoot = new GOterm("GO:0008150", "biological process", "biological_process");
+		bpRoot.addTermToAncestry(bpRoot);
+		GOterm bpCellularProcess = new GOterm("GO:0009987", "cellular process", "biological_process");
+		bpCellularProcess.addTermToAncestry(bpRoot);
+		bpCellularProcess.addTermToAncestry(bpCellularProcess);
+		GOterm bpSingleOrganismProcess = new GOterm("GO:0044699", "single-organism process", "biological_process");
+		bpSingleOrganismProcess.addTermToAncestry(bpRoot);
+		bpSingleOrganismProcess.addTermToAncestry(bpSingleOrganismProcess);
+	}
+	
 }

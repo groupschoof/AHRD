@@ -1,5 +1,6 @@
 package ahrd.controller;
 
+import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Utils.fromFile;
 import static ahrd.controller.Utils.readFile;
 
@@ -100,6 +101,9 @@ public class Settings implements Cloneable {
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
 	public static final String GO_DB_PATH_KEY = "go_db_path";
 	public static final String REFERENCE_GO_ANNOTATIONS_PATH_KEY = "reference_go_annotations";
+	public static final String GO_F1_SIMPLE_KEY = "simple_GO_f1_scores";
+	public static final String GO_F1_ANCESTRY_KEY = "ancestry_GO_f1_scores";
+	public static final String GO_F1_SEMSIM_KEY = "semsim_GO_f1_scores";
 	
 	/**
 	 * Fields:
@@ -239,6 +243,19 @@ public class Settings implements Cloneable {
 	 * Triggers the evaluation of AHRDs GO annotations 
 	 */
 	private String pathToReferenceGoAnnotations;
+	/**
+	 * Toggle set to induce the calculation and output of an F1-score based on reference and prediction GO annotations alone.
+	 * Is set to true as default GO F1-score if non of the three GO F1-score flags are toggled.  
+	 */
+	private Boolean calculateSimpleGoF1Scores = false;
+	/**
+	 * Toggle set to induce the calculation and output of an F1-score based on reference and prediction GO annotations extended to their complete ancestry. 
+	 */
+	private Boolean calculateAncestryGoF1Scores = false;
+	/**
+	 * Toggle set to induce the calculation and output of an F1-score based on the semantic similarity (based on term information content) of reference and prediction GO annotations. 
+	 */
+	private Boolean calculateSemsimGoF1Scores = false;
 	
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -385,7 +402,16 @@ public class Settings implements Cloneable {
 		if (input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY) != null) {
 			this.setPathToReferenceGoAnnotations(input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY).toString());
 		}
-		
+		// If non of the GO F1 Keys is specified in the YML input the simple version is used as default
+		if (input.get(GO_F1_SIMPLE_KEY) != null || (input.get(GO_F1_ANCESTRY_KEY) == null && input.get(GO_F1_SEMSIM_KEY) == null)) {
+			this.setCalculateSimpleGoF1Scores(true);
+		}
+		if (input.get(GO_F1_ANCESTRY_KEY) != null) {
+			this.setCalculateAncestryGoF1Scores(true);
+		}
+		if (input.get(GO_F1_SEMSIM_KEY) != null) {
+			this.setCalculateSemsimGoF1Scores(true);
+		}
 	}
 
 	/**
@@ -976,7 +1002,35 @@ public class Settings implements Cloneable {
 		this.pathToReferenceGoAnnotations = pathToReferenceGoAnnotations;
 	}
 	
+	public Boolean hasReferenceGoAnnotations() {
+		return getPathToReferenceGoAnnotations() != null && new File(getPathToReferenceGoAnnotations()).exists();
+	}
+	
 	public List<String> getReferenceGoAnnotationsFromFile() throws IOException {
 		return fromFile(getPathToReferenceGoAnnotations());
+	}
+
+	public Boolean getCalculateSimpleGoF1Scores() {
+		return calculateSimpleGoF1Scores;
+	}
+
+	public void setCalculateSimpleGoF1Scores(Boolean calculateSimpleGoF1Scores) {
+		this.calculateSimpleGoF1Scores = calculateSimpleGoF1Scores;
+	}
+
+	public Boolean getCalculateAncestryGoF1Scores() {
+		return calculateAncestryGoF1Scores;
+	}
+
+	public void setCalculateAncestryGoF1Scores(Boolean calculateAncestryGoF1Scores) {
+		this.calculateAncestryGoF1Scores = calculateAncestryGoF1Scores;
+	}
+
+	public Boolean getCalculateSemsimGoF1Scores() {
+		return calculateSemsimGoF1Scores;
+	}
+
+	public void setCalculateSemsimGoF1Scores(Boolean calculateSemsimGoF1Scores) {
+		this.calculateSemsimGoF1Scores = calculateSemsimGoF1Scores;
 	}
 }

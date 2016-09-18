@@ -48,11 +48,9 @@ public class Evaluator extends AHRD {
 			}
 		}
 	}
-	
-	public void setupGoAnnotationEvaluation() throws FileNotFoundException, IOException , MissingAccessionException {
-		if (getSettings().hasGeneOntologyAnnotations()
-				&& getSettings().getPathToReferenceGoAnnotations() != null
-				&& new File(getSettings().getPathToReferenceGoAnnotations()).exists()) {
+
+	public void setupGoAnnotationEvaluation() throws FileNotFoundException, IOException, MissingAccessionException {
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 			// Load a Map of all GO terms
 			goDB = new GOdatabase().getMap();
 			// Load reference GO annotations
@@ -83,7 +81,7 @@ public class Evaluator extends AHRD {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param args
 	 */

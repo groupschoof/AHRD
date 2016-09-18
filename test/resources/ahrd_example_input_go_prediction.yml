@@ -22,7 +22,7 @@ blast_dbs:
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_trembl.txt
     token_blacklist: ./test/resources/blacklist_token.txt
-    gene_ontology_result: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
+    gene_ontology_result: ./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt
 
   tair:
     weight: 854
@@ -34,5 +34,5 @@ blast_dbs:
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_tair.txt
     token_blacklist: ./test/resources/blacklist_token.txt
-    gene_ontology_result: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
+    gene_ontology_result: ./test/resources/database_gene_ontology_annotations_TAIR10_GOA.txt
     database_go_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"

@@ -37,7 +37,9 @@ public class EvaluationScoreCalculator {
 	private Double falsePositivesRate;
 	private Double highestPossibleEvaluationScore;
 	private Set<GOterm> referenceGoAnnoatations = new HashSet<GOterm>();
-	private Double goAnnotationScore;
+	private Double simpleGoAnnotationScore;
+	private Double ancestryGoAnnotationScore;
+	private Double semSimGoAnnotationScore;
 
 	public EvaluationScoreCalculator(Protein protein) {
 		super();
@@ -247,10 +249,27 @@ public class EvaluationScoreCalculator {
 			setEvalScoreMinBestCompScore(getEvalutionScore() - bestCompEvlScr);
 		}
 		// Evaluate GO annotations
-		setGoAnnotationScore(calcGoAnnotationScore());
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+			// Calculation of an F1-score based on reference and prediction GO annotations alone
+			if (getSettings().getCalculateSimpleGoF1Scores()) {
+				setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore());
+			}
+			// Calculation of an F1-score based on reference and prediction GO annotations extended to their complete ancestry
+			if (getSettings().getCalculateAncestryGoF1Scores()) {
+				setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore());
+			}
+			// Calculation of an F1-score based on the semantic similarity (based on term information content) of reference and prediction GO annotations.
+			if (getSettings().getCalculateSemsimGoF1Scores()) {
+				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore());
+			}
+		}
 	}
-
-	private Double calcGoAnnotationScore() {
+	
+	/**
+	 * Calculates an f1 score from recall and precision based on simple cardinality of the reference and prediction GO term sets.  
+	 * @return Double - F1 score
+	 */
+	private Double calcSimpleGoAnnotationScore() {
 		Double f1 = 0.0;
 		int truePositive = 0;
 		Double recall = 0.0;
@@ -275,6 +294,53 @@ public class EvaluationScoreCalculator {
 			f1 = 2*precision*recall/(precision+recall);
 		}
 		return f1;
+	}
+	
+	/**
+	 * Calculates an f1 score from recall and precision based on the cardinality of the reference and prediction GO term sets expanded to their complete ancestry   
+	 * @return Double - F1 score
+	 */
+	private Double calcAncestryGoAnnotationScore() {
+		Double f1 = 0.0;
+		Set<GOterm> reference = new HashSet<GOterm>();
+		for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
+			reference.addAll(referenceIter.next().getAncestry());
+		}
+		Set<GOterm> prediction = new HashSet<GOterm>();
+		for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter.hasNext();) {
+			prediction.addAll(predictionIter.next().getAncestry());
+		}
+		int truePositive = 0;
+		Double recall = 0.0;
+		Double precision = 0.0;
+		if (reference.size() > 0 && prediction.size() > 0) {
+			for (Iterator<GOterm> referenceIter = reference.iterator(); referenceIter.hasNext();) {
+				if (prediction.contains(referenceIter.next())) {
+					truePositive ++;
+				}
+			}
+			recall = (double)truePositive/reference.size();
+			precision = (double)truePositive/prediction.size();
+		} else {
+			if(reference.size() == 0) {
+				recall = 1.0;
+			}
+			if(prediction.size() == 0) {
+				precision = 1.0;
+			}
+		}
+		if (precision > 0.0 && recall > 0.0) {
+			f1 = 2*precision*recall/(precision+recall);
+		}
+		return f1;
+	}
+	
+	/**
+	 * Calculates an f1 score from recall and precision based on the semantic similarity of the reference and prediction GO term sets.  
+	 * @return Double - F1 score
+	 */
+	private Double calcSemSimGoAnnotationScore() {
+		return 0.0;
 	}
 
 	/**
@@ -413,11 +479,29 @@ public class EvaluationScoreCalculator {
 		this.referenceGoAnnoatations = referenceGoAnnoatations;
 	}
 
-	public Double getGoAnnotationScore() {
-		return goAnnotationScore;
+	public Double getSimpleGoAnnotationScore() {
+		return simpleGoAnnotationScore;
 	}
 
-	public void setGoAnnotationScore(Double goAnnotationScore) {
-		this.goAnnotationScore = goAnnotationScore;
+	public void setSimpleGoAnnotationScore(Double simpleGoAnnotationScore) {
+		this.simpleGoAnnotationScore = simpleGoAnnotationScore;
 	}
+
+	public Double getAncestryGoAnnotationScore() {
+		return ancestryGoAnnotationScore;
+	}
+
+	public void setAncestryGoAnnotationScore(Double ancestryGoAnnotationScore) {
+		this.ancestryGoAnnotationScore = ancestryGoAnnotationScore;
+	}
+
+	public Double getSemSimGoAnnotationScore() {
+		return semSimGoAnnotationScore;
+	}
+
+	public void setSemSimGoAnnotationScore(Double semSimGoAnnotationScore) {
+		this.semSimGoAnnotationScore = semSimGoAnnotationScore;
+	}
+
+
 }

@@ -41,7 +41,7 @@ public class ReferenceGoAnnotationsTest {
 		assertTrue(!getSettings().hasGeneOntologyAnnotations());
 		getSettings().setPathToGeneOntologyResult("swissprot","/not/existing/path.raw");
 		assertTrue(!getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt");
+		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
 		assertTrue(getSettings().hasGeneOntologyAnnotations());
 	}
 
