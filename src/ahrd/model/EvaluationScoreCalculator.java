@@ -340,7 +340,100 @@ public class EvaluationScoreCalculator {
 	 * @return Double - F1 score
 	 */
 	private Double calcSemSimGoAnnotationScore() {
-		return 0.0;
+		Double f1 = 0.0;
+		Double recall = 0.0;
+		Double precision = 0.0;
+		// Recall
+		/** Find the information content of the reference:
+		 * Usually the information content of the terms themselves,
+		 *  but if they havn't been used in swissprot 
+		 *  their info content is infinite so the highest non infinite info content 
+		 *  from their ancestry is used as fallback. 
+		 */
+		
+		if (this.referenceGoAnnoatations.size() > 0 && this.protein.getGoResultsTerms().size() > 0) {
+			Double infoContentReference = 0.0;
+			Double infoContentPrediction = 0.0;
+			for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
+				GOterm referenceTerm = referenceIter.next();
+				Double maxInfoContentAncestry = 0.0;
+				for (Iterator<GOterm> ancestryIter = referenceTerm.getAncestry().iterator(); ancestryIter.hasNext();) {
+					Double infoContent = ancestryIter.next().getInformationContent();
+					if (!Double.isInfinite(infoContent) && infoContent > maxInfoContentAncestry) {
+						maxInfoContentAncestry = infoContent;
+					}
+				}
+				infoContentReference += maxInfoContentAncestry;
+				Double maxCommonInfoContentPrediction = 0.0;
+				for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter.hasNext();) {
+					Double infoContent = maxCommonInfoContent(referenceTerm, predictionIter.next());
+					if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContentPrediction) {
+						maxCommonInfoContentPrediction = infoContent;
+					}
+				}
+				infoContentPrediction += maxCommonInfoContentPrediction;
+			}
+			if (infoContentReference > 0.0) {
+				recall = infoContentPrediction / infoContentReference;
+			} else {
+				recall = 1.0;
+			}
+			
+			infoContentPrediction = 0.0;
+			infoContentReference = 0.0;
+			for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter.hasNext();) {
+				GOterm predictionTerm = predictionIter.next();
+				Double maxInfoContentAncestry = 0.0;
+				for (Iterator<GOterm> ancestryIter = predictionTerm.getAncestry().iterator(); ancestryIter.hasNext();) {
+					Double infoContent = ancestryIter.next().getInformationContent();
+					if (!Double.isInfinite(infoContent) && infoContent > maxInfoContentAncestry) {
+						maxInfoContentAncestry = infoContent;
+					}
+				}
+				infoContentPrediction += maxInfoContentAncestry;
+				Double maxCommonInfoContentReference = 0.0;
+				for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
+					Double infoContent = maxCommonInfoContent(predictionTerm, referenceIter.next());
+					if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContentReference) {
+						maxCommonInfoContentReference = infoContent;
+					}
+				}
+				infoContentReference += maxCommonInfoContentReference;
+				
+			}
+			if (infoContentPrediction > 0.0) {
+				precision = infoContentReference / infoContentPrediction;
+			} else {
+				precision = 1.0;
+			}
+		} else {
+			if(this.referenceGoAnnoatations.size() == 0) {
+				recall = 1.0;
+			}
+			if(this.protein.getGoResultsTerms().size() == 0) {
+				precision = 1.0;
+			}
+		}
+		if (precision > 0.0 && recall > 0.0) {
+			f1 = 2*precision*recall/(precision+recall);
+		}
+		if (f1 > 1.0) {
+			System.out.println("p: " + precision + "\tr: " + recall + "\tf1: " + f1);
+		}
+		return f1;
+	}
+	
+	private Double maxCommonInfoContent(GOterm firstTerm, GOterm secondTerm) {
+		Set<GOterm> commonAncestry = new HashSet<GOterm>(firstTerm.getAncestry());
+		commonAncestry.retainAll(secondTerm.getAncestry());
+		Double maxCommonInfoContent = 0.0;
+		for (Iterator<GOterm> ancestryIter = commonAncestry.iterator(); ancestryIter.hasNext();) {
+			Double infoContent = ancestryIter.next().getInformationContent();
+			if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContent) {
+				maxCommonInfoContent = infoContent;
+			}
+		}
+		return maxCommonInfoContent;
 	}
 
 	/**

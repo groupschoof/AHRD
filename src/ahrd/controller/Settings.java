@@ -255,7 +255,7 @@ public class Settings implements Cloneable {
 	/**
 	 * Toggle set to induce the calculation and output of an F1-score based on the semantic similarity (based on term information content) of reference and prediction GO annotations. 
 	 */
-	private Boolean calculateSemsimGoF1Scores = false;
+	private Boolean calculateSemSimGoF1Scores = false;
 	
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -410,7 +410,7 @@ public class Settings implements Cloneable {
 			this.setCalculateAncestryGoF1Scores(true);
 		}
 		if (input.get(GO_F1_SEMSIM_KEY) != null) {
-			this.setCalculateSemsimGoF1Scores(true);
+			this.setCalculateSemSimGoF1Scores(true);
 		}
 	}
 
@@ -1027,10 +1027,10 @@ public class Settings implements Cloneable {
 	}
 
 	public Boolean getCalculateSemsimGoF1Scores() {
-		return calculateSemsimGoF1Scores;
+		return calculateSemSimGoF1Scores;
 	}
 
-	public void setCalculateSemsimGoF1Scores(Boolean calculateSemsimGoF1Scores) {
-		this.calculateSemsimGoF1Scores = calculateSemsimGoF1Scores;
+	public void setCalculateSemSimGoF1Scores(Boolean calculateSemsimGoF1Scores) {
+		this.calculateSemSimGoF1Scores = calculateSemsimGoF1Scores;
 	}
 }
