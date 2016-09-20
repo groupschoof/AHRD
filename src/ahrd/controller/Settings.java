@@ -97,7 +97,8 @@ public class Settings implements Cloneable {
 	public static final Pattern DEFAULT_DATABASE_GO_REGEX = Pattern
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
-	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
+	public static final String EVALUATE_VALID_TOKENS_KEY = "evaluate_valid_tokens";
+	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
 	public static final String GO_DB_PATH_KEY = "go_db_path";
 	public static final String REFERENCE_GO_ANNOTATIONS_PATH_KEY = "reference_go_annotations";
 	public static final String GO_F1_SIMPLE_KEY = "simple_GO_f1_scores";
@@ -380,7 +381,7 @@ public class Settings implements Cloneable {
 		if (input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY) != null) {
 			this.preferReferenceWithGoAnnos = true;
 		}
-		if (input.get(EVALUATE_VALID_TAKENS_KEY) != null) {
+		if (input.get(EVALUATE_VALID_TOKENS_KEY) != null) {
 			this.setEvaluateValidTokens(true);
 		}
 		if (input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY) != null) {
