@@ -87,7 +87,8 @@ public class DescriptionScoreCalculator {
 				if (iterBlastResult.getTokens().size() > 0) {
 					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
 					if (databaseGoAnnotations != null && !databaseGoAnnotations.isEmpty()
-							&& databaseGoAnnotations.containsKey(iterBlastResult.getShortAccession()))
+							&& databaseGoAnnotations.containsKey(iterBlastResult.getShortAccession())
+							&& getSettings().getPreferReferenceWithGoAnnos())
 						scoreRankingWithGoAnnos.add(iterBlastResult.getDescriptionScore());
 				}
 			}

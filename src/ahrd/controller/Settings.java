@@ -1,6 +1,5 @@
 package ahrd.controller;
 
-import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Utils.fromFile;
 import static ahrd.controller.Utils.readFile;
 

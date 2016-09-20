@@ -1,5 +1,6 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.DEFAULT_LINE_SEP;
 import static ahrd.controller.Settings.getSettings;
 
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class Protein {
 
 	public static Protein constructFromFastaEntry(String fastaEntry)
 			throws MissingAccessionException {
-		String[] fasta_data = fastaEntry.split("\n");
+		String[] fasta_data = fastaEntry.split(DEFAULT_LINE_SEP);
 		String accession = fasta_data[0].split(" ")[0];
 		if (accession == null || accession.equals("")) {
 			throw new MissingAccessionException(
