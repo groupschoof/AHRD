@@ -54,8 +54,7 @@ public class EvaluationScoreCalculator {
 	 * @param referenceTokens
 	 * @return Double - The number of shared Tokens
 	 */
-	public static Double truePositives(Set<String> assignedTokens,
-			Set<String> referenceTokens) {
+	public static Double truePositives(Set<String> assignedTokens, Set<String> referenceTokens) {
 		double tp = 0.0;
 		if (assignedTokens != null && !assignedTokens.isEmpty()) {
 			for (String assignedTkn : assignedTokens) {
@@ -75,10 +74,8 @@ public class EvaluationScoreCalculator {
 	 * @param referenceTokens
 	 * @return Double - True-Positives-Rate
 	 */
-	public static Double truePositivesRate(Set<String> assignedTokens,
-			Set<String> referenceTokens) {
-		return truePositives(assignedTokens, referenceTokens)
-				/ referenceTokens.size();
+	public static Double truePositivesRate(Set<String> assignedTokens, Set<String> referenceTokens) {
+		return truePositives(assignedTokens, referenceTokens) / referenceTokens.size();
 	}
 
 	/**
@@ -93,8 +90,8 @@ public class EvaluationScoreCalculator {
 	 * @param allBlastTokens
 	 * @return Double - False-Positives-Rates
 	 */
-	public static Double falsePositivesRate(Set<String> assignedTokens,
-			Set<String> referenceTokens, Set<String> allBlastTokens) {
+	public static Double falsePositivesRate(Set<String> assignedTokens, Set<String> referenceTokens,
+			Set<String> allBlastTokens) {
 		// Count false-positives
 		double fp = 0;
 		for (String asgnTkn : assignedTokens) {
@@ -137,12 +134,10 @@ public class EvaluationScoreCalculator {
 	 *            - Tokens of the Reference
 	 * @return Double - F-Beta-Score
 	 */
-	public static Double fBetaScore(Set<String> assignedTkns,
-			Set<String> referenceTkns) {
+	public static Double fBetaScore(Set<String> assignedTkns, Set<String> referenceTkns) {
 		// Validate Reference:
 		if (referenceTkns == null || referenceTkns.isEmpty())
-			throw new IllegalArgumentException(
-					"Cannot calculate F1-Score, got an empty set of Reference-Tokens.");
+			throw new IllegalArgumentException("Cannot calculate F1-Score, got an empty set of Reference-Tokens.");
 		// Calculate f-beta-score:
 		double fBetaScore = 0.0;
 		if (assignedTkns != null && !assignedTkns.isEmpty()) {
@@ -153,8 +148,7 @@ public class EvaluationScoreCalculator {
 				double rc = tp / referenceTkns.size();
 				// F-Beta-Measure is the harmonic mean of precision and recall
 				// weighted by param beta:
-				Double bSqr = getSettings().getFMeasureBetaParameter()
-						* getSettings().getFMeasureBetaParameter();
+				Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
 				fBetaScore = (1 + bSqr) * (pr * rc) / (bSqr * pr + rc);
 			}
 		}
@@ -172,8 +166,7 @@ public class EvaluationScoreCalculator {
 	 */
 	public void addUnchangedBlastResult(String blastDb, BlastResult br) {
 		if (!getUnchangedBlastResults().containsKey(blastDb)
-				|| getUnchangedBlastResults().get(blastDb).getBitScore() < br
-						.getBitScore()) {
+				|| getUnchangedBlastResults().get(blastDb).getBitScore() < br.getBitScore()) {
 			getUnchangedBlastResults().put(blastDb, br);
 		}
 	}
@@ -184,29 +177,21 @@ public class EvaluationScoreCalculator {
 	 * Blast-Hit.
 	 */
 	public void assignEvlScrsToCompetitors() {
-		if (getReferenceDescription() != null
-				&& getReferenceDescription().getDescription() != null) {
+		if (getReferenceDescription() != null && getReferenceDescription().getDescription() != null) {
 			// First Competitor is the Description assigned by AHRD itself:
-			if (getProtein().getDescriptionScoreCalculator()
-					.getHighestScoringBlastResult() != null) {
+			if (getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult() != null) {
 				// Generate the set of Evaluation-Tokens from the
 				// actually assigned Description, WITHOUT filtering each
 				// Token with the BLACKLIST:
-				getProtein().getDescriptionScoreCalculator()
-						.getHighestScoringBlastResult().tokenizeForEvaluation();
-				Set<String> hrdEvlTkns = getProtein()
-						.getDescriptionScoreCalculator()
-						.getHighestScoringBlastResult().getEvaluationTokens();
+				getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult().tokenizeForEvaluation();
+				Set<String> hrdEvlTkns = getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult()
+						.getEvaluationTokens();
 				// Calculate the Evaluation-Score as the F-Beta-Score:
-				setEvalutionScore(fBetaScore(hrdEvlTkns,
-						getReferenceDescription().getTokens()));
+				setEvalutionScore(fBetaScore(hrdEvlTkns, getReferenceDescription().getTokens()));
 				// Enable calculation of the ROC-Curve:
-				setTruePositivesRate(truePositivesRate(hrdEvlTkns,
-						getReferenceDescription().getTokens()));
-				setFalsePositivesRate(falsePositivesRate(hrdEvlTkns,
-						getReferenceDescription().getTokens(), getProtein()
-								.getTokenScoreCalculator().getTokenScores()
-								.keySet()));
+				setTruePositivesRate(truePositivesRate(hrdEvlTkns, getReferenceDescription().getTokens()));
+				setFalsePositivesRate(falsePositivesRate(hrdEvlTkns, getReferenceDescription().getTokens(),
+						getProtein().getTokenScoreCalculator().getTokenScores().keySet()));
 			} else {
 				// Well, no Description assigned means scores ZERO:
 				setEvalutionScore(0.0);
@@ -218,16 +203,14 @@ public class EvaluationScoreCalculator {
 			Double bestCompEvlScr = 0.0;
 			if (getUnchangedBlastResults().size() > 0) {
 				for (String blastDatabase : getUnchangedBlastResults().keySet()) {
-					BlastResult cmpt = getUnchangedBlastResults().get(
-							blastDatabase);
+					BlastResult cmpt = getUnchangedBlastResults().get(blastDatabase);
 					if (cmpt != null) {
 						// Generate the set of Evaluation-Tokens from the
 						// actually assigned Description, WITHOUT filtering each
 						// Token with the BLACKLIST:
 						cmpt.tokenizeForEvaluation();
-						cmpt.setEvaluationScore(fBetaScore(
-								cmpt.getEvaluationTokens(),
-								getReferenceDescription().getTokens()));
+						cmpt.setEvaluationScore(
+								fBetaScore(cmpt.getEvaluationTokens(), getReferenceDescription().getTokens()));
 						// Find best performing competitor-method:
 						if (cmpt.getEvaluationScore() > bestCompEvlScr)
 							bestCompEvlScr = cmpt.getEvaluationScore();
@@ -237,9 +220,8 @@ public class EvaluationScoreCalculator {
 			// Also compare with the Blast2GO-Annotation(s), if present:
 			if (getBlast2GoAnnots() != null) {
 				for (Blast2GoAnnot b2ga : getBlast2GoAnnots()) {
-					b2ga.setEvaluationScore(fBetaScore(
-							b2ga.getEvaluationTokens(),
-							getReferenceDescription().getTokens()));
+					b2ga.setEvaluationScore(
+							fBetaScore(b2ga.getEvaluationTokens(), getReferenceDescription().getTokens()));
 					// Find best performing competitor-method:
 					if (b2ga.getEvaluationScore() > bestCompEvlScr)
 						bestCompEvlScr = b2ga.getEvaluationScore();
@@ -250,58 +232,68 @@ public class EvaluationScoreCalculator {
 		}
 		// Evaluate GO annotations
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-			// Calculation of an F1-score based on reference and prediction GO annotations alone
+			// Calculation of an F1-score based on reference and prediction GO
+			// annotations alone
 			if (getSettings().getCalculateSimpleGoF1Scores()) {
 				setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore());
 			}
-			// Calculation of an F1-score based on reference and prediction GO annotations extended to their complete ancestry
+			// Calculation of an F1-score based on reference and prediction GO
+			// annotations extended to their complete ancestry
 			if (getSettings().getCalculateAncestryGoF1Scores()) {
 				setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore());
 			}
-			// Calculation of an F1-score based on the semantic similarity (based on term information content) of reference and prediction GO annotations.
+			// Calculation of an F1-score based on the semantic similarity
+			// (based on term information content) of reference and prediction
+			// GO annotations.
 			if (getSettings().getCalculateSemsimGoF1Scores()) {
 				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore());
 			}
 		}
 	}
-	
+
 	/**
-	 * Calculates an f1 score from recall and precision based on simple cardinality of the reference and prediction GO term sets.  
-	 * @return Double - F1 score
+	 * Calculates an f score from recall and precision based on simple
+	 * cardinality of the reference and prediction GO term sets.
+	 * 
+	 * @return Double - F score
 	 */
 	private Double calcSimpleGoAnnotationScore() {
-		Double f1 = 0.0;
+		Double f = 0.0;
 		int truePositive = 0;
 		Double recall = 0.0;
 		Double precision = 0.0;
 		if (this.referenceGoAnnoatations.size() > 0 && this.protein.getGoResultsTerms().size() > 0) {
 			for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
 				if (this.protein.getGoResultsTerms().contains(referenceIter.next())) {
-					truePositive ++;
+					truePositive++;
 				}
 			}
-			recall = (double)truePositive/this.referenceGoAnnoatations.size();
-			precision = (double)truePositive/this.protein.getGoResultsTerms().size();
+			recall = (double) truePositive / this.referenceGoAnnoatations.size();
+			precision = (double) truePositive / this.protein.getGoResultsTerms().size();
 		} else {
-			if(this.referenceGoAnnoatations.size() == 0) {
+			if (this.referenceGoAnnoatations.size() == 0) {
 				recall = 1.0;
 			}
-			if(this.protein.getGoResultsTerms().size() == 0) {
+			if (this.protein.getGoResultsTerms().size() == 0) {
 				precision = 1.0;
 			}
 		}
 		if (precision > 0.0 && recall > 0.0) {
-			f1 = 2*precision*recall/(precision+recall);
+			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
+			f = (1 + bSqr) * precision * recall / (bSqr * precision + recall);
 		}
-		return f1;
+		return f;
 	}
-	
+
 	/**
-	 * Calculates an f1 score from recall and precision based on the cardinality of the reference and prediction GO term sets expanded to their complete ancestry   
-	 * @return Double - F1 score
+	 * Calculates an f score from recall and precision based on the cardinality
+	 * of the reference and prediction GO term sets expanded to their complete
+	 * ancestry
+	 * 
+	 * @return Double - F score
 	 */
 	private Double calcAncestryGoAnnotationScore() {
-		Double f1 = 0.0;
+		Double f = 0.0;
 		Set<GOterm> reference = new HashSet<GOterm>();
 		for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
 			reference.addAll(referenceIter.next().getAncestry());
@@ -316,41 +308,44 @@ public class EvaluationScoreCalculator {
 		if (reference.size() > 0 && prediction.size() > 0) {
 			for (Iterator<GOterm> referenceIter = reference.iterator(); referenceIter.hasNext();) {
 				if (prediction.contains(referenceIter.next())) {
-					truePositive ++;
+					truePositive++;
 				}
 			}
-			recall = (double)truePositive/reference.size();
-			precision = (double)truePositive/prediction.size();
+			recall = (double) truePositive / reference.size();
+			precision = (double) truePositive / prediction.size();
 		} else {
-			if(reference.size() == 0) {
+			if (reference.size() == 0) {
 				recall = 1.0;
 			}
-			if(prediction.size() == 0) {
+			if (prediction.size() == 0) {
 				precision = 1.0;
 			}
 		}
 		if (precision > 0.0 && recall > 0.0) {
-			f1 = 2*precision*recall/(precision+recall);
+			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
+			f = (1 + bSqr) * precision * recall / (bSqr * precision + recall);
 		}
-		return f1;
+		return f;
 	}
-	
+
 	/**
-	 * Calculates an f1 score from recall and precision based on the semantic similarity of the reference and prediction GO term sets.  
-	 * @return Double - F1 score
+	 * Calculates an 1 score from recall and precision based on the semantic
+	 * similarity of the reference and prediction GO term sets.
+	 * 
+	 * @return Double - F score
 	 */
 	private Double calcSemSimGoAnnotationScore() {
-		Double f1 = 0.0;
+		Double f = 0.0;
 		Double recall = 0.0;
 		Double precision = 0.0;
 		// Recall
-		/** Find the information content of the reference:
-		 * Usually the information content of the terms themselves,
-		 *  but if they havn't been used in swissprot 
-		 *  their info content is infinite so the highest non infinite info content 
-		 *  from their ancestry is used as fallback. 
+		/**
+		 * Find the information content of the reference: Usually the
+		 * information content of the terms themselves, but if they havn't been
+		 * used in swissprot their info content is infinite so the highest non
+		 * infinite info content from their ancestry is used as fallback.
 		 */
-		
+
 		if (this.referenceGoAnnoatations.size() > 0 && this.protein.getGoResultsTerms().size() > 0) {
 			Double infoContentReference = 0.0;
 			Double infoContentPrediction = 0.0;
@@ -365,7 +360,8 @@ public class EvaluationScoreCalculator {
 				}
 				infoContentReference += maxInfoContentAncestry;
 				Double maxCommonInfoContentPrediction = 0.0;
-				for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter.hasNext();) {
+				for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter
+						.hasNext();) {
 					Double infoContent = maxCommonInfoContent(referenceTerm, predictionIter.next());
 					if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContentPrediction) {
 						maxCommonInfoContentPrediction = infoContent;
@@ -378,10 +374,11 @@ public class EvaluationScoreCalculator {
 			} else {
 				recall = 1.0;
 			}
-			
+
 			infoContentPrediction = 0.0;
 			infoContentReference = 0.0;
-			for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter.hasNext();) {
+			for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter
+					.hasNext();) {
 				GOterm predictionTerm = predictionIter.next();
 				Double maxInfoContentAncestry = 0.0;
 				for (Iterator<GOterm> ancestryIter = predictionTerm.getAncestry().iterator(); ancestryIter.hasNext();) {
@@ -392,14 +389,15 @@ public class EvaluationScoreCalculator {
 				}
 				infoContentPrediction += maxInfoContentAncestry;
 				Double maxCommonInfoContentReference = 0.0;
-				for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
+				for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter
+						.hasNext();) {
 					Double infoContent = maxCommonInfoContent(predictionTerm, referenceIter.next());
 					if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContentReference) {
 						maxCommonInfoContentReference = infoContent;
 					}
 				}
 				infoContentReference += maxCommonInfoContentReference;
-				
+
 			}
 			if (infoContentPrediction > 0.0) {
 				precision = infoContentReference / infoContentPrediction;
@@ -407,22 +405,23 @@ public class EvaluationScoreCalculator {
 				precision = 1.0;
 			}
 		} else {
-			if(this.referenceGoAnnoatations.size() == 0) {
+			if (this.referenceGoAnnoatations.size() == 0) {
 				recall = 1.0;
 			}
-			if(this.protein.getGoResultsTerms().size() == 0) {
+			if (this.protein.getGoResultsTerms().size() == 0) {
 				precision = 1.0;
 			}
 		}
 		if (precision > 0.0 && recall > 0.0) {
-			f1 = 2*precision*recall/(precision+recall);
+			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
+			f = (1 + bSqr) * precision * recall / (bSqr * precision + recall);
 		}
-		if (f1 > 1.0) {
-			System.out.println("p: " + precision + "\tr: " + recall + "\tf1: " + f1);
+		if (f > 1.0) { // Something went very wrong - Should never be happening
+			System.out.println("p: " + precision + "\tr: " + recall + "\tf1: " + f);
 		}
-		return f1;
+		return f;
 	}
-	
+
 	private Double maxCommonInfoContent(GOterm firstTerm, GOterm secondTerm) {
 		Set<GOterm> commonAncestry = new HashSet<GOterm>(firstTerm.getAncestry());
 		commonAncestry.retainAll(secondTerm.getAncestry());
@@ -444,15 +443,13 @@ public class EvaluationScoreCalculator {
 	 */
 	public void findHighestPossibleEvaluationScore() {
 		setHighestPossibleEvaluationScore(0.0);
-		for (List<BlastResult> resultsFromBlastDatabase : getProtein()
-				.getBlastResults().values()) {
+		for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 			for (BlastResult cmpt : resultsFromBlastDatabase) {
 				// Generate the set of Evaluation-Tokens from the
 				// actually assigned Description, WITHOUT filtering each
 				// Token with the BLACKLIST:
 				cmpt.tokenizeForEvaluation();
-				cmpt.setEvaluationScore(fBetaScore(cmpt.getEvaluationTokens(),
-						getReferenceDescription().getTokens()));
+				cmpt.setEvaluationScore(fBetaScore(cmpt.getEvaluationTokens(), getReferenceDescription().getTokens()));
 				// Find best performing BlastResult-Description:
 				if (cmpt.getEvaluationScore() > getHighestPossibleEvaluationScore())
 					setHighestPossibleEvaluationScore(cmpt.getEvaluationScore());
@@ -493,8 +490,7 @@ public class EvaluationScoreCalculator {
 		return referenceDescription;
 	}
 
-	public void setReferenceDescription(
-			ReferenceDescription referenceDescription) {
+	public void setReferenceDescription(ReferenceDescription referenceDescription) {
 		this.referenceDescription = referenceDescription;
 	}
 
@@ -502,8 +498,7 @@ public class EvaluationScoreCalculator {
 		return unchangedBlastResults;
 	}
 
-	public void setUnchangedBlastResults(
-			Map<String, BlastResult> unchangedBlastResults) {
+	public void setUnchangedBlastResults(Map<String, BlastResult> unchangedBlastResults) {
 		this.unchangedBlastResults = unchangedBlastResults;
 	}
 
@@ -559,8 +554,7 @@ public class EvaluationScoreCalculator {
 		return highestPossibleEvaluationScore;
 	}
 
-	public void setHighestPossibleEvaluationScore(
-			Double highestPossibleEvaluationScore) {
+	public void setHighestPossibleEvaluationScore(Double highestPossibleEvaluationScore) {
 		this.highestPossibleEvaluationScore = highestPossibleEvaluationScore;
 	}
 
@@ -595,6 +589,5 @@ public class EvaluationScoreCalculator {
 	public void setSemSimGoAnnotationScore(Double semSimGoAnnotationScore) {
 		this.semSimGoAnnotationScore = semSimGoAnnotationScore;
 	}
-
 
 }
