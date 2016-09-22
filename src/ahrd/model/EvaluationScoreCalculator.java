@@ -232,21 +232,37 @@ public class EvaluationScoreCalculator {
 		}
 		// Evaluate GO annotations
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+			/**
+			 * AHRD
+			 */
 			// Calculation of an F1-score based on reference and prediction GO
 			// annotations alone
-			if (getSettings().getCalculateSimpleGoF1Scores()) {
-				setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore());
-			}
+			if (getSettings().getCalculateSimpleGoF1Scores())
+				setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, this.protein.getGoResultsTerms()));
 			// Calculation of an F1-score based on reference and prediction GO
 			// annotations extended to their complete ancestry
-			if (getSettings().getCalculateAncestryGoF1Scores()) {
-				setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore());
-			}
+			if (getSettings().getCalculateAncestryGoF1Scores())
+				setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, this.protein.getGoResultsTerms()));
 			// Calculation of an F1-score based on the semantic similarity
 			// (based on term information content) of reference and prediction
 			// GO annotations.
-			if (getSettings().getCalculateSemsimGoF1Scores()) {
-				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore());
+			if (getSettings().getCalculateSemSimGoF1Scores())
+				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, this.protein.getGoResultsTerms()));
+			/**
+			 * B2G
+			 */
+			if (getBlast2GoAnnots() != null) {
+				for (Blast2GoAnnot b2ga : getBlast2GoAnnots()) {
+					if (getSettings().getCalculateSimpleGoF1Scores())
+						b2ga.setSimpleGoAnnotationScore(
+								calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, b2ga.getGoAnnotations()));
+					if (getSettings().getCalculateAncestryGoF1Scores())
+						b2ga.setAncestryGoAnnotationScore(
+								calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, b2ga.getGoAnnotations()));
+					if (getSettings().getCalculateSemSimGoF1Scores())
+						b2ga.setSemSimGoAnnotationScore(
+								calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, b2ga.getGoAnnotations()));
+				}
 			}
 		}
 	}
@@ -257,51 +273,8 @@ public class EvaluationScoreCalculator {
 	 * 
 	 * @return Double - F score
 	 */
-	private Double calcSimpleGoAnnotationScore() {
+	private Double calcSimpleGoAnnotationScore(Set<GOterm> reference, Set<GOterm> prediction) {
 		Double f = 0.0;
-		int truePositive = 0;
-		Double recall = 0.0;
-		Double precision = 0.0;
-		if (this.referenceGoAnnoatations.size() > 0 && this.protein.getGoResultsTerms().size() > 0) {
-			for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
-				if (this.protein.getGoResultsTerms().contains(referenceIter.next())) {
-					truePositive++;
-				}
-			}
-			recall = (double) truePositive / this.referenceGoAnnoatations.size();
-			precision = (double) truePositive / this.protein.getGoResultsTerms().size();
-		} else {
-			if (this.referenceGoAnnoatations.size() == 0) {
-				recall = 1.0;
-			}
-			if (this.protein.getGoResultsTerms().size() == 0) {
-				precision = 1.0;
-			}
-		}
-		if (precision > 0.0 && recall > 0.0) {
-			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f = (1 + bSqr) * precision * recall / (bSqr * precision + recall);
-		}
-		return f;
-	}
-
-	/**
-	 * Calculates an f score from recall and precision based on the cardinality
-	 * of the reference and prediction GO term sets expanded to their complete
-	 * ancestry
-	 * 
-	 * @return Double - F score
-	 */
-	private Double calcAncestryGoAnnotationScore() {
-		Double f = 0.0;
-		Set<GOterm> reference = new HashSet<GOterm>();
-		for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
-			reference.addAll(referenceIter.next().getAncestry());
-		}
-		Set<GOterm> prediction = new HashSet<GOterm>();
-		for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter.hasNext();) {
-			prediction.addAll(predictionIter.next().getAncestry());
-		}
 		int truePositive = 0;
 		Double recall = 0.0;
 		Double precision = 0.0;
@@ -329,12 +302,55 @@ public class EvaluationScoreCalculator {
 	}
 
 	/**
+	 * Calculates an f score from recall and precision based on the cardinality
+	 * of the reference and prediction GO term sets expanded to their complete
+	 * ancestry
+	 * 
+	 * @return Double - F score
+	 */
+	private Double calcAncestryGoAnnotationScore(Set<GOterm> reference, Set<GOterm> prediction) {
+		Double f = 0.0;
+		Set<GOterm> referenceAncestry = new HashSet<GOterm>();
+		for (Iterator<GOterm> referenceIter = reference.iterator(); referenceIter.hasNext();) {
+			referenceAncestry.addAll(referenceIter.next().getAncestry());
+		}
+		Set<GOterm> predictionAncestry = new HashSet<GOterm>();
+		for (Iterator<GOterm> predictionIter = prediction.iterator(); predictionIter.hasNext();) {
+			predictionAncestry.addAll(predictionIter.next().getAncestry());
+		}
+		int truePositive = 0;
+		Double recall = 0.0;
+		Double precision = 0.0;
+		if (referenceAncestry.size() > 0 && predictionAncestry.size() > 0) {
+			for (Iterator<GOterm> referenceIter = referenceAncestry.iterator(); referenceIter.hasNext();) {
+				if (predictionAncestry.contains(referenceIter.next())) {
+					truePositive++;
+				}
+			}
+			recall = (double) truePositive / referenceAncestry.size();
+			precision = (double) truePositive / predictionAncestry.size();
+		} else {
+			if (referenceAncestry.size() == 0) {
+				recall = 1.0;
+			}
+			if (predictionAncestry.size() == 0) {
+				precision = 1.0;
+			}
+		}
+		if (precision > 0.0 && recall > 0.0) {
+			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
+			f = (1 + bSqr) * precision * recall / (bSqr * precision + recall);
+		}
+		return f;
+	}
+
+	/**
 	 * Calculates an 1 score from recall and precision based on the semantic
 	 * similarity of the reference and prediction GO term sets.
 	 * 
 	 * @return Double - F score
 	 */
-	private Double calcSemSimGoAnnotationScore() {
+	private Double calcSemSimGoAnnotationScore(Set<GOterm> reference, Set<GOterm> prediction) {
 		Double f = 0.0;
 		Double recall = 0.0;
 		Double precision = 0.0;
@@ -345,11 +361,10 @@ public class EvaluationScoreCalculator {
 		 * used in swissprot their info content is infinite so the highest non
 		 * infinite info content from their ancestry is used as fallback.
 		 */
-
-		if (this.referenceGoAnnoatations.size() > 0 && this.protein.getGoResultsTerms().size() > 0) {
+		if (reference.size() > 0 && prediction.size() > 0) {
 			Double infoContentReference = 0.0;
 			Double infoContentPrediction = 0.0;
-			for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter.hasNext();) {
+			for (Iterator<GOterm> referenceIter = reference.iterator(); referenceIter.hasNext();) {
 				GOterm referenceTerm = referenceIter.next();
 				Double maxInfoContentAncestry = 0.0;
 				for (Iterator<GOterm> ancestryIter = referenceTerm.getAncestry().iterator(); ancestryIter.hasNext();) {
@@ -360,7 +375,7 @@ public class EvaluationScoreCalculator {
 				}
 				infoContentReference += maxInfoContentAncestry;
 				Double maxCommonInfoContentPrediction = 0.0;
-				for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter
+				for (Iterator<GOterm> predictionIter = prediction.iterator(); predictionIter
 						.hasNext();) {
 					Double infoContent = maxCommonInfoContent(referenceTerm, predictionIter.next());
 					if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContentPrediction) {
@@ -377,7 +392,7 @@ public class EvaluationScoreCalculator {
 
 			infoContentPrediction = 0.0;
 			infoContentReference = 0.0;
-			for (Iterator<GOterm> predictionIter = this.protein.getGoResultsTerms().iterator(); predictionIter
+			for (Iterator<GOterm> predictionIter = prediction.iterator(); predictionIter
 					.hasNext();) {
 				GOterm predictionTerm = predictionIter.next();
 				Double maxInfoContentAncestry = 0.0;
@@ -389,7 +404,7 @@ public class EvaluationScoreCalculator {
 				}
 				infoContentPrediction += maxInfoContentAncestry;
 				Double maxCommonInfoContentReference = 0.0;
-				for (Iterator<GOterm> referenceIter = this.referenceGoAnnoatations.iterator(); referenceIter
+				for (Iterator<GOterm> referenceIter = reference.iterator(); referenceIter
 						.hasNext();) {
 					Double infoContent = maxCommonInfoContent(predictionTerm, referenceIter.next());
 					if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContentReference) {
@@ -405,10 +420,10 @@ public class EvaluationScoreCalculator {
 				precision = 1.0;
 			}
 		} else {
-			if (this.referenceGoAnnoatations.size() == 0) {
+			if (reference.size() == 0) {
 				recall = 1.0;
 			}
-			if (this.protein.getGoResultsTerms().size() == 0) {
+			if (prediction.size() == 0) {
 				precision = 1.0;
 			}
 		}

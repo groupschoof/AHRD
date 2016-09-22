@@ -3,6 +3,7 @@ package ahrd.model;
 import static ahrd.model.TokenScoreCalculator.tokenize;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Blast2GoAnnot implements Comparable<Blast2GoAnnot> {
@@ -11,15 +12,21 @@ public class Blast2GoAnnot implements Comparable<Blast2GoAnnot> {
 	private String description;
 	private Set<String> evaluationTokens;
 	private Double evaluationScore = 0.0;
+	private Set<GOterm> goAnnotations = new HashSet<GOterm>();
+	private Double simpleGoAnnotationScore = 0.0;
+	private Double ancestryGoAnnotationScore = 0.0;
+	private Double semSimGoAnnotationScore = 0.0;
 
 	public static Blast2GoAnnot fromBlast2GoEntry(String resultLine) {
 		Blast2GoAnnot res = null;
 		String[] vals = resultLine.split("\t");
 		String accession = vals[0].trim();
 		// GO-Term-Accession is in position 2, which is ignored here.
-		String description = vals[2].trim();
-		if (accession != null && description != null && !accession.equals("") && !description.equals(""))
-			res = new Blast2GoAnnot(accession, description);
+		if (vals.length > 2) {
+			String description = vals[2].trim();
+			if (accession != null && description != null && !accession.equals("") && !description.equals(""))
+				res = new Blast2GoAnnot(accession, description);
+		}
 		return res;
 	}
 
@@ -28,6 +35,11 @@ public class Blast2GoAnnot implements Comparable<Blast2GoAnnot> {
 		setAccession(accession);
 		setDescription(description);
 		setEvaluationTokens(tokenize(getDescription(), new ArrayList<String>()));
+	}
+	
+	public Blast2GoAnnot(String accession, String description, Set<GOterm> goAnnots) {
+		this(accession, description);
+		this.setGoAnnotations(goAnnots);
 	}
 
 	/**
@@ -98,4 +110,37 @@ public class Blast2GoAnnot implements Comparable<Blast2GoAnnot> {
 	public void setEvaluationScore(Double evaluationScore) {
 		this.evaluationScore = evaluationScore;
 	}
+
+	public Set<GOterm> getGoAnnotations() {
+		return goAnnotations;
+	}
+
+	public void setGoAnnotations(Set<GOterm> goAnnotations) {
+		this.goAnnotations = goAnnotations;
+	}
+
+	public Double getSimpleGoAnnotationScore() {
+		return simpleGoAnnotationScore;
+	}
+
+	public void setSimpleGoAnnotationScore(Double simpleGoAnnotationScore) {
+		this.simpleGoAnnotationScore = simpleGoAnnotationScore;
+	}
+
+	public Double getAncestryGoAnnotationScore() {
+		return ancestryGoAnnotationScore;
+	}
+
+	public void setAncestryGoAnnotationScore(Double ancestryGoAnnotationScore) {
+		this.ancestryGoAnnotationScore = ancestryGoAnnotationScore;
+	}
+
+	public Double getSemSimGoAnnotationScore() {
+		return semSimGoAnnotationScore;
+	}
+
+	public void setSemSimGoAnnotationScore(Double semSimGoAnnotationScore) {
+		this.semSimGoAnnotationScore = semSimGoAnnotationScore;
+	}
+	
 }

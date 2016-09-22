@@ -68,6 +68,8 @@ public class Settings implements Cloneable {
 	public static final String REFERENCES_TOKEN_BLACKLIST_KEY = "references_token_blacklist";
 	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
 	public static final String BLAST_2_GO_ANNOT_FILE_KEY = "blast2go";
+	public static final Pattern BLAST_2_GO_ANNOTATION_FILE_DESCLINE_REGEX = Pattern.compile("^(?<shortAccession>[^\\t]+)\\t(?<goTerm>GO:\\d{7})\\t(?<description>[^\\t]+)$"); 
+	public static final Pattern BLAST_2_GO_ANNOTATION_FILE_ANNOTLINE_REGEX = Pattern.compile("^(?<shortAccession>[^\\t]+)\\t(?<goTerm>GO:\\d{7})$");
 	public static final String TEMPERATURE_KEY = "temperature";
 	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
 	public static final String OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY = "optimization_acceptance_probability_scaling_factor";
@@ -402,16 +404,21 @@ public class Settings implements Cloneable {
 		if (input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY) != null) {
 			this.setPathToReferenceGoAnnotations(input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY).toString());
 		}
-		// If non of the GO F1 Keys is specified in the YML input the simple version is used as default
-		if (input.get(GO_F1_SIMPLE_KEY) != null || (input.get(GO_F1_ANCESTRY_KEY) == null && input.get(GO_F1_SEMSIM_KEY) == null)) {
-			this.setCalculateSimpleGoF1Scores(true);
-		}
 		if (input.get(GO_F1_ANCESTRY_KEY) != null) {
-			this.setCalculateAncestryGoF1Scores(true);
+			this.setCalculateAncestryGoF1Scores(parseBoolString(input.get(GO_F1_ANCESTRY_KEY).toString()));
 		}
 		if (input.get(GO_F1_SEMSIM_KEY) != null) {
-			this.setCalculateSemSimGoF1Scores(true);
+			this.setCalculateSemSimGoF1Scores(parseBoolString(input.get(GO_F1_SEMSIM_KEY).toString()));
 		}
+		// If non of the GO F1 Keys is specified in the YML input the simple version is used as default
+		if (input.get(GO_F1_SIMPLE_KEY) != null) {
+			this.setCalculateSimpleGoF1Scores(parseBoolString(input.get(GO_F1_SIMPLE_KEY).toString()));
+		} else {
+			if (input.get(GO_F1_ANCESTRY_KEY) == null && input.get(GO_F1_SEMSIM_KEY) == null) {
+				this.setCalculateSimpleGoF1Scores(true);
+			}
+		}
+		
 	}
 
 	/**
@@ -722,6 +729,10 @@ public class Settings implements Cloneable {
 	public List<String> getBlast2GoAnnotations() throws IOException {
 		return fromFile(getPathToBlast2GoAnnotations());
 	}
+	
+	public Boolean hasBlast2GoAnnotations() {
+		return getPathToBlast2GoAnnotations() != null && new File(getPathToBlast2GoAnnotations()).exists();
+	}
 
 	public Double getAvgEvaluationScore() {
 		return getParameters().getAvgEvaluationScore();
@@ -1026,11 +1037,30 @@ public class Settings implements Cloneable {
 		this.calculateAncestryGoF1Scores = calculateAncestryGoF1Scores;
 	}
 
-	public Boolean getCalculateSemsimGoF1Scores() {
+	public Boolean getCalculateSemSimGoF1Scores() {
 		return calculateSemSimGoF1Scores;
 	}
 
 	public void setCalculateSemSimGoF1Scores(Boolean calculateSemsimGoF1Scores) {
 		this.calculateSemSimGoF1Scores = calculateSemsimGoF1Scores;
+	}
+
+	public static Pattern getBlast2GoAnnotationFileDesclineRegex() {
+		return BLAST_2_GO_ANNOTATION_FILE_DESCLINE_REGEX;
+	}
+
+	public static Pattern getBlast2GoAnnotationFileAnnotlineRegex() {
+		return BLAST_2_GO_ANNOTATION_FILE_ANNOTLINE_REGEX;
+	}
+	
+	private static Boolean parseBoolString(String input) {
+		if (input.equalsIgnoreCase("true") || input.equalsIgnoreCase("false")) {
+			return Boolean.valueOf(input);
+		} else {
+			if (input.equalsIgnoreCase("t") || input.equalsIgnoreCase("y") || input.equalsIgnoreCase("")) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
