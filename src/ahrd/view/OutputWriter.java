@@ -132,7 +132,7 @@ public class OutputWriter extends AbstractOutputWriter {
 	}
 
 	public String buildHighestPossibleEvaluationScoreColumn(Protein prot) {
-		return "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore());
+		return "\t" + formattedNumberToString(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore());
 	}
 
 	public String buildBlast2GoColumns(Protein prot) {
@@ -141,7 +141,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (rankedBlast2GoAnnots != null && !rankedBlast2GoAnnots.isEmpty()) {
 			Blast2GoAnnot bestB2ga = rankedBlast2GoAnnots.get(rankedBlast2GoAnnots.size() - 1);
 			csvCols += "\t" + bestB2ga.getDescription() + "\t" + bestB2ga.getEvaluationTokens().size() + "\t"
-					+ FRMT.format(bestB2ga.getEvaluationScore());
+					+ formattedNumberToString(bestB2ga.getEvaluationScore());
 		} else {
 			csvCols += "\t\t0\t0.0";
 		}
@@ -169,10 +169,10 @@ public class OutputWriter extends AbstractOutputWriter {
 				csvCells += "0";
 			csvCells += "\t" + prot.getEvaluationScoreCalculator().getReferenceDescription().getDescription() + "\t"
 					+ prot.getEvaluationScoreCalculator().getReferenceDescription().getTokens().size() + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore()) + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalScoreMinBestCompScore()) + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getTruePositivesRate()) + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getFalsePositivesRate());
+					+ formattedNumberToString(prot.getEvaluationScoreCalculator().getEvalutionScore()) + "\t"
+					+ formattedNumberToString(prot.getEvaluationScoreCalculator().getEvalScoreMinBestCompScore()) + "\t"
+					+ formattedNumberToString(prot.getEvaluationScoreCalculator().getTruePositivesRate()) + "\t"
+					+ formattedNumberToString(prot.getEvaluationScoreCalculator().getFalsePositivesRate());
 		} else
 			csvCells = "\t\t\t\t\t\t\t";
 		return csvCells;
@@ -198,11 +198,11 @@ public class OutputWriter extends AbstractOutputWriter {
 			csvCells = "\t\t\t\t\t\t\t\t";
 		} else {
 			BlastResult hsbr = prot.getDescriptionScoreCalculator().getHighestScoringBlastResult();
-			csvCells += "\t" + FRMT.format(prot.getTokenScoreCalculator().sumOfAllTokenScores(hsbr));
-			csvCells += "\t" + FRMT.format(prot.getTokenScoreCalculator().getTokenHighScore());
-			csvCells += "\t" + FRMT.format(prot.getLexicalScoreCalculator().correctionFactor(hsbr));
-			csvCells += "\t" + FRMT.format(prot.getLexicalScoreCalculator().lexicalScore(hsbr));
-			csvCells += "\t" + FRMT.format(prot.getDescriptionScoreCalculator().relativeBlastScore(hsbr));
+			csvCells += "\t" + formattedNumberToString(prot.getTokenScoreCalculator().sumOfAllTokenScores(hsbr));
+			csvCells += "\t" + formattedNumberToString(prot.getTokenScoreCalculator().getTokenHighScore());
+			csvCells += "\t" + formattedNumberToString(prot.getLexicalScoreCalculator().correctionFactor(hsbr));
+			csvCells += "\t" + formattedNumberToString(prot.getLexicalScoreCalculator().lexicalScore(hsbr));
+			csvCells += "\t" + formattedNumberToString(prot.getDescriptionScoreCalculator().relativeBlastScore(hsbr));
 		}
 		return csvCells;
 	}
@@ -211,7 +211,7 @@ public class OutputWriter extends AbstractOutputWriter {
 		String tokenSetCell = "\t";
 
 		for (String token : prot.getTokenScoreCalculator().getTokenScores().keySet()) {
-			tokenSetCell += "[" + token + "->" + FRMT.format(prot.getTokenScoreCalculator().getTokenScores().get(token))
+			tokenSetCell += "[" + token + "->" + formattedNumberToString(prot.getTokenScoreCalculator().getTokenScores().get(token))
 					+ "]";
 		}
 
@@ -237,9 +237,7 @@ public class OutputWriter extends AbstractOutputWriter {
 				BlastResult bestBr = prot.getEvaluationScoreCalculator().getUnchangedBlastResults().get(blastDb);
 				csvRow += "\t\"" + bestBr.getAccession() + " " + bestBr.getDescription() + "\"";
 				if (bestBr.getEvaluationScore() != null) {
-					String evalScore = (bestBr.getEvaluationScore() == Double.NaN) ? "NA"
-							: FRMT.format(bestBr.getEvaluationScore());
-					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t" + evalScore;
+					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t" + formattedNumberToString(bestBr.getEvaluationScore());
 				}
 			} else {
 				csvRow += "\t";
