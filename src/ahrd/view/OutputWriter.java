@@ -22,18 +22,19 @@ public class OutputWriter extends AbstractOutputWriter {
 	}
 
 	public void writeOutput() throws IOException {
-		BufferedWriter bw = new BufferedWriter(new FileWriter(getSettings()
-				.getPathToOutput()));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(getSettings().getPathToOutput()));
 		if (getSettings().doWriteHRDScoresToOutput())
 			writeHRDScoresOutputHeader();
 
 		// Column-Names:
 		bw.write("# AHRD-Version " + AHRD.VERSION + "\n");
 		bw.write("\n");
-		bw.write("Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-Term");
+		bw.write(
+				"Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-Term");
 
 		if (getSettings().isInTrainingMode()) {
-			bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+			bw.write(
+					"\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
@@ -107,10 +108,8 @@ public class OutputWriter extends AbstractOutputWriter {
 	 */
 	public void writeHRDScoresOutputHeader() throws IOException {
 		// Initialize OutputWriter:
-		hrdScoresWriter = new BufferedWriter(new FileWriter(getSettings()
-				.getPathToHRDScoresOutput()));
-		hrdScoresWriter
-				.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Score\n");
+		hrdScoresWriter = new BufferedWriter(new FileWriter(getSettings().getPathToHRDScoresOutput()));
+		hrdScoresWriter.write("Protein-Accesion\tBlast-Hit-Accession\tAHRD-Score\n");
 	}
 
 	/**
@@ -126,28 +125,22 @@ public class OutputWriter extends AbstractOutputWriter {
 	public void writeHrdScoresOutput(Protein prot) throws IOException {
 		for (String blastDatabaseName : prot.getBlastResults().keySet()) {
 			for (BlastResult br : prot.getBlastResults().get(blastDatabaseName)) {
-				this.hrdScoresWriter.write(prot.getAccession() + "\t"
-						+ br.getAccession() + "\t" + br.getDescriptionScore()
-						+ "\n");
+				this.hrdScoresWriter
+						.write(prot.getAccession() + "\t" + br.getAccession() + "\t" + br.getDescriptionScore() + "\n");
 			}
 		}
 	}
 
 	public String buildHighestPossibleEvaluationScoreColumn(Protein prot) {
-		return "\t"
-				+ FRMT.format(prot.getEvaluationScoreCalculator()
-						.getHighestPossibleEvaluationScore());
+		return "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore());
 	}
 
 	public String buildBlast2GoColumns(Protein prot) {
 		String csvCols = "";
-		List<Blast2GoAnnot> rankedBlast2GoAnnots = prot
-				.getEvaluationScoreCalculator().sortBlast2GoAnnotsByEvalScore();
+		List<Blast2GoAnnot> rankedBlast2GoAnnots = prot.getEvaluationScoreCalculator().sortBlast2GoAnnotsByEvalScore();
 		if (rankedBlast2GoAnnots != null && !rankedBlast2GoAnnots.isEmpty()) {
-			Blast2GoAnnot bestB2ga = rankedBlast2GoAnnots
-					.get(rankedBlast2GoAnnots.size() - 1);
-			csvCols += "\t" + bestB2ga.getDescription() + "\t"
-					+ bestB2ga.getEvaluationTokens().size() + "\t"
+			Blast2GoAnnot bestB2ga = rankedBlast2GoAnnots.get(rankedBlast2GoAnnots.size() - 1);
+			csvCols += "\t" + bestB2ga.getDescription() + "\t" + bestB2ga.getEvaluationTokens().size() + "\t"
 					+ FRMT.format(bestB2ga.getEvaluationScore());
 		} else {
 			csvCols += "\t\t0\t0.0";
@@ -169,31 +162,17 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (prot.getEvaluationScoreCalculator().getEvalutionScore() != null) {
 			// HRD-Length ref f1score diff-to-best-competitor:
 			csvCells += "\t";
-			if (prot.getDescriptionScoreCalculator()
-					.getHighestScoringBlastResult() != null)
-				csvCells += prot.getDescriptionScoreCalculator()
-						.getHighestScoringBlastResult().getEvaluationTokens()
+			if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null)
+				csvCells += prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getEvaluationTokens()
 						.size();
 			else
 				csvCells += "0";
-			csvCells += "\t"
-					+ prot.getEvaluationScoreCalculator()
-							.getReferenceDescription().getDescription()
-					+ "\t"
-					+ prot.getEvaluationScoreCalculator()
-							.getReferenceDescription().getTokens().size()
-					+ "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator()
-							.getEvalutionScore())
-					+ "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator()
-							.getEvalScoreMinBestCompScore())
-					+ "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator()
-							.getTruePositivesRate())
-					+ "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator()
-							.getFalsePositivesRate());
+			csvCells += "\t" + prot.getEvaluationScoreCalculator().getReferenceDescription().getDescription() + "\t"
+					+ prot.getEvaluationScoreCalculator().getReferenceDescription().getTokens().size() + "\t"
+					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore()) + "\t"
+					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalScoreMinBestCompScore()) + "\t"
+					+ FRMT.format(prot.getEvaluationScoreCalculator().getTruePositivesRate()) + "\t"
+					+ FRMT.format(prot.getEvaluationScoreCalculator().getFalsePositivesRate());
 		} else
 			csvCells = "\t\t\t\t\t\t\t";
 		return csvCells;
@@ -218,23 +197,12 @@ public class OutputWriter extends AbstractOutputWriter {
 		if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() == null) {
 			csvCells = "\t\t\t\t\t\t\t\t";
 		} else {
-			BlastResult hsbr = prot.getDescriptionScoreCalculator()
-					.getHighestScoringBlastResult();
-			csvCells += "\t"
-					+ FRMT.format(prot.getTokenScoreCalculator()
-							.sumOfAllTokenScores(hsbr));
-			csvCells += "\t"
-					+ FRMT.format(prot.getTokenScoreCalculator()
-							.getTokenHighScore());
-			csvCells += "\t"
-					+ FRMT.format(prot.getLexicalScoreCalculator()
-							.correctionFactor(hsbr));
-			csvCells += "\t"
-					+ FRMT.format(prot.getLexicalScoreCalculator()
-							.lexicalScore(hsbr));
-			csvCells += "\t"
-					+ FRMT.format(prot.getDescriptionScoreCalculator()
-							.relativeBlastScore(hsbr));
+			BlastResult hsbr = prot.getDescriptionScoreCalculator().getHighestScoringBlastResult();
+			csvCells += "\t" + FRMT.format(prot.getTokenScoreCalculator().sumOfAllTokenScores(hsbr));
+			csvCells += "\t" + FRMT.format(prot.getTokenScoreCalculator().getTokenHighScore());
+			csvCells += "\t" + FRMT.format(prot.getLexicalScoreCalculator().correctionFactor(hsbr));
+			csvCells += "\t" + FRMT.format(prot.getLexicalScoreCalculator().lexicalScore(hsbr));
+			csvCells += "\t" + FRMT.format(prot.getDescriptionScoreCalculator().relativeBlastScore(hsbr));
 		}
 		return csvCells;
 	}
@@ -242,13 +210,9 @@ public class OutputWriter extends AbstractOutputWriter {
 	public String buildTokenSetCell(Protein prot) {
 		String tokenSetCell = "\t";
 
-		for (String token : prot.getTokenScoreCalculator().getTokenScores()
-				.keySet()) {
-			tokenSetCell += "["
-					+ token
-					+ "->"
-					+ FRMT.format(prot.getTokenScoreCalculator()
-							.getTokenScores().get(token)) + "]";
+		for (String token : prot.getTokenScoreCalculator().getTokenScores().keySet()) {
+			tokenSetCell += "[" + token + "->" + FRMT.format(prot.getTokenScoreCalculator().getTokenScores().get(token))
+					+ "]";
 		}
 
 		return tokenSetCell;
@@ -269,15 +233,14 @@ public class OutputWriter extends AbstractOutputWriter {
 		String csvRow = "";
 
 		for (String blastDb : getSettings().getBlastDatabases()) {
-			if (prot.getEvaluationScoreCalculator().getUnchangedBlastResults()
-					.get(blastDb) != null) {
-				BlastResult bestBr = prot.getEvaluationScoreCalculator()
-						.getUnchangedBlastResults().get(blastDb);
-				csvRow += "\t\"" + bestBr.getAccession() + " "
-						+ bestBr.getDescription() + "\"";
-				if (bestBr.getEvaluationScore() != null)
-					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"
-							+ FRMT.format(bestBr.getEvaluationScore());
+			if (prot.getEvaluationScoreCalculator().getUnchangedBlastResults().get(blastDb) != null) {
+				BlastResult bestBr = prot.getEvaluationScoreCalculator().getUnchangedBlastResults().get(blastDb);
+				csvRow += "\t\"" + bestBr.getAccession() + " " + bestBr.getDescription() + "\"";
+				if (bestBr.getEvaluationScore() != null) {
+					String evalScore = (bestBr.getEvaluationScore() == Double.NaN) ? "NA"
+							: FRMT.format(bestBr.getEvaluationScore());
+					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t" + evalScore;
+				}
 			} else {
 				csvRow += "\t";
 				if (getSettings().isInTrainingMode())
