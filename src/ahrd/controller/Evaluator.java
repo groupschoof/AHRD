@@ -5,11 +5,9 @@ import static ahrd.controller.Settings.getSettings;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +17,8 @@ import ahrd.model.GOdatabase;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
-import ahrd.view.OutputWriter;
+import ahrd.view.EvaluatorOutputWriter;
+import ahrd.view.TsvOutputWriter;
 
 public class Evaluator extends AHRD {
 	
@@ -152,7 +151,7 @@ public class Evaluator extends AHRD {
 			if (getSettings().doFindHighestPossibleEvaluationScore())
 				evaluator.findHighestPossibleEvaluationScores();
 			// Generate Output:
-			OutputWriter ow = new OutputWriter(evaluator.getProteins().values());
+			TsvOutputWriter ow = new EvaluatorOutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
 			System.out.println("Written output into:\n" + getSettings().getPathToOutput());
 		} catch (Exception e) {

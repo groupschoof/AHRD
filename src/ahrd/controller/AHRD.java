@@ -23,8 +23,8 @@ import ahrd.model.GOterm;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import ahrd.view.FastaOutputWriter;
-import ahrd.view.IOutputWriter;
 import ahrd.view.OutputWriter;
+import ahrd.view.TsvOutputWriter;
 import nu.xom.ParsingException;
 
 public class AHRD {
@@ -72,7 +72,7 @@ public class AHRD {
 					+ "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
 			// Write result to output-file:
 			System.out.println("Writing output to '" + getSettings().getPathToOutput() + "'.");
-			IOutputWriter ow = initializeOutputWriter(ahrd.getProteins().values());
+			OutputWriter ow = initializeOutputWriter(ahrd.getProteins().values());
 			ow.writeOutput();
 			// Log
 			System.out.println("Wrote output in " + ahrd.takeTime() + "sec, currently occupying "
@@ -85,12 +85,12 @@ public class AHRD {
 		}
 	}
 
-	public static IOutputWriter initializeOutputWriter(Collection<Protein> proteins) {
-		IOutputWriter ow = null;
+	public static OutputWriter initializeOutputWriter(Collection<Protein> proteins) {
+		OutputWriter ow = null;
 		if (getSettings().doOutputFasta())
 			ow = new FastaOutputWriter(proteins);
 		else
-			ow = new OutputWriter(proteins);
+			ow = new TsvOutputWriter(proteins);
 		return ow;
 	}
 

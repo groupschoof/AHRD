@@ -7,13 +7,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import ahrd.model.BlastResult;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import ahrd.model.TokenScoreCalculator;
 
-public abstract class AbstractOutputWriter implements IOutputWriter {
+public abstract class AbstractOutputWriter implements OutputWriter {
 
 	/**
 	 * Format decimal numbers to three digits after decimal-point and leading
@@ -58,17 +59,28 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 		}
 		descLine += seperator;
 		// Gene-Ontology-Results:
-		List<String> sortedGOs = new ArrayList<String>(protein.getGoResults());
+		descLine += combineGoTermStrings(protein.getGoResults());
+		
+		return descLine;
+	}
+	
+	public String combineGoTermStrings(Set<String> gos) {
+		return combineGoTermStrings(gos, ", ");
+	}
+	
+	public String combineGoTermStrings(Set<String> gos, String seperator) {
+		String goLine = "";
+		List<String> sortedGOs = new ArrayList<String>(gos);
 		Collections.sort(sortedGOs);
 		for (Iterator<String> i = sortedGOs.iterator(); i.hasNext();) {
 			String gor = i.next();
-			descLine += gor;
+			goLine += gor;
 			if (i.hasNext())
-				descLine += ", ";
+				goLine += seperator;
 		}
-		return descLine;
+		return goLine;
 	}
-
+	
 	/**
 	 * Four Positions. Each gets a '*', if...
 	 * 
