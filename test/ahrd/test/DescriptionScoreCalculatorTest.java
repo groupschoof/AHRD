@@ -65,7 +65,7 @@ public class DescriptionScoreCalculatorTest {
 	@Test
 	public void testFindHighestScoringBlastResult() throws DatabaseException, IOException {
 		try {
-			initializeDb(true);
+			initializeDb(false);
 			Protein p = TestUtils.mockProteinAndBlastResultsForDescriptionScoreCalculatorTest();
 			// Token-Scores are not needed, as the lexical score is mocked!
 			// test
