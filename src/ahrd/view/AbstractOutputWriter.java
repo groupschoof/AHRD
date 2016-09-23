@@ -21,6 +21,17 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 	 */
 	public static final DecimalFormat FRMT = new DecimalFormat("#,###0.###");
 
+	/**
+	 * Uses static final DecimalFormat FRMT to format the input double, or if
+	 * the input is Double.NaN returns "NA"
+	 * 
+	 * @param nmb
+	 * @return String NA or the formatted double
+	 */
+	public static String formattedNumberToString(Double nmb) {
+		return (nmb == Double.NaN) ? "NA" : FRMT.format(nmb);
+	}
+
 	private Collection<Protein> proteins;
 
 	public AbstractOutputWriter(Collection<Protein> proteins) {
@@ -32,12 +43,10 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 	public String buildDescriptionLine(Protein protein, String seperator) {
 		String descLine = protein.getAccession() + seperator;
 		// Blast-Results
-		if (protein.getDescriptionScoreCalculator()
-				.getHighestScoringBlastResult() != null) {
-			BlastResult br = protein.getDescriptionScoreCalculator()
-					.getHighestScoringBlastResult();
-			descLine += br.getAccession() + seperator + qualityCode(protein)
-					+ seperator + br.getDescription() + seperator;
+		if (protein.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null) {
+			BlastResult br = protein.getDescriptionScoreCalculator().getHighestScoringBlastResult();
+			descLine += br.getAccession() + seperator + qualityCode(protein) + seperator + br.getDescription()
+					+ seperator;
 		} else {
 			// Maintain Table's Column-Structure, if writing tab delimited
 			// values:
@@ -47,8 +56,7 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 				descLine += "Unknown protein";
 		}
 		// Interpro
-		List<InterproResult> sortedIprs = new ArrayList<InterproResult>(
-				protein.getInterproResults());
+		List<InterproResult> sortedIprs = new ArrayList<InterproResult>(protein.getInterproResults());
 		Collections.sort(sortedIprs);
 		for (Iterator<InterproResult> i = sortedIprs.iterator(); i.hasNext();) {
 			InterproResult ipr = i.next();
@@ -84,19 +92,15 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 	 * @return the quality code
 	 */
 	public String qualityCode(Protein p) {
-		BlastResult hsbr = p.getDescriptionScoreCalculator()
-				.getHighestScoringBlastResult();
+		BlastResult hsbr = p.getDescriptionScoreCalculator().getHighestScoringBlastResult();
 		String qc = "";
 		// Position 1
 		qc += (hsbr.getBitScore() > 50.0 && hsbr.getEValue() < 0.1) ? "*" : "-";
 		// Position 2
-		qc += (TokenScoreCalculator.overlapScore(hsbr.getQueryStart(),
-				hsbr.getQueryEnd(), p.getSequenceLength(),
-				hsbr.getSubjectStart(), hsbr.getSubjectEnd(),
-				hsbr.getSubjectLength()) > 0.6) ? "*" : "-";
+		qc += (TokenScoreCalculator.overlapScore(hsbr.getQueryStart(), hsbr.getQueryEnd(), p.getSequenceLength(),
+				hsbr.getSubjectStart(), hsbr.getSubjectEnd(), hsbr.getSubjectLength()) > 0.6) ? "*" : "-";
 		// Position 3
-		qc += (p.getDescriptionScoreCalculator().getDescriptionHighScore() >= 0.5) ? "*"
-				: "-";
+		qc += (p.getDescriptionScoreCalculator().getDescriptionHighScore() >= 0.5) ? "*" : "-";
 		// Internal DescriptionScore:
 		// qc += "[" + FRMT.format(hsbr.getDescriptionScore()) + "]";
 

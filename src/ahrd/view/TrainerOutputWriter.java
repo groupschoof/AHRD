@@ -1,6 +1,7 @@
 package ahrd.view;
 
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.view.AbstractOutputWriter.formattedNumberToString;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -18,8 +19,7 @@ public class TrainerOutputWriter {
 	 * Format decimal numbers to three digits after decimal-point and leading
 	 * zero, if number is smaller than zero.
 	 */
-	public static final DecimalFormat FRMT = new DecimalFormat(
-			"#,######0.######");
+	public static final DecimalFormat FRMT = new DecimalFormat("#,######0.######");
 
 	private BufferedWriter pathBufWrtr;
 	private BufferedWriter outBufWrtr;
@@ -28,12 +28,10 @@ public class TrainerOutputWriter {
 	public TrainerOutputWriter() throws IOException {
 		super();
 		// Ensure Blast-Database-Parameters always appear in the right columns:
-		this.sortedBlastDatabases = new ArrayList<String>(getSettings()
-				.getBlastDatabases());
+		this.sortedBlastDatabases = new ArrayList<String>(getSettings().getBlastDatabases());
 		Collections.sort(this.sortedBlastDatabases);
 		// Prepare buffered output-writer:
-		this.pathBufWrtr = new BufferedWriter(new FileWriter(getSettings()
-				.getPathToSimulatedAnnealingPathLog()));
+		this.pathBufWrtr = new BufferedWriter(new FileWriter(getSettings().getPathToSimulatedAnnealingPathLog()));
 		// And write the header into the path-log:
 		this.pathBufWrtr.write(generateHeader(false));
 	}
@@ -54,11 +52,9 @@ public class TrainerOutputWriter {
 		return hdr;
 	}
 
-	public void writeIterationOutput(Settings currentSettings,
-			double diffAvgEvalScoreToCurrAccepted, int accepted)
+	public void writeIterationOutput(Settings currentSettings, double diffAvgEvalScoreToCurrAccepted, int accepted)
 			throws IOException {
-		this.pathBufWrtr.write(settingsRow(currentSettings,
-				diffAvgEvalScoreToCurrAccepted, accepted));
+		this.pathBufWrtr.write(settingsRow(currentSettings, diffAvgEvalScoreToCurrAccepted, accepted));
 	}
 
 	/**
@@ -68,56 +64,48 @@ public class TrainerOutputWriter {
 	 * @param avgMaxEvaluationScore
 	 * @throws IOException
 	 */
-	public void writeFinalOutput(Settings acceptedSettings,
-			Double avgMaxEvaluationScore,
+	public void writeFinalOutput(Settings acceptedSettings, Double avgMaxEvaluationScore,
 			Integer acceptedSettingsFoundAtTemperature) throws IOException {
 		// Clean up buffered Sim-Anneal-Path-Log-Writer:
 		this.pathBufWrtr.close();
 
 		// Write output about found best performing Parameters:
-		this.outBufWrtr = new BufferedWriter(new FileWriter(getSettings()
-				.getPathToOutput()));
+		this.outBufWrtr = new BufferedWriter(new FileWriter(getSettings().getPathToOutput()));
 		// this.outBufWrtr.write("Found best scoring Parameters:\n");
 		this.outBufWrtr.write(generateHeader(true));
-		this.outBufWrtr.write(finalSettingsRow(acceptedSettings,
-				acceptedSettingsFoundAtTemperature, avgMaxEvaluationScore));
+		this.outBufWrtr
+				.write(finalSettingsRow(acceptedSettings, acceptedSettingsFoundAtTemperature, avgMaxEvaluationScore));
 
 		// Clean buffered Output-Writer:
 		this.outBufWrtr.close();
 	}
 
-	public String settingsRow(Settings s,
-			double diffAvgEvalScoreToCurrAccepted, int accepted) {
-		String col = s.getTemperature().toString() + "\t"
-				+ s.getAvgEvaluationScore() + "\t"
+	public String settingsRow(Settings s, double diffAvgEvalScoreToCurrAccepted, int accepted) {
+		String col = s.getTemperature().toString() + "\t" + s.getAvgEvaluationScore() + "\t"
 				+ diffAvgEvalScoreToCurrAccepted + "\t" + accepted + "\t"
-				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
-				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t" + "\t"
-				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
-				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
-				+ FRMT.format(s.getTokenScoreOverlapScoreWeight());
+				+ formattedNumberToString(s.getAvgTruePositivesRate()) + "\t"
+				+ formattedNumberToString(s.getAvgFalsePositivesRate()) + "\t" + "\t"
+				+ formattedNumberToString(s.getTokenScoreBitScoreWeight()) + "\t"
+				+ formattedNumberToString(s.getTokenScoreDatabaseScoreWeight()) + "\t"
+				+ formattedNumberToString(s.getTokenScoreOverlapScoreWeight());
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + FRMT.format(s.getBlastDbWeight(blastDb));
-			col += "\t"
-					+ FRMT.format(s.getDescriptionScoreBitScoreWeight(blastDb));
+			col += "\t" + FRMT.format(s.getDescriptionScoreBitScoreWeight(blastDb));
 		}
 		col += "\n";
 		return col;
 	}
 
-	public String finalSettingsRow(Settings s, Integer sFoundAtTemp,
-			Double avgMaxEvalScore) {
-		String col = sFoundAtTemp + "\t" + avgMaxEvalScore + "\t"
-				+ s.getAvgEvaluationScore() + "\t"
-				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
-				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
-				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
-				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
-				+ FRMT.format(s.getTokenScoreOverlapScoreWeight());
+	public String finalSettingsRow(Settings s, Integer sFoundAtTemp, Double avgMaxEvalScore) {
+		String col = sFoundAtTemp + "\t" + avgMaxEvalScore + "\t" + s.getAvgEvaluationScore() + "\t"
+				+ formattedNumberToString(s.getAvgTruePositivesRate()) + "\t"
+				+ formattedNumberToString(s.getAvgFalsePositivesRate()) + "\t"
+				+ formattedNumberToString(s.getTokenScoreBitScoreWeight()) + "\t"
+				+ formattedNumberToString(s.getTokenScoreDatabaseScoreWeight()) + "\t"
+				+ formattedNumberToString(s.getTokenScoreOverlapScoreWeight());
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + FRMT.format(s.getBlastDbWeight(blastDb));
-			col += "\t"
-					+ FRMT.format(s.getDescriptionScoreBitScoreWeight(blastDb));
+			col += "\t" + FRMT.format(s.getDescriptionScoreBitScoreWeight(blastDb));
 		}
 		col += "\n";
 		return col;
