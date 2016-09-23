@@ -23,13 +23,13 @@ public abstract class AbstractOutputWriter implements IOutputWriter {
 
 	/**
 	 * Uses static final DecimalFormat FRMT to format the input double, or if
-	 * the input is Double.NaN returns "NA"
+	 * the input is not a number or infinite returns "NA".
 	 * 
 	 * @param nmb
 	 * @return String NA or the formatted double
 	 */
 	public static String formattedNumberToString(Double nmb) {
-		return (nmb == Double.NaN) ? "NA" : FRMT.format(nmb);
+		return (nmb.isNaN() || nmb.isInfinite()) ? "NA" : FRMT.format(nmb);
 	}
 
 	private Collection<Protein> proteins;
