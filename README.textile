@@ -23,7 +23,7 @@ h2. Table of contents
 ## "AHRD run using BLASTX results":#25-ahrd-run-using-blastx-results
 ## "Parameter Optimization":#26-parameter-optimization
 ### "Optimization in parallel (Trainer-Batcher)":#261-optimization-in-parallel-(trainer-batcher)
-## "Computing F-Scores for selected parameter sets (AHRD-Evaluator)":https://github.com/groupschoof/AHRD#27-computing-f-scores-for-selected-parameter-sets-ahrd-evaluator
+## "Computing F-Scores for selected parameter sets (AHRD-Evaluator)":#27-computing-f-scores-for-selected-parameter-sets-ahrd-evaluator
 # "Algorithm":#3-algorithm
 ## "Pseudo-Code":#31-pseudo-code
 ## "Used Formulae and Parameters":#32-used-formulae-and-parameters
