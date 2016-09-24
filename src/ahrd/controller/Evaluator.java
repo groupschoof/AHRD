@@ -8,13 +8,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
+import ahrd.model.BlastResult;
 import ahrd.model.GOdatabase;
 import ahrd.model.GOterm;
+import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
 import ahrd.view.EvaluatorOutputWriter;
@@ -119,6 +122,26 @@ public class Evaluator extends AHRD {
 					prot.getGoResultsTerms().add(term);
 				}
 			}
+			// Annotate the best blast results with GOterm objects
+			if (getSettings().getWriteBestBlastHitsToOutput()) {
+				for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();){
+					Map<String, BlastResult> bestBlastResult = protIter.next().getEvaluationScoreCalculator().getUnchangedBlastResults();
+					if (bestBlastResult != null) {
+						for (String blastDb : bestBlastResult.keySet()) {
+						String bestBlastResultShortAccession = bestBlastResult.get(blastDb).getShortAccession();
+							if (getDatabaseGoAnnotations().containsKey(bestBlastResultShortAccession)) {
+								for (String termAcc : getDatabaseGoAnnotations().get(bestBlastResultShortAccession)) {
+									GOterm term = goDB.get(termAcc);
+									if (term == null) {
+										throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
+									}
+									bestBlastResult.get(blastDb).getGoAnnotations().add(term);
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -140,6 +163,7 @@ public class Evaluator extends AHRD {
 			// Load a Map of all GO terms
 			// Load reference GO annotations
 			// Add GOterm objects to predicted annotations
+			// Annotate the best blast results with GOterm objects
 			evaluator.setupGoAnnotationEvaluation();
 			// Blast2GO is another competitor in the field of annotation of
 			// predicted Proteins. AHRD might be compared with B2Gs performance:

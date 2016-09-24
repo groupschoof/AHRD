@@ -23,7 +23,7 @@ import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.Protein;
 
-public class ReferenceGoAnnotationsTest {
+public class DatabaseGoAnnotationsTest {
 
 	private AHRD ahrd;
 
@@ -66,17 +66,17 @@ public class ReferenceGoAnnotationsTest {
 	}
 
 	@Test
-	public void testParseReferenceGoAnnotations() throws IOException,
+	public void testParseDatabaseGoAnnotations() throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
 			ParsingException {
 		ahrd.setup(false);
 		assertNotNull(ahrd.getDatabaseGoAnnotations());
 		assertTrue(!ahrd.getDatabaseGoAnnotations().isEmpty());
 		assertEquals(4, ahrd.getDatabaseGoAnnotations().size());
-		Set<String> refGos = ahrd.getDatabaseGoAnnotations()
+		Set<String> dbGos = ahrd.getDatabaseGoAnnotations()
 				.get("AT1G01040");
-		assertTrue(refGos.contains("GO:0005634"));
-		assertTrue(refGos.contains("GO:0008026"));
+		assertTrue(dbGos.contains("GO:0005634"));
+		assertTrue(dbGos.contains("GO:0008026"));
 	}
 
 	@Test

@@ -214,6 +214,18 @@ public class EvaluationScoreCalculator {
 						// Find best performing competitor-method:
 						if (cmpt.getEvaluationScore() > bestCompEvlScr)
 							bestCompEvlScr = cmpt.getEvaluationScore();
+						// If requested: Evaluate the GO annotations of the best blast result
+						if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+							if (getSettings().getCalculateSimpleGoF1Scores())
+								cmpt.setSimpleGoAnnotationScore(
+										calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, cmpt.getGoAnnotations()));
+							if (getSettings().getCalculateAncestryGoF1Scores())
+								cmpt.setAncestryGoAnnotationScore(
+										calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, cmpt.getGoAnnotations()));
+							if (getSettings().getCalculateSemSimGoF1Scores())
+								cmpt.setSemSimGoAnnotationScore(
+										calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, cmpt.getGoAnnotations()));
+						}
 					}
 				}
 			}

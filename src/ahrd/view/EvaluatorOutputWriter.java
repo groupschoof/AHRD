@@ -3,7 +3,6 @@ package ahrd.view;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -224,8 +223,18 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		for (String blastDb : getSettings().getBlastDatabases()) {
 			if (blastDb != null && !blastDb.equals(""))
 				hdr += ("\tBest BlastHit against '" + blastDb + "'");
-			if (getSettings().isInTrainingMode())
+			if (getSettings().isInTrainingMode()) {
 				hdr += "\tLength\tEvaluation-Score";
+				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+					hdr += "\tBlast2GO-Annotations '" + blastDb + "'";
+					if (getSettings().getCalculateSimpleGoF1Scores())
+						hdr += "\tBlast2GO-Annotations-Simple-F-Score '" + blastDb + "'";
+					if (getSettings().getCalculateAncestryGoF1Scores())
+						hdr += "\tBlast2GO-Annotations-Ancestry-F-Score '" + blastDb + "'";
+					if (getSettings().getCalculateSemSimGoF1Scores())
+						hdr += "\tBlast2GO-Annotations-SemSim-F-Score '" + blastDb + "'";
+				}
+			}
 		}
 		return hdr;
 	}
@@ -236,20 +245,41 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			if (prot.getEvaluationScoreCalculator().getUnchangedBlastResults().get(blastDb) != null) {
 				BlastResult bestBr = prot.getEvaluationScoreCalculator().getUnchangedBlastResults().get(blastDb);
 				csvRow += "\t\"" + bestBr.getAccession() + " " + bestBr.getDescription() + "\"";
-				if (bestBr.getEvaluationScore() != null)
+				if (bestBr.getEvaluationScore() != null) {
 					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"
 							+ FRMT.format(bestBr.getEvaluationScore());
+					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+						csvRow += "\t" + combineGoTermsToString(bestBr.getGoAnnotations());
+						if (getSettings().getCalculateSimpleGoF1Scores())
+							csvRow += "\t" + FRMT.format(bestBr.getSimpleGoAnnotationScore());
+						if (getSettings().getCalculateAncestryGoF1Scores())
+							csvRow += "\t" + FRMT.format(bestBr.getAncestryGoAnnotationScore());
+						if (getSettings().getCalculateSemSimGoF1Scores())
+							csvRow += "\t" + FRMT.format(bestBr.getSemSimGoAnnotationScore());
+					}
+				}
 			} else {
 				csvRow += "\t";
-				if (getSettings().isInTrainingMode())
+				if (getSettings().isInTrainingMode()) {
 					csvRow += "\t0\t0.0";
+					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+						csvRow += "\t";
+						if (getSettings().getCalculateSimpleGoF1Scores())
+							csvRow += "\t0.0";
+						if (getSettings().getCalculateAncestryGoF1Scores())
+							csvRow += "\t0.0";
+						if (getSettings().getCalculateSemSimGoF1Scores())
+							csvRow += "\t0.0";
+					}
+				}
 			}
 		}
 		return csvRow;
 	}
 
 	private String buildReferenceGoAnnotationColumns(Protein prot) {
-		String goColumns = "\t" + combineGoTermsToString(prot.getEvaluationScoreCalculator().getReferenceGoAnnoatations());
+		String goColumns = "\t"
+				+ combineGoTermsToString(prot.getEvaluationScoreCalculator().getReferenceGoAnnoatations());
 		if (getSettings().getCalculateSimpleGoF1Scores())
 			goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSimpleGoAnnotationScore());
 		if (getSettings().getCalculateAncestryGoF1Scores())

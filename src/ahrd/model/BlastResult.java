@@ -81,6 +81,18 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * similarity search results. It should only be used in that context.
 	 */
 	private Protein protein;
+	/**
+	 * Gene Ontology term annotations. Populated in the best blast results of
+	 * proteins if the output of the best blast results and the evaluation of GO
+	 * terms is requested
+	 */
+	private Set<GOterm> goAnnotations = new HashSet<GOterm>();
+	/**
+	 * GO annotation F scores
+	 */
+	private Double simpleGoAnnotationScore; // Simple cardinality based
+	private Double ancestryGoAnnotationScore; // Cardinality of the term ancestries 
+	private Double semSimGoAnnotationScore; // Based on semantic similarity derived from term information content 
 
 	/**
 	 * Makes a double string representation parseable by Double.parseDouble
@@ -670,6 +682,38 @@ public class BlastResult implements Comparable<BlastResult> {
 
 	public void setProtein(Protein protein) {
 		this.protein = protein;
+	}
+
+	public Set<GOterm> getGoAnnotations() {
+		return goAnnotations;
+	}
+
+	public void setGoAnnotations(Set<GOterm> goAnnotation) {
+		this.goAnnotations = goAnnotation;
+	}
+
+	public Double getSimpleGoAnnotationScore() {
+		return simpleGoAnnotationScore;
+	}
+
+	public void setSimpleGoAnnotationScore(Double simpleGoAnnotationScore) {
+		this.simpleGoAnnotationScore = simpleGoAnnotationScore;
+	}
+
+	public Double getAncestryGoAnnotationScore() {
+		return ancestryGoAnnotationScore;
+	}
+
+	public void setAncestryGoAnnotationScore(Double ancestryGoAnnotationScore) {
+		this.ancestryGoAnnotationScore = ancestryGoAnnotationScore;
+	}
+
+	public Double getSemSimGoAnnotationScore() {
+		return semSimGoAnnotationScore;
+	}
+
+	public void setSemSimGoAnnotationScore(Double semSimGoAnnotationScore) {
+		this.semSimGoAnnotationScore = semSimGoAnnotationScore;
 	}
 
 }
