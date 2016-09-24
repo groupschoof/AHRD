@@ -234,7 +234,7 @@ h3. 2.7 Computing F-Scores for selected parameter sets (AHRD-Evaluator)
 
 Having different parameter sets AHRD enables you to compute their performance in terms of F-Scores for each reference protein. Optionally you can also revise the theorectically maximum attainable F-Score and see how well the best Hits from each sequence similarity search perform. In order to do so, use the Evaluator function:
 
-<pre>java -cp ./dist/ahrd.jar ahrd.controller.Evaluator .evaluator_example.yml</pre> 
+<pre>java -cp ./dist/ahrd.jar ahrd.controller.Evaluator ./evaluator_example.yml</pre> 
 
 See @./test/resources/evaluator_example.yml@ for more details.
 
@@ -244,6 +244,12 @@ Parameters specific to the Evaluator function are:
 # @write_scores_to_output: false@ Set to @true@ if you want to see all internal intermediate scores: Token-Scores, Lexical-Scores, and Description-Scores. Use with extreme caution, because this option is meant for developers _only_.
 # @write_best_blast_hits_to_output: false@ Set to @true@ if you want to see the respective best sequence similarity search Hits and their performances.
 # @f_measure_beta_parameter: 1.0@ This parameter is also used by AHRD-Trainer. See section "2.6":#26-parameter-optimization for details.
+
+Optionally you can apply AHRD's balcklisting and filtering on the Reference Descriptions, too. This results in performance only being assessed on non-blacklistes and filtered descriptions, of which only meaningful words, i.e. non blacklisted tokens will be scored. In order to do so, you need to set _all_ of the three following parameters. Note, that you can point any of them to empty dummy files, if you wish.
+
+# @references_description_blacklist: ./test/resources/blacklist_descline.txt@ Regular expressions that identify reference descriptions not to score.
+# @references_description_filter: ./test/resources/filter_descline_sprot.txt@ Regular expressions that filter out parts from the reference descriptions to be ignored for performance scoring.
+# @references_token_blacklist: ./test/resources/blacklist_token.txt@ Regular expressions that identify non-meaningful words (tokens) not to be considered when computing the performance scores.
 
 h2. 3 Algorithm
 
