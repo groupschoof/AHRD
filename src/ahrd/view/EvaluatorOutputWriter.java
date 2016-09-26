@@ -289,28 +289,4 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		return goColumns;
 	}
 
-	public String combineGoTermsToString(Set<GOterm> gos) {
-		return combineGoTermsToString(gos, ", ");
-	}
-
-	public String combineGoTermsToString(Set<GOterm> gos, String seperator) {
-		String goLine = "";
-		if (gos != null) {
-			List<String> sortedGos = new ArrayList<String>();
-			for (Iterator<GOterm> goTermIter = gos.iterator(); goTermIter.hasNext();) {
-				GOterm term = goTermIter.next();
-				sortedGos.add(term.getAccession());
-			}
-			Collections.sort(sortedGos);
-			for (Iterator<String> iter = sortedGos.iterator(); iter.hasNext();) {
-				String term = iter.next();
-				goLine += term;
-				if (iter.hasNext())
-					goLine += seperator;
-			}
-
-		}
-		return goLine;
-	}
-
 }

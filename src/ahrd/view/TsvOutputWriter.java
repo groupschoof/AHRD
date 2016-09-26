@@ -5,10 +5,16 @@ import static ahrd.controller.Settings.getSettings;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import ahrd.controller.AHRD;
 import ahrd.model.BlastResult;
+import ahrd.model.GOterm;
 import ahrd.model.Protein;
 
 public class TsvOutputWriter extends AbstractOutputWriter {
@@ -29,12 +35,18 @@ public class TsvOutputWriter extends AbstractOutputWriter {
 		bw.write("\n");
 		// Column-Names:
 		bw.write(ahrdColumnNames());
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasPathToGoSlimFile()) {
+			bw.write("\tGO-Slim-Annotation");
+		}
 		bw.write("\n");
 
 		for (Protein prot : getProteins()) {
 			// Generate the Human Readable Description:
 			String csvRow = buildDescriptionLine(prot, "\t");
-
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasPathToGoSlimFile()) {
+				csvRow += "\t" + combineGoTermsToString(prot.getGoSlimTerms());
+			}
+			
 			// Write row to CSV:
 			csvRow += "\n";
 			bw.write(csvRow);
@@ -90,4 +102,29 @@ public class TsvOutputWriter extends AbstractOutputWriter {
 			}
 		}
 	}
+	
+	public String combineGoTermsToString(Set<GOterm> gos) {
+		return combineGoTermsToString(gos, ", ");
+	}
+
+	public String combineGoTermsToString(Set<GOterm> gos, String seperator) {
+		String goLine = "";
+		if (gos != null) {
+			List<String> sortedGos = new ArrayList<String>();
+			for (Iterator<GOterm> goTermIter = gos.iterator(); goTermIter.hasNext();) {
+				GOterm term = goTermIter.next();
+				sortedGos.add(term.getAccession());
+			}
+			Collections.sort(sortedGos);
+			for (Iterator<String> iter = sortedGos.iterator(); iter.hasNext();) {
+				String term = iter.next();
+				goLine += term;
+				if (iter.hasNext())
+					goLine += seperator;
+			}
+
+		}
+		return goLine;
+	}
+	
 }

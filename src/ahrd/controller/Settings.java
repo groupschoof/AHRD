@@ -68,8 +68,10 @@ public class Settings implements Cloneable {
 	public static final String REFERENCES_TOKEN_BLACKLIST_KEY = "references_token_blacklist";
 	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
 	public static final String BLAST_2_GO_ANNOT_FILE_KEY = "blast2go";
-	public static final Pattern BLAST_2_GO_ANNOTATION_FILE_DESCLINE_REGEX = Pattern.compile("^(?<shortAccession>[^\\t]+)\\t(?<goTerm>GO:\\d{7})\\t(?<description>[^\\t]+)$"); 
-	public static final Pattern BLAST_2_GO_ANNOTATION_FILE_ANNOTLINE_REGEX = Pattern.compile("^(?<shortAccession>[^\\t]+)\\t(?<goTerm>GO:\\d{7})$");
+	public static final Pattern BLAST_2_GO_ANNOTATION_FILE_DESCLINE_REGEX = Pattern
+			.compile("^(?<shortAccession>[^\\t]+)\\t(?<goTerm>GO:\\d{7})\\t(?<description>[^\\t]+)$");
+	public static final Pattern BLAST_2_GO_ANNOTATION_FILE_ANNOTLINE_REGEX = Pattern
+			.compile("^(?<shortAccession>[^\\t]+)\\t(?<goTerm>GO:\\d{7})$");
 	public static final String TEMPERATURE_KEY = "temperature";
 	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
 	public static final String OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY = "optimization_acceptance_probability_scaling_factor";
@@ -106,7 +108,9 @@ public class Settings implements Cloneable {
 	public static final String GO_F1_SIMPLE_KEY = "simple_GO_f1_scores";
 	public static final String GO_F1_ANCESTRY_KEY = "ancestry_GO_f1_scores";
 	public static final String GO_F1_SEMSIM_KEY = "semsim_GO_f1_scores";
-	
+	public static final String GO_SLIM_PATH_KEY = "GO_slim";
+	public static final Pattern GO_SLIM_FILE_GOTERM_REGEX = Pattern.compile("^id: (?<goTerm>GO:\\d{7})$");
+
 	/**
 	 * Fields:
 	 */
@@ -234,31 +238,42 @@ public class Settings implements Cloneable {
 	 */
 	private Boolean evaluateValidTokens = true;
 	/**
-	 * The path in witch to keep:
-	 * - Downloaded reviewed part of Uniprot
-	 * - Downloaded Gene Ontology mysql database dump
-	 * - Serialized copy of the GOdatabase, generated when it was needed the for first time  
+	 * The path in witch to keep: - Downloaded reviewed part of Uniprot -
+	 * Downloaded Gene Ontology mysql database dump - Serialized copy of the
+	 * GOdatabase, generated when it was needed the for first time
 	 */
 	private String pathToGoDatabase;
 	/**
-	 * Path to file containing GO annotations of the query proteins
-	 * Triggers the evaluation of AHRDs GO annotations 
+	 * Path to file containing GO annotations of the query proteins Triggers the
+	 * evaluation of AHRDs GO annotations
 	 */
 	private String pathToReferenceGoAnnotations;
 	/**
-	 * Toggle set to induce the calculation and output of an F1-score based on reference and prediction GO annotations alone.
-	 * Is set to true as default GO F1-score if non of the three GO F1-score flags are toggled.  
+	 * Toggle set to induce the calculation and output of an F1-score based on
+	 * reference and prediction GO annotations alone. Is set to true as default
+	 * GO F1-score if non of the three GO F1-score flags are toggled.
 	 */
 	private Boolean calculateSimpleGoF1Scores = false;
 	/**
-	 * Toggle set to induce the calculation and output of an F1-score based on reference and prediction GO annotations extended to their complete ancestry. 
+	 * Toggle set to induce the calculation and output of an F1-score based on
+	 * reference and prediction GO annotations extended to their complete
+	 * ancestry.
 	 */
 	private Boolean calculateAncestryGoF1Scores = false;
 	/**
-	 * Toggle set to induce the calculation and output of an F1-score based on the semantic similarity (based on term information content) of reference and prediction GO annotations. 
+	 * Toggle set to induce the calculation and output of an F1-score based on
+	 * the semantic similarity (based on term information content) of reference
+	 * and prediction GO annotations.
 	 */
 	private Boolean calculateSemSimGoF1Scores = false;
-	
+	/**
+	 * Path to file containing a subset of the Gene Ontology. Triggers the
+	 * annotation of the query proteins with this broad categorical GO terms
+	 * instead of the detailed ones determined from the blast results.
+	 * Useful to give a summary of the GO annotation of for example a genome, microarray or cDNA collection.
+	 */
+	private String pathToGoSlimFile;
+
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
 	 * 
@@ -410,7 +425,8 @@ public class Settings implements Cloneable {
 		if (input.get(GO_F1_SEMSIM_KEY) != null) {
 			this.setCalculateSemSimGoF1Scores(parseBoolString(input.get(GO_F1_SEMSIM_KEY).toString()));
 		}
-		// If non of the GO F1 Keys is specified in the YML input the simple version is used as default
+		// If non of the GO F1 Keys is specified in the YML input the simple
+		// version is used as default
 		if (input.get(GO_F1_SIMPLE_KEY) != null) {
 			this.setCalculateSimpleGoF1Scores(parseBoolString(input.get(GO_F1_SIMPLE_KEY).toString()));
 		} else {
@@ -418,7 +434,10 @@ public class Settings implements Cloneable {
 				this.setCalculateSimpleGoF1Scores(true);
 			}
 		}
-		
+		if (input.get(GO_SLIM_PATH_KEY) != null) {
+			this.setPathToGoSlimFile(input.get(GO_SLIM_PATH_KEY).toString());
+		}
+
 	}
 
 	/**
@@ -608,14 +627,14 @@ public class Settings implements Cloneable {
 	public boolean hasGeneOntologyAnnotations() {
 		boolean result = false;
 		for (String blastDatabaseName : getBlastDatabases()) {
-			if (getPathToGeneOntologyResults(blastDatabaseName) != null 
+			if (getPathToGeneOntologyResults(blastDatabaseName) != null
 					&& new File(getPathToGeneOntologyResults(blastDatabaseName)).exists()) {
 				result = true;
 			}
 		}
 		return result;
 	}
-	
+
 	public boolean hasGeneOntologyAnnotation(String blastDatabaseName) {
 		if (getPathToGeneOntologyResults(blastDatabaseName) != null
 				&& new File(getPathToGeneOntologyResults(blastDatabaseName)).exists()) {
@@ -623,11 +642,11 @@ public class Settings implements Cloneable {
 		}
 		return false;
 	}
-	
+
 	public void setPathToGeneOntologyResult(String blastDatabaseName, String path) {
 		getBlastDbSettings(blastDatabaseName).put(GENE_ONTOLOGY_RESULT_KEY, path);
 	}
-	
+
 	public void removeAllPathToGeneOntologyResults() {
 		for (String blastDatabaseName : getBlastDatabases()) {
 			getBlastDbSettings(blastDatabaseName).remove(GENE_ONTOLOGY_RESULT_KEY);
@@ -729,7 +748,7 @@ public class Settings implements Cloneable {
 	public List<String> getBlast2GoAnnotations() throws IOException {
 		return fromFile(getPathToBlast2GoAnnotations());
 	}
-	
+
 	public Boolean hasBlast2GoAnnotations() {
 		return getPathToBlast2GoAnnotations() != null && new File(getPathToBlast2GoAnnotations()).exists();
 	}
@@ -932,7 +951,7 @@ public class Settings implements Cloneable {
 		}
 		return DEFAULT_DATABASE_GO_REGEX;
 	}
-	
+
 	public Boolean getPreferReferenceWithGoAnnos() {
 		return preferReferenceWithGoAnnos;
 	}
@@ -1004,7 +1023,7 @@ public class Settings implements Cloneable {
 	public void setPathToGoDatabase(String pathToGoDatabase) {
 		this.pathToGoDatabase = pathToGoDatabase;
 	}
-	
+
 	public String getPathToReferenceGoAnnotations() {
 		return pathToReferenceGoAnnotations;
 	}
@@ -1012,11 +1031,11 @@ public class Settings implements Cloneable {
 	public void setPathToReferenceGoAnnotations(String pathToReferenceGoAnnotations) {
 		this.pathToReferenceGoAnnotations = pathToReferenceGoAnnotations;
 	}
-	
+
 	public Boolean hasReferenceGoAnnotations() {
 		return getPathToReferenceGoAnnotations() != null && new File(getPathToReferenceGoAnnotations()).exists();
 	}
-	
+
 	public List<String> getReferenceGoAnnotationsFromFile() throws IOException {
 		return fromFile(getPathToReferenceGoAnnotations());
 	}
@@ -1052,7 +1071,7 @@ public class Settings implements Cloneable {
 	public static Pattern getBlast2GoAnnotationFileAnnotlineRegex() {
 		return BLAST_2_GO_ANNOTATION_FILE_ANNOTLINE_REGEX;
 	}
-	
+
 	private static Boolean parseBoolString(String input) {
 		if (input.equalsIgnoreCase("true") || input.equalsIgnoreCase("false")) {
 			return Boolean.valueOf(input);
@@ -1062,5 +1081,25 @@ public class Settings implements Cloneable {
 			}
 		}
 		return false;
+	}
+
+	public String getPathToGoSlimFile() {
+		return pathToGoSlimFile;
+	}
+	
+	public List<String> getGoSlimFile() throws IOException {
+		return fromFile(getPathToGoSlimFile());
+	}
+
+	public void setPathToGoSlimFile(String pathToGoSlimFile) {
+		this.pathToGoSlimFile = pathToGoSlimFile;
+	}
+	
+	public Boolean hasPathToGoSlimFile() {
+		return getPathToGoSlimFile() != null && new File(getPathToGoSlimFile()).exists(); 
+	}
+
+	public static Pattern getGoSlimFileGotermRegex() {
+		return GO_SLIM_FILE_GOTERM_REGEX;
 	}
 }

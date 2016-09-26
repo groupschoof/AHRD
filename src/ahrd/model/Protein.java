@@ -23,6 +23,7 @@ public class Protein {
 	private Set<InterproResult> interproResults = new HashSet<InterproResult>();
 	private Set<String> goResults = new HashSet<String>();
 	private Set<GOterm> goResultsTerms = new HashSet<GOterm>();
+	private Set<GOterm> goSlimTerms = new HashSet<GOterm>();
 	private TokenScoreCalculator tokenScoreCalculator;
 	private LexicalScoreCalculator lexicalScoreCalculator;
 	private DescriptionScoreCalculator descriptionScoreCalculator;
@@ -274,6 +275,14 @@ public class Protein {
 
 	public void setGoResultsTerms(Set<GOterm> goResultsTerms) {
 		this.goResultsTerms = goResultsTerms;
+	}
+
+	public Set<GOterm> getGoSlimTerms() {
+		return goSlimTerms;
+	}
+
+	public void setGoSlimTerms(Set<GOterm> goSlimTerms) {
+		this.goSlimTerms = goSlimTerms;
 	}
 
 }
