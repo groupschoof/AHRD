@@ -75,7 +75,8 @@ public class AHRD {
 			// Log
 			System.out.println("...assigned highestest scoring human readable descriptions in " + ahrd.takeTime()
 					+ "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
-			// If requested assign GO slim terms in addition to detailed GO term annotation
+			// If requested assign GO slim terms in addition to detailed GO term
+			// annotation
 			ahrd.annotateWithGoSlim();
 			// Write result to output-file:
 			System.out.println("Writing output to '" + getSettings().getPathToOutput() + "'.");
@@ -84,7 +85,7 @@ public class AHRD {
 			// Log
 			System.out.println("Wrote output in " + ahrd.takeTime() + "sec, currently occupying "
 					+ ahrd.takeMemoryUsage() + " MB");
-			
+
 			System.out.println("\n\nDONE");
 		} catch (Exception e) {
 			System.err.println("We are sorry, an un-expected ERROR occurred:");
@@ -248,18 +249,18 @@ public class AHRD {
 			// filter for each protein's most-informative
 			// interpro-results
 			InterproResult.filterForMostInforming(prot);
-		}		
+		}
 	}
-	
+
 	/**
 	 * If AHRD is requested to annotate GO term in accordance to a GO slim set
 	 * 
 	 * @throws IOException
-	 * @throws MissingAccessionException 
+	 * @throws MissingAccessionException
 	 */
 	public void annotateWithGoSlim() throws IOException, MissingAccessionException {
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasPathToGoSlimFile()) {
-			Set<GOterm> goSlim = new HashSet<GOterm>(); 
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
+			Set<GOterm> goSlim = new HashSet<GOterm>();
 			// Load a Map of all GO terms
 			goDB = new GOdatabase().getMap();
 			// Load set of GO slim terms
@@ -270,12 +271,16 @@ public class AHRD {
 					String termAcc = m.group("goTerm");
 					GOterm term = goDB.get(termAcc);
 					if (term == null)
-						throw new MissingAccessionException(
-								"Could not find GO term for accession '" + termAcc + "'");
+						throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 					goSlim.add(term);
 				}
 			}
-			// Annotate proteins
+			// Annotate proteins:
+			// The ancestry of every detailed term is examined for intersections
+			// with the GO-Slim set.
+			// From the intersection only the term with the highest information
+			// content is annotated because some GO-Slim categories exclude some
+			// of their child terms.
 			for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();) {
 				Protein prot = protIter.next();
 				for (String termAcc : prot.getGoResults()) {
@@ -283,10 +288,15 @@ public class AHRD {
 					if (term == null) {
 						throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 					}
-					for (GOterm ancestor : term.getAncestry()){
-						if (goSlim.contains(ancestor)) {
-							prot.getGoSlimTerms().add(ancestor);
+					Double maxInfoContent = 0.0;
+					GOterm highestInfoContentGoSlimTerm = null;
+					for (GOterm ancestor : term.getAncestry()) {
+						if (goSlim.contains(ancestor) && ancestor.getInformationContent() > maxInfoContent) {
+							highestInfoContentGoSlimTerm = ancestor;
 						}
+					}
+					if (highestInfoContentGoSlimTerm != null) {
+						prot.getGoSlimTerms().add(highestInfoContentGoSlimTerm);	
 					}
 				}
 			}

@@ -108,7 +108,7 @@ public class Settings implements Cloneable {
 	public static final String GO_F1_SIMPLE_KEY = "simple_GO_f1_scores";
 	public static final String GO_F1_ANCESTRY_KEY = "ancestry_GO_f1_scores";
 	public static final String GO_F1_SEMSIM_KEY = "semsim_GO_f1_scores";
-	public static final String GO_SLIM_PATH_KEY = "GO_slim";
+	public static final String GO_SLIM_PATH_KEY = "go_slim";
 	public static final Pattern GO_SLIM_FILE_GOTERM_REGEX = Pattern.compile("^id: (?<goTerm>GO:\\d{7})$");
 
 	/**
@@ -1095,7 +1095,7 @@ public class Settings implements Cloneable {
 		this.pathToGoSlimFile = pathToGoSlimFile;
 	}
 	
-	public Boolean hasPathToGoSlimFile() {
+	public Boolean hasGoSlimFile() {
 		return getPathToGoSlimFile() != null && new File(getPathToGoSlimFile()).exists(); 
 	}
 

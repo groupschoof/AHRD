@@ -35,7 +35,7 @@ public class TsvOutputWriter extends AbstractOutputWriter {
 		bw.write("\n");
 		// Column-Names:
 		bw.write(ahrdColumnNames());
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasPathToGoSlimFile()) {
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
 			bw.write("\tGO-Slim-Annotation");
 		}
 		bw.write("\n");
@@ -43,7 +43,7 @@ public class TsvOutputWriter extends AbstractOutputWriter {
 		for (Protein prot : getProteins()) {
 			// Generate the Human Readable Description:
 			String csvRow = buildDescriptionLine(prot, "\t");
-			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasPathToGoSlimFile()) {
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
 				csvRow += "\t" + combineGoTermsToString(prot.getGoSlimTerms());
 			}
 			
@@ -112,13 +112,11 @@ public class TsvOutputWriter extends AbstractOutputWriter {
 		if (gos != null) {
 			List<String> sortedGos = new ArrayList<String>();
 			for (Iterator<GOterm> goTermIter = gos.iterator(); goTermIter.hasNext();) {
-				GOterm term = goTermIter.next();
-				sortedGos.add(term.getAccession());
+				sortedGos.add(goTermIter.next().getAccession());
 			}
 			Collections.sort(sortedGos);
 			for (Iterator<String> iter = sortedGos.iterator(); iter.hasNext();) {
-				String term = iter.next();
-				goLine += term;
+				goLine += iter.next();
 				if (iter.hasNext())
 					goLine += seperator;
 			}
