@@ -222,17 +222,17 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		String hdr = "";
 		for (String blastDb : getSettings().getBlastDatabases()) {
 			if (blastDb != null && !blastDb.equals(""))
-				hdr += ("\tBest BlastHit against '" + blastDb + "'");
+				hdr += ("\tBest-BlastHit-against-'" + blastDb + "'");
 			if (getSettings().isInTrainingMode()) {
 				hdr += "\tLength\tEvaluation-Score";
 				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-					hdr += "\tBlast2GO-Annotations '" + blastDb + "'";
+					hdr += "\tBest-BlastHit-Annotations-'" + blastDb + "'";
 					if (getSettings().getCalculateSimpleGoF1Scores())
-						hdr += "\tBlast2GO-Annotations-Simple-F-Score '" + blastDb + "'";
+						hdr += "\tBest-BlastHit-Annotations-Simple-F-Score-'" + blastDb + "'";
 					if (getSettings().getCalculateAncestryGoF1Scores())
-						hdr += "\tBlast2GO-Annotations-Ancestry-F-Score '" + blastDb + "'";
+						hdr += "\tBest-BlastHit-Annotations-Ancestry-F-Score-'" + blastDb + "'";
 					if (getSettings().getCalculateSemSimGoF1Scores())
-						hdr += "\tBlast2GO-Annotations-SemSim-F-Score '" + blastDb + "'";
+						hdr += "\tBest-BlastHit-Annotations-SemSim-F-Score-'" + blastDb + "'";
 				}
 			}
 		}
