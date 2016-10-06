@@ -20,7 +20,7 @@ import java.util.Set;
  * 
  * @author Kathrin Klee, Asis Hallab
  */
-public class Parameters implements Cloneable {
+public class Parameters implements Cloneable, Comparable<Parameters> {
 
 	private Double tokenScoreBitScoreWeight;
 	private Double tokenScoreDatabaseScoreWeight;
@@ -301,6 +301,41 @@ public class Parameters implements Cloneable {
 	public Long mutateBlastDatabaseWeightBy() {
 		return new Double(Math.ceil(100.0 * mutatePercentageBy())).longValue();
 	}
+	
+	/**
+	 * Creates an offspring with a random recombination of the current parameters and a given parameter set.
+	 * 
+	 * @param partner - The Parameters to recombine the current ones with 
+	 * 
+	 * @return The random offspring of the current and given Parameters  
+	 */
+	public Parameters recombine(Parameters partner) {
+		Parameters offspring = this.clone();
+		Random rand = Utils.random;
+		if(rand.nextBoolean()) {
+			offspring.setTokenScoreBitScoreWeight(this.getTokenScoreBitScoreWeight());
+		} else {
+			offspring.setTokenScoreBitScoreWeight(partner.getTokenScoreBitScoreWeight());
+		}
+		if(rand.nextBoolean()) {
+			offspring.setTokenScoreDatabaseScoreWeight(this.getTokenScoreDatabaseScoreWeight());
+		} else {
+			offspring.setTokenScoreDatabaseScoreWeight(partner.getTokenScoreDatabaseScoreWeight());
+		}
+		if(rand.nextBoolean()) {
+			offspring.setTokenScoreOverlapScoreWeight(this.getTokenScoreOverlapScoreWeight());
+		} else {
+			offspring.setTokenScoreOverlapScoreWeight(partner.getTokenScoreOverlapScoreWeight());
+		}
+		for (String blastDbName : getSettings().getSortedBlastDatabases()) {
+			if(rand.nextBoolean())
+				offspring.setDescriptionScoreBitScoreWeight(blastDbName, partner.getDescriptionScoreBitScoreWeight(blastDbName).toString());
+			if(rand.nextBoolean())
+				offspring.setBlastDbWeight(blastDbName, partner.getBlastDbWeight(blastDbName).toString());
+		}
+		return offspring;
+	}
+		
 
 	/**
 	 * Returns a clone of this instance.
@@ -464,5 +499,26 @@ public class Parameters implements Cloneable {
 
 	public void setLastMutatedParameter(Integer lastMutatedParameter) {
 		this.lastMutatedParameter = lastMutatedParameter;
+	}
+	
+	/**
+	* Compares the average evaluation score of the current Parameters with 
+	* the average evaluation score of the specified parameters for order. 
+	* Returns a negative integer, zero, or a positive integer as the average 
+	* evaluation score of the current Parameters of these Parameters is less
+    * than, equal to, or greater than the average evaluation Score of the 
+    * specified Parameters.
+    * */
+	@Override
+	public int compareTo(Parameters other) {
+		if (this.getAvgEvaluationScore() != null && other.getAvgEvaluationScore() != null){
+			if (this.getAvgEvaluationScore() < other.getAvgEvaluationScore()) {
+				return -1;
+			} 
+			if (this.getAvgEvaluationScore() > other.getAvgEvaluationScore()) {
+				return 1;
+			}
+		}
+		return 0;
 	}
 }

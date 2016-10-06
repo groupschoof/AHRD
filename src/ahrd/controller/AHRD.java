@@ -171,7 +171,7 @@ public class AHRD {
 
 	/**
 	 * Method initializes the AHRD-run: 1. Loads Proteins 2. Parses BlastResults
-	 * 3. Parses InterproResults 4. Parses Gene-Ontology-Results
+	 * 3. Parses InterproResults 4. Parses database Gene-Ontology-Annotations
 	 * 
 	 * @throws IOException
 	 * @throws MissingAccessionException
@@ -197,11 +197,10 @@ public class AHRD {
 			System.out.println("...parsed blast results in " + takeTime() + "sec, currently occupying "
 					+ takeMemoryUsage() + " MB");
 
-		// Reference GO Annotations (for Proteins in the searched Blast
-		// Databases)
+		// Database GO Annotations (for Proteins in the searched Blast Databases)
 		setUpDatabaseGoAnnotations();
 		if (writeLogMsgs) {
-			System.out.println("...parsed reference Gene Ontology Annotations (GOA) in " + takeTime()
+			System.out.println("...parsed database Gene Ontology Annotations (GOA) in " + takeTime()
 					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
 		}
 
