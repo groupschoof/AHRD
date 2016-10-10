@@ -399,7 +399,7 @@ public class Settings implements Cloneable {
 			this.preferReferenceWithGoAnnos = true;
 		}
 		if (input.get(EVALUATE_VALID_TOKENS_KEY) != null) {
-			this.setEvaluateValidTokens(true);
+			this.setEvaluateValidTokens(parseBoolString(input.get(EVALUATE_VALID_TOKENS_KEY).toString()));
 		}
 		if (input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY) != null) {
 			this.setPathToReferencesDescriptionBlacklist(input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY).toString());

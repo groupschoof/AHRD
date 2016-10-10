@@ -452,7 +452,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * want to evaluate <i>all</i> tokens, that are printed out, too. This set
 	 * of evaluation-tokens is set if and only if, AHRD is run in Evaluator-Mode
 	 * and this BlastResult is the best scoring of the Blast-Search-Result, it
-	 * is obtained from. You can evaluate AHRD based <i>only<\i> on tokens that
+	 * is obtained from. You can evaluate AHRD based <i>only</i> on tokens that
 	 * passed the Blacklist and Filtering with the correct input parameter. See
 	 * <code>Settings.evaluateValidTokens</code> for details.
 	 * 

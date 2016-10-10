@@ -166,6 +166,10 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		}
 		// Remember what made the neighbor different from its parent:
 		ngb.setLastMutatedParameter(randParamToMutate);
+		// Reset average evaluation score
+		ngb.setAvgEvaluationScore(null);
+		ngb.setAvgFalsePositivesRate(null);
+		ngb.setAvgTruePositivesRate(null);
 		return ngb;
 	}
 
@@ -305,6 +309,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	/**
 	 * Creates an offspring with a random recombination of the current parameters and a given parameter set.
 	 * 
+	 * @NOTE: The three <em>Token-Score-Weights</em> are normalized to sum up to 1.
+	 * 
 	 * @param partner - The Parameters to recombine the current ones with 
 	 * 
 	 * @return The random offspring of the current and given Parameters  
@@ -312,30 +318,24 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	public Parameters recombine(Parameters partner) {
 		Parameters offspring = this.clone();
 		Random rand = Utils.random;
-		if(rand.nextBoolean()) {
-			offspring.setTokenScoreBitScoreWeight(this.getTokenScoreBitScoreWeight());
-		} else {
+		if(rand.nextBoolean())
 			offspring.setTokenScoreBitScoreWeight(partner.getTokenScoreBitScoreWeight());
-		}
-		if(rand.nextBoolean()) {
-			offspring.setTokenScoreDatabaseScoreWeight(this.getTokenScoreDatabaseScoreWeight());
-		} else {
+		if(rand.nextBoolean())
 			offspring.setTokenScoreDatabaseScoreWeight(partner.getTokenScoreDatabaseScoreWeight());
-		}
-		if(rand.nextBoolean()) {
-			offspring.setTokenScoreOverlapScoreWeight(this.getTokenScoreOverlapScoreWeight());
-		} else {
+		if(rand.nextBoolean())
 			offspring.setTokenScoreOverlapScoreWeight(partner.getTokenScoreOverlapScoreWeight());
-		}
 		for (String blastDbName : getSettings().getSortedBlastDatabases()) {
 			if(rand.nextBoolean())
 				offspring.setDescriptionScoreBitScoreWeight(blastDbName, partner.getDescriptionScoreBitScoreWeight(blastDbName).toString());
 			if(rand.nextBoolean())
 				offspring.setBlastDbWeight(blastDbName, partner.getBlastDbWeight(blastDbName).toString());
 		}
+		offspring.normalizeTokenScoreWeights();
+		offspring.setAvgEvaluationScore(null);
+		offspring.setAvgFalsePositivesRate(null);
+		offspring.setAvgTruePositivesRate(null);
 		return offspring;
 	}
-		
 
 	/**
 	 * Returns a clone of this instance.

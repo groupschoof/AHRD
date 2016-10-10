@@ -21,8 +21,8 @@ import ahrd.view.TrainerOutputWriter;
 
 public class GeneticTrainer extends Evaluator {
 
-	private static final int NUMBER_OF_GENERATIONS = 5;
-	private static final int POPULATION_SIZE = 10;
+	private static final int NUMBER_OF_GENERATIONS = 50;
+	private static final int POPULATION_SIZE = 100;
 	private static final Double GENERATIONAL_SURVIVAL_RATE = 0.2;
 	private static final Double GENERATIONAL_OFFSPRING_RATE = 0.2;
 	private static final Double GENERATIONAL_MUTANT_RATE = 0.2;
@@ -56,7 +56,7 @@ public class GeneticTrainer extends Evaluator {
 			// Try to find optimal parameters heuristically:
 			trainer.train();
 			// Calculate the average maximum evaluation score AHRD could have
-			// possible achieved:
+			// possibly achieved:
 			trainer.calcAvgMaxEvaluationScore();
 
 			// Write final output
@@ -87,65 +87,118 @@ public class GeneticTrainer extends Evaluator {
 	}
 
 	/**
-	 * As of now performs hill-climbing to optimize parameters.
+	 * Random first generation. Survival of the fittest, recombination of fit
+	 * survivors, mutants of fit survivors and random parameter sets for the
+	 * rest in each succeeding generation.
 	 * 
 	 * @throws IOException
 	 * @throws MissingInterproResultException
 	 * @throws SQLException
 	 */
 	public void train() throws MissingInterproResultException, IOException, SQLException {
-		// Set up first generation
 		Set<Parameters> population = new HashSet<Parameters>();
+		// Set up first generation
+		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();
+		sortedDistinctBlastDatabaseNames.addAll(getSettings().getBlastDatabases());
+		Collections.sort(sortedDistinctBlastDatabaseNames);
 		for (int i = 1; i <= POPULATION_SIZE; i++) {
-			List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();
-			sortedDistinctBlastDatabaseNames.addAll(getSettings().getBlastDatabases());
-			Collections.sort(sortedDistinctBlastDatabaseNames);
 			population.add(Parameters.randomParameters(sortedDistinctBlastDatabaseNames));
 		}
 		int generation = 1;
+		// simulate generational succession
 		while (generation <= NUMBER_OF_GENERATIONS) {
 			// Determine the fitness of each individual (parameter set) in the
 			// population
 			for (Iterator<Parameters> paraIter = population.iterator(); paraIter.hasNext();) {
 				Parameters individual = paraIter.next();
+				// if (individual.getAvgEvaluationScore() == null) {
 				getSettings().setParameters(individual);
 				// Iterate over all Proteins and assign the best scoring Human
 				// Readable Description
-				if (individual.getAvgEvaluationScore() == null) {
-					assignHumanReadableDescriptions();
-					// Evaluate AHRD's performance for each Protein:
-					calculateEvaluationScores();
-					// Estimate average performance of current Parameters:
-					calcAveragesOfEvalScoreTPRandFPR();
-				}
-			}
-			// Survival of the fittest
-			NavigableSet<Parameters> ranking = new TreeSet<Parameters>();
-			ranking.addAll(population);
-			population.clear();
-			for (int i = 1; i <= numberOfSurvivors; i++) {
-				population.add(ranking.pollLast());
-			}
-			/*
-			 * OR: pollFirst until ranking.size == numberOfSurvivors -> keep
-			 * ranking of survivors to simulate sexual selection (bias toward
-			 * higher scores when randomly selecting mates) -> keep ranking of
-			 * survivors for bias in selection of perm to mutate
-			 */
-			population.addAll(ranking);
-			// Recombination of survivors
-			ranking.clear();
-			ranking.addAll(population);
-			for (int i = 1; i <= numberOfOffspring; i++) {
-				Random rand = Utils.random;
-				// population.
-				// rand.nextInt(numberOfSurvivors)+1;
-				// population.add(e);
+				assignHumanReadableDescriptions();
+				// Evaluate AHRD's performance for each Protein:
+				calculateEvaluationScores();
+				// Estimate average performance of current Parameters:
+				calcAveragesOfEvalScoreTPRandFPR();
+				// }
 			}
 
-			// Increment generation counter
+			// Survival of the fittest
+			NavigableSet<Parameters> fittnessRanking = new TreeSet<Parameters>();
+			fittnessRanking.addAll(population);
+			population.clear();
+			while (fittnessRanking.size() > numberOfSurvivors) {
+				fittnessRanking.pollFirst();
+			}
+			population.addAll(fittnessRanking);
+
+			for (Iterator<Parameters> fitIter = fittnessRanking.descendingIterator(); fitIter.hasNext();) {
+				System.out.print(fitIter.next().getAvgEvaluationScore() + " ");
+			}
+			System.out.print("\n");
+
+			// Recombination of fit survivors
+			Set<Set<Parameters>> uniqueMatingPairs = new HashSet<Set<Parameters>>();
+			while (population.size() < numberOfSurvivors + numberOfOffspring) {
+				Set<Parameters> matingPair = new HashSet<Parameters>();
+				do {
+					matingPair.clear();
+					while (matingPair.size() < 2) {
+						matingPair.add(getRandomFitIndividual(fittnessRanking));
+					}
+				} while (uniqueMatingPairs.contains(matingPair));
+				uniqueMatingPairs.add(matingPair);
+				Parameters[] matingPairArray = matingPair.toArray(new Parameters[0]);
+				population.add(matingPairArray[0].recombine(matingPairArray[1]));
+			}
+
+			// Mutants of fit survivors
+			while (population.size() < numberOfSurvivors + numberOfOffspring + numberOfMutants) {
+				population.add(getRandomFitIndividual(fittnessRanking).neighbour(null));
+			}
+
+			// Fill the rest of the population with new parameter sets
+			while (population.size() <= POPULATION_SIZE) {
+				population.add(Parameters.randomParameters(sortedDistinctBlastDatabaseNames));
+			}
+
+			// Remember the best parameter set and the generation it was found
+			// in
+			double current = fittnessRanking.last().getAvgEvaluationScore();
+			if (getBestParameters() == null) {
+				System.out.println("current: " + current + "\tbest: " + 0);
+			} else {
+				double best = getBestParameters().getAvgEvaluationScore();
+				System.out.println("current: " + current + "\tbest: " + best);
+			}
+			if (getBestParameters() == null
+					|| fittnessRanking.last().getAvgEvaluationScore() > getBestParameters().getAvgEvaluationScore()) {
+				setBestParameters(fittnessRanking.last().clone());
+				setGenerationBestParametersWereFoundIn(generation);
+			}
 			generation += 1;
 		}
+	}
+
+	/**
+	 * Returns a random individual (parameter set) from a navigable set of
+	 * parameter sets ordered according to their fittness (evaluation score) A
+	 * strong bias towards fitter individuals is applied
+	 * 
+	 * @param fittnessRanking
+	 * @return random fit parameter set
+	 */
+	private static Parameters getRandomFitIndividual(NavigableSet<Parameters> fittnessRanking) {
+		Parameters randomFitIndividual = null;
+		int placeInRanking = Integer.MAX_VALUE;
+		while (placeInRanking > fittnessRanking.size()) {
+			placeInRanking = (int) Math.ceil(Math.abs(Utils.random.nextGaussian() * ((double) fittnessRanking.size() / 3)));
+		}
+		Iterator<Parameters> decendingRankingIter = fittnessRanking.descendingIterator();
+		for (int i = 1; i <= placeInRanking; i++) {
+			randomFitIndividual = decendingRankingIter.next();
+		}
+		return randomFitIndividual;
 	}
 
 	/**
