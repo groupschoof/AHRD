@@ -50,7 +50,18 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 * score.
 	 */
 	private Integer lastMutatedParameter = null;
-
+	/**
+	 * In order to fine tune the genetic algorithm for training of parameters
+	 * it can be useful to remember the origin of the parameter set in the previous 
+	 * generation.  
+	 */
+	private String origin;
+	
+	/**
+	 * 
+	 * @param sortedDistinctBlastDatabaseNames
+	 * @return
+	 */
 	public static Parameters randomParameters(
 			List<String> sortedDistinctBlastDatabaseNames) {
 		Parameters out = new Parameters();
@@ -65,6 +76,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 					randomMultipleOfOneTenth().toString());
 			out.setBlastDbWeight(blastDbName, randomMultipleOfTen().toString());
 		}
+		// Set origin for genetic training output
+		out.setOrigin("random");
 		return out;
 	}
 
@@ -170,6 +183,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		ngb.setAvgEvaluationScore(null);
 		ngb.setAvgFalsePositivesRate(null);
 		ngb.setAvgTruePositivesRate(null);
+		// Set origin for genetic training output
+		ngb.setOrigin("mutation");
 		return ngb;
 	}
 
@@ -334,6 +349,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		offspring.setAvgEvaluationScore(null);
 		offspring.setAvgFalsePositivesRate(null);
 		offspring.setAvgTruePositivesRate(null);
+		// Set origin for genetic training
+		offspring.setOrigin("recombination");
 		return offspring;
 	}
 
@@ -520,5 +537,13 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 			}
 		}
 		return 0;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
 	}
 }

@@ -110,14 +110,14 @@ public class TokenScoreCalculator {
 			for (BlastResult iterResult : getProtein().getBlastResults().get(iterBlastDb)) {
 				// iterate through tokens in different blast result desc-lines
 				for (String token : iterResult.getTokens()) {
-					if (!(getTokenScores().containsKey(token))) {
+//					if (!(getTokenScores().containsKey(token))) {
 						double tokenscore = tokenScore(token, iterBlastDb);
 						getTokenScores().put(token, new Double(tokenscore));
 						// remember highest token score
 						if (tokenscore > getTokenHighScore()) {
 							setTokenHighScore(tokenscore);
 						}
-					}
+//					}
 				}
 			}
 		}

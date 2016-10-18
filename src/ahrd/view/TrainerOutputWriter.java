@@ -21,9 +21,9 @@ public class TrainerOutputWriter {
 	public static final DecimalFormat FRMT = new DecimalFormat(
 			"#,######0.######");
 
-	private BufferedWriter pathBufWrtr;
-	private BufferedWriter outBufWrtr;
-	private List<String> sortedBlastDatabases;
+	protected BufferedWriter pathBufWrtr;
+	protected BufferedWriter outBufWrtr;
+	protected List<String> sortedBlastDatabases;
 
 	public TrainerOutputWriter() throws IOException {
 		super();

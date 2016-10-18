@@ -10,14 +10,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
 import ahrd.exception.MissingInterproResultException;
 import ahrd.model.EvaluationScoreCalculator;
 import ahrd.model.Protein;
-import ahrd.view.TrainerOutputWriter;
+import ahrd.view.GeneticTrainerOutputWriter;
 
 public class GeneticTrainer extends Evaluator {
 
@@ -32,7 +31,7 @@ public class GeneticTrainer extends Evaluator {
 	private static int numberOfMutants = (int) Math.round(POPULATION_SIZE * GENERATIONAL_MUTANT_RATE);
 	private Parameters bestParameters;
 	private Integer generationBestParametersWereFoundIn;
-	private TrainerOutputWriter outWriter;
+	private GeneticTrainerOutputWriter outWriter;
 	/**
 	 * The average of AHRD's maximum evaluation score for each Protein. This is
 	 * the maximum of the evaluation scores calculated for all Descriptions of
@@ -82,8 +81,7 @@ public class GeneticTrainer extends Evaluator {
 	 */
 	public GeneticTrainer(String pathToInputYml) throws IOException {
 		super(pathToInputYml);
-		this.outWriter = new TrainerOutputWriter();
-		// Remember tested Parameter-Sets and their scores?
+		this.outWriter = new GeneticTrainerOutputWriter();
 	}
 
 	/**
@@ -105,22 +103,24 @@ public class GeneticTrainer extends Evaluator {
 			population.add(Parameters.randomParameters(sortedDistinctBlastDatabaseNames));
 		}
 		int generation = 1;
+		double diffAvgEvalScoreToLastGeneration = 0;
 		// simulate generational succession
 		while (generation <= NUMBER_OF_GENERATIONS) {
+			// Show progress
+			System.out.print("\rEvaluating generation " + generation + " of " + NUMBER_OF_GENERATIONS);
 			// Determine the fitness of each individual (parameter set) in the
 			// population
-			for (Iterator<Parameters> paraIter = population.iterator(); paraIter.hasNext();) {
-				Parameters individual = paraIter.next();
-				// if (individual.getAvgEvaluationScore() == null) {
-				getSettings().setParameters(individual);
-				// Iterate over all Proteins and assign the best scoring Human
-				// Readable Description
-				assignHumanReadableDescriptions();
-				// Evaluate AHRD's performance for each Protein:
-				calculateEvaluationScores();
-				// Estimate average performance of current Parameters:
-				calcAveragesOfEvalScoreTPRandFPR();
-				// }
+			for (Parameters individual : population) {
+				if (individual.getAvgEvaluationScore() == null) {
+					getSettings().setParameters(individual);
+					// Iterate over all Proteins and assign the best scoring Human
+					// Readable Description
+					assignHumanReadableDescriptions();
+					// Evaluate AHRD's performance for each Protein:
+					calculateEvaluationScores();
+					// Estimate average performance of current Parameters:
+					calcAveragesOfEvalScoreTPRandFPR();
+				}
 			}
 
 			// Survival of the fittest
@@ -131,11 +131,6 @@ public class GeneticTrainer extends Evaluator {
 				fittnessRanking.pollFirst();
 			}
 			population.addAll(fittnessRanking);
-
-			for (Iterator<Parameters> fitIter = fittnessRanking.descendingIterator(); fitIter.hasNext();) {
-				System.out.print(fitIter.next().getAvgEvaluationScore() + " ");
-			}
-			System.out.print("\n");
 
 			// Recombination of fit survivors
 			Set<Set<Parameters>> uniqueMatingPairs = new HashSet<Set<Parameters>>();
@@ -164,18 +159,16 @@ public class GeneticTrainer extends Evaluator {
 
 			// Remember the best parameter set and the generation it was found
 			// in
-			double current = fittnessRanking.last().getAvgEvaluationScore();
-			if (getBestParameters() == null) {
-				System.out.println("current: " + current + "\tbest: " + 0);
-			} else {
-				double best = getBestParameters().getAvgEvaluationScore();
-				System.out.println("current: " + current + "\tbest: " + best);
+			if (getBestParameters() != null) {
+				diffAvgEvalScoreToLastGeneration = fittnessRanking.last().getAvgEvaluationScore() - getBestParameters().getAvgEvaluationScore();
 			}
 			if (getBestParameters() == null
 					|| fittnessRanking.last().getAvgEvaluationScore() > getBestParameters().getAvgEvaluationScore()) {
 				setBestParameters(fittnessRanking.last().clone());
 				setGenerationBestParametersWereFoundIn(generation);
 			}
+			// Write output of current iteration:
+			this.outWriter.writeIterationOutput(generation, getBestParameters(), diffAvgEvalScoreToLastGeneration, getBestParameters().getOrigin());
 			generation += 1;
 		}
 	}
@@ -273,5 +266,5 @@ public class GeneticTrainer extends Evaluator {
 	public void setGenerationBestParametersWereFoundIn(Integer generationBestParametersWereFoundIn) {
 		this.generationBestParametersWereFoundIn = generationBestParametersWereFoundIn;
 	}
-
+	
 }
