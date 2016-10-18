@@ -61,6 +61,15 @@ public class Utils {
 	}
 
 	/**
+	 * Random: >= 1 and <= 10
+	 * 
+	 * @return Long
+	 */
+	public static Double randomMultipleOfOne() {
+		return randomMultipleOfTen() * 0.1;
+	}
+	
+	/**
 	 * Random: >= 10 and <= 100
 	 * 
 	 * @return Long

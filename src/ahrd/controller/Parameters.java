@@ -2,6 +2,7 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Utils.randomMultipleOfOneTenth;
+import static ahrd.controller.Utils.randomMultipleOfOne;
 import static ahrd.controller.Utils.randomMultipleOfTen;
 import static ahrd.controller.Utils.randomSaveSubtract;
 import static ahrd.controller.Utils.roundToNDecimalPlaces;
@@ -73,7 +74,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		// Init BlastDbs' Parameters:
 		for (String blastDbName : sortedDistinctBlastDatabaseNames) {
 			out.setDescriptionScoreBitScoreWeight(blastDbName,
-					randomMultipleOfOneTenth().toString());
+					randomMultipleOfOne().toString());
 			out.setBlastDbWeight(blastDbName, randomMultipleOfTen().toString());
 		}
 		// Set origin for genetic training output
