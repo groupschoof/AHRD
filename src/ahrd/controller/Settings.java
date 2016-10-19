@@ -110,6 +110,8 @@ public class Settings implements Cloneable {
 	public static final String GO_F1_SEMSIM_KEY = "semsim_GO_f1_scores";
 	public static final String GO_SLIM_PATH_KEY = "go_slim";
 	public static final Pattern GO_SLIM_FILE_GOTERM_REGEX = Pattern.compile("^id: (?<goTerm>GO:\\d{7})$");
+	public static final String GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY = "number_of_generations";
+	public static final String GENETIC_TRAINING_POPULATION_SIZE_KEY = "population_size";
 
 	/**
 	 * Fields:
@@ -273,6 +275,15 @@ public class Settings implements Cloneable {
 	 * Useful to give a summary of the GO annotation of for example a genome, microarray or cDNA collection.
 	 */
 	private String pathToGoSlimFile;
+	/**
+	 * The number of generation to be consecutively evolved and evaluated when performing parameter optimization in the genetic trainer
+	 */
+	private int numberOfGenerations = 25;
+	/**
+	 * The size of each generation to be evolved and evaluated when performing parameter optimization in the genetic trainer
+	 */
+	private int populationSize = 250;
+
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -437,7 +448,12 @@ public class Settings implements Cloneable {
 		if (input.get(GO_SLIM_PATH_KEY) != null) {
 			this.setPathToGoSlimFile(input.get(GO_SLIM_PATH_KEY).toString());
 		}
-
+		if (input.get(GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY) != null) {
+			this.setNumberOfGenerations(Integer.parseInt((String) input.get(GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY)));
+		}
+		if (input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY) != null) {
+			this.setNumberOfGenerations(Integer.parseInt((String) input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY)));
+		}
 	}
 
 	/**
@@ -1101,5 +1117,21 @@ public class Settings implements Cloneable {
 
 	public static Pattern getGoSlimFileGotermRegex() {
 		return GO_SLIM_FILE_GOTERM_REGEX;
+	}
+
+	public int getNumberOfGenerations() {
+		return numberOfGenerations;
+	}
+
+	public void setNumberOfGenerations(int numberOfGenerations) {
+		this.numberOfGenerations = numberOfGenerations;
+	}
+
+	public int getPopulationSize() {
+		return populationSize;
+	}
+
+	public void setPopulationSize(int populationSize) {
+		this.populationSize = populationSize;
 	}
 }

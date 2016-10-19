@@ -20,15 +20,13 @@ import ahrd.view.GeneticTrainerOutputWriter;
 
 public class GeneticTrainer extends Evaluator {
 
-	private static final int NUMBER_OF_GENERATIONS = 50;
-	private static final int POPULATION_SIZE = 100;
 	private static final Double GENERATIONAL_SURVIVAL_RATE = 0.2;
 	private static final Double GENERATIONAL_OFFSPRING_RATE = 0.2;
 	private static final Double GENERATIONAL_MUTANT_RATE = 0.2;
 
-	private static int numberOfSurvivors = (int) Math.round(POPULATION_SIZE * GENERATIONAL_SURVIVAL_RATE);
-	private static int numberOfOffspring = (int) Math.round(POPULATION_SIZE * GENERATIONAL_OFFSPRING_RATE);
-	private static int numberOfMutants = (int) Math.round(POPULATION_SIZE * GENERATIONAL_MUTANT_RATE);
+	private static int numberOfSurvivors;
+	private static int numberOfOffspring;
+	private static int numberOfMutants;
 	private Parameters bestParameters;
 	private Integer generationBestParametersWereFoundIn;
 	private GeneticTrainerOutputWriter outWriter;
@@ -82,6 +80,9 @@ public class GeneticTrainer extends Evaluator {
 	public GeneticTrainer(String pathToInputYml) throws IOException {
 		super(pathToInputYml);
 		this.outWriter = new GeneticTrainerOutputWriter();
+		numberOfSurvivors = (int) Math.round(getSettings().getPopulationSize() * GENERATIONAL_SURVIVAL_RATE);
+		numberOfOffspring = (int) Math.round(getSettings().getPopulationSize() * GENERATIONAL_OFFSPRING_RATE);
+		numberOfMutants = (int) Math.round(getSettings().getPopulationSize() * GENERATIONAL_MUTANT_RATE);
 	}
 
 	/**
@@ -99,15 +100,15 @@ public class GeneticTrainer extends Evaluator {
 		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();
 		sortedDistinctBlastDatabaseNames.addAll(getSettings().getBlastDatabases());
 		Collections.sort(sortedDistinctBlastDatabaseNames);
-		for (int i = 1; i <= POPULATION_SIZE; i++) {
+		for (int i = 1; i <= getSettings().getPopulationSize(); i++) {
 			population.add(Parameters.randomParameters(sortedDistinctBlastDatabaseNames));
 		}
 		int generation = 1;
 		double diffAvgEvalScoreToLastGeneration = 0;
 		// simulate generational succession
-		while (generation <= NUMBER_OF_GENERATIONS) {
+		while (generation <= getSettings().getNumberOfGenerations()) {
 			// Show progress
-			System.out.print("\rEvaluating generation " + generation + " of " + NUMBER_OF_GENERATIONS);
+			System.out.print("\rEvaluating generation " + generation + " of " + getSettings().getNumberOfGenerations());
 			// Determine the fitness of each individual (parameter set) in the
 			// population
 			for (Parameters individual : population) {
@@ -153,7 +154,7 @@ public class GeneticTrainer extends Evaluator {
 			}
 
 			// Fill the rest of the population with new parameter sets
-			while (population.size() <= POPULATION_SIZE) {
+			while (population.size() <= getSettings().getPopulationSize()) {
 				population.add(Parameters.randomParameters(sortedDistinctBlastDatabaseNames));
 			}
 
