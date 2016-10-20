@@ -526,15 +526,39 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	* evaluation score of the current Parameters of these Parameters is less
     * than, equal to, or greater than the average evaluation Score of the 
     * specified Parameters.
+    * 
+    * In case different parameter sets have been evaluated to the exact same 
+    * average score they can be further distinguished by the values of the 
+    * parameters themselves.
     * */
 	@Override
 	public int compareTo(Parameters other) {
 		if (this.getAvgEvaluationScore() != null && other.getAvgEvaluationScore() != null){
-			if (this.getAvgEvaluationScore() < other.getAvgEvaluationScore()) {
+			if (this.getAvgEvaluationScore() < other.getAvgEvaluationScore())
 				return -1;
-			} 
-			if (this.getAvgEvaluationScore() > other.getAvgEvaluationScore()) {
+			if (this.getAvgEvaluationScore() > other.getAvgEvaluationScore())
 				return 1;
+			if (this.getTokenScoreBitScoreWeight() < other.getTokenScoreBitScoreWeight())
+				return -1;
+			if (this.getTokenScoreBitScoreWeight() > other.getTokenScoreBitScoreWeight())
+				return 1;
+			if (this.getTokenScoreDatabaseScoreWeight() < other.getTokenScoreDatabaseScoreWeight())
+				return -1;
+			if (this.getTokenScoreDatabaseScoreWeight() > other.getTokenScoreDatabaseScoreWeight())
+				return 1;
+			if (this.getTokenScoreOverlapScoreWeight() < other.getTokenScoreOverlapScoreWeight())
+				return -1;
+			if (this.getTokenScoreOverlapScoreWeight() > other.getTokenScoreOverlapScoreWeight())
+				return 1;
+			for (String blastDbName : getSettings().getSortedBlastDatabases()) {
+				if (this.getDescriptionScoreBitScoreWeight(blastDbName) < other.getDescriptionScoreBitScoreWeight(blastDbName))
+					return -1;
+				if (this.getDescriptionScoreBitScoreWeight(blastDbName) > other.getDescriptionScoreBitScoreWeight(blastDbName))
+					return 1;
+				if (this.getBlastDbWeight(blastDbName) < other.getBlastDbWeight(blastDbName))
+					return -1;
+				if (this.getBlastDbWeight(blastDbName) > other.getBlastDbWeight(blastDbName))
+					return 1;
 			}
 		}
 		return 0;

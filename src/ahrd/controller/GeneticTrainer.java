@@ -13,8 +13,11 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.model.EvaluationScoreCalculator;
+import ahrd.model.GOdatabase;
+import ahrd.model.GOterm;
 import ahrd.model.Protein;
 import ahrd.view.GeneticTrainerOutputWriter;
 
@@ -49,7 +52,7 @@ public class GeneticTrainer extends Evaluator {
 			// After the setup the unique short accessions are no longer needed:
 			trainer.setUniqueBlastResultShortAccessions(null);
 			trainer.setupReferenceDescriptions();
-
+			trainer.setupGoAnnotationEvaluation();
 			// Try to find optimal parameters heuristically:
 			trainer.train();
 			// Calculate the average maximum evaluation score AHRD could have
@@ -93,8 +96,9 @@ public class GeneticTrainer extends Evaluator {
 	 * @throws IOException
 	 * @throws MissingInterproResultException
 	 * @throws SQLException
+	 * @throws MissingAccessionException 
 	 */
-	public void train() throws MissingInterproResultException, IOException, SQLException {
+	public void train() throws MissingInterproResultException, IOException, SQLException, MissingAccessionException {
 		Set<Parameters> population = new HashSet<Parameters>();
 		// Set up first generation
 		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();
@@ -117,6 +121,9 @@ public class GeneticTrainer extends Evaluator {
 					// Iterate over all Proteins and assign the best scoring Human
 					// Readable Description
 					assignHumanReadableDescriptions();
+					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+						goAnnotsStringToObject();
+					}
 					// Evaluate AHRD's performance for each Protein:
 					calculateEvaluationScores();
 					// Estimate average performance of current Parameters:
@@ -135,17 +142,19 @@ public class GeneticTrainer extends Evaluator {
 
 			// Recombination of fit survivors
 			Set<Set<Parameters>> uniqueMatingPairs = new HashSet<Set<Parameters>>();
-			while (population.size() < numberOfSurvivors + numberOfOffspring) {
-				Set<Parameters> matingPair = new HashSet<Parameters>();
-				do {
-					matingPair.clear();
-					while (matingPair.size() < 2) {
-						matingPair.add(getRandomFitIndividual(fittnessRanking));
-					}
-				} while (uniqueMatingPairs.contains(matingPair));
-				uniqueMatingPairs.add(matingPair);
-				Parameters[] matingPairArray = matingPair.toArray(new Parameters[0]);
-				population.add(matingPairArray[0].recombine(matingPairArray[1]));
+			if (Utils.binomial(fittnessRanking.size(), 2) >= numberOfOffspring) { // Avoid endless loops occurring if size of fittnessRanking very small 
+				while (population.size() < numberOfSurvivors + numberOfOffspring) {
+					Set<Parameters> matingPair = new HashSet<Parameters>();
+					do {
+						matingPair.clear();
+						while (matingPair.size() < 2) {
+							matingPair.add(getRandomFitIndividual(fittnessRanking));
+						}
+					} while (uniqueMatingPairs.contains(matingPair));
+					uniqueMatingPairs.add(matingPair);
+					Parameters[] matingPairArray = matingPair.toArray(new Parameters[0]);
+					population.add(matingPairArray[0].recombine(matingPairArray[1]));
+				}
 			}
 
 			// Mutants of fit survivors
@@ -197,7 +206,9 @@ public class GeneticTrainer extends Evaluator {
 
 	/**
 	 * Calculates the average of AHRD's EvaluationScore (objective-function).
-	 * Also calculates the average True-Positives- and False-Positives-Rates.
+	 * If GO term scores have been computed the average is based upon them.
+	 * Otherwise the conventional HRD based scores are used. If so also calculates 
+	 * the average True-Positives- and False-Positives-Rates.
 	 */
 	public void calcAveragesOfEvalScoreTPRandFPR() {
 		// average evaluation-score
@@ -206,25 +217,41 @@ public class GeneticTrainer extends Evaluator {
 		Double avgTruePosRate = 0.0;
 		// average FPR:
 		Double avgFalsePosRate = 0.0;
-		for (Protein p : getProteins().values()) {
-			EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
-			if (e != null) {
-				if (e.getEvalutionScore() != null)
-					avgEvlScr += e.getEvalutionScore();
-				if (e.getTruePositivesRate() != null)
-					avgTruePosRate += e.getTruePositivesRate();
-				if (e.getFalsePositivesRate() != null)
-					avgFalsePosRate += e.getFalsePositivesRate();
+		// Evaluate GO annotations.
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+			for (Protein p : getProteins().values()) {
+				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
+				if (e != null) {
+					//Depending on the settings the go annotation f-score with the highest level of complexity is used
+					if (getSettings().getCalculateSemSimGoF1Scores()) {
+						avgEvlScr += e.getSemSimGoAnnotationScore();
+					} else {
+						if (getSettings().getCalculateAncestryGoF1Scores()) {
+							avgEvlScr += e.getAncestryGoAnnotationScore();
+						} else {
+							avgEvlScr += e.getSimpleGoAnnotationScore();
+						}
+					}
+				}
+			}
+		} else { // Otherwise use HRD based scores
+			for (Protein p : getProteins().values()) {
+				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
+				if (e != null) {
+					if (e.getEvalutionScore() != null)
+						avgEvlScr += e.getEvalutionScore();
+					if (e.getTruePositivesRate() != null)
+						avgTruePosRate += e.getTruePositivesRate();
+					if (e.getFalsePositivesRate() != null)
+						avgFalsePosRate += e.getFalsePositivesRate();
+				}
 			}
 		}
 		// average each number:
 		Double numberOfProts = new Double(getProteins().size());
-		if (avgEvlScr > 0.0)
-			avgEvlScr = avgEvlScr / numberOfProts;
-		if (avgTruePosRate > 0.0)
-			avgTruePosRate = avgTruePosRate / numberOfProts;
-		if (avgFalsePosRate > 0.0)
-			avgFalsePosRate = avgFalsePosRate / numberOfProts;
+		avgEvlScr = avgEvlScr / numberOfProts;
+		avgTruePosRate = avgTruePosRate / numberOfProts;
+		avgFalsePosRate = avgFalsePosRate / numberOfProts;
 		// done:
 		getSettings().setAvgEvaluationScore(avgEvlScr);
 		getSettings().setAvgTruePositivesRate(avgTruePosRate);

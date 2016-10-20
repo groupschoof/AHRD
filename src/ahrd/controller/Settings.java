@@ -452,7 +452,7 @@ public class Settings implements Cloneable {
 			this.setNumberOfGenerations(Integer.parseInt((String) input.get(GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY)));
 		}
 		if (input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY) != null) {
-			this.setNumberOfGenerations(Integer.parseInt((String) input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY)));
+			this.setPopulationSize(Integer.parseInt((String) input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY)));
 		}
 	}
 

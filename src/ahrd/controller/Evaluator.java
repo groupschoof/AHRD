@@ -5,6 +5,7 @@ import static ahrd.controller.Settings.getSettings;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -114,16 +115,7 @@ public class Evaluator extends AHRD {
 				p.getEvaluationScoreCalculator().getReferenceGoAnnoatations().add(term);
 			}
 			// Add GOterm objects to predicted annotations
-			for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();) {
-				Protein prot = protIter.next();
-				for (String termAcc : prot.getGoResults()) {
-					GOterm term = goDB.get(termAcc);
-					if (term == null) {
-						throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
-					}
-					prot.getGoResultsTerms().add(term);
-				}
-			}
+			goAnnotsStringToObject();
 			// Annotate the best blast results with GOterm objects
 			if (getSettings().getWriteBestBlastHitsToOutput()) {
 				for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();){
@@ -147,6 +139,24 @@ public class Evaluator extends AHRD {
 		}
 	}
 
+	public void goAnnotsStringToObject() throws FileNotFoundException, IOException, MissingAccessionException {
+		// Load a Map of all GO terms
+		if (goDB == null)
+			goDB = new GOdatabase().getMap();
+		// Add GOterm objects to predicted annotations
+		for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();) {
+			Protein prot = protIter.next();
+			prot.setGoResultsTerms(new HashSet<GOterm>());
+			for (String termAcc : prot.getGoResults()) {
+				GOterm term = goDB.get(termAcc);
+				if (term == null) {
+					throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
+				}
+				prot.getGoResultsTerms().add(term);
+			}
+		}
+	}
+	
 	/**
 	 * @param args
 	 */

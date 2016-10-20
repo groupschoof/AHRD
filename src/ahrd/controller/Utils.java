@@ -174,4 +174,18 @@ public class Utils {
 	public static String replaceLast(String text, String regex, String replacement) {
         return text.replaceFirst("(?s)(.*)" + regex, "$1" + replacement);
     }
+	
+	/**
+	 * https://rosettacode.org/wiki/Evaluate_binomial_coefficients#Java
+	 * (GNU Free Documentation License 1.2) 
+	 */
+	public static long binomial(int n, int k) {
+        if (k>n-k)
+            k=n-k;
+ 
+        long b=1;
+        for (int i=1, m=n; i<=k; i++, m--)
+            b=b*m/i;
+        return b;
+    }
 }
