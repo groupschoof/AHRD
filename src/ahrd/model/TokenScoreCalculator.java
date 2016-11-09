@@ -103,6 +103,7 @@ public class TokenScoreCalculator {
 	 * the Map 'tokenScores' key is Token and value is it's TokenScore.
 	 */
 	public void assignTokenScores() {
+		setTokenHighScore(0.0);
 		// iterate through blast databases having BlastResults
 		for (String iterBlastDb : getProtein().getBlastResults().keySet()) {
 			// iterate through blast results in coming from the different blast

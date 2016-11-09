@@ -2,6 +2,8 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,11 +17,11 @@ import java.util.TreeSet;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
+import ahrd.exception.MissingProteinException;
 import ahrd.model.EvaluationScoreCalculator;
-import ahrd.model.GOdatabase;
-import ahrd.model.GOterm;
 import ahrd.model.Protein;
 import ahrd.view.GeneticTrainerOutputWriter;
+import nu.xom.ParsingException;
 
 public class GeneticTrainer extends Evaluator {
 
@@ -97,14 +99,20 @@ public class GeneticTrainer extends Evaluator {
 	 * @throws MissingInterproResultException
 	 * @throws SQLException
 	 * @throws MissingAccessionException 
+	 * @throws ParsingException 
+	 * @throws MissingProteinException 
 	 */
-	public void train() throws MissingInterproResultException, IOException, SQLException, MissingAccessionException {
+	public void train() throws MissingInterproResultException, IOException, SQLException, MissingAccessionException, MissingProteinException, ParsingException {
 		Set<Parameters> population = new HashSet<Parameters>();
 		// Set up first generation
 		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();
 		sortedDistinctBlastDatabaseNames.addAll(getSettings().getBlastDatabases());
 		Collections.sort(sortedDistinctBlastDatabaseNames);
-		for (int i = 1; i <= getSettings().getPopulationSize(); i++) {
+		// Add parameters from YML-input to first generation (enables seeding with high mean evaluation score parameter set)
+		Parameters seed = getSettings().getParameters().clone();
+		seed.setOrigin("seed");
+		population.add(seed);
+		for (int i = 2; i <= getSettings().getPopulationSize(); i++) {
 			population.add(Parameters.randomParameters(sortedDistinctBlastDatabaseNames));
 		}
 		int generation = 1;
@@ -116,7 +124,7 @@ public class GeneticTrainer extends Evaluator {
 			// Determine the fitness of each individual (parameter set) in the
 			// population
 			for (Parameters individual : population) {
-				if (individual.getAvgEvaluationScore() == null) {
+//				if (individual.getAvgEvaluationScore() == null) {
 					getSettings().setParameters(individual);
 					// Iterate over all Proteins and assign the best scoring Human
 					// Readable Description
@@ -128,7 +136,10 @@ public class GeneticTrainer extends Evaluator {
 					calculateEvaluationScores();
 					// Estimate average performance of current Parameters:
 					calcAveragesOfEvalScoreTPRandFPR();
-				}
+//					if(getSettings().getParameters().getOrigin().equals("seed")) {
+//						writeProteins(generation);
+//					}
+//				}
 			}
 
 			// Survival of the fittest
@@ -182,7 +193,50 @@ public class GeneticTrainer extends Evaluator {
 			generation += 1;
 		}
 	}
-
+	
+	/**
+	 * Writes useful info for every protein according to the currents parameter set to file.
+	 * Is meant for Debugging.
+	 * Uses the generation number as file name.
+	 * @param generation
+	 * @throws IOException
+	 */
+	private void writeProteins(int generation) throws IOException{
+		BufferedWriter outBufWrtr = new BufferedWriter(new FileWriter(generation + ".tsv"));
+		outBufWrtr.write("QueryAccession\tBlastAccession\tSemSimGoAnnotationScore\tGOterms\tDescriptionScore\tLexicalScore\tRelativeBlastScore\tBitScore\tMaxBitScore\tDescription\n");
+		int count = 0;
+		for(Protein p:getProteins().values()) {
+			if(p.getDescriptionScoreCalculator()==null) {
+				System.out.println("NPE");
+			} else {
+				if (p.getDescriptionScoreCalculator().getHighestScoringBlastResult()==null) {
+					//outBufWrtr.write(p.getAccession() + "\t-\n");
+				} else {
+					if(p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescription()==null) {
+						System.out.println("NPE");
+					} else {
+						count++;
+						if (count == 178) {
+							double test = p.getLexicalScoreCalculator().lexicalScore(p.getDescriptionScoreCalculator().getHighestScoringBlastResult());
+							test = test + 0.0;
+						}
+						outBufWrtr.write(p.getAccession() + "\t"
+					+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession() + "\t"
+					+ p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore() + "\t"
+					+ String.join(",", p.getGoResults()) + "\t" 
+					+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescriptionScore() + "\t"
+					+ p.getLexicalScoreCalculator().lexicalScore(p.getDescriptionScoreCalculator().getHighestScoringBlastResult()) + "\t"
+					+ p.getDescriptionScoreCalculator().relativeBlastScore(p.getDescriptionScoreCalculator().getHighestScoringBlastResult()) + "\t"
+					+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getBitScore() + "\t"
+					+ p.getDescriptionScoreCalculator().getMaxBitScore() + "\t"
+					+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescription() + "\n");
+					}
+				}
+			}
+		}
+		outBufWrtr.close();	
+	}
+	
 	/**
 	 * Returns a random individual (parameter set) from a navigable set of
 	 * parameter sets ordered according to their fittness (evaluation score) A

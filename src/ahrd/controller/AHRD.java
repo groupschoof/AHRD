@@ -244,6 +244,8 @@ public class AHRD {
 							prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession())) {
 				prot.setGoResults(getDatabaseGoAnnotations()
 						.get(prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession()));
+			} else {
+				prot.setGoResults(new HashSet<String>());
 			}
 			// filter for each protein's most-informative
 			// interpro-results
