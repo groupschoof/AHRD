@@ -25,6 +25,11 @@ public class EvaluationScoreCalculator {
 	 */
 	private Set<Blast2GoAnnot> blast2GoAnnots;
 	/**
+	 * Competitor annotations
+	 */
+	private Map<String, CompetitorAnnotation> competitorAnnotations;
+	
+	/**
 	 * The unchanged BlastResults are not passed through any filter nor
 	 * blacklist, they serve only AHRD-evaluation and training-purposes. Only
 	 * the best BlastHit per searched Blast-Database is remembered. Comparison
@@ -198,9 +203,34 @@ public class EvaluationScoreCalculator {
 				setTruePositivesRate(0.0);
 				setFalsePositivesRate(0.0);
 			}
+			// Do the competitors
+			Double bestCompEvlScr = 0.0;
+			if (getSettings().hasCompetitors()) {
+				for (String competitor : getSettings().getCompetitorSettings().keySet()) {
+					Map<String, CompetitorAnnotation> compAnnots = getCompetitorAnnotations();
+					if (compAnnots != null) {
+						CompetitorAnnotation annot = compAnnots.get(competitor);
+						if (annot != null) {
+							// Description
+							annot.setEvaluationScore(fBetaScore(annot.getEvaluationTokens(), getReferenceDescription().getTokens()));
+							// Find best performing competitor-method:
+							if (annot.getEvaluationScore() > bestCompEvlScr)
+								bestCompEvlScr = annot.getEvaluationScore();
+							// GOterm annotations scores
+							if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+								if (getSettings().getCalculateSimpleGoF1Scores())
+									annot.setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, annot.getGoAnnotations()));
+								if (getSettings().getCalculateAncestryGoF1Scores())
+									annot.setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, annot.getGoAnnotations()));
+								if (getSettings().getCalculateSemSimGoF1Scores())
+									annot.setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, annot.getGoAnnotations()));
+							}
+						}
+					}
+				}
+			}
 			// Other competitors are the best unchanged BlastHits from all
 			// performed Blast-Database-Searches:
-			Double bestCompEvlScr = 0.0;
 			if (getUnchangedBlastResults().size() > 0) {
 				for (String blastDatabase : getUnchangedBlastResults().keySet()) {
 					BlastResult cmpt = getUnchangedBlastResults().get(blastDatabase);
@@ -615,6 +645,21 @@ public class EvaluationScoreCalculator {
 
 	public void setSemSimGoAnnotationScore(Double semSimGoAnnotationScore) {
 		this.semSimGoAnnotationScore = semSimGoAnnotationScore;
+	}
+
+	public Map<String, CompetitorAnnotation> getCompetitorAnnotations() {
+		return competitorAnnotations;
+	}
+
+	public void setCompetitorAnnotations(Map<String, CompetitorAnnotation> competitorAnnotations) {
+		this.competitorAnnotations = competitorAnnotations;
+	}
+	
+	public void addCompetitorAnnotation(String competitor, CompetitorAnnotation annotation) {
+		if (this.competitorAnnotations == null) {
+			setCompetitorAnnotations(new HashMap<String, CompetitorAnnotation>());
+		}
+		this.competitorAnnotations.put(competitor, annotation);
 	}
 
 }

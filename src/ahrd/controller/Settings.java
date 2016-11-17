@@ -112,7 +112,10 @@ public class Settings implements Cloneable {
 	public static final Pattern GO_SLIM_FILE_GOTERM_REGEX = Pattern.compile("^id: (?<goTerm>GO:\\d{7})$");
 	public static final String GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY = "number_of_generations";
 	public static final String GENETIC_TRAINING_POPULATION_SIZE_KEY = "population_size";
-
+	public static final String COMPETITORS_KEY = "competitors";
+	public static final String COMPETITOR_DESCRIPTIONS_FILE_KEY = "descriptions";
+	public static final String COMPETITOR_GOA_FILE_KEY = "go_annotations";
+	
 	/**
 	 * Fields:
 	 */
@@ -283,7 +286,10 @@ public class Settings implements Cloneable {
 	 * The size of each generation to be evolved and evaluated when performing parameter optimization in the genetic trainer
 	 */
 	private int populationSize = 250;
-
+	/**
+	 * Competitors to be compared to AHRD in evaluation run
+	 */
+	private Map<String, Map<String, String>> competitorSettings = new HashMap<String, Map<String, String>>();
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -453,6 +459,9 @@ public class Settings implements Cloneable {
 		}
 		if (input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY) != null) {
 			this.setPopulationSize(Integer.parseInt((String) input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY)));
+		}
+		if (input.get(COMPETITORS_KEY) != null) {
+			setCompetitorSettings((Map<String, Map<String, String>>) input.get(COMPETITORS_KEY));
 		}
 	}
 
@@ -1133,5 +1142,25 @@ public class Settings implements Cloneable {
 
 	public void setPopulationSize(int populationSize) {
 		this.populationSize = populationSize;
+	}
+
+	public Map<String, Map<String, String>> getCompetitorSettings() {
+		return competitorSettings;
+	}
+
+	public void setCompetitorSettings(Map<String, Map<String, String>> competitorSettings) {
+		this.competitorSettings = competitorSettings;
+	}
+	
+	public Boolean hasCompetitors() {
+		return !getCompetitorSettings().isEmpty();
+	}
+	
+	public List<String> getCompetitorDescriptions(String competitor) throws IOException {
+		return fromFile(getCompetitorSettings().get(competitor).get(COMPETITOR_DESCRIPTIONS_FILE_KEY));
+	}
+	
+	public List<String> getCompetitorGOAnnotations(String competitor) throws IOException {
+		return fromFile(getCompetitorSettings().get(competitor).get(COMPETITOR_GOA_FILE_KEY));
 	}
 }

@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.BlastResult;
+import ahrd.model.CompetitorAnnotation;
 import ahrd.model.GOdatabase;
 import ahrd.model.GOterm;
 import ahrd.model.InterproResult;
@@ -180,7 +181,9 @@ public class Evaluator extends AHRD {
 			// Blast2GO is another competitor in the field of annotation of
 			// predicted Proteins. AHRD might be compared with B2Gs performance:
 			evaluator.setupBlast2GoAnnots();
-			// Evaluate AHRD's performance for each Protein:
+			// Sets up description and GOterm annotations of competitors in the EvaluationScoreCalculators of each Protein   
+			evaluator.setupCompetitors();
+			// Evaluate AHRD's and Competitors Performance for each Protein:
 			evaluator.calculateEvaluationScores();
 			// If requested, calculate the highest possibly achievable
 			// evaluation score:
@@ -222,6 +225,51 @@ public class Evaluator extends AHRD {
 	public void findHighestPossibleEvaluationScores() {
 		for (Protein prot : getProteins().values()) {
 			prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
+		}
+	}
+	
+	/**
+	 * It is assumed that every protein with GO annotations is also present in the description annotation file.
+	 * Annotation files must be tab separated. 
+	 * @throws IOException 
+	 * @throws MissingAccessionException 
+	 */
+	private void setupCompetitors() throws IOException, MissingAccessionException {
+		if(getSettings().hasCompetitors()){
+			for (String competitor : getSettings().getCompetitorSettings().keySet()) {
+				Map<String, CompetitorAnnotation> annots = new HashMap<String, CompetitorAnnotation>();
+				// Parse description lines and build a map of protein accessions and blast2go annotations
+				for (String competitorDescriptionLine : getSettings().getCompetitorDescriptions(competitor)) {
+					String[] values = competitorDescriptionLine.split("\t");
+					String accession = values[0].trim();
+					CompetitorAnnotation annot = new CompetitorAnnotation(accession, values[1].trim());
+					annots.put(accession, annot);
+				}
+				// GO annotations
+				if(getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+					// Parse GO annotation lines and add go annotations to blast2go annotations
+					for (String competitorGoAnnotationLine : getSettings().getCompetitorGOAnnotations(competitor)) {
+						String[] values = competitorGoAnnotationLine.split("\t");
+						String accession = values[0].trim();
+						CompetitorAnnotation annot = annots.get(accession);
+						if (annot == null)
+							throw new MissingAccessionException("Could not find " + competitor + " Annotation for Accession '" + accession + "'");
+						String termAcc = values[1].trim();
+						GOterm term = this.goDB.get(termAcc);
+						if (term == null)
+							throw new MissingAccessionException("Could not find '" + termAcc + "' in GOterm database for " + competitor + " Annotation of protein '" + accession + "'");
+						annot.getGoAnnotations().add(term);
+					}
+				}
+				// Add competitor annotations to the evaluation score calculators of the appropriate proteins
+				for (Map.Entry<String, CompetitorAnnotation> annot : annots.entrySet()) {
+					Protein p = getProteins().get(annot.getKey());
+					if (p == null)
+						throw new MissingAccessionException(
+								"Could not find Protein for Accession '" + annot.getKey() + "'");
+					p.getEvaluationScoreCalculator().addCompetitorAnnotation(competitor, annot.getValue());
+				}	
+			}
 		}
 	}
 

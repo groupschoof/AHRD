@@ -10,11 +10,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import ahrd.controller.AHRD;
 import ahrd.model.Blast2GoAnnot;
 import ahrd.model.BlastResult;
+import ahrd.model.CompetitorAnnotation;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
 
@@ -58,6 +60,20 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					bw.write("\tBlast2GO-Annotations-SemSim-F-Score");
 			}
 		}
+		if (getSettings().hasCompetitors()) {
+			for (String competitor : getSettings().getCompetitorSettings().keySet()) {
+				bw.write("\t" + competitor + "-Description\t" + competitor + "-Length\t" + competitor + "-Evaluation-Score");
+				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+					bw.write("\t" + competitor + "-Annotations");
+					if (getSettings().getCalculateSimpleGoF1Scores())
+						bw.write("\t" + competitor + "-Annotations-Simple-F-Score");
+					if (getSettings().getCalculateAncestryGoF1Scores())
+						bw.write("\t" + competitor + "-Annotations-Ancestry-F-Score");
+					if (getSettings().getCalculateSemSimGoF1Scores())
+						bw.write("\t" + competitor + "-Annotations-SemSim-F-Score");
+				}
+			}
+		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
 			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
 		}
@@ -90,6 +106,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			if (getSettings().hasBlast2GoAnnotations()) {
 				csvRow += buildBlast2GoColumns(prot);
+			}
+			if (getSettings().hasCompetitors()) {
+				for (String competitor : getSettings().getCompetitorSettings().keySet()) {
+					csvRow += buildCompetitorColumns(competitor, prot);
+				}
 			}
 			if (getSettings().doFindHighestPossibleEvaluationScore()) {
 				csvRow += buildHighestPossibleEvaluationScoreColumn(prot);
@@ -135,20 +156,52 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					csvCols += "\t" + FRMT.format(bestB2ga.getSemSimGoAnnotationScore());
 			}
 		} else {
-			csvCols += "\t\t0\t0.0";
-			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-				csvCols += "\t";
-				if (getSettings().getCalculateSimpleGoF1Scores())
-					csvCols += "\t0.0";
-				if (getSettings().getCalculateAncestryGoF1Scores())
-					csvCols += "\t0.0";
-				if (getSettings().getCalculateSemSimGoF1Scores())
-					csvCols += "\t0.0";
-			}
+			csvCols += buildCompetitorsMissingAnnotationColumns();
 		}
 
 		return csvCols;
 	}
+	
+	public String buildCompetitorColumns(String competitor, Protein prot) {
+		String csvCols = "";
+		Map<String, CompetitorAnnotation> compAnnots = prot.getEvaluationScoreCalculator().getCompetitorAnnotations();
+		if (compAnnots != null) {
+			CompetitorAnnotation annot = compAnnots.get(competitor);
+			if (annot != null) {
+				csvCols += "\t" + annot.getDescription() + "\t" + annot.getEvaluationTokens().size() + "\t" + FRMT.format(annot.getEvaluationScore());
+				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+					csvCols += "\t" + combineGoTermsToString(annot.getGoAnnotations());
+					if (getSettings().getCalculateSimpleGoF1Scores())
+						csvCols += "\t" + FRMT.format(annot.getSimpleGoAnnotationScore());
+					if (getSettings().getCalculateAncestryGoF1Scores())
+						csvCols += "\t" + FRMT.format(annot.getAncestryGoAnnotationScore());
+					if (getSettings().getCalculateSemSimGoF1Scores())
+						csvCols += "\t" + FRMT.format(annot.getSemSimGoAnnotationScore());
+				}
+			} else {
+				csvCols += buildCompetitorsMissingAnnotationColumns();
+			}
+		} else {
+			csvCols += buildCompetitorsMissingAnnotationColumns();
+		}
+		return csvCols;
+	}
+	
+	public String buildCompetitorsMissingAnnotationColumns() {
+		String csvCols = "";
+		csvCols += "\t\t0\t0.0";
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+			csvCols += "\t";
+			if (getSettings().getCalculateSimpleGoF1Scores())
+				csvCols += "\t0.0";
+			if (getSettings().getCalculateAncestryGoF1Scores())
+				csvCols += "\t0.0";
+			if (getSettings().getCalculateSemSimGoF1Scores())
+				csvCols += "\t0.0";
+		}
+		return csvCols;
+	}
+	
 
 	/**
 	 * @param Protein
