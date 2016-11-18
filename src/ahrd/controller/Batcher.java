@@ -24,7 +24,6 @@ public class Batcher {
 	public static final String AHRD_CALL_BATCH_NAME = "#batch_name#";
 	public static final String PROTEINS_DIR_KEY = "proteins_dir";
 	public static final String REFERENCES_DIR_KEY = "references_dir";
-	public static final String BLAST_2_GO_RESULTS_DIR_KEY = "blast2go_dir";
 	public static final String BLAST_RESULTS_DIR_KEY = "dir";
 	public static final String INTERPRO_RESULTS_DIR_KEY = "interpro_results_dir";
 	public static final String INTERPRO_RESULTS_FILE_KEY = "interpro_results_file";
@@ -132,13 +131,6 @@ public class Batcher {
 		if (getInput().containsKey(REFERENCES_DIR_KEY)) {
 			batchYml.put(Settings.REFERENCES_FASTA_KEY,
 					generatePathToFile(batchName, REFERENCES_DIR_KEY, null));
-		}
-		// Set blast2go-results, if given:
-		if (getInput().containsKey(BLAST_2_GO_RESULTS_DIR_KEY)) {
-			batchYml.put(
-					Settings.BLAST_2_GO_ANNOT_FILE_KEY,
-					generatePathToFile(batchName, BLAST_2_GO_RESULTS_DIR_KEY,
-							null));
 		}
 		// Store F-Score-Beta-Parameter, if given:
 		if (getInput().containsKey(Settings.F_MEASURE_BETA_PARAM_KEY)) {

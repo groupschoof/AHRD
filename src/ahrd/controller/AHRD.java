@@ -21,7 +21,6 @@ import org.xml.sax.SAXException;
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
-import ahrd.model.Blast2GoAnnot;
 import ahrd.model.BlastResult;
 import ahrd.model.GOdatabase;
 import ahrd.model.GOterm;

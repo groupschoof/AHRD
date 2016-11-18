@@ -40,7 +40,10 @@ write_best_blast_hits_to_output: true
 write_scores_to_output: false
 output: ./ahrd_output.csv
 references_fasta: ./test/resources/references.fasta
-blast2go: ./test/resources/blast2go_out.annot
+competitors:
+  blast2go:
+    descriptions: ./test/resources/blast2go_descriptions.tsv
+    go_annotations: ./test/resources/blast2go_goterms.tsv
 remember_simulated_annealing_path: true
 seq_sim_search_table_comment_line_regex: "#"
 seq_sim_search_table_sep: "\t"

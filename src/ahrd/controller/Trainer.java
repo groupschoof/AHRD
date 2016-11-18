@@ -40,10 +40,6 @@ public class Trainer extends Evaluator {
 			// After the setup the unique short accessions are no longer needed:
 			trainer.setUniqueBlastResultShortAccessions(null);
 			trainer.setupReferenceDescriptions();
-			// Blast2GO is another competitor in the field of annotation of
-			// predicted Proteins. AHRD might be compared with B2Gs performance:
-			trainer.setupBlast2GoAnnots();
-
 			// Try to find optimal parameters heuristically:
 			trainer.train();
 			// Calculate the average maximum evaluation score AHRD could have

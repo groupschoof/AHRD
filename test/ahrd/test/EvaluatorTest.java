@@ -12,7 +12,6 @@ import org.xml.sax.SAXException;
 import ahrd.controller.Evaluator;
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
-import ahrd.model.Blast2GoAnnot;
 
 public class EvaluatorTest {
 
@@ -27,25 +26,22 @@ public class EvaluatorTest {
 	public void testSetupBlast2GoAnnots() throws IOException,
 			MissingAccessionException {
 		evaluator.initializeProteins();
-		evaluator.setupBlast2GoAnnots();
+		evaluator.setupCompetitors();
 		assertEquals(2, evaluator.getProteins().size());
 		assertNotNull(
-				"After setting up Blast2GoAnnots the Evaluator should have assigned a Blast2GoAnnot to the protein with accession 'gene:chr01.1056:mRNA:chr01.1056'.",
+				"After setting up Competitors the Evaluator should have assigned a CompetitorAnnotation to the protein with accession 'gene:chr01.1056:mRNA:chr01.1056'.",
 				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
-						.getEvaluationScoreCalculator().getBlast2GoAnnots());
+						.getEvaluationScoreCalculator().getCompetitorAnnotations());
 		assertNotNull(
-				"After setting up Blast2GoAnnots the Evaluator should have assigned a Blast2GoAnnot to the protein with accession 'gene:chr01.1056:mRNA:chr01.1056'.",
+				"After setting up Blast2GoAnnots the Evaluator should have assigned a Blast2GoAnnot to the protein with accession 'gene:chr01.502:mRNA:chr01.502'.",
 				evaluator.getProteins().get("gene:chr01.502:mRNA:chr01.502")
-						.getEvaluationScoreCalculator().getBlast2GoAnnots());
+						.getEvaluationScoreCalculator().getCompetitorAnnotations());
 		assertEquals("nrpb6a dna binding dna-directed rna polymerase",
 				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
-						.getEvaluationScoreCalculator().getBlast2GoAnnots()
-						.toArray(new Blast2GoAnnot[] {})[0].getDescription());
+						.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getDescription());
 		assertEquals(6,
 				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
-						.getEvaluationScoreCalculator().getBlast2GoAnnots()
-						.toArray(new Blast2GoAnnot[] {})[0]
-						.getEvaluationTokens().size());
+						.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getEvaluationTokens().size());
 	}
 
 	@Test

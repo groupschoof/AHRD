@@ -20,12 +20,8 @@ public class EvaluationScoreCalculator {
 	 */
 	private ReferenceDescription referenceDescription;
 	/**
-	 * A Blast2GoAnnotation is instantiated in order to compare AHRD's
-	 * performance with Blast2GOs. Blast2Go assigns multiple descriptions.
-	 */
-	private Set<Blast2GoAnnot> blast2GoAnnots;
-	/**
-	 * Competitor annotations
+	 * The annotations of competitors are instantiated in order to compare AHRD's
+	 * performance to them.
 	 */
 	private Map<String, CompetitorAnnotation> competitorAnnotations;
 	
@@ -259,16 +255,6 @@ public class EvaluationScoreCalculator {
 					}
 				}
 			}
-			// Also compare with the Blast2GO-Annotation(s), if present:
-			if (getBlast2GoAnnots() != null) {
-				for (Blast2GoAnnot b2ga : getBlast2GoAnnots()) {
-					b2ga.setEvaluationScore(
-							fBetaScore(b2ga.getEvaluationTokens(), getReferenceDescription().getTokens()));
-					// Find best performing competitor-method:
-					if (b2ga.getEvaluationScore() > bestCompEvlScr)
-						bestCompEvlScr = b2ga.getEvaluationScore();
-				}
-			}
 			// Compare AHRD's performance:
 			setEvalScoreMinBestCompScore(getEvalutionScore() - bestCompEvlScr);
 		}
@@ -290,22 +276,6 @@ public class EvaluationScoreCalculator {
 			// GO annotations.
 			if (getSettings().getCalculateSemSimGoF1Scores())
 				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, this.protein.getGoResultsTerms()));
-			/**
-			 * B2G
-			 */
-			if (getBlast2GoAnnots() != null) {
-				for (Blast2GoAnnot b2ga : getBlast2GoAnnots()) {
-					if (getSettings().getCalculateSimpleGoF1Scores())
-						b2ga.setSimpleGoAnnotationScore(
-								calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, b2ga.getGoAnnotations()));
-					if (getSettings().getCalculateAncestryGoF1Scores())
-						b2ga.setAncestryGoAnnotationScore(
-								calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, b2ga.getGoAnnotations()));
-					if (getSettings().getCalculateSemSimGoF1Scores())
-						b2ga.setSemSimGoAnnotationScore(
-								calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, b2ga.getGoAnnotations()));
-				}
-			}
 		}
 	}
 
@@ -514,35 +484,6 @@ public class EvaluationScoreCalculator {
 		}
 	}
 
-	/**
-	 * Sorts Blast2GoAnnots by their evaluation-scores ascending. So the
-	 * <b>last</b> Blast2GoAnnot in the list will be best performing!
-	 * 
-	 * @return Sorted List<Blast2GoAnnot>
-	 */
-	public List<Blast2GoAnnot> sortBlast2GoAnnotsByEvalScore() {
-		List<Blast2GoAnnot> b2gaRanked = null;
-		if (getBlast2GoAnnots() != null) {
-			b2gaRanked = new ArrayList<Blast2GoAnnot>(getBlast2GoAnnots());
-			Collections.sort(b2gaRanked);
-		}
-		return b2gaRanked;
-	}
-
-	/**
-	 * Blast2Go assigns multiple annotations. In the standard output-file
-	 * (.annot) these are written into several lines. Some of those lines show
-	 * identical descriptions, hence this method only adds Blast2GoAnnots, if
-	 * its description is not already present.
-	 * 
-	 * @param b2ga
-	 */
-	public void addBlast2GoAnnot(Blast2GoAnnot b2ga) {
-		if (getBlast2GoAnnots() == null)
-			setBlast2GoAnnots(new HashSet<Blast2GoAnnot>());
-		getBlast2GoAnnots().add(b2ga);
-	}
-
 	public ReferenceDescription getReferenceDescription() {
 		return referenceDescription;
 	}
@@ -597,14 +538,6 @@ public class EvaluationScoreCalculator {
 
 	public void setFalsePositivesRate(Double falsePositivesRate) {
 		this.falsePositivesRate = falsePositivesRate;
-	}
-
-	public Set<Blast2GoAnnot> getBlast2GoAnnots() {
-		return blast2GoAnnots;
-	}
-
-	public void setBlast2GoAnnots(Set<Blast2GoAnnot> blast2GoAnnots) {
-		this.blast2GoAnnots = blast2GoAnnots;
 	}
 
 	public Double getHighestPossibleEvaluationScore() {

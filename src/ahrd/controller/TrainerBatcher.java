@@ -97,12 +97,6 @@ public class TrainerBatcher extends Batcher {
 		batchYml.put(Settings.REFERENCES_FASTA_KEY,
 				getInput().get(Settings.REFERENCES_FASTA_KEY));
 
-		// Set blast2go-results, if given:
-		if (getInput().containsKey(BLAST_2_GO_RESULTS_DIR_KEY)) {
-			batchYml.put(Settings.BLAST_2_GO_ANNOT_FILE_KEY,
-					getInput().get(Settings.BLAST_2_GO_ANNOT_FILE_KEY));
-		}
-
 		// Store F-Score-Beta-Parameter, if given:
 		if (getInput().containsKey(Settings.F_MEASURE_BETA_PARAM_KEY)) {
 			batchYml.put(Settings.F_MEASURE_BETA_PARAM_KEY,

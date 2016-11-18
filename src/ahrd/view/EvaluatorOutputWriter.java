@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import ahrd.controller.AHRD;
-import ahrd.model.Blast2GoAnnot;
 import ahrd.model.BlastResult;
 import ahrd.model.CompetitorAnnotation;
 import ahrd.model.GOterm;
@@ -47,18 +46,6 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		}
 		if (getSettings().getWriteScoresToOutput()) {
 			bw.write("\tSum(Token-Scores)\tTokenHighScore\tCorrection-Factor\tLexical-Score\tRelativeBitScore");
-		}
-		if (getSettings().hasBlast2GoAnnotations()) {
-			bw.write("\tBlast2GO-Description\tBlast2GO-Length\tBlast2GO-Evaluation-Score");
-			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-				bw.write("\tBlast2GO-Annotations");
-				if (getSettings().getCalculateSimpleGoF1Scores())
-					bw.write("\tBlast2GO-Annotations-Simple-F-Score");
-				if (getSettings().getCalculateAncestryGoF1Scores())
-					bw.write("\tBlast2GO-Annotations-Ancestry-F-Score");
-				if (getSettings().getCalculateSemSimGoF1Scores())
-					bw.write("\tBlast2GO-Annotations-SemSim-F-Score");
-			}
 		}
 		if (getSettings().hasCompetitors()) {
 			for (String competitor : getSettings().getCompetitorSettings().keySet()) {
@@ -104,9 +91,6 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			if (getSettings().getWriteScoresToOutput()) {
 				csvRow += buildDescScoreCells(prot);
 			}
-			if (getSettings().hasBlast2GoAnnotations()) {
-				csvRow += buildBlast2GoColumns(prot);
-			}
 			if (getSettings().hasCompetitors()) {
 				for (String competitor : getSettings().getCompetitorSettings().keySet()) {
 					csvRow += buildCompetitorColumns(competitor, prot);
@@ -137,29 +121,6 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 
 	public String buildHighestPossibleEvaluationScoreColumn(Protein prot) {
 		return "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore());
-	}
-
-	public String buildBlast2GoColumns(Protein prot) {
-		String csvCols = "";
-		List<Blast2GoAnnot> rankedBlast2GoAnnots = prot.getEvaluationScoreCalculator().sortBlast2GoAnnotsByEvalScore();
-		if (rankedBlast2GoAnnots != null && !rankedBlast2GoAnnots.isEmpty()) {
-			Blast2GoAnnot bestB2ga = rankedBlast2GoAnnots.get(rankedBlast2GoAnnots.size() - 1);
-			csvCols += "\t" + bestB2ga.getDescription() + "\t" + bestB2ga.getEvaluationTokens().size() + "\t"
-					+ FRMT.format(bestB2ga.getEvaluationScore());
-			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-				csvCols += "\t" + combineGoTermsToString(bestB2ga.getGoAnnotations());
-				if (getSettings().getCalculateSimpleGoF1Scores())
-					csvCols += "\t" + FRMT.format(bestB2ga.getSimpleGoAnnotationScore());
-				if (getSettings().getCalculateAncestryGoF1Scores())
-					csvCols += "\t" + FRMT.format(bestB2ga.getAncestryGoAnnotationScore());
-				if (getSettings().getCalculateSemSimGoF1Scores())
-					csvCols += "\t" + FRMT.format(bestB2ga.getSemSimGoAnnotationScore());
-			}
-		} else {
-			csvCols += buildCompetitorsMissingAnnotationColumns();
-		}
-
-		return csvCols;
 	}
 	
 	public String buildCompetitorColumns(String competitor, Protein prot) {

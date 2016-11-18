@@ -67,11 +67,6 @@ public class Settings implements Cloneable {
 	public static final String REFERENCES_DESCRIPTION_BLACKLIST_KEY = "references_description_blacklist";
 	public static final String REFERENCES_TOKEN_BLACKLIST_KEY = "references_token_blacklist";
 	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
-	public static final String BLAST_2_GO_ANNOT_FILE_KEY = "blast2go";
-	public static final Pattern BLAST_2_GO_ANNOTATION_FILE_DESCLINE_REGEX = Pattern
-			.compile("^(?<shortAccession>[^\\t]+)\\t(?<goTerm>GO:\\d{7})\\t(?<description>[^\\t]+)$");
-	public static final Pattern BLAST_2_GO_ANNOTATION_FILE_ANNOTLINE_REGEX = Pattern
-			.compile("^(?<shortAccession>[^\\t]+)\\t(?<goTerm>GO:\\d{7})$");
 	public static final String TEMPERATURE_KEY = "temperature";
 	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
 	public static final String OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY = "optimization_acceptance_probability_scaling_factor";
@@ -160,7 +155,6 @@ public class Settings implements Cloneable {
 	private Map<String, List<String>> blastResultsBlacklists = new HashMap<String, List<String>>();
 	private Map<String, List<String>> blastResultsFilter = new HashMap<String, List<String>>();
 	private Map<String, List<String>> tokenBlacklists = new HashMap<String, List<String>>();
-	private String pathToBlast2GoAnnotations;
 	/**
 	 * For the <strong>simulated annealing</strong> algorithm, this will be
 	 * current temperature. (Default is 75000)
@@ -346,10 +340,6 @@ public class Settings implements Cloneable {
 		// to some other value than 1.0
 		if (input.get(F_MEASURE_BETA_PARAM_KEY) != null)
 			this.fMeasureBetaParameter = Double.parseDouble((String) input.get(F_MEASURE_BETA_PARAM_KEY));
-		// If started to compare AHRD with Blast2Go, enable reading of
-		// B2G-Annotations:
-		if (input.get(BLAST_2_GO_ANNOT_FILE_KEY) != null)
-			this.pathToBlast2GoAnnotations = (String) input.get(BLAST_2_GO_ANNOT_FILE_KEY);
 		// Simulated Annealing can be started with custom temperature and value
 		// it is cooled-down by each step:
 		if (input.get(TEMPERATURE_KEY) != null)
@@ -766,17 +756,6 @@ public class Settings implements Cloneable {
 		return this.fMeasureBetaParameter;
 	}
 
-	public String getPathToBlast2GoAnnotations() {
-		return pathToBlast2GoAnnotations;
-	}
-
-	public List<String> getBlast2GoAnnotations() throws IOException {
-		return fromFile(getPathToBlast2GoAnnotations());
-	}
-
-	public Boolean hasBlast2GoAnnotations() {
-		return getPathToBlast2GoAnnotations() != null && new File(getPathToBlast2GoAnnotations()).exists();
-	}
 
 	public Double getAvgEvaluationScore() {
 		return getParameters().getAvgEvaluationScore();
@@ -1087,14 +1066,6 @@ public class Settings implements Cloneable {
 
 	public void setCalculateSemSimGoF1Scores(Boolean calculateSemsimGoF1Scores) {
 		this.calculateSemSimGoF1Scores = calculateSemsimGoF1Scores;
-	}
-
-	public static Pattern getBlast2GoAnnotationFileDesclineRegex() {
-		return BLAST_2_GO_ANNOTATION_FILE_DESCLINE_REGEX;
-	}
-
-	public static Pattern getBlast2GoAnnotationFileAnnotlineRegex() {
-		return BLAST_2_GO_ANNOTATION_FILE_ANNOTLINE_REGEX;
 	}
 
 	private static Boolean parseBoolString(String input) {

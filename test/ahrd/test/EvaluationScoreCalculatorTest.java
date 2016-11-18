@@ -5,10 +5,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static ahrd.controller.Settings.getSettings;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,15 +17,17 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import ahrd.model.Blast2GoAnnot;
+import ahrd.model.CompetitorAnnotation;
 import ahrd.model.BlastResult;
 import ahrd.model.EvaluationScoreCalculator;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
+import ahrd.model.GOdatabase;
 
 public class EvaluationScoreCalculatorTest {
-
+	private Map<String, GOterm> goDB;
+	
 	@Before
 	public void setup() throws IOException {
 		// Init:
@@ -131,7 +133,7 @@ public class EvaluationScoreCalculatorTest {
 	}
 
 	@Test
-	public void testAssignEvlScrsToCompetitors() {
+	public void testAssignEvlScrsToCompetitors() throws FileNotFoundException, IOException {
 		Protein p = TestUtils.mockProtein();
 		// Mock reference description:
 		ReferenceDescription rd = new ReferenceDescription();
@@ -202,15 +204,19 @@ public class EvaluationScoreCalculatorTest {
 						"tair",
 						new HashSet<String>(Arrays.asList("ahrd", "is", "a",
 								"sheep"))));
-		// mock Blast2GoAnnots:
-		String b2gResEntry = "accession\tGO:123456\tAHRD horn growthase";
-		String b2gResEntryTwo = "accession\tGO:654321\tGoat wool growthase";
-		Blast2GoAnnot b2gaRef = Blast2GoAnnot.fromBlast2GoEntry(b2gResEntry);
-		b2gaRef.setEvaluationScore(0.1);
-		Blast2GoAnnot b2gaTwo = Blast2GoAnnot.fromBlast2GoEntry(b2gResEntryTwo);
-		b2gaTwo.setEvaluationScore(0.5);
-		p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2gaRef);
-		p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2gaTwo);
+		// mock CompetitorAnnotations:
+		if (goDB == null) {
+			goDB = new GOdatabase().getMap();
+		}
+		CompetitorAnnotation firstAnnot = new CompetitorAnnotation("AHRDv2_Acc", "AHRD horn growthase");
+		firstAnnot.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0005524"))));
+		firstAnnot.setEvaluationScore(0.1);
+		CompetitorAnnotation secondAnnot = new CompetitorAnnotation("AHRDv2_Acc", "Goat wool growthase");
+		secondAnnot.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0009853"))));
+//		firstAnnot.setEvaluationScore(0.1);
+//		secondAnnot.setEvaluationScore(0.5);
+		p.getEvaluationScoreCalculator().addCompetitorAnnotation("blast2go", firstAnnot);
+		p.getEvaluationScoreCalculator().addCompetitorAnnotation("eggNOG-mapper", secondAnnot);
 		// TEST:
 		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
 		// Test Assignment of scores to the three best Blast-Hits (sprot, tair,
@@ -224,9 +230,9 @@ public class EvaluationScoreCalculatorTest {
 		assertEquals(0.4444444444444445, p.getEvaluationScoreCalculator()
 				.getUnchangedBlastResults().get("tair").getEvaluationScore(),
 				0.0);
-		// Test Assignment of scores to the two Blat2GoAnnots:
-		assertEquals(0.25, b2gaRef.getEvaluationScore(), 0.0);
-		assertEquals(0.0, b2gaTwo.getEvaluationScore(), 0.0);
+		// Test Assignment of scores to the two CompetitorAnnotations:
+		assertEquals(0.25, firstAnnot.getEvaluationScore(), 0.0);
+		assertEquals(0.0, secondAnnot.getEvaluationScore(), 0.0);
 		// evaluation-scores should be fine (tested above)
 		// Just test the resulting evalScoreMinBestCompScore:
 		assertEquals(0.111111111111111, p.getEvaluationScoreCalculator()
@@ -292,62 +298,31 @@ public class EvaluationScoreCalculatorTest {
 	}
 
 	@Test
-	public void testAddBlast2GoAnnot() {
+	public void testAddCompetitorAnnotion() throws FileNotFoundException, IOException {
 		Protein p = TestUtils.mockProtein();
-		String b2gResEntry = "accession\tGO:123456\tSheep horn growthase";
-		String b2gResEntryTwo = "accession\tGO:654321\tGoat wool grothase";
-		Blast2GoAnnot b2gaRef = Blast2GoAnnot.fromBlast2GoEntry(b2gResEntry);
-		Blast2GoAnnot b2gaClone = Blast2GoAnnot.fromBlast2GoEntry(b2gResEntry);
-		Blast2GoAnnot b2gaTwo = Blast2GoAnnot.fromBlast2GoEntry(b2gResEntryTwo);
-		// test
-		p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2gaRef);
-		assertEquals(1, p.getEvaluationScoreCalculator().getBlast2GoAnnots()
-				.size());
-		assertEquals(
-				"Sheep horn growthase",
-				p.getEvaluationScoreCalculator().getBlast2GoAnnots()
-						.toArray(new Blast2GoAnnot[] {})[0].getDescription());
-		p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2gaClone);
-		assertEquals(1, p.getEvaluationScoreCalculator().getBlast2GoAnnots()
-				.size());
-		assertEquals(
-				"Sheep horn growthase",
-				p.getEvaluationScoreCalculator().getBlast2GoAnnots()
-						.toArray(new Blast2GoAnnot[] {})[0].getDescription());
-		p.getEvaluationScoreCalculator().addBlast2GoAnnot(b2gaTwo);
-		assertEquals(2, p.getEvaluationScoreCalculator().getBlast2GoAnnots()
-				.size());
-		for (Blast2GoAnnot b2ga : p.getEvaluationScoreCalculator()
-				.getBlast2GoAnnots().toArray(new Blast2GoAnnot[] {})) {
-			assertTrue("Sheep horn growthase".equals(b2ga.getDescription())
-					|| "Goat wool grothase".equals(b2ga.getDescription()));
+		if (goDB == null) {
+			goDB = new GOdatabase().getMap();
 		}
-	}
-
-	@Test
-	public void testSortBlast2GoAnnotsByEvalScore() {
-		Protein p = TestUtils.mockProtein();
-		String b2gResEntry = "accession\tGO:123456\tSheep horn growthase";
-		String b2gResEntryTwo = "accession\tGO:654321\tGoat wool growthase";
-		String b2gResEntryThree = "accession\tGO:654321\tOveja chiquitisima bala mucho";
-		Blast2GoAnnot b2gaRef = Blast2GoAnnot.fromBlast2GoEntry(b2gResEntry);
-		b2gaRef.setEvaluationScore(0.1);
-		Blast2GoAnnot b2gaTwo = Blast2GoAnnot.fromBlast2GoEntry(b2gResEntryTwo);
-		b2gaTwo.setEvaluationScore(0.5);
-		Blast2GoAnnot b2gaThree = Blast2GoAnnot
-				.fromBlast2GoEntry(b2gResEntryThree);
-		b2gaThree.setEvaluationScore(0.9);
-		Set<Blast2GoAnnot> b2gas = new HashSet<Blast2GoAnnot>();
-		b2gas.add(b2gaRef);
-		b2gas.add(b2gaTwo);
-		b2gas.add(b2gaThree);
-		p.getEvaluationScoreCalculator().setBlast2GoAnnots(b2gas);
+		CompetitorAnnotation firstAnnot = new CompetitorAnnotation("P04637", "Cellular tumor antigen p53");
+		firstAnnot.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0005524"))));
+		firstAnnot.setEvaluationScore(0.1);
+		CompetitorAnnotation firstAnnotClone = new CompetitorAnnotation("P04637", "Cellular tumor antigen p53");
+		firstAnnotClone.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0005524"))));
+		firstAnnotClone.setEvaluationScore(0.1);
+		CompetitorAnnotation secondAnnot = new CompetitorAnnotation("P0C512", "Ribulose bisphosphate carboxylase large chain");
+		secondAnnot.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0009853"))));
 		// test
-		List<Blast2GoAnnot> rankedB2gas = p.getEvaluationScoreCalculator()
-				.sortBlast2GoAnnotsByEvalScore();
-		assertEquals(b2gaRef, rankedB2gas.get(0));
-		assertEquals(b2gaTwo, rankedB2gas.get(1));
-		assertEquals(b2gaThree, rankedB2gas.get(2));
+		p.getEvaluationScoreCalculator().addCompetitorAnnotation("blast2go", firstAnnot);
+		assertEquals(1, p.getEvaluationScoreCalculator().getCompetitorAnnotations().size());
+		assertEquals("Cellular tumor antigen p53", p.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getDescription());
+		p.getEvaluationScoreCalculator().addCompetitorAnnotation("blast2go", firstAnnotClone);
+		assertEquals(1, p.getEvaluationScoreCalculator().getCompetitorAnnotations().size());
+		assertEquals("Cellular tumor antigen p53", p.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getDescription());
+		p.getEvaluationScoreCalculator().addCompetitorAnnotation("eggNOG-mapper", secondAnnot);
+		assertEquals(2, p.getEvaluationScoreCalculator().getCompetitorAnnotations().size());
+		for (CompetitorAnnotation compAnnot : p.getEvaluationScoreCalculator().getCompetitorAnnotations().values()) {
+			assertTrue("Cellular tumor antigen p53".equals(compAnnot.getDescription())	|| "Ribulose bisphosphate carboxylase large chain".equals(compAnnot.getDescription()));
+		}
 	}
 
 	@Test
