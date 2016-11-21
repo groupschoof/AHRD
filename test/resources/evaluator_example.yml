@@ -40,3 +40,7 @@ blast_dbs:
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_tair.txt
     token_blacklist: ./test/resources/blacklist_token.txt
+competitors:
+  blast2go:
+    descriptions: ./test/resources/blast2go_descriptions.tsv
+    go_annotations: ./test/resources/blast2go_goterms.tsv

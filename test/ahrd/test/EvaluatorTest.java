@@ -2,8 +2,10 @@ package ahrd.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +13,9 @@ import org.xml.sax.SAXException;
 
 import ahrd.controller.Evaluator;
 import ahrd.exception.MissingAccessionException;
+import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
+import ahrd.model.GOterm;
 
 public class EvaluatorTest {
 
@@ -19,29 +23,7 @@ public class EvaluatorTest {
 
 	@Before
 	public void setup() throws IOException {
-		this.evaluator = new Evaluator("./test/resources/ahrd_input.yml");
-	}
-
-	@Test
-	public void testSetupBlast2GoAnnots() throws IOException,
-			MissingAccessionException {
-		evaluator.initializeProteins();
-		evaluator.setupCompetitors();
-		assertEquals(3, evaluator.getProteins().size());
-		assertNotNull(
-				"After setting up Competitors the Evaluator should have assigned a CompetitorAnnotation to the protein with accession 'gene:chr01.1056:mRNA:chr01.1056'.",
-				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
-						.getEvaluationScoreCalculator().getCompetitorAnnotations());
-		assertNotNull(
-				"After setting up Blast2GoAnnots the Evaluator should have assigned a Blast2GoAnnot to the protein with accession 'gene:chr01.502:mRNA:chr01.502'.",
-				evaluator.getProteins().get("gene:chr01.502:mRNA:chr01.502")
-						.getEvaluationScoreCalculator().getCompetitorAnnotations());
-		assertEquals("nrpb6a dna binding dna-directed rna polymerase",
-				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
-						.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getDescription());
-		assertEquals(6,
-				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
-						.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getEvaluationTokens().size());
+		this.evaluator = new Evaluator("./test/resources/evaluator_example.yml");
 	}
 
 	@Test
@@ -81,10 +63,61 @@ public class EvaluatorTest {
 	}
 	
 	@Test
-	public void testSetupCompetitors() throws IOException, MissingAccessionException {
-		this.evaluator = new Evaluator("./test/resources/evaluator_example.yml");
+	public void testSetupCompetitors() throws IOException, MissingAccessionException, MissingInterproResultException, SQLException {
 		evaluator.initializeProteins();
 		evaluator.setupReferenceDescriptions();
+		evaluator.assignHumanReadableDescriptions();
+		evaluator.setupGoAnnotationEvaluation();
 		evaluator.setupCompetitors();
+		
+		assertEquals(3, evaluator.getProteins().size());
+		
+		assertNotNull(
+				"After setting up Blast2GoAnnots the Evaluator should have assigned a Blast2GoAnnot to the protein with accession 'gene:chr01.502:mRNA:chr01.502'.",
+				evaluator.getProteins().get("gene:chr01.502:mRNA:chr01.502")
+						.getEvaluationScoreCalculator().getCompetitorAnnotations());
+		
+		assertNotNull(
+				"After setting up Competitors the Evaluator should have assigned a CompetitorAnnotation to the protein with accession 'gene:chr01.1056:mRNA:chr01.1056'.",
+				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
+						.getEvaluationScoreCalculator().getCompetitorAnnotations());
+		assertNotNull(evaluator.getProteins()
+				.get("gene:chr01.1056:mRNA:chr01.1056")
+				.getEvaluationScoreCalculator().getCompetitorAnnotations());
+		assertEquals(1, evaluator.getProteins()
+				.get("gene:chr01.1056:mRNA:chr01.1056")
+				.getEvaluationScoreCalculator().getCompetitorAnnotations().size());
+		assertEquals("nrpb6a dna binding dna-directed rna polymerase",
+				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
+						.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getDescription());
+		assertEquals(6,
+				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
+						.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getEvaluationTokens().size());
+		assertEquals(2, evaluator.getProteins()
+				.get("gene:chr01.1056:mRNA:chr01.1056")
+				.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getGoAnnotations().size());
+		for (GOterm term : evaluator.getProteins()
+				.get("gene:chr01.1056:mRNA:chr01.1056")
+				.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getGoAnnotations()) {
+			assertTrue(term.getAccession().equals("GO:0005525") || term.getAccession().equals("GO:0007264"));
+		}
+		
+		assertNotNull(evaluator.getProteins()
+				.get("P04637")
+				.getEvaluationScoreCalculator().getCompetitorAnnotations());
+		assertEquals(1, evaluator.getProteins()
+				.get("P04637")
+				.getEvaluationScoreCalculator().getCompetitorAnnotations().size());
+		assertEquals("", evaluator.getProteins()
+				.get("P04637")
+				.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getDescription());
+		assertEquals(3, evaluator.getProteins()
+				.get("P04637")
+				.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getGoAnnotations().size());
+		for (GOterm term : evaluator.getProteins()
+				.get("P04637")
+				.getEvaluationScoreCalculator().getCompetitorAnnotations().get("blast2go").getGoAnnotations()) {
+			assertTrue(term.getAccession().equals("GO:0005524") || term.getAccession().equals("GO:0006284") || term.getAccession().equals("GO:0000733"));
+		}
 	}
 }

@@ -136,9 +136,9 @@ public class GeneticTrainer extends Evaluator {
 					calculateEvaluationScores();
 					// Estimate average performance of current Parameters:
 					calcAveragesOfEvalScoreTPRandFPR();
-					if(getSettings().getParameters().getOrigin().equals("seed")) {
-						writeProteins(generation);
-					}
+//					if(getSettings().getParameters().getOrigin().equals("seed")) {
+//						writeProteins(generation);
+//					}
 //				}
 			}
 

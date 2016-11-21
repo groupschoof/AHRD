@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -213,10 +214,19 @@ public class EvaluationScoreCalculatorTest {
 		firstAnnot.setEvaluationScore(0.1);
 		CompetitorAnnotation secondAnnot = new CompetitorAnnotation("AHRDv2_Acc", "Goat wool growthase");
 		secondAnnot.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0009853"))));
-//		firstAnnot.setEvaluationScore(0.1);
-//		secondAnnot.setEvaluationScore(0.5);
+		secondAnnot.setEvaluationScore(0.5);
 		p.getEvaluationScoreCalculator().addCompetitorAnnotation("blast2go", firstAnnot);
-		p.getEvaluationScoreCalculator().addCompetitorAnnotation("eggNOG-mapper", secondAnnot);
+		p.getEvaluationScoreCalculator().addCompetitorAnnotation("eggNOGmapper", secondAnnot);
+		Map<String, String> blast2goSettings = new HashMap<String, String>();
+		blast2goSettings.put("descriptions:", "./mock_file_path.tsv");
+		blast2goSettings.put("go_annotations:", "./mock_file_path.goa");
+		Map<String, String> eggNOGmapperSettings = new HashMap<String, String>();
+		eggNOGmapperSettings.put("descriptions:", "./mock_file_path.tsv");
+		eggNOGmapperSettings.put("go_annotations:", "./mock_file_path.goa");
+		Map<String, Map<String, String>> competitorSettings = new HashMap<String, Map<String, String>>();
+		competitorSettings.put("blast2go", blast2goSettings);
+		competitorSettings.put("eggNOGmapper", eggNOGmapperSettings);
+		getSettings().setCompetitorSettings(competitorSettings);
 		// TEST:
 		p.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
 		// Test Assignment of scores to the three best Blast-Hits (sprot, tair,
