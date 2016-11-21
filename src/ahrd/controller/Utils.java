@@ -10,6 +10,7 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -188,4 +189,28 @@ public class Utils {
             b=b*m/i;
         return b;
     }
+	
+	/**
+	 * Adapted from: http://stackoverflow.com/q/1751844
+	 * (Creative Commons Attribution Share Alike license)
+	 * 
+	 * Concatenates the Strings in a Collection to one single String. 
+	 * Strings from the Collection are separated by the separator String. 
+	 * @param sep
+	 * @param col
+	 * @return
+	 */
+	public static String joinStringCollection(String sep, Collection<String> col) {
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (String item : col) {
+			if(first) {
+				first = false;
+			} else {
+				sb.append(sep);
+			}
+			sb.append(item);
+		}
+		return sb.toString();
+	}
 }

@@ -120,7 +120,7 @@ public class ProteinTest {
 		prot_db = Protein.initializeProteins(getSettings().getProteinsFasta());
 		assertTrue(prot_db instanceof Map);
 		assertNotNull(prot_db);
-		assertEquals(2, prot_db.size());
+		assertEquals(3, prot_db.size());
 	}
 
 	@Test

@@ -27,7 +27,7 @@ public class EvaluatorTest {
 			MissingAccessionException {
 		evaluator.initializeProteins();
 		evaluator.setupCompetitors();
-		assertEquals(2, evaluator.getProteins().size());
+		assertEquals(3, evaluator.getProteins().size());
 		assertNotNull(
 				"After setting up Competitors the Evaluator should have assigned a CompetitorAnnotation to the protein with accession 'gene:chr01.1056:mRNA:chr01.1056'.",
 				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
@@ -49,7 +49,7 @@ public class EvaluatorTest {
 			MissingAccessionException {
 		evaluator.initializeProteins();
 		evaluator.setupReferenceDescriptions();
-		assertEquals(2, evaluator.getProteins().size());
+		assertEquals(3, evaluator.getProteins().size());
 		assertNotNull(evaluator.getProteins()
 				.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getEvaluationScoreCalculator().getReferenceDescription());
@@ -78,5 +78,13 @@ public class EvaluatorTest {
 						.getEvaluationScoreCalculator()
 						.getUnchangedBlastResults().get("swissprot")
 						.getTokens().size());
+	}
+	
+	@Test
+	public void testSetupCompetitors() throws IOException, MissingAccessionException {
+		this.evaluator = new Evaluator("./test/resources/evaluator_example.yml");
+		evaluator.initializeProteins();
+		evaluator.setupReferenceDescriptions();
+		evaluator.setupCompetitors();
 	}
 }

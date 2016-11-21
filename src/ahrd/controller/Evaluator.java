@@ -172,8 +172,7 @@ public class Evaluator extends AHRD {
 	}
 	
 	/**
-	 * It is assumed that every protein with GO annotations is also present in the description annotation file.
-	 * Annotation files must be tab separated. 
+	 * Annotation files must be tab separated and w/o column headers. 
 	 * @throws IOException 
 	 * @throws MissingAccessionException 
 	 */
@@ -195,8 +194,10 @@ public class Evaluator extends AHRD {
 						String[] values = competitorGoAnnotationLine.split("\t");
 						String accession = values[0].trim();
 						CompetitorAnnotation annot = annots.get(accession);
-						if (annot == null)
-							throw new MissingAccessionException("Could not find " + competitor + " Annotation for Accession '" + accession + "'");
+						if (annot == null) {
+							annot = new CompetitorAnnotation(accession, "");
+							annots.put(accession, annot);
+						}
 						String termAcc = values[1].trim();
 						GOterm term = this.goDB.get(termAcc);
 						if (term == null)

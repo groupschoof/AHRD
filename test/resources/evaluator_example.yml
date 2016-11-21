@@ -1,5 +1,6 @@
 proteins_fasta: ./test/resources/proteins.fasta
 references_fasta: ./test/resources/references.fasta
+reference_go_annotations: ./test/resources/reference_go_annotations.goa
 output: ./evaluator_output.tsv
 find_highest_possible_evaluation_score: true
 write_scores_to_output: false
@@ -17,6 +18,8 @@ blast_dbs:
     blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_sprot.txt
     token_blacklist: ./test/resources/blacklist_token.txt
+    gene_ontology_result: ./test/resources/go_results.csv 
+    database_go_regex: "^(?<shortAccession>gene:[^\\t]+)}\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"
 
   trembl:
     weight: 904

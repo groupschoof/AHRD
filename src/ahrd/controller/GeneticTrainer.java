@@ -136,9 +136,9 @@ public class GeneticTrainer extends Evaluator {
 					calculateEvaluationScores();
 					// Estimate average performance of current Parameters:
 					calcAveragesOfEvalScoreTPRandFPR();
-//					if(getSettings().getParameters().getOrigin().equals("seed")) {
-//						writeProteins(generation);
-//					}
+					if(getSettings().getParameters().getOrigin().equals("seed")) {
+						writeProteins(generation);
+					}
 //				}
 			}
 
@@ -223,7 +223,7 @@ public class GeneticTrainer extends Evaluator {
 						outBufWrtr.write(p.getAccession() + "\t"
 					+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession() + "\t"
 					+ p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore() + "\t"
-					+ String.join(",", p.getGoResults()) + "\t" 
+					+ Utils.joinStringCollection(",", p.getGoResults()) + "\t"
 					+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescriptionScore() + "\t"
 					+ p.getLexicalScoreCalculator().lexicalScore(p.getDescriptionScoreCalculator().getHighestScoringBlastResult()) + "\t"
 					+ p.getDescriptionScoreCalculator().relativeBlastScore(p.getDescriptionScoreCalculator().getHighestScoringBlastResult()) + "\t"
