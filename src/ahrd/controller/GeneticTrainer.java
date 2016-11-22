@@ -135,7 +135,7 @@ public class GeneticTrainer extends Evaluator {
 					// Evaluate AHRD's performance for each Protein:
 					calculateEvaluationScores();
 					// Estimate average performance of current Parameters:
-					calcAveragesOfEvalScoreTPRandFPR();
+					calcAverageEvalScore();
 //					if(getSettings().getParameters().getOrigin().equals("seed")) {
 //						writeProteins(generation);
 //					}
@@ -189,7 +189,7 @@ public class GeneticTrainer extends Evaluator {
 				setGenerationBestParametersWereFoundIn(generation);
 			}
 			// Write output of current iteration:
-			this.outWriter.writeIterationOutput(generation, getBestParameters(), diffAvgEvalScoreToLastGeneration, getBestParameters().getOrigin());
+			this.outWriter.writeGeneticIterationOutput(generation, getBestParameters(), diffAvgEvalScoreToLastGeneration, getBestParameters().getOrigin());
 			generation += 1;
 		}
 	}
@@ -261,16 +261,11 @@ public class GeneticTrainer extends Evaluator {
 	/**
 	 * Calculates the average of AHRD's EvaluationScore (objective-function).
 	 * If GO term scores have been computed the average is based upon them.
-	 * Otherwise the conventional HRD based scores are used. If so also calculates 
-	 * the average True-Positives- and False-Positives-Rates.
+	 * Otherwise the conventional HRD based scores are used.
 	 */
-	public void calcAveragesOfEvalScoreTPRandFPR() {
+	public void calcAverageEvalScore() {
 		// average evaluation-score
 		Double avgEvlScr = 0.0;
-		// average TPR:
-		Double avgTruePosRate = 0.0;
-		// average FPR:
-		Double avgFalsePosRate = 0.0;
 		// Evaluate GO annotations.
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 			for (Protein p : getProteins().values()) {
@@ -294,22 +289,14 @@ public class GeneticTrainer extends Evaluator {
 				if (e != null) {
 					if (e.getEvalutionScore() != null)
 						avgEvlScr += e.getEvalutionScore();
-					if (e.getTruePositivesRate() != null)
-						avgTruePosRate += e.getTruePositivesRate();
-					if (e.getFalsePositivesRate() != null)
-						avgFalsePosRate += e.getFalsePositivesRate();
 				}
 			}
 		}
 		// average each number:
 		Double numberOfProts = new Double(getProteins().size());
 		avgEvlScr = avgEvlScr / numberOfProts;
-		avgTruePosRate = avgTruePosRate / numberOfProts;
-		avgFalsePosRate = avgFalsePosRate / numberOfProts;
 		// done:
 		getSettings().setAvgEvaluationScore(avgEvlScr);
-		getSettings().setAvgTruePositivesRate(avgTruePosRate);
-		getSettings().setAvgFalsePositivesRate(avgFalsePosRate);
 	}
 
 	/**
