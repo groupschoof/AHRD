@@ -265,9 +265,9 @@ public class BlastResultTest {
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
 		BlastResult.parseBlastDatabase(protDb, "trembl", brs);
 		Protein p1 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
-		assertTrue(!p1.getEvaluationScoreCalculator().getUnchangedBlastResults().isEmpty());
-		assertNotNull(p1.getEvaluationScoreCalculator().getUnchangedBlastResults().get("trembl"));
+		assertTrue(!p1.getEvaluationScoreCalculator().getBestUnchangedBlastResults().isEmpty());
+		assertNotNull(p1.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get("trembl"));
 		assertEquals("tr|W9CFB7|W9CFB7_9HELO",
-				p1.getEvaluationScoreCalculator().getUnchangedBlastResults().get("trembl").getAccession());
+				p1.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get("trembl").getAccession());
 	}
 }

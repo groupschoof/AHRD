@@ -31,7 +31,7 @@ public class EvaluationScoreCalculator {
 	 * the best BlastHit per searched Blast-Database is remembered. Comparison
 	 * is based on the Hits' Bit-Scores.
 	 */
-	private Map<String, BlastResult> unchangedBlastResults = new HashMap<String, BlastResult>();
+	private Map<String, BlastResult> bestUnchangedBlastResults = new HashMap<String, BlastResult>();
 	private Double evalutionScore;
 	private Double evalScoreMinBestCompScore;
 	private Double truePositivesRate;
@@ -159,16 +159,18 @@ public class EvaluationScoreCalculator {
 	/**
 	 * The unchanged BlastResults are not passed through any filter nor
 	 * blacklist, they serve only AHRD-evaluation and training-purposes.
+	 * The BlastResult is compared to the (until now) best BlastResult 
+	 * and takes its place if it trumps its bit score. 
 	 * 
 	 * @param String
 	 *            blastDb
 	 * @param BlastResult
 	 *            br
 	 */
-	public void addUnchangedBlastResult(String blastDb, BlastResult br) {
-		if (!getUnchangedBlastResults().containsKey(blastDb)
-				|| getUnchangedBlastResults().get(blastDb).getBitScore() < br.getBitScore()) {
-			getUnchangedBlastResults().put(blastDb, br);
+	public void addBestUnchangedBlastResult(String blastDb, BlastResult br) {
+		if (!getBestUnchangedBlastResults().containsKey(blastDb)
+				|| getBestUnchangedBlastResults().get(blastDb).getBitScore() < br.getBitScore()) {
+			getBestUnchangedBlastResults().put(blastDb, br);
 		}
 	}
 
@@ -227,9 +229,9 @@ public class EvaluationScoreCalculator {
 			}
 			// Other competitors are the best unchanged BlastHits from all
 			// performed Blast-Database-Searches:
-			if (getUnchangedBlastResults().size() > 0) {
-				for (String blastDatabase : getUnchangedBlastResults().keySet()) {
-					BlastResult cmpt = getUnchangedBlastResults().get(blastDatabase);
+			if (getBestUnchangedBlastResults().size() > 0) {
+				for (String blastDatabase : getBestUnchangedBlastResults().keySet()) {
+					BlastResult cmpt = getBestUnchangedBlastResults().get(blastDatabase);
 					if (cmpt != null) {
 						// Generate the set of Evaluation-Tokens from the
 						// actually assigned Description, WITHOUT filtering each
@@ -492,12 +494,12 @@ public class EvaluationScoreCalculator {
 		this.referenceDescription = referenceDescription;
 	}
 
-	public Map<String, BlastResult> getUnchangedBlastResults() {
-		return unchangedBlastResults;
+	public Map<String, BlastResult> getBestUnchangedBlastResults() {
+		return bestUnchangedBlastResults;
 	}
 
-	public void setUnchangedBlastResults(Map<String, BlastResult> unchangedBlastResults) {
-		this.unchangedBlastResults = unchangedBlastResults;
+	public void setBestUnchangedBlastResults(Map<String, BlastResult> unchangedBlastResults) {
+		this.bestUnchangedBlastResults = unchangedBlastResults;
 	}
 
 	public Protein getProtein() {

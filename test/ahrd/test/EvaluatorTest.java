@@ -58,7 +58,7 @@ public class EvaluatorTest {
 				"Parsing the BlastResults should also trigger tokenization of the Description-Lines of the unchanged BlastHits!",
 				4, evaluator.getProteins().get("gene:chr01.502:mRNA:chr01.502")
 						.getEvaluationScoreCalculator()
-						.getUnchangedBlastResults().get("swissprot")
+						.getBestUnchangedBlastResults().get("swissprot")
 						.getTokens().size());
 	}
 	

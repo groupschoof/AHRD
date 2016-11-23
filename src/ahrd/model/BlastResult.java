@@ -84,7 +84,8 @@ public class BlastResult implements Comparable<BlastResult> {
 	/**
 	 * Gene Ontology term annotations. Populated in the best blast results of
 	 * proteins if the output of the best blast results and the evaluation of GO
-	 * terms is requested
+	 * terms is requested.
+	 * Or populated if the output of the highest possible GO annotation score is requested. 
 	 */
 	private Set<GOterm> goAnnotations = new HashSet<GOterm>();
 	/**
@@ -512,7 +513,7 @@ public class BlastResult implements Comparable<BlastResult> {
 			theClone.setDescription(filter(theClone.getDescription()));
 			// Tokenize without filtering tokens through the Blacklist:
 			theClone.setTokens(TokenScoreCalculator.tokenize(theClone.getDescription(), new ArrayList<String>()));
-			getProtein().getEvaluationScoreCalculator().addUnchangedBlastResult(getBlastDatabaseName(), theClone);
+			getProtein().getEvaluationScoreCalculator().addBestUnchangedBlastResult(getBlastDatabaseName(), theClone);
 		}
 		if (passesBlacklist(getDescription())) {
 			// Pass bestScoringHSP through filter:

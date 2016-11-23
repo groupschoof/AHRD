@@ -160,7 +160,7 @@ public class EvaluationScoreCalculatorTest {
 		p.getDescriptionScoreCalculator()
 				.setHighestScoringBlastResult(ahrdsRes);
 		// mock competitive results
-		p.getEvaluationScoreCalculator().addUnchangedBlastResult(
+		p.getEvaluationScoreCalculator().addBestUnchangedBlastResult(
 				"swissprot",
 				TestUtils.mockBlastResult(
 						"Sprot One",
@@ -175,7 +175,7 @@ public class EvaluationScoreCalculatorTest {
 						"swissprot",
 						new HashSet<String>(Arrays.asList("ahrd", "is", "the",
 								"best"))));
-		p.getEvaluationScoreCalculator().addUnchangedBlastResult(
+		p.getEvaluationScoreCalculator().addBestUnchangedBlastResult(
 				"trembl",
 				TestUtils.mockBlastResult(
 						"trEMBL One",
@@ -190,7 +190,7 @@ public class EvaluationScoreCalculatorTest {
 						"trembl",
 						new HashSet<String>(Arrays.asList("ahrd", "is", "best",
 								"eaten", "alive"))));
-		p.getEvaluationScoreCalculator().addUnchangedBlastResult(
+		p.getEvaluationScoreCalculator().addBestUnchangedBlastResult(
 				"tair",
 				TestUtils.mockBlastResult(
 						"TAIR One",
@@ -232,13 +232,13 @@ public class EvaluationScoreCalculatorTest {
 		// Test Assignment of scores to the three best Blast-Hits (sprot, tair,
 		// trembl):
 		assertEquals(0.888888888888889, p.getEvaluationScoreCalculator()
-				.getUnchangedBlastResults().get("swissprot")
+				.getBestUnchangedBlastResults().get("swissprot")
 				.getEvaluationScore(), 0.0);
 		assertEquals(0.6, p.getEvaluationScoreCalculator()
-				.getUnchangedBlastResults().get("trembl").getEvaluationScore(),
+				.getBestUnchangedBlastResults().get("trembl").getEvaluationScore(),
 				0.0);
 		assertEquals(0.4444444444444445, p.getEvaluationScoreCalculator()
-				.getUnchangedBlastResults().get("tair").getEvaluationScore(),
+				.getBestUnchangedBlastResults().get("tair").getEvaluationScore(),
 				0.0);
 		// Test Assignment of scores to the two CompetitorAnnotations:
 		assertEquals(0.25, firstAnnot.getEvaluationScore(), 0.0);

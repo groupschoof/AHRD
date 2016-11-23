@@ -256,8 +256,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 	public String buildBestBlastHitsColumns(Protein prot) {
 		String csvRow = "";
 		for (String blastDb : getSettings().getBlastDatabases()) {
-			if (prot.getEvaluationScoreCalculator().getUnchangedBlastResults().get(blastDb) != null) {
-				BlastResult bestBr = prot.getEvaluationScoreCalculator().getUnchangedBlastResults().get(blastDb);
+			if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+				BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
 				csvRow += "\t\"" + bestBr.getAccession() + " " + bestBr.getDescription() + "\"";
 				if (bestBr.getEvaluationScore() != null) {
 					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"

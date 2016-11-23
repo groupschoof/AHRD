@@ -239,7 +239,7 @@ public class TrainerTest {
 		for (Protein p : this.trainer.getProteins().values()) {
 			assertTrue(
 					"Setting up Trainer with flag 'write_best_blast_hits_to_output: false' should enforce NOT remembering competitor annotations 'description from best Blast-Hits'.",
-					p.getEvaluationScoreCalculator().getUnchangedBlastResults()
+					p.getEvaluationScoreCalculator().getBestUnchangedBlastResults()
 							.size() == 0);
 		}
 	}

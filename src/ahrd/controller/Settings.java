@@ -110,6 +110,7 @@ public class Settings implements Cloneable {
 	public static final String COMPETITORS_KEY = "competitors";
 	public static final String COMPETITOR_DESCRIPTIONS_FILE_KEY = "descriptions";
 	public static final String COMPETITOR_GOA_FILE_KEY = "go_annotations";
+	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score"; 
 	
 	/**
 	 * Fields:
@@ -284,6 +285,11 @@ public class Settings implements Cloneable {
 	 * Competitors to be compared to AHRD in evaluation run
 	 */
 	private Map<String, Map<String, String>> competitorSettings = new HashMap<String, Map<String, String>>();
+	/**
+	 * Evaluation or Optimization might be interested in the highest possibly
+	 * achievable score for go annotations:
+	 */
+	private boolean findHighestPossibleGoScore = false;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -453,6 +459,9 @@ public class Settings implements Cloneable {
 		if (input.get(COMPETITORS_KEY) != null) {
 			setCompetitorSettings((Map<String, Map<String, String>>) input.get(COMPETITORS_KEY));
 		}
+		if (input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY) != null
+				&& Boolean.parseBoolean(input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY).toString()))
+			setFindHighestPossibleGoScore(true);
 	}
 
 	/**
@@ -1133,5 +1142,13 @@ public class Settings implements Cloneable {
 	
 	public List<String> getCompetitorGOAnnotations(String competitor) throws IOException {
 		return fromFile(getCompetitorSettings().get(competitor).get(COMPETITOR_GOA_FILE_KEY));
+	}
+
+	public boolean doFindHighestPossibleGoScore() {
+		return findHighestPossibleGoScore;
+	}
+
+	public void setFindHighestPossibleGoScore(boolean findHighestPossibleGoScore) {
+		this.findHighestPossibleGoScore = findHighestPossibleGoScore;
 	}
 }

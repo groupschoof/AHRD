@@ -25,6 +25,8 @@ public abstract class AbstractOutputWriter implements OutputWriter {
 	private Collection<Protein> proteins;
 
 	public AbstractOutputWriter(Collection<Protein> proteins) {
+		FRMT.getDecimalFormatSymbols().setDecimalSeparator('.');
+		FRMT.getDecimalFormatSymbols().setGroupingSeparator(',');
 		setProteins(proteins);
 	}
 

@@ -66,7 +66,7 @@ public class Evaluator extends AHRD {
 			// Annotate the best blast results with GOterm objects
 			if (getSettings().getWriteBestBlastHitsToOutput()) {
 				for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();){
-					Map<String, BlastResult> bestBlastResult = protIter.next().getEvaluationScoreCalculator().getUnchangedBlastResults();
+					Map<String, BlastResult> bestBlastResult = protIter.next().getEvaluationScoreCalculator().getBestUnchangedBlastResults();
 					if (bestBlastResult != null) {
 						for (String blastDb : bestBlastResult.keySet()) {
 						String bestBlastResultShortAccession = bestBlastResult.get(blastDb).getShortAccession();
@@ -77,6 +77,27 @@ public class Evaluator extends AHRD {
 										throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 									}
 									bestBlastResult.get(blastDb).getGoAnnotations().add(term);
+								}
+							}
+						}
+					}
+				}
+			}
+			// If highest possible GO-annotation scores are requested all BlastResults have to be annotated first
+			if (getSettings().doFindHighestPossibleGoScore()) {
+				for (Protein prot : getProteins().values()) {
+					Map<String, List<BlastResult>> blastResultMap = prot.getBlastResults();
+					for (String blastDb : blastResultMap.keySet()) {
+						List<BlastResult> blastResultList = blastResultMap.get(blastDb);
+						for (BlastResult br : blastResultList) {
+							String blastResultShortAccession = br.getShortAccession();
+							if (getDatabaseGoAnnotations().containsKey(blastResultShortAccession)) {
+								for (String termAcc : getDatabaseGoAnnotations().get(blastResultShortAccession)) {
+									GOterm term = goDB.get(termAcc);
+									if (term == null) {
+										throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
+									}
+									br.getGoAnnotations().add(term);
 								}
 							}
 						}
@@ -132,6 +153,9 @@ public class Evaluator extends AHRD {
 			// evaluation score:
 			if (getSettings().doFindHighestPossibleEvaluationScore())
 				evaluator.findHighestPossibleEvaluationScores();
+			// If requested, calculate the highest possibly achievable score for go annotations:
+			if (getSettings().doFindHighestPossibleGoScore())
+				evaluator.findHighestPossibleGoScores();
 			// Generate Output:
 			TsvOutputWriter ow = new EvaluatorOutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
@@ -171,6 +195,18 @@ public class Evaluator extends AHRD {
 		}
 	}
 	
+	/**
+	 * Calculates the go-annotation-scores requested (simple, ancestry, semsim)
+	 * for each Protein's Blast-Results' GOterm annotations and stores the 
+	 * maximum possible score in each Protein's EvaluationScoreCalculator. 
+	 * This is used to get more accurate information of how well AHRD performs.
+	 */
+	public void findHighestPossibleGoScores() {
+		for (Protein prot : getProteins().values()) {
+			prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
+		}
+	}
+
 	/**
 	 * Annotation files must be tab separated and w/o column headers. 
 	 * @throws IOException 
