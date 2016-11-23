@@ -86,10 +86,8 @@ public class Evaluator extends AHRD {
 			// If highest possible GO-annotation scores are requested all BlastResults have to be annotated first
 			if (getSettings().doFindHighestPossibleGoScore()) {
 				for (Protein prot : getProteins().values()) {
-					Map<String, List<BlastResult>> blastResultMap = prot.getBlastResults();
-					for (String blastDb : blastResultMap.keySet()) {
-						List<BlastResult> blastResultList = blastResultMap.get(blastDb);
-						for (BlastResult br : blastResultList) {
+					for (List<BlastResult> blastDbResults : prot.getBlastResults().values()) {
+						for (BlastResult br : blastDbResults) {
 							String blastResultShortAccession = br.getShortAccession();
 							if (getDatabaseGoAnnotations().containsKey(blastResultShortAccession)) {
 								for (String termAcc : getDatabaseGoAnnotations().get(blastResultShortAccession)) {
@@ -203,7 +201,7 @@ public class Evaluator extends AHRD {
 	 */
 	public void findHighestPossibleGoScores() {
 		for (Protein prot : getProteins().values()) {
-			prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
+			prot.getEvaluationScoreCalculator().findHighestPossibleGoScore();
 		}
 	}
 

@@ -52,11 +52,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				bw.write("\t" + competitor + "-Description\t" + competitor + "-Length\t" + competitor + "-Evaluation-Score");
 				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 					bw.write("\t" + competitor + "-Annotations");
-					if (getSettings().getCalculateSimpleGoF1Scores())
+					if (getSettings().doCalculateSimpleGoF1Scores())
 						bw.write("\t" + competitor + "-Annotations-Simple-F-Score");
-					if (getSettings().getCalculateAncestryGoF1Scores())
+					if (getSettings().doCalculateAncestryGoF1Scores())
 						bw.write("\t" + competitor + "-Annotations-Ancestry-F-Score");
-					if (getSettings().getCalculateSemSimGoF1Scores())
+					if (getSettings().doCalculateSemSimGoF1Scores())
 						bw.write("\t" + competitor + "-Annotations-SemSim-F-Score");
 				}
 			}
@@ -66,12 +66,20 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		}
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 			bw.write("\tReference-GO-Annotations");
-			if (getSettings().getCalculateSimpleGoF1Scores())
+			if (getSettings().doCalculateSimpleGoF1Scores())
 				bw.write("\tAHRD-GO-Annotations-Simple-F-Score");
-			if (getSettings().getCalculateAncestryGoF1Scores())
+			if (getSettings().doCalculateAncestryGoF1Scores())
 				bw.write("\tAHRD-GO-Annotations-Ancestry-F-Score");
-			if (getSettings().getCalculateSemSimGoF1Scores())
+			if (getSettings().doCalculateSemSimGoF1Scores())
 				bw.write("\tAHRD-GO-Annotations-SemSim-F-Score");
+			if (getSettings().doFindHighestPossibleGoScore()) {
+				if (getSettings().doCalculateSimpleGoF1Scores())
+					bw.write("\tHighest-Possible-BlastResult-GO-Annotations-Simple-F-Score");
+				if (getSettings().doCalculateAncestryGoF1Scores())
+					bw.write("\tHighest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score");
+				if (getSettings().doCalculateSemSimGoF1Scores())
+					bw.write("\tHighest-Possible-BlastResult-GO-Annotations-SemSim-F-Score");
+			}
 		}
 		bw.write("\n");
 
@@ -101,6 +109,14 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 				csvRow += buildReferenceGoAnnotationColumns(prot);
+			}
+			if (getSettings().doFindHighestPossibleGoScore()) {
+				if (getSettings().doCalculateSimpleGoF1Scores())
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore());
+				if (getSettings().doCalculateAncestryGoF1Scores())
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore());
+				if (getSettings().doCalculateSemSimGoF1Scores())
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore());
 			}
 
 			// Write row to CSV:
@@ -132,11 +148,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				csvCols += "\t" + annot.getDescription() + "\t" + annot.getEvaluationTokens().size() + "\t" + FRMT.format(annot.getEvaluationScore());
 				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 					csvCols += "\t" + combineGoTermsToString(annot.getGoAnnotations());
-					if (getSettings().getCalculateSimpleGoF1Scores())
+					if (getSettings().doCalculateSimpleGoF1Scores())
 						csvCols += "\t" + FRMT.format(annot.getSimpleGoAnnotationScore());
-					if (getSettings().getCalculateAncestryGoF1Scores())
+					if (getSettings().doCalculateAncestryGoF1Scores())
 						csvCols += "\t" + FRMT.format(annot.getAncestryGoAnnotationScore());
-					if (getSettings().getCalculateSemSimGoF1Scores())
+					if (getSettings().doCalculateSemSimGoF1Scores())
 						csvCols += "\t" + FRMT.format(annot.getSemSimGoAnnotationScore());
 				}
 			} else {
@@ -153,11 +169,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		csvCols += "\t\t0\t0.0";
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 			csvCols += "\t";
-			if (getSettings().getCalculateSimpleGoF1Scores())
+			if (getSettings().doCalculateSimpleGoF1Scores())
 				csvCols += "\t0.0";
-			if (getSettings().getCalculateAncestryGoF1Scores())
+			if (getSettings().doCalculateAncestryGoF1Scores())
 				csvCols += "\t0.0";
-			if (getSettings().getCalculateSemSimGoF1Scores())
+			if (getSettings().doCalculateSemSimGoF1Scores())
 				csvCols += "\t0.0";
 		}
 		return csvCols;
@@ -241,11 +257,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				hdr += "\tLength\tEvaluation-Score";
 				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 					hdr += "\tBest-BlastHit-Annotations-'" + blastDb + "'";
-					if (getSettings().getCalculateSimpleGoF1Scores())
+					if (getSettings().doCalculateSimpleGoF1Scores())
 						hdr += "\tBest-BlastHit-Annotations-Simple-F-Score-'" + blastDb + "'";
-					if (getSettings().getCalculateAncestryGoF1Scores())
+					if (getSettings().doCalculateAncestryGoF1Scores())
 						hdr += "\tBest-BlastHit-Annotations-Ancestry-F-Score-'" + blastDb + "'";
-					if (getSettings().getCalculateSemSimGoF1Scores())
+					if (getSettings().doCalculateSemSimGoF1Scores())
 						hdr += "\tBest-BlastHit-Annotations-SemSim-F-Score-'" + blastDb + "'";
 				}
 			}
@@ -264,11 +280,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							+ FRMT.format(bestBr.getEvaluationScore());
 					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 						csvRow += "\t" + combineGoTermsToString(bestBr.getGoAnnotations());
-						if (getSettings().getCalculateSimpleGoF1Scores())
+						if (getSettings().doCalculateSimpleGoF1Scores())
 							csvRow += "\t" + FRMT.format(bestBr.getSimpleGoAnnotationScore());
-						if (getSettings().getCalculateAncestryGoF1Scores())
+						if (getSettings().doCalculateAncestryGoF1Scores())
 							csvRow += "\t" + FRMT.format(bestBr.getAncestryGoAnnotationScore());
-						if (getSettings().getCalculateSemSimGoF1Scores())
+						if (getSettings().doCalculateSemSimGoF1Scores())
 							csvRow += "\t" + FRMT.format(bestBr.getSemSimGoAnnotationScore());
 					}
 				}
@@ -278,11 +294,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					csvRow += "\t0\t0.0";
 					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 						csvRow += "\t";
-						if (getSettings().getCalculateSimpleGoF1Scores())
+						if (getSettings().doCalculateSimpleGoF1Scores())
 							csvRow += "\t0.0";
-						if (getSettings().getCalculateAncestryGoF1Scores())
+						if (getSettings().doCalculateAncestryGoF1Scores())
 							csvRow += "\t0.0";
-						if (getSettings().getCalculateSemSimGoF1Scores())
+						if (getSettings().doCalculateSemSimGoF1Scores())
 							csvRow += "\t0.0";
 					}
 				}
@@ -294,11 +310,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 	private String buildReferenceGoAnnotationColumns(Protein prot) {
 		String goColumns = "\t"
 				+ combineGoTermsToString(prot.getEvaluationScoreCalculator().getReferenceGoAnnoatations());
-		if (getSettings().getCalculateSimpleGoF1Scores())
+		if (getSettings().doCalculateSimpleGoF1Scores())
 			goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSimpleGoAnnotationScore());
-		if (getSettings().getCalculateAncestryGoF1Scores())
+		if (getSettings().doCalculateAncestryGoF1Scores())
 			goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getAncestryGoAnnotationScore());
-		if (getSettings().getCalculateSemSimGoF1Scores())
+		if (getSettings().doCalculateSemSimGoF1Scores())
 			goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSemSimGoAnnotationScore());
 		return goColumns;
 	}

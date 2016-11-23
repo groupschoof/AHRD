@@ -41,6 +41,9 @@ public class EvaluationScoreCalculator {
 	private Double simpleGoAnnotationScore;
 	private Double ancestryGoAnnotationScore;
 	private Double semSimGoAnnotationScore;
+	private Double highestPossibleSimpleGoAnnotationScore;
+	private Double highestPossibleAncestryGoAnnotationScore;
+	private Double highestPossibleSemSimGoAnnotationScore;
 
 	public EvaluationScoreCalculator(Protein protein) {
 		super();
@@ -216,11 +219,11 @@ public class EvaluationScoreCalculator {
 								bestCompEvlScr = annot.getEvaluationScore();
 							// GOterm annotations scores
 							if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-								if (getSettings().getCalculateSimpleGoF1Scores())
+								if (getSettings().doCalculateSimpleGoF1Scores())
 									annot.setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, annot.getGoAnnotations()));
-								if (getSettings().getCalculateAncestryGoF1Scores())
+								if (getSettings().doCalculateAncestryGoF1Scores())
 									annot.setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, annot.getGoAnnotations()));
-								if (getSettings().getCalculateSemSimGoF1Scores())
+								if (getSettings().doCalculateSemSimGoF1Scores())
 									annot.setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, annot.getGoAnnotations()));
 							}
 						}
@@ -244,13 +247,13 @@ public class EvaluationScoreCalculator {
 							bestCompEvlScr = cmpt.getEvaluationScore();
 						// If requested: Evaluate the GO annotations of the best blast result
 						if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-							if (getSettings().getCalculateSimpleGoF1Scores())
+							if (getSettings().doCalculateSimpleGoF1Scores())
 								cmpt.setSimpleGoAnnotationScore(
 										calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, cmpt.getGoAnnotations()));
-							if (getSettings().getCalculateAncestryGoF1Scores())
+							if (getSettings().doCalculateAncestryGoF1Scores())
 								cmpt.setAncestryGoAnnotationScore(
 										calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, cmpt.getGoAnnotations()));
-							if (getSettings().getCalculateSemSimGoF1Scores())
+							if (getSettings().doCalculateSemSimGoF1Scores())
 								cmpt.setSemSimGoAnnotationScore(
 										calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, cmpt.getGoAnnotations()));
 						}
@@ -267,16 +270,16 @@ public class EvaluationScoreCalculator {
 			 */
 			// Calculation of an F1-score based on reference and prediction GO
 			// annotations alone
-			if (getSettings().getCalculateSimpleGoF1Scores())
+			if (getSettings().doCalculateSimpleGoF1Scores())
 				setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, this.protein.getGoResultsTerms()));
 			// Calculation of an F1-score based on reference and prediction GO
 			// annotations extended to their complete ancestry
-			if (getSettings().getCalculateAncestryGoF1Scores())
+			if (getSettings().doCalculateAncestryGoF1Scores())
 				setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, this.protein.getGoResultsTerms()));
 			// Calculation of an F1-score based on the semantic similarity
 			// (based on term information content) of reference and prediction
 			// GO annotations.
-			if (getSettings().getCalculateSemSimGoF1Scores())
+			if (getSettings().doCalculateSemSimGoF1Scores())
 				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, this.protein.getGoResultsTerms()));
 		}
 	}
@@ -485,6 +488,59 @@ public class EvaluationScoreCalculator {
 			}
 		}
 	}
+	
+	/**
+	 * In order to get more accurate information of how well AHRD performs, we
+	 * infer the highest possible score by calculating all requested 
+	 * GO-annotation-scores (simple, ancestry, semsim) for each 
+	 * BlastResult's GO annotations and remembering the highest achieved score.
+	 */
+	public void findHighestPossibleGoScore() {
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+			if (getSettings().doCalculateSimpleGoF1Scores()) {
+				this.setHighestPossibleSimpleGoAnnotationScore(0.0);
+				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+					for (BlastResult br : resultsFromBlastDatabase) {
+						double score = calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
+						if (score > this.getHighestPossibleSimpleGoAnnotationScore())
+								this.setHighestPossibleSimpleGoAnnotationScore(score);
+						if (getHighestPossibleSimpleGoAnnotationScore().equals(1.0))
+							break;
+					}
+					if (getHighestPossibleSimpleGoAnnotationScore().equals(1.0))
+						break;
+				}
+			}
+			if (getSettings().doCalculateAncestryGoF1Scores()) {
+				this.setHighestPossibleAncestryGoAnnotationScore(0.0);
+				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+					for (BlastResult br : resultsFromBlastDatabase) {
+						double score = calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
+						if (score > this.getHighestPossibleAncestryGoAnnotationScore())
+								this.setHighestPossibleAncestryGoAnnotationScore(score);
+						if (getHighestPossibleAncestryGoAnnotationScore().equals(1.0))
+							break;
+					}
+					if (getHighestPossibleAncestryGoAnnotationScore().equals(1.0))
+						break;
+				}
+			}
+			if (getSettings().doCalculateSemSimGoF1Scores()) {
+				this.setHighestPossibleSemSimGoAnnotationScore(0.0);
+				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+					for (BlastResult br : resultsFromBlastDatabase) {
+						double score = calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
+						if (score > this.getHighestPossibleSemSimGoAnnotationScore())
+								this.setHighestPossibleSemSimGoAnnotationScore(score);
+						if (getHighestPossibleSemSimGoAnnotationScore().equals(1.0))
+							break;
+					}
+					if (getHighestPossibleSemSimGoAnnotationScore().equals(1.0))
+						break;
+				}
+			}
+		}
+	}
 
 	public ReferenceDescription getReferenceDescription() {
 		return referenceDescription;
@@ -595,6 +651,30 @@ public class EvaluationScoreCalculator {
 			setCompetitorAnnotations(new HashMap<String, CompetitorAnnotation>());
 		}
 		this.competitorAnnotations.put(competitor, annotation);
+	}
+
+	public Double getHighestPossibleSimpleGoAnnotationScore() {
+		return highestPossibleSimpleGoAnnotationScore;
+	}
+
+	public void setHighestPossibleSimpleGoAnnotationScore(Double highestPossiblesimpleGoAnnotationScore) {
+		this.highestPossibleSimpleGoAnnotationScore = highestPossiblesimpleGoAnnotationScore;
+	}
+
+	public Double getHighestPossibleAncestryGoAnnotationScore() {
+		return highestPossibleAncestryGoAnnotationScore;
+	}
+
+	public void setHighestPossibleAncestryGoAnnotationScore(Double highestPossibleancestryGoAnnotationScore) {
+		this.highestPossibleAncestryGoAnnotationScore = highestPossibleancestryGoAnnotationScore;
+	}
+
+	public Double getHighestPossibleSemSimGoAnnotationScore() {
+		return highestPossibleSemSimGoAnnotationScore;
+	}
+
+	public void setHighestPossibleSemSimGoAnnotationScore(Double highestPossiblesemSimGoAnnotationScore) {
+		this.highestPossibleSemSimGoAnnotationScore = highestPossiblesemSimGoAnnotationScore;
 	}
 
 }

@@ -1053,7 +1053,7 @@ public class Settings implements Cloneable {
 		return fromFile(getPathToReferenceGoAnnotations());
 	}
 
-	public Boolean getCalculateSimpleGoF1Scores() {
+	public Boolean doCalculateSimpleGoF1Scores() {
 		return calculateSimpleGoF1Scores;
 	}
 
@@ -1061,7 +1061,7 @@ public class Settings implements Cloneable {
 		this.calculateSimpleGoF1Scores = calculateSimpleGoF1Scores;
 	}
 
-	public Boolean getCalculateAncestryGoF1Scores() {
+	public Boolean doCalculateAncestryGoF1Scores() {
 		return calculateAncestryGoF1Scores;
 	}
 
@@ -1069,7 +1069,7 @@ public class Settings implements Cloneable {
 		this.calculateAncestryGoF1Scores = calculateAncestryGoF1Scores;
 	}
 
-	public Boolean getCalculateSemSimGoF1Scores() {
+	public Boolean doCalculateSemSimGoF1Scores() {
 		return calculateSemSimGoF1Scores;
 	}
 

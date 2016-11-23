@@ -51,6 +51,9 @@ public class GeneticTrainer extends Evaluator {
 		try {
 			GeneticTrainer trainer = new GeneticTrainer(args[0]);
 			trainer.setup(false); // false -> Don't log memory and time-usages
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+				getSettings().setFindHighestPossibleGoScore(true);
+			}
 			// After the setup the unique short accessions are no longer needed:
 			trainer.setUniqueBlastResultShortAccessions(null);
 			trainer.setupReferenceDescriptions();
@@ -120,7 +123,7 @@ public class GeneticTrainer extends Evaluator {
 		// simulate generational succession
 		while (generation <= getSettings().getNumberOfGenerations()) {
 			// Show progress
-			System.out.print("\rEvaluating generation " + generation + " of " + getSettings().getNumberOfGenerations());
+			System.out.println("\rEvaluating generation " + generation + " of " + getSettings().getNumberOfGenerations());
 			// Determine the fitness of each individual (parameter set) in the
 			// population
 			for (Parameters individual : population) {
@@ -139,6 +142,7 @@ public class GeneticTrainer extends Evaluator {
 //					if(getSettings().getParameters().getOrigin().equals("seed")) {
 //						writeProteins(generation);
 //					}
+					System.out.println(individual.getOrigin() + ": " + getSettings().getAvgEvaluationScore());
 //				}
 			}
 
@@ -272,10 +276,10 @@ public class GeneticTrainer extends Evaluator {
 				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
 				if (e != null) {
 					//Depending on the settings the go annotation f-score with the highest level of complexity is used
-					if (getSettings().getCalculateSemSimGoF1Scores()) {
+					if (getSettings().doCalculateSemSimGoF1Scores()) {
 						avgEvlScr += e.getSemSimGoAnnotationScore();
 					} else {
-						if (getSettings().getCalculateAncestryGoF1Scores()) {
+						if (getSettings().doCalculateAncestryGoF1Scores()) {
 							avgEvlScr += e.getAncestryGoAnnotationScore();
 						} else {
 							avgEvlScr += e.getSimpleGoAnnotationScore();
@@ -304,12 +308,29 @@ public class GeneticTrainer extends Evaluator {
 	 * achieve.
 	 */
 	public void calcAvgMaxEvaluationScore() {
-		for (Protein prot : getProteins().values()) {
-			prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
-			setAvgMaxEvaluationScore(getAvgMaxEvaluationScore()
-					+ prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore());
+		double avgMaxEvlScr = 0.0; 		// init average maximum evaluation-score
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) { 		// Evaluate GO annotations.
+			for (Protein p : getProteins().values()) {
+				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
+					e.findHighestPossibleGoScore();
+					//Depending on the settings the go annotation f-score with the highest level of complexity is used
+					if (getSettings().doCalculateSemSimGoF1Scores()) {
+						avgMaxEvlScr += e.getHighestPossibleSemSimGoAnnotationScore();
+					} else {
+						if (getSettings().doCalculateAncestryGoF1Scores()) {
+							avgMaxEvlScr += e.getHighestPossibleAncestryGoAnnotationScore();
+						} else {
+							avgMaxEvlScr += e.getHighestPossibleSimpleGoAnnotationScore();
+						}
+					}
+			}
+		} else { // Otherwise use HRD based scores
+			for (Protein prot : getProteins().values()) {
+				prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
+				avgMaxEvlScr += prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore();
+			}
 		}
-		setAvgMaxEvaluationScore(getAvgMaxEvaluationScore() / getProteins().size());
+		setAvgMaxEvaluationScore(avgMaxEvlScr / getProteins().size());		// calculate average
 	}
 
 	public Double getAvgMaxEvaluationScore() {
