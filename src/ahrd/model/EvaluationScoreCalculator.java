@@ -498,7 +498,7 @@ public class EvaluationScoreCalculator {
 	public void findHighestPossibleGoScore() {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
-				this.setHighestPossibleSimpleGoAnnotationScore(0.0);
+				this.setHighestPossibleSemSimGoAnnotationScore(calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, new HashSet<GOterm>())); // In case reference go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
 						double score = calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
@@ -512,7 +512,7 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			if (getSettings().doCalculateAncestryGoF1Scores()) {
-				this.setHighestPossibleAncestryGoAnnotationScore(0.0);
+				this.setHighestPossibleSemSimGoAnnotationScore(this.calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, new HashSet<GOterm>())); // In case reference go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
 						double score = calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
@@ -526,7 +526,7 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			if (getSettings().doCalculateSemSimGoF1Scores()) {
-				this.setHighestPossibleSemSimGoAnnotationScore(0.0);
+				this.setHighestPossibleSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, new HashSet<GOterm>())); // In case reference go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
 						double score = calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
