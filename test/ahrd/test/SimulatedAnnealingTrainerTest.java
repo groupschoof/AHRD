@@ -18,20 +18,20 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import ahrd.controller.Parameters;
-import ahrd.controller.Trainer;
+import ahrd.controller.SimulatedAnnealingTrainer;
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.Protein;
 
-public class TrainerTest {
+public class SimulatedAnnealingTrainerTest {
 
-	private Trainer trainer;
+	private SimulatedAnnealingTrainer trainer;
 
 	@Before
 	public void setUp() throws IOException, MissingAccessionException,
 			MissingProteinException, SAXException, ParsingException {
-		trainer = new Trainer("./test/resources/trainer_input.yml");
+		trainer = new SimulatedAnnealingTrainer("./test/resources/trainer_input.yml");
 		trainer.setup(false); // false -> Don't log memory and time-usages
 		trainer.setupReferenceDescriptions();
 		// Sets up description and GOterm annotations of competitors in the EvaluationScoreCalculators of each Protein
@@ -40,7 +40,7 @@ public class TrainerTest {
 
 	@Test
 	public void testAvgEvaluationScore() {
-		assertTrue("Trainer should initialize Settings to Training-Mode.",
+		assertTrue("SimulatedAnnealingTrainer should initialize Settings to Training-Mode.",
 				getSettings().isInTrainingMode());
 		Protein p1 = new Protein("protein_one", 200);
 		p1.getEvaluationScoreCalculator().setEvalutionScore(1.0);
@@ -238,7 +238,7 @@ public class TrainerTest {
 		this.trainer.setup(false);
 		for (Protein p : this.trainer.getProteins().values()) {
 			assertTrue(
-					"Setting up Trainer with flag 'write_best_blast_hits_to_output: false' should enforce NOT remembering competitor annotations 'description from best Blast-Hits'.",
+					"Setting up SimulatedAnnealingTrainer with flag 'write_best_blast_hits_to_output: false' should enforce NOT remembering competitor annotations 'description from best Blast-Hits'.",
 					p.getEvaluationScoreCalculator().getBestUnchangedBlastResults()
 							.size() == 0);
 		}

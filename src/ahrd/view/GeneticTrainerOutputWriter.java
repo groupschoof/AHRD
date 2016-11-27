@@ -57,13 +57,12 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 			Double avgMaxEvalScore) {
 		String col = sFoundInGeneration + "\t" + avgMaxEvalScore + "\t"
 				+ s.getAvgEvaluationScore() + "\t"
-				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
-				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
-				+ FRMT.format(s.getTokenScoreOverlapScoreWeight());
+				+ s.getTokenScoreBitScoreWeight() + "\t"
+				+ s.getTokenScoreDatabaseScoreWeight() + "\t"
+				+ s.getTokenScoreOverlapScoreWeight();
 		for (String blastDb : this.sortedBlastDatabases) {
-			col += "\t" + FRMT.format(s.getBlastDbWeight(blastDb));
-			col += "\t"
-					+ FRMT.format(s.getDescriptionScoreBitScoreWeight(blastDb));
+			col += "\t" + s.getBlastDbWeight(blastDb);
+			col += "\t" + s.getDescriptionScoreBitScoreWeight(blastDb);
 		}
 		col += "\n";
 		return col;

@@ -2,68 +2,36 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Random;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import ahrd.exception.MissingInterproResultException;
+import ahrd.model.BlastResult;
+import ahrd.model.DescriptionScoreCalculator;
 import ahrd.model.EvaluationScoreCalculator;
 import ahrd.model.Protein;
+import ahrd.model.TokenScoreCalculator;
 import ahrd.view.TrainerOutputWriter;
 
 public class Trainer extends Evaluator {
 
-	private Parameters acceptedParameters;
-	private Parameters bestParameters;
-	private Integer bestParametersFoundAtTemperature;
-	private TrainerOutputWriter outWriter;
-	private Set<Parameters> testedParameters;
+	protected Parameters bestParameters;
+	protected TrainerOutputWriter outWriter;
+
 	/**
 	 * The average of AHRD's maximum evaluation score for each Protein. This is
 	 * the maximum of the evaluation scores calculated for all Descriptions of
 	 * each Protein. These maximums are then averaged.
 	 */
-	private Double avgMaxEvaluationScore = 0.0;
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		System.out
-				.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.Trainer input.yml\n");
-
-		try {
-			Trainer trainer = new Trainer(args[0]);
-			trainer.setup(false); // false -> Don't log memory and time-usages
-			// After the setup the unique short accessions are no longer needed:
-			trainer.setUniqueBlastResultShortAccessions(null);
-			trainer.setupReferenceDescriptions();
-			// Try to find optimal parameters heuristically:
-			trainer.train();
-			// Calculate the average maximum evaluation score AHRD could have
-			// possible achieved:
-			trainer.calcAvgMaxEvaluationScore();
-
-			// Write final output
-			Settings bestSettings = getSettings().clone();
-			bestSettings.setParameters(trainer.getBestParameters());
-			trainer.outWriter.writeFinalOutput(bestSettings,
-					trainer.getAvgMaxEvaluationScore(),
-					trainer.getBestParametersFoundAtTemperature());
-			System.out
-					.println("Logged path through parameter- and score-space into:\n"
-							+ getSettings()
-									.getPathToSimulatedAnnealingPathLog());
-			System.out.println("Written output into:\n"
-					+ getSettings().getPathToOutput());
-		} catch (Exception e) {
-			System.err.println("We are sorry, an unexpected ERROR occurred:");
-			e.printStackTrace(System.err);
-		}
-
-	}
+	protected Double avgMaxEvaluationScore = 0.0;
 
 	/**
 	 * Constructor initializes the Settings as given in the argument input.yml
@@ -73,140 +41,33 @@ public class Trainer extends Evaluator {
 	 */
 	public Trainer(String pathToInputYml) throws IOException {
 		super(pathToInputYml);
-		this.outWriter = new TrainerOutputWriter();
-		// Remember tested Parameter-Sets and their scores?
-		if (getSettings().rememberSimulatedAnnealingPath())
-			this.testedParameters = new HashSet<Parameters>();
 	}
 
 	/**
-	 * As of now performs hill-climbing to optimize parameters.
-	 * 
-	 * @throws IOException
-	 * @throws MissingInterproResultException
-	 * @throws SQLException
+	 * Removes all BlastResults from each Protein and adds them again.
+	 * Reinitializes the TokenScoreCalculator and the DescriptionScoreCalculator of each Protein.
+	 * This triggers recalculation of cumulative and total token scores in the TokenScoreCalulator and the maxBitScore in the DescriptionScoreCalculator.
+	 * The target of this operation are the CumulativeTokenBlastDatabaseScore and the TotalTokenBlastDatabaseScore in the TokenScoreCalculator.
+	 * These scores depend on the BlastDbWeights and can't be transfered from other sets of Parameters.  
 	 */
-	public void train() throws MissingInterproResultException, IOException,
-			SQLException {
-		while (getSettings().getTemperature() > 0) {
-			// If we run simulated annealing remembering tested Parameters and
-			// their scores,
-			// do not calculate current Parameter's performance, if already done
-			// in former cycle:
-			if (getSettings().rememberSimulatedAnnealingPath()
-					&& getTestedParameters().contains(
-							getSettings().getParameters())) {
-				getSettings().setParameters(
-						getAlreadyTestedParameters(getSettings()
-								.getParameters()));
-			} else {
-				// Iterate over all Proteins and assign the best scoring Human
-				// Readable Description
-				assignHumanReadableDescriptions();
-				// Evaluate AHRD's performance for each Protein:
-				calculateEvaluationScores();
-				// Estimate average performance of current Parameters:
-				calcAveragesOfEvalScoreTPRandFPR();
+	protected void reinitializeBlastResults() {
+		for (Protein p : getProteins().values()) {
+			Map<String, List<BlastResult>> blastResults = p.getBlastResults();
+			p.setBlastResults(new HashMap<String, List<BlastResult>>());
+			p.setTokenScoreCalculator(new TokenScoreCalculator(p));
+			p.setDescriptionScoreCalculator(new DescriptionScoreCalculator(p));
+			for(String blastDb : blastResults.keySet()) {
+				for(BlastResult br : blastResults.get(blastDb)){
+					p.addBlastResult(br);
+				}
 			}
-			// Breaking a little bit with the pure simulated annealing
-			// algorithm, we remember the best performing Parameters:
-			findBestSettings();
-			// If started with this option, remember currently evaluated
-			// Parameters:
-			if (getSettings().rememberSimulatedAnnealingPath())
-				getTestedParameters()
-						.add(getSettings().getParameters().clone());
-			// Remember difference in avg. evaluation-scores, *before* accepting
-			// or rejecting current Parameters:
-			Double diffScores = diffEvalScoreToCurrentlyAcceptedParams();
-			// Initialize the next iteration.
-			// Find locally optimal (according to objective function)
-			// Parameters:
-			int acceptedCurrParameters = acceptOrRejectParameters();
-			// Write output of current iteration:
-			this.outWriter.writeIterationOutput(getSettings(), diffScores,
-					acceptedCurrParameters);
-			// Try a slightly changes set of Parameters:
-			initNeighbouringSettings();
-			// Cool down temperature:
-			coolDown();
 		}
-	}
-
-	/**
-	 * Each iteration the average evaluation-score is compared with the latest
-	 * far high-score. If the current Settings Score is better, it will become
-	 * the high-score.
-	 */
-	public void findBestSettings() {
-		if (getBestParameters() == null
-				|| getSettings().getAvgEvaluationScore() > getBestParameters()
-						.getAvgEvaluationScore()) {
-			setBestParameters(getSettings().getParameters().clone());
-			setBestParametersFoundAtTemperature(getSettings().getTemperature());
-		}
-	}
-
-	/**
-	 * Generates new Settings from the currently accepted ones by
-	 * <em>slightly</em> changing them to a <em>neighboring</em> according to
-	 * the euclidean distance in the parameter-space Instance.
-	 */
-	public void initNeighbouringSettings() {
-		getSettings().setParameters(
-				getAcceptedParameters().neighbour(
-						diffEvalScoreToCurrentlyAcceptedParams()));
-	}
-
-	public Double diffEvalScoreToCurrentlyAcceptedParams() {
-		return (getAcceptedParameters() != null) ? getSettings()
-				.getAvgEvaluationScore()
-				- getAcceptedParameters().getAvgEvaluationScore() : 0.0;
-	}
-
-	/**
-	 * Calculates Acceptance-Probability according to the <strong>simulated
-	 * annealing</strong> algorithm. The distribution of P('Accept worse
-	 * performing parameter-sets') := exp(- delta(scores)*scaling-factor /
-	 * current-temperature)
-	 * 
-	 * @return Double - The calculated acceptance-probability
-	 */
-	public Double acceptanceProbability() {
-		// Scaling-Factor referenced for reading convenience. ;-)
-		Double sf = getSettings()
-				.getOptimizationAcceptanceProbabilityScalingFactor();
-		// If current Settings perform better than the so far found best, accept
-		// them:
-		double p = 1.0;
-		// If not, generate Acceptance-Probability based on Score-Difference and
-		// current Temperature:
-		if (getAcceptedParameters() != null
-				&& diffEvalScoreToCurrentlyAcceptedParams() < 0.0) {
-			// In this case the difference in avg. evaluation scores of current
-			// to accepted parameters is always NEGATIVE.
-			// Hence the following formula can be written as:
-			// p := exp((delta.scores*sf)/T.curr), where delta.score is a
-			// negative real value.
-			p = Math.exp(diffEvalScoreToCurrentlyAcceptedParams() * sf
-					/ getSettings().getTemperature());
-		}
-		return p;
-	}
-
-	/**
-	 * Diminishes the temperature by one iteration-step.
-	 * 
-	 * @Note: Temperature is a global Setting.
-	 */
-	public void coolDown() {
-		getSettings().setTemperature(
-				getSettings().getTemperature() - getSettings().getCoolDownBy());
 	}
 
 	/**
 	 * Calculates the average of AHRD's EvaluationScore (objective-function).
-	 * Also calculates the average True-Positives- and False-Positives-Rates.
+	 * If GO term scores have been computed the average is based upon them.
+	 * Otherwise the conventional HRD based scores are used.
 	 */
 	public void calcAveragesOfEvalScoreTPRandFPR() {
 		// average evaluation-score
@@ -215,15 +76,34 @@ public class Trainer extends Evaluator {
 		Double avgTruePosRate = 0.0;
 		// average FPR:
 		Double avgFalsePosRate = 0.0;
-		for (Protein p : getProteins().values()) {
-			EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
-			if (e != null) {
-				if (e.getEvalutionScore() != null)
-					avgEvlScr += e.getEvalutionScore();
-				if (e.getTruePositivesRate() != null)
-					avgTruePosRate += e.getTruePositivesRate();
-				if (e.getFalsePositivesRate() != null)
-					avgFalsePosRate += e.getFalsePositivesRate();
+		// Evaluate GO annotations.
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+			for (Protein p : getProteins().values()) {
+				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
+				if (e != null) {
+					//Depending on the settings the go annotation f-score with the highest level of complexity is used
+					if (getSettings().doCalculateSemSimGoF1Scores()) {
+						avgEvlScr += e.getSemSimGoAnnotationScore();
+					} else {
+						if (getSettings().doCalculateAncestryGoF1Scores()) {
+							avgEvlScr += e.getAncestryGoAnnotationScore();
+						} else {
+							avgEvlScr += e.getSimpleGoAnnotationScore();
+						}
+					}
+				}
+			}
+		} else { // Otherwise use HRD based scores
+			for (Protein p : getProteins().values()) {
+				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
+				if (e != null) {
+					if (e.getEvalutionScore() != null)
+						avgEvlScr += e.getEvalutionScore();
+					if (e.getTruePositivesRate() != null)
+						avgTruePosRate += e.getTruePositivesRate();
+					if (e.getFalsePositivesRate() != null)
+						avgFalsePosRate += e.getFalsePositivesRate();
+				}
 			}
 		}
 		// average each number:
@@ -241,87 +121,135 @@ public class Trainer extends Evaluator {
 	}
 
 	/**
-	 * Evaluates the current runs average score (objective function) and based
-	 * on this decides according to the simulated annealing algorithm, if the
-	 * currently used Settings are accepted or rejected.
-	 * 
-	 * @Note: Settings are cloned to avoid changing parameters, we want to
-	 *        remember unchanged!
-	 * 
-	 * @return int -
-	 *         <ul>
-	 *         <li>0 Rejected worse performing parameters</li>
-	 *         <li>1 Accepted worse performing parameters</li>
-	 *         <li>2 Accepted equally well performing parameters</li>
-	 *         <li>3 Accepted better performing parameters</li>
-	 *         </ul>
-	 */
-	public int acceptOrRejectParameters() {
-		int accepted = 0; // Rejected worse performing parameters
-		double acceptCurrSettingsProb = acceptanceProbability();
-		if (acceptCurrSettingsProb == 1.0) {
-			if (getAcceptedParameters() == null
-					|| getAcceptedParameters().getAvgEvaluationScore() < getSettings()
-							.getAvgEvaluationScore()) {
-				accepted = 3; // Accepted better performing parameters
-			} else {
-				accepted = 2; // Accepted equally well performing parameters
-			}
-			setAcceptedParameters(getSettings().getParameters().clone());
-		} else {
-			// Take random decision
-			Random r = Utils.random;
-			if (r.nextDouble() <= acceptCurrSettingsProb) {
-				setAcceptedParameters(getSettings().getParameters().clone());
-				accepted = 1; // Accepted worse performing parameters
-			}
-			// else discard the current Settings and continue with the so far
-			// optimal ones.
-		}
-		return accepted;
-	}
-
-	/**
-	 * Do not calculate the current Parameters' performance again, use
-	 * remembered scores instead.
-	 * 
-	 * @param current
-	 * @return Parameters
-	 */
-	public Parameters getAlreadyTestedParameters(Parameters current) {
-		Parameters alreadyTested = null;
-		for (Parameters iterParams : getTestedParameters().toArray(
-				new Parameters[] {})) {
-			if (current.equals(iterParams))
-				alreadyTested = iterParams;
-		}
-		return alreadyTested;
-	}
-
-	/**
 	 * This calculates the average maximum evaluation score AHRD could possibly
 	 * achieve.
 	 */
 	public void calcAvgMaxEvaluationScore() {
-		for (Protein prot : getProteins().values()) {
-			prot.getEvaluationScoreCalculator()
-					.findHighestPossibleEvaluationScore();
-			setAvgMaxEvaluationScore(getAvgMaxEvaluationScore()
-					+ prot.getEvaluationScoreCalculator()
-							.getHighestPossibleEvaluationScore());
+		double avgMaxEvlScr = 0.0; 		// init average maximum evaluation-score
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) { 		// Evaluate GO annotations.
+			for (Protein p : getProteins().values()) {
+				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
+					e.findHighestPossibleGoScore();
+					//Depending on the settings the go annotation f-score with the highest level of complexity is used
+					if (getSettings().doCalculateSemSimGoF1Scores()) {
+						avgMaxEvlScr += e.getHighestPossibleSemSimGoAnnotationScore();
+					} else {
+						if (getSettings().doCalculateAncestryGoF1Scores()) {
+							avgMaxEvlScr += e.getHighestPossibleAncestryGoAnnotationScore();
+						} else {
+							avgMaxEvlScr += e.getHighestPossibleSimpleGoAnnotationScore();
+						}
+					}
+			}
+		} else { // Otherwise use HRD based scores
+			for (Protein prot : getProteins().values()) {
+				prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
+				avgMaxEvlScr += prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore();
+			}
 		}
-		setAvgMaxEvaluationScore(getAvgMaxEvaluationScore()
-				/ getProteins().size());
+		setAvgMaxEvaluationScore(avgMaxEvlScr / getProteins().size());		// calculate average
 	}
 
-	public Parameters getAcceptedParameters() {
-		return acceptedParameters;
+	/**
+	 * Writes useful info for every protein according to the currents parameter set to file.
+	 * Is meant for Debugging.
+	 * Uses the generation number as file name.
+	 * @param iteration
+	 * @throws IOException
+	 */
+	protected void writeProteins(int iteration) throws IOException{
+		BufferedWriter outBufWrtr = new BufferedWriter(new FileWriter(iteration + ".tsv"));
+		outBufWrtr.write("#Generation\tAverage Evaluation-Score(F-Score)\tOrigin\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight");
+		List<String> sortedBlastDatabases = new ArrayList<String>(getSettings().getBlastDatabases());
+		Collections.sort(sortedBlastDatabases);
+		for (String blastDb : sortedBlastDatabases) {
+			outBufWrtr.write("\t" + blastDb + "-Weight");
+			outBufWrtr.write("\t" + blastDb + "-Description-Score-Bit-Score-Weight");
+		}
+		outBufWrtr.write("\n");
+		outBufWrtr.write("#" + iteration + "\t" 
+		+ getSettings().getAvgEvaluationScore() + "\t"
+		+ getSettings().getParameters().getOrigin() + "\t" 
+		+ getSettings().getTokenScoreBitScoreWeight() + "\t"
+		+ getSettings().getTokenScoreDatabaseScoreWeight() + "\t"
+		+ getSettings().getTokenScoreOverlapScoreWeight());
+		for (String blastDb : sortedBlastDatabases) {
+			outBufWrtr.write("\t" + getSettings().getBlastDbWeight(blastDb));
+			outBufWrtr.write("\t" + getSettings().getDescriptionScoreBitScoreWeight(blastDb));
+		}
+		outBufWrtr.write("\n");
+		
+		outBufWrtr.write("QueryAccession\tBlastAccession\tSemSimGoAnnotationScore\tGOterms\tDescriptionScore\tLexicalScore\tRelativeBlastScore\tBitScore\tMaxBitScore\tDescription\tTokenScoreHighScore\tTotalTokenBitScore\tTotalTokenBlastDatabaseScore\tTotalTokenOverlapScore\tCumulativeTokenBitScores\tCumulativeTokenBlastDatabaseScores\tgetCumulativeTokenOverlapScores\n");
+		for(Protein p:getProteins().values()) {
+			if (p.getDescriptionScoreCalculator().getHighestScoringBlastResult() == null) {
+				outBufWrtr.write(p.getAccession() + "\t\t" 
+			+ p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore() + "\t"
+			+ Utils.joinStringCollection(",", p.getGoResults()) + "\t"
+			+ "0\t0\t0\t0\t0\t\t0\t0\n");
+			} else {
+				if(p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescription() == null) {
+					System.out.println("NPE");
+				} else {
+					outBufWrtr.write(p.getAccession() + "\t"
+				+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession() + "\t"
+				+ p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore() + "\t"
+				+ Utils.joinStringCollection(",", p.getGoResults()) + "\t"
+				+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescriptionScore() + "\t"
+				+ p.getLexicalScoreCalculator().lexicalScore(p.getDescriptionScoreCalculator().getHighestScoringBlastResult()) + "\t"
+				+ p.getDescriptionScoreCalculator().relativeBlastScore(p.getDescriptionScoreCalculator().getHighestScoringBlastResult()) + "\t"
+				+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getBitScore() + "\t"
+				+ p.getDescriptionScoreCalculator().getMaxBitScore() + "\t"
+				+ p.getDescriptionScoreCalculator().getHighestScoringBlastResult().getDescription() + "\t"
+				+ p.getTokenScoreCalculator().getTokenHighScore() + "\t"
+				+ p.getTokenScoreCalculator().getTotalTokenBitScore() + "\t"
+				+ p.getTokenScoreCalculator().getTotalTokenBlastDatabaseScore() + "\t"
+				+ p.getTokenScoreCalculator().getTotalTokenOverlapScore() + "\t"
+				+ p.getTokenScoreCalculator().getCumulativeTokenBitScores() + "\t"
+				+ p.getTokenScoreCalculator().getCumulativeTokenBlastDatabaseScores() + "\t"
+				+ p.getTokenScoreCalculator().getCumulativeTokenOverlapScores()
+				+ "\n");
+				}
+			}
+		}
+		outBufWrtr.close();
+		
+		File theDir = new File(Integer.toString(iteration));
+		theDir.mkdir();
+		for(Protein p:getProteins().values()) {
+			outBufWrtr = new BufferedWriter(new FileWriter("./" + iteration + "/" + p.getAccession() + ".tsv"));
+			outBufWrtr.write("BlastDb\tBlastAccession\tShortAccession\tDescriptionScore\tDescription\tBitScore\tTokens\tInformativeTokens\tTokenScores\tDescriptionScoreRelativeBlastScore\tLexicalScore\tLexicalScoreCorrectionFactor\tLexicalScoreSumTokenScoresDividebByHighScore\tSumOfAllTokenScores\n");
+			for(String blastDb : p.getBlastResults().keySet()) {
+				for(BlastResult br : p.getBlastResults().get(blastDb)){
+					TokenScoreCalculator tsk = p.getTokenScoreCalculator();
+					Set<String> informativeTokens = new HashSet<String>();
+					List<String> tokenScores = new ArrayList<String>();
+					for(String token : br.getTokens()) {
+						if (tsk.isInformativeToken(token)) {
+							informativeTokens.add(token);
+						}
+						tokenScores.add(tsk.getTokenScores().get(token).toString());
+					}
+					outBufWrtr.write(blastDb + "\t"
+							+ br.getAccession() + "\t"
+							+ br.getShortAccession() + "\t" 
+							+ br.getDescriptionScore() + "\t"
+							+ br.getDescription() + "\t"
+							+ br.getBitScore() + "\t"
+							+ Utils.joinStringCollection(",", br.getTokens()) + "\t"
+							+ Utils.joinStringCollection(",", informativeTokens) + "\t"
+							+ Utils.joinStringCollection(",", tokenScores) + "\t"
+							+ p.getDescriptionScoreCalculator().relativeBlastScore(br) + "\t"
+							+ p.getLexicalScoreCalculator().lexicalScore(br) + "\t"
+							+ p.getLexicalScoreCalculator().correctionFactor(br) + "\t"
+							+ p.getLexicalScoreCalculator().sumTokenScoresDividebByHighScore(br) + "\t"
+							+ p.getTokenScoreCalculator().sumOfAllTokenScores(br) + "\t"
+							+ "\n");
+				}
+			}
+			outBufWrtr.close();
+		}
 	}
-
-	public void setAcceptedParameters(Parameters acceptedSettings) {
-		this.acceptedParameters = acceptedSettings;
-	}
-
+	
 	public Parameters getBestParameters() {
 		return bestParameters;
 	}
@@ -330,25 +258,12 @@ public class Trainer extends Evaluator {
 		this.bestParameters = bestParameters;
 	}
 
-	public Set<Parameters> getTestedParameters() {
-		return testedParameters;
-	}
-
 	public Double getAvgMaxEvaluationScore() {
 		return avgMaxEvaluationScore;
 	}
 
 	public void setAvgMaxEvaluationScore(Double avgMaxEvaluationScore) {
 		this.avgMaxEvaluationScore = avgMaxEvaluationScore;
-	}
-
-	public Integer getBestParametersFoundAtTemperature() {
-		return bestParametersFoundAtTemperature;
-	}
-
-	public void setBestParametersFoundAtTemperature(
-			Integer bestParametersFoundAtTemperature) {
-		this.bestParametersFoundAtTemperature = bestParametersFoundAtTemperature;
 	}
 
 }

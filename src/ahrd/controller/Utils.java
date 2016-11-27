@@ -201,6 +201,8 @@ public class Utils {
 	 * @return
 	 */
 	public static String joinStringCollection(String sep, Collection<String> col) {
+		if (col == null)
+			return "";
 		StringBuilder sb = new StringBuilder();
 		boolean first = true;
 		for (String item : col) {
