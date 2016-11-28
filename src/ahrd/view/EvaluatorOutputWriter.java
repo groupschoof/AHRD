@@ -166,15 +166,15 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 	
 	public String buildCompetitorsMissingAnnotationColumns() {
 		String csvCols = "";
-		csvCols += "\t\t0\t0.0";
+		csvCols += "\t\t0\t0";
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 			csvCols += "\t";
 			if (getSettings().doCalculateSimpleGoF1Scores())
-				csvCols += "\t0.0";
+				csvCols += "\t0";
 			if (getSettings().doCalculateAncestryGoF1Scores())
-				csvCols += "\t0.0";
+				csvCols += "\t0";
 			if (getSettings().doCalculateSemSimGoF1Scores())
-				csvCols += "\t0.0";
+				csvCols += "\t0";
 		}
 		return csvCols;
 	}
@@ -291,15 +291,15 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			} else {
 				csvRow += "\t";
 				if (getSettings().isInTrainingMode()) {
-					csvRow += "\t0\t0.0";
+					csvRow += "\t0\t0";
 					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 						csvRow += "\t";
 						if (getSettings().doCalculateSimpleGoF1Scores())
-							csvRow += "\t0.0";
+							csvRow += "\t0";
 						if (getSettings().doCalculateAncestryGoF1Scores())
-							csvRow += "\t0.0";
+							csvRow += "\t0";
 						if (getSettings().doCalculateSemSimGoF1Scores())
-							csvRow += "\t0.0";
+							csvRow += "\t0";
 					}
 				}
 			}

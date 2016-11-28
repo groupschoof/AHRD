@@ -2,6 +2,7 @@ package ahrd.view;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,12 +22,16 @@ public abstract class AbstractOutputWriter implements OutputWriter {
 	 * zero, if number is smaller than zero.
 	 */
 	public static final DecimalFormat FRMT = new DecimalFormat("#,###0.###");
-
+	static {
+        final DecimalFormatSymbols dcs = FRMT.getDecimalFormatSymbols();
+        dcs.setDecimalSeparator('.');
+        dcs.setGroupingSeparator(',');
+        FRMT.setDecimalFormatSymbols(dcs);
+	}
+	
 	private Collection<Protein> proteins;
 
 	public AbstractOutputWriter(Collection<Protein> proteins) {
-		FRMT.getDecimalFormatSymbols().setDecimalSeparator('.');
-		FRMT.getDecimalFormatSymbols().setGroupingSeparator(',');
 		setProteins(proteins);
 	}
 
