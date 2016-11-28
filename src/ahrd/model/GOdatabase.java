@@ -193,7 +193,7 @@ public class GOdatabase {
 
 		// Read in SwissProt annotations
 		// Counts each annotation towards a GO term and its complete ancestry  
-		System.out.println("Reading and counting aprox 2.7 million SwissProt annoations ...");
+		System.out.println("Reading and counting aprox 2.7 million SwissProt annotations ...");
 		int bpCount = 0;
 		int ccCount = 0;
 		int mfCount = 0;
