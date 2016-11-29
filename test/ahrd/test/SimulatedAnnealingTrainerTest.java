@@ -81,7 +81,7 @@ public class SimulatedAnnealingTrainerTest {
 
 	@Test
 	public void testRememberSimulatedAnnealingPath()
-			throws MissingInterproResultException, IOException, SQLException {
+			throws MissingInterproResultException, IOException, SQLException, MissingAccessionException {
 		// Just do two cycles:
 		getSettings().setTemperature(2);
 		Parameters p = getSettings().getParameters().clone();
