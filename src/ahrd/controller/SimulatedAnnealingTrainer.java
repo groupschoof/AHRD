@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.view.TrainerOutputWriter;
 
@@ -41,9 +42,13 @@ public class SimulatedAnnealingTrainer extends Trainer {
 		try {
 			SimulatedAnnealingTrainer trainer = new SimulatedAnnealingTrainer(args[0]);
 			trainer.setup(false); // false -> Don't log memory and time-usages
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+				getSettings().setFindHighestPossibleGoScore(true);
+			}
 			// After the setup the unique short accessions are no longer needed:
 			trainer.setUniqueBlastResultShortAccessions(null);
 			trainer.setupReferenceDescriptions();
+			trainer.setupGoAnnotationEvaluation();
 			// Try to find optimal parameters heuristically:
 			trainer.train();
 			// Calculate the average maximum evaluation score AHRD could have
@@ -75,9 +80,10 @@ public class SimulatedAnnealingTrainer extends Trainer {
 	 * @throws IOException
 	 * @throws MissingInterproResultException
 	 * @throws SQLException
+	 * @throws MissingAccessionException 
 	 */
 	public void train() throws MissingInterproResultException, IOException,
-			SQLException {
+			SQLException, MissingAccessionException {
 		while (getSettings().getTemperature() > 0) {
 			// If we run simulated annealing remembering tested Parameters and
 			// their scores,
@@ -94,6 +100,9 @@ public class SimulatedAnnealingTrainer extends Trainer {
 				// Iterate over all Proteins and assign the best scoring Human
 				// Readable Description
 				assignHumanReadableDescriptions();
+				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+					goAnnotsStringToObject();
+				}
 				// Evaluate AHRD's performance for each Protein:
 				calculateEvaluationScores();
 				// Estimate average performance of current Parameters:
