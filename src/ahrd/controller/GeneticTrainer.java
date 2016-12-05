@@ -147,20 +147,14 @@ public class GeneticTrainer extends Trainer {
 			population.addAll(fittnessRanking);
 
 			// Recombination of fit survivors
-			Set<Set<Parameters>> uniqueMatingPairs = new HashSet<Set<Parameters>>();
-			if (Utils.binomial(fittnessRanking.size(), 2) >= numberOfOffspring) { // Avoid endless loops occurring if size of fittnessRanking very small 
-				while (population.size() < numberOfSurvivors + numberOfOffspring) {
-					Set<Parameters> matingPair = new HashSet<Parameters>();
-					do {
-						matingPair.clear();
-						while (matingPair.size() < 2) {
-							matingPair.add(getRandomFitIndividual(fittnessRanking));
-						}
-					} while (uniqueMatingPairs.contains(matingPair));
-					uniqueMatingPairs.add(matingPair);
-					Parameters[] matingPairArray = matingPair.toArray(new Parameters[0]);
-					population.add(matingPairArray[0].recombine(matingPairArray[1]));
+			System.out.println("Recombination");
+			while (population.size() < numberOfSurvivors + numberOfOffspring) {
+				Parameters mama = getRandomFitIndividual(fittnessRanking);
+				Parameters papa = getRandomFitIndividual(fittnessRanking);
+				while (papa == mama) {
+					papa = getRandomFitIndividual(fittnessRanking);
 				}
+				population.add(mama.recombine(papa));
 			}
 
 			// Mutants of fit survivors

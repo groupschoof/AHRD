@@ -129,17 +129,17 @@ public class Trainer extends Evaluator {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) { 		// Evaluate GO annotations.
 			for (Protein p : getProteins().values()) {
 				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
-					e.findHighestPossibleGoScore();
-					//Depending on the settings the go annotation f-score with the highest level of complexity is used
-					if (getSettings().doCalculateSemSimGoF1Scores()) {
-						avgMaxEvlScr += e.getHighestPossibleSemSimGoAnnotationScore();
+				e.findHighestPossibleGoScore();
+				//Depending on the settings the go annotation f-score with the highest level of complexity is used
+				if (getSettings().doCalculateSemSimGoF1Scores()) {
+					avgMaxEvlScr += e.getHighestPossibleSemSimGoAnnotationScore();
+				} else {
+					if (getSettings().doCalculateAncestryGoF1Scores()) {
+						avgMaxEvlScr += e.getHighestPossibleAncestryGoAnnotationScore();
 					} else {
-						if (getSettings().doCalculateAncestryGoF1Scores()) {
-							avgMaxEvlScr += e.getHighestPossibleAncestryGoAnnotationScore();
-						} else {
-							avgMaxEvlScr += e.getHighestPossibleSimpleGoAnnotationScore();
-						}
+						avgMaxEvlScr += e.getHighestPossibleSimpleGoAnnotationScore();
 					}
+				}
 			}
 		} else { // Otherwise use HRD based scores
 			for (Protein prot : getProteins().values()) {
