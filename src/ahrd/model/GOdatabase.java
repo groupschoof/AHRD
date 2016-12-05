@@ -88,7 +88,7 @@ public class GOdatabase {
 		String geneOntologyMYSQLdumpFilePath = pathToGoDatabase + geneOntologyMYSQLdumpFileName;
 		// Download gene ontology mysql data base dump if not alrady on drive
 		if (!new File(geneOntologyMYSQLdumpFilePath).exists()) {
-			System.out.println("Downloading GO databese (aprox. 12MB) from:\n" + geneOntologyMYSQLdumpURL);
+			System.out.println("Downloading GO database (aprox. 12MB) from:\n" + geneOntologyMYSQLdumpURL);
 			download(geneOntologyMYSQLdumpURL, geneOntologyMYSQLdumpFilePath);
 		}
 		
