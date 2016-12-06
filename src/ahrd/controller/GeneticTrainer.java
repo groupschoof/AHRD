@@ -138,28 +138,33 @@ public class GeneticTrainer extends Trainer {
 			}
 
 			// Survival of the fittest
-			NavigableSet<Parameters> fittnessRanking = new TreeSet<Parameters>();
-			fittnessRanking.addAll(population);
+			NavigableSet<Parameters> fitnessRanking = new TreeSet<Parameters>();
+			fitnessRanking.addAll(population);
 			population.clear();
-			while (fittnessRanking.size() > numberOfSurvivors) {
-				fittnessRanking.pollFirst();
+			while (fitnessRanking.size() > numberOfSurvivors) {
+				fitnessRanking.pollFirst();
 			}
-			population.addAll(fittnessRanking);
+			population.addAll(fitnessRanking);
 
 			// Recombination of fit survivors
-			System.out.println("Recombination");
+			int count = 0;
 			while (population.size() < numberOfSurvivors + numberOfOffspring) {
-				Parameters mama = getRandomFitIndividual(fittnessRanking);
-				Parameters papa = getRandomFitIndividual(fittnessRanking);
+				Parameters mama = getRandomFitIndividual(fitnessRanking);
+				Parameters papa = getRandomFitIndividual(fitnessRanking);
 				while (papa == mama) {
-					papa = getRandomFitIndividual(fittnessRanking);
+					papa = getRandomFitIndividual(fitnessRanking);
 				}
 				population.add(mama.recombine(papa));
+				count++;
+				// Algorithm has converged i.e. has enriched the set of survivors with parameter sets too similar to each other, to result in new sets via recombination.
+				// Recombination is aborted and the places in the population are instead filled with additional mutants.
+				if (count > numberOfOffspring * 3)
+					break;
 			}
 
 			// Mutants of fit survivors
 			while (population.size() < numberOfSurvivors + numberOfOffspring + numberOfMutants) {
-				population.add(getRandomFitIndividual(fittnessRanking).neighbour(null));
+				population.add(getRandomFitIndividual(fitnessRanking).neighbour(null));
 			}
 
 			// Fill the rest of the population with new parameter sets
@@ -170,11 +175,11 @@ public class GeneticTrainer extends Trainer {
 			// Remember the best parameter set and the generation it was found
 			// in
 			if (getBestParameters() != null) {
-				diffAvgEvalScoreToLastGeneration = fittnessRanking.last().getAvgEvaluationScore() - getBestParameters().getAvgEvaluationScore();
+				diffAvgEvalScoreToLastGeneration = fitnessRanking.last().getAvgEvaluationScore() - getBestParameters().getAvgEvaluationScore();
 			}
 			if (getBestParameters() == null
-					|| fittnessRanking.last().getAvgEvaluationScore() > getBestParameters().getAvgEvaluationScore()) {
-				setBestParameters(fittnessRanking.last().clone());
+					|| fitnessRanking.last().getAvgEvaluationScore() > getBestParameters().getAvgEvaluationScore()) {
+				setBestParameters(fitnessRanking.last().clone());
 				setGenerationBestParametersWereFoundIn(generation);
 			}
 			// Write output of current iteration:
@@ -188,16 +193,16 @@ public class GeneticTrainer extends Trainer {
 	 * parameter sets ordered according to their fitness (evaluation score) A
 	 * strong bias towards fitter individuals is applied
 	 * 
-	 * @param fittnessRanking
+	 * @param fitnessRanking
 	 * @return random fit parameter set
 	 */
-	private static Parameters getRandomFitIndividual(NavigableSet<Parameters> fittnessRanking) {
+	private static Parameters getRandomFitIndividual(NavigableSet<Parameters> fitnessRanking) {
 		Parameters randomFitIndividual = null;
 		int placeInRanking = Integer.MAX_VALUE;
-		while (placeInRanking > fittnessRanking.size()) {
-			placeInRanking = (int) Math.ceil(Math.abs(Utils.random.nextGaussian() * ((double) fittnessRanking.size() / 3)));
+		while (placeInRanking > fitnessRanking.size()) {
+			placeInRanking = (int) Math.ceil(Math.abs(Utils.random.nextGaussian() * ((double) fitnessRanking.size() / 3)));
 		}
-		Iterator<Parameters> decendingRankingIter = fittnessRanking.descendingIterator();
+		Iterator<Parameters> decendingRankingIter = fitnessRanking.descendingIterator();
 		for (int i = 1; i <= placeInRanking; i++) {
 			randomFitIndividual = decendingRankingIter.next();
 		}
