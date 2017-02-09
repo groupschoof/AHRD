@@ -33,6 +33,7 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 			throws IOException {
 		this.pathBufWrtr.write(geneticSettingsRow(generation, currentGenerationsBestParameters,
 				diffAvgEvalScoreToLastGeneration, Origin));
+		this.pathBufWrtr.flush();
 	}
 
 	public String geneticSettingsRow(int generation, Parameters p,
