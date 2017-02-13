@@ -316,22 +316,22 @@ public class Settings implements Cloneable {
 		YamlReader reader = new YamlReader(new FileReader(pathToYml));
 		Map<String, Object> input = (Map<String, Object>) reader.read();
 		this.blastDbSettings = (Map<String, Map<String, String>>) input.get(BLAST_DBS_KEY);
-		setPathToProteinsFasta((String) input.get(PROTEINS_FASTA_KEY));
-		setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
-		setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
-		setPathToOutput((String) input.get(OUTPUT_KEY));
+		this.setPathToProteinsFasta((String) input.get(PROTEINS_FASTA_KEY));
+		this.setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
+		this.setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
+		this.setPathToOutput((String) input.get(OUTPUT_KEY));
 		if (input.get(HRD_SCORES_OUTPUT_PATH) != null && !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
 			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH));
 		// Trainer logs path through parameter-space here:
 		if (input.get(SIMULATED_ANNEALING_PATH_LOG_KEY) != null)
 			setPathToSimulatedAnnealingPathLog((String) input.get(SIMULATED_ANNEALING_PATH_LOG_KEY));
-		setTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
-		setTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
-		setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
-		setWriteTokenSetToOutput(Boolean.parseBoolean((String) input.get(WRITE_TOKEN_SET_TO_OUTPUT)));
-		setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
-		setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
-		setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
+		this.setTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
+		this.setTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
+		this.setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
+		this.setWriteTokenSetToOutput(Boolean.parseBoolean((String) input.get(WRITE_TOKEN_SET_TO_OUTPUT)));
+		this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
+		this.setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
+		this.setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
 		// Generate the Blacklists and Filters for each Blast-Database from
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
@@ -354,71 +354,63 @@ public class Settings implements Cloneable {
 		// Simulated Annealing can be started with custom temperature and value
 		// it is cooled-down by each step:
 		if (input.get(TEMPERATURE_KEY) != null)
-			setTemperature(Integer.parseInt((String) input.get(TEMPERATURE_KEY)));
+			this.setTemperature(Integer.parseInt((String) input.get(TEMPERATURE_KEY)));
 		if (input.get(COOL_DOWN_BY_KEY) != null)
 			this.coolDownBy = Integer.parseInt((String) input.get(COOL_DOWN_BY_KEY));
 		if (input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY) != null)
-			setOptimizationAcceptanceProbabilityScalingFactor(
+			this.setOptimizationAcceptanceProbabilityScalingFactor(
 					Double.parseDouble((String) input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY)));
 		if (input.get(MUTATOR_MEAN_KEY) != null)
-			setMutatorMean(Double.parseDouble((String) input.get(MUTATOR_MEAN_KEY)));
+			this.setMutatorMean(Double.parseDouble((String) input.get(MUTATOR_MEAN_KEY)));
 		if (input.get(MUTATOR_DEVIATION_KEY) != null)
-			setMutatorDeviation(Double.parseDouble((String) input.get(MUTATOR_DEVIATION_KEY)));
-		if (input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY) != null
-				&& Boolean.parseBoolean(input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY).toString()))
-			this.rememberSimulatedAnnealingPath = true;
+			this.setMutatorDeviation(Double.parseDouble((String) input.get(MUTATOR_DEVIATION_KEY)));
+		this.setRememberSimulatedAnnealingPath(Boolean.parseBoolean((String) input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY)));
 		if (input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY) != null)
-			setpMutateSameParameterScale(Double.parseDouble((String) input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY)));
+			this.setpMutateSameParameterScale(Double.parseDouble((String) input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY)));
 		// Evaluation or Optimization might be interested in the highest
 		// possibly achievable evaluation-score:
-		if (input.get(FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY) != null
-				&& Boolean.parseBoolean(input.get(FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY).toString()))
-			this.findHighestPossibleEvaluationScore = true;
+		this.setFindHighestPossibleEvaluationScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY)));
 		// Set any non default parameters controlling, how sequence similarity
 		// search result tables are parsed:
 		if (input.get(SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY) != null) {
-			setSeqSimSearchTableCommentLineRegex(
+			this.setSeqSimSearchTableCommentLineRegex(
 					Pattern.compile(input.get(SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SEP_KEY) != null) {
-			setSeqSimSearchTableSep(input.get(SEQ_SIM_SEARCH_TABLE_SEP_KEY).toString());
+			this.setSeqSimSearchTableSep(input.get(SEQ_SIM_SEARCH_TABLE_SEP_KEY).toString());
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY) != null) {
-			setSeqSimSearchTableQueryCol(Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY).toString()));
+			this.setSeqSimSearchTableQueryCol(Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY) != null) {
-			setSeqSimSearchTableSubjectCol(
+			this.setSeqSimSearchTableSubjectCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY) != null) {
-			setSeqSimSearchTableQueryStartCol(
+			this.setSeqSimSearchTableQueryStartCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY) != null) {
-			setSeqSimSearchTableQueryEndCol(
+			this.setSeqSimSearchTableQueryEndCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_START_COL_KEY) != null) {
-			setSeqSimSearchTableSubjectStartCol(
+			this.setSeqSimSearchTableSubjectStartCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_START_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY) != null) {
-			setSeqSimSearchTableSubjectEndCol(
+			this.setSeqSimSearchTableSubjectEndCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY) != null) {
-			setSeqSimSearchTableEValueCol(Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY).toString()));
+			this.setSeqSimSearchTableEValueCol(Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY).toString()));
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY) != null) {
-			setSeqSimSearchTableBitScoreCol(
+			this.setSeqSimSearchTableBitScoreCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
 		}
-		if (input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY) != null) {
-			this.preferReferenceWithGoAnnos = true;
-		}
-		if (input.get(EVALUATE_VALID_TOKENS_KEY) != null) {
-			this.setEvaluateValidTokens(parseBoolString(input.get(EVALUATE_VALID_TOKENS_KEY).toString()));
-		}
+		this.setPreferReferenceWithGoAnnos(Boolean.parseBoolean((String) input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY)));
+		this.setEvaluateValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_VALID_TOKENS_KEY)));
 		if (input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY) != null) {
 			this.setPathToReferencesDescriptionBlacklist(input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY).toString());
 			this.setReferencesDescriptionBlacklist(fromFile(getPathToReferencesDescriptionBlacklist()));
@@ -437,16 +429,12 @@ public class Settings implements Cloneable {
 		if (input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY) != null) {
 			this.setPathToReferenceGoAnnotations(input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY).toString());
 		}
-		if (input.get(GO_F1_ANCESTRY_KEY) != null) {
-			this.setCalculateAncestryGoF1Scores(parseBoolString(input.get(GO_F1_ANCESTRY_KEY).toString()));
-		}
-		if (input.get(GO_F1_SEMSIM_KEY) != null) {
-			this.setCalculateSemSimGoF1Scores(parseBoolString(input.get(GO_F1_SEMSIM_KEY).toString()));
-		}
+		this.setCalculateAncestryGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_ANCESTRY_KEY)));
+		this.setCalculateSemSimGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_SEMSIM_KEY)));
 		// If non of the GO F1 Keys is specified in the YML input the simple
 		// version is used as default
 		if (input.get(GO_F1_SIMPLE_KEY) != null) {
-			this.setCalculateSimpleGoF1Scores(parseBoolString(input.get(GO_F1_SIMPLE_KEY).toString()));
+			this.setCalculateSimpleGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_SIMPLE_KEY)));
 		} else {
 			if (input.get(GO_F1_ANCESTRY_KEY) == null && input.get(GO_F1_SEMSIM_KEY) == null) {
 				this.setCalculateSimpleGoF1Scores(true);
@@ -464,11 +452,8 @@ public class Settings implements Cloneable {
 		if (input.get(COMPETITORS_KEY) != null) {
 			setCompetitorSettings((Map<String, Map<String, String>>) input.get(COMPETITORS_KEY));
 		}
-		if (input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY) != null
-				&& Boolean.parseBoolean(input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY).toString())) {
-			setFindHighestPossibleGoScore(true);
-		}
-		setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
+		this.setFindHighestPossibleGoScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY)));
+		this.setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
 	}
 
 	/**
@@ -519,6 +504,10 @@ public class Settings implements Cloneable {
 	 */
 	public boolean rememberSimulatedAnnealingPath() {
 		return this.rememberSimulatedAnnealingPath;
+	}
+	
+	public void setRememberSimulatedAnnealingPath(boolean rememberSimulatedAnnealingPath) {
+		this.rememberSimulatedAnnealingPath = rememberSimulatedAnnealingPath;
 	}
 
 	/**
@@ -1084,17 +1073,6 @@ public class Settings implements Cloneable {
 		this.calculateSemSimGoF1Scores = calculateSemsimGoF1Scores;
 	}
 
-	private static Boolean parseBoolString(String input) {
-		if (input.equalsIgnoreCase("true") || input.equalsIgnoreCase("false")) {
-			return Boolean.valueOf(input);
-		} else {
-			if (input.equalsIgnoreCase("t") || input.equalsIgnoreCase("y") || input.equalsIgnoreCase("")) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public String getPathToGoSlimFile() {
 		return pathToGoSlimFile;
 	}
@@ -1165,5 +1143,9 @@ public class Settings implements Cloneable {
 
 	public void setWriteFscoreDetailsToOutput(boolean writeFscoreDetailsToOutput) {
 		this.writeFscoreDetailsToOutput = writeFscoreDetailsToOutput;
+	}
+
+	public void setFindHighestPossibleEvaluationScore(boolean findHighestPossibleEvaluationScore) {
+		this.findHighestPossibleEvaluationScore = findHighestPossibleEvaluationScore;
 	}
 }
