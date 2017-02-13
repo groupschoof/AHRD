@@ -110,7 +110,8 @@ public class Settings implements Cloneable {
 	public static final String COMPETITORS_KEY = "competitors";
 	public static final String COMPETITOR_DESCRIPTIONS_FILE_KEY = "descriptions";
 	public static final String COMPETITOR_GOA_FILE_KEY = "go_annotations";
-	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score"; 
+	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score";
+	public static final String WRITE_FSCORE_DETAILS_TO_OUTPUT = "write_fscore_details_to_output";
 	
 	/**
 	 * Fields:
@@ -290,6 +291,10 @@ public class Settings implements Cloneable {
 	 * achievable score for go annotations:
 	 */
 	private boolean findHighestPossibleGoScore = false;
+	/**
+	 * Adds the precision and recall to the output of all (go based) F-scores 
+	 */
+	private boolean writeFscoreDetailsToOutput = false;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -460,8 +465,10 @@ public class Settings implements Cloneable {
 			setCompetitorSettings((Map<String, Map<String, String>>) input.get(COMPETITORS_KEY));
 		}
 		if (input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY) != null
-				&& Boolean.parseBoolean(input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY).toString()))
+				&& Boolean.parseBoolean(input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY).toString())) {
 			setFindHighestPossibleGoScore(true);
+		}
+		setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
 	}
 
 	/**
@@ -1150,5 +1157,13 @@ public class Settings implements Cloneable {
 
 	public void setFindHighestPossibleGoScore(boolean findHighestPossibleGoScore) {
 		this.findHighestPossibleGoScore = findHighestPossibleGoScore;
+	}
+
+	public boolean doWriteFscoreDetailsToOutput() {
+		return writeFscoreDetailsToOutput;
+	}
+
+	public void setWriteFscoreDetailsToOutput(boolean writeFscoreDetailsToOutput) {
+		this.writeFscoreDetailsToOutput = writeFscoreDetailsToOutput;
 	}
 }

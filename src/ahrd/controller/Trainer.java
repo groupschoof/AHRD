@@ -83,12 +83,12 @@ public class Trainer extends Evaluator {
 				if (e != null) {
 					//Depending on the settings the go annotation f-score with the highest level of complexity is used
 					if (getSettings().doCalculateSemSimGoF1Scores()) {
-						avgEvlScr += e.getSemSimGoAnnotationScore();
+						avgEvlScr += e.getSemSimGoAnnotationScore().getScore();
 					} else {
 						if (getSettings().doCalculateAncestryGoF1Scores()) {
-							avgEvlScr += e.getAncestryGoAnnotationScore();
+							avgEvlScr += e.getAncestryGoAnnotationScore().getScore();
 						} else {
-							avgEvlScr += e.getSimpleGoAnnotationScore();
+							avgEvlScr += e.getSimpleGoAnnotationScore().getScore();
 						}
 					}
 				}
@@ -132,12 +132,12 @@ public class Trainer extends Evaluator {
 				e.findHighestPossibleGoScore();
 				//Depending on the settings the go annotation f-score with the highest level of complexity is used
 				if (getSettings().doCalculateSemSimGoF1Scores()) {
-					avgMaxEvlScr += e.getHighestPossibleSemSimGoAnnotationScore();
+					avgMaxEvlScr += e.getHighestPossibleSemSimGoAnnotationScore().getScore();
 				} else {
 					if (getSettings().doCalculateAncestryGoF1Scores()) {
-						avgMaxEvlScr += e.getHighestPossibleAncestryGoAnnotationScore();
+						avgMaxEvlScr += e.getHighestPossibleAncestryGoAnnotationScore().getScore();
 					} else {
-						avgMaxEvlScr += e.getHighestPossibleSimpleGoAnnotationScore();
+						avgMaxEvlScr += e.getHighestPossibleSimpleGoAnnotationScore().getScore();
 					}
 				}
 			}

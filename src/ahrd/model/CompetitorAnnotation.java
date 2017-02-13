@@ -13,9 +13,9 @@ public class CompetitorAnnotation {
 	private Set<String> evaluationTokens;
 	private Double evaluationScore = 0.0;
 	private Set<GOterm> goAnnotations = new HashSet<GOterm>();
-	private Double simpleGoAnnotationScore = 0.0;
-	private Double ancestryGoAnnotationScore = 0.0;
-	private Double semSimGoAnnotationScore = 0.0;
+	private Fscore simpleGoAnnotationScore;
+	private Fscore ancestryGoAnnotationScore;
+	private Fscore semSimGoAnnotationScore;
 
 	public CompetitorAnnotation(String accession, String description) {
 		super();
@@ -69,27 +69,27 @@ public class CompetitorAnnotation {
 		this.goAnnotations = goAnnotations;
 	}
 
-	public Double getSimpleGoAnnotationScore() {
+	public Fscore getSimpleGoAnnotationScore() {
 		return simpleGoAnnotationScore;
 	}
 
-	public void setSimpleGoAnnotationScore(Double simpleGoAnnotationScore) {
+	public void setSimpleGoAnnotationScore(Fscore simpleGoAnnotationScore) {
 		this.simpleGoAnnotationScore = simpleGoAnnotationScore;
 	}
 
-	public Double getAncestryGoAnnotationScore() {
+	public Fscore getAncestryGoAnnotationScore() {
 		return ancestryGoAnnotationScore;
 	}
 
-	public void setAncestryGoAnnotationScore(Double ancestryGoAnnotationScore) {
+	public void setAncestryGoAnnotationScore(Fscore ancestryGoAnnotationScore) {
 		this.ancestryGoAnnotationScore = ancestryGoAnnotationScore;
 	}
 
-	public Double getSemSimGoAnnotationScore() {
+	public Fscore getSemSimGoAnnotationScore() {
 		return semSimGoAnnotationScore;
 	}
 
-	public void setSemSimGoAnnotationScore(Double semSimGoAnnotationScore) {
+	public void setSemSimGoAnnotationScore(Fscore semSimGoAnnotationScore) {
 		this.semSimGoAnnotationScore = semSimGoAnnotationScore;
 	}
 	

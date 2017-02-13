@@ -91,9 +91,9 @@ public class BlastResult implements Comparable<BlastResult> {
 	/**
 	 * GO annotation F scores
 	 */
-	private Double simpleGoAnnotationScore; // Simple cardinality based
-	private Double ancestryGoAnnotationScore; // Cardinality of the term ancestries 
-	private Double semSimGoAnnotationScore; // Based on semantic similarity derived from term information content 
+	private Fscore simpleGoAnnotationScore; // Simple cardinality based
+	private Fscore ancestryGoAnnotationScore; // Cardinality of the term ancestries 
+	private Fscore semSimGoAnnotationScore; // Based on semantic similarity derived from term information content 
 
 	/**
 	 * Makes a double string representation parseable by Double.parseDouble
@@ -693,27 +693,27 @@ public class BlastResult implements Comparable<BlastResult> {
 		this.goAnnotations = goAnnotation;
 	}
 
-	public Double getSimpleGoAnnotationScore() {
+	public Fscore getSimpleGoAnnotationScore() {
 		return simpleGoAnnotationScore;
 	}
 
-	public void setSimpleGoAnnotationScore(Double simpleGoAnnotationScore) {
+	public void setSimpleGoAnnotationScore(Fscore simpleGoAnnotationScore) {
 		this.simpleGoAnnotationScore = simpleGoAnnotationScore;
 	}
 
-	public Double getAncestryGoAnnotationScore() {
+	public Fscore getAncestryGoAnnotationScore() {
 		return ancestryGoAnnotationScore;
 	}
 
-	public void setAncestryGoAnnotationScore(Double ancestryGoAnnotationScore) {
+	public void setAncestryGoAnnotationScore(Fscore ancestryGoAnnotationScore) {
 		this.ancestryGoAnnotationScore = ancestryGoAnnotationScore;
 	}
 
-	public Double getSemSimGoAnnotationScore() {
+	public Fscore getSemSimGoAnnotationScore() {
 		return semSimGoAnnotationScore;
 	}
 
-	public void setSemSimGoAnnotationScore(Double semSimGoAnnotationScore) {
+	public void setSemSimGoAnnotationScore(Fscore semSimGoAnnotationScore) {
 		this.semSimGoAnnotationScore = semSimGoAnnotationScore;
 	}
 

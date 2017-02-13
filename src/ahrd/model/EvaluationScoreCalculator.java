@@ -2,8 +2,6 @@ package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,12 +36,12 @@ public class EvaluationScoreCalculator {
 	private Double falsePositivesRate;
 	private Double highestPossibleEvaluationScore;
 	private Set<GOterm> referenceGoAnnoatations = new HashSet<GOterm>();
-	private Double simpleGoAnnotationScore;
-	private Double ancestryGoAnnotationScore;
-	private Double semSimGoAnnotationScore;
-	private Double highestPossibleSimpleGoAnnotationScore;
-	private Double highestPossibleAncestryGoAnnotationScore;
-	private Double highestPossibleSemSimGoAnnotationScore;
+	private Fscore simpleGoAnnotationScore;
+	private Fscore ancestryGoAnnotationScore;
+	private Fscore semSimGoAnnotationScore;
+	private Fscore highestPossibleSimpleGoAnnotationScore;
+	private Fscore highestPossibleAncestryGoAnnotationScore;
+	private Fscore highestPossibleSemSimGoAnnotationScore;
 
 	public EvaluationScoreCalculator(Protein protein) {
 		super();
@@ -290,30 +288,28 @@ public class EvaluationScoreCalculator {
 	 * 
 	 * @return Double - F score
 	 */
-	private Double calcSimpleGoAnnotationScore(Set<GOterm> reference, Set<GOterm> prediction) {
-		Double f = 0.0;
+	private Fscore calcSimpleGoAnnotationScore(Set<GOterm> reference, Set<GOterm> prediction) {
+		Fscore f = new Fscore();
 		int truePositive = 0;
-		Double recall = 0.0;
-		Double precision = 0.0;
 		if (reference.size() > 0 && prediction.size() > 0) {
 			for (Iterator<GOterm> referenceIter = reference.iterator(); referenceIter.hasNext();) {
 				if (prediction.contains(referenceIter.next())) {
 					truePositive++;
 				}
 			}
-			recall = (double) truePositive / reference.size();
-			precision = (double) truePositive / prediction.size();
+			f.setRecall((double) truePositive / reference.size());
+			f.setPrecision((double) truePositive / prediction.size());
 		} else {
 			if (reference.size() == 0) {
-				recall = 1.0;
+				f.setRecall(1.0);
 			}
 			if (prediction.size() == 0) {
-				precision = 1.0;
+				f.setPrecision(1.0);
 			}
 		}
-		if (precision > 0.0 && recall > 0.0) {
+		if (f.getPrecision() > 0.0 && f.getRecall() > 0.0) {
 			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f = (1 + bSqr) * precision * recall / (bSqr * precision + recall);
+			f.setScore((1 + bSqr) * f.getPrecision() * f.getRecall() / (bSqr * f.getPrecision() + f.getRecall()));
 		}
 		return f;
 	}
@@ -325,8 +321,8 @@ public class EvaluationScoreCalculator {
 	 * 
 	 * @return Double - F score
 	 */
-	private Double calcAncestryGoAnnotationScore(Set<GOterm> reference, Set<GOterm> prediction) {
-		Double f = 0.0;
+	private Fscore calcAncestryGoAnnotationScore(Set<GOterm> reference, Set<GOterm> prediction) {
+		Fscore f = new Fscore();
 		Set<GOterm> referenceAncestry = new HashSet<GOterm>();
 		for (Iterator<GOterm> referenceIter = reference.iterator(); referenceIter.hasNext();) {
 			referenceAncestry.addAll(referenceIter.next().getAncestry());
@@ -356,8 +352,10 @@ public class EvaluationScoreCalculator {
 		}
 		if (precision > 0.0 && recall > 0.0) {
 			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f = (1 + bSqr) * precision * recall / (bSqr * precision + recall);
+			f.setScore((1 + bSqr) * precision * recall / (bSqr * precision + recall));
 		}
+		f.setPrecision(precision);
+		f.setRecall(recall);
 		return f;
 	}
 
@@ -367,8 +365,8 @@ public class EvaluationScoreCalculator {
 	 * 
 	 * @return Double - F score
 	 */
-	private Double calcSemSimGoAnnotationScore(Set<GOterm> reference, Set<GOterm> prediction) {
-		Double f = 0.0;
+	private Fscore calcSemSimGoAnnotationScore(Set<GOterm> reference, Set<GOterm> prediction) {
+		Fscore f = new Fscore();
 		Double recall = 0.0;
 		Double precision = 0.0;
 		// Recall
@@ -446,11 +444,13 @@ public class EvaluationScoreCalculator {
 		}
 		if (precision > 0.0 && recall > 0.0) {
 			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f = (1 + bSqr) * precision * recall / (bSqr * precision + recall);
+			f.setScore((1 + bSqr) * precision * recall / (bSqr * precision + recall));
 		}
-		if (f > 1.0) { // Something went very wrong - Should never be happening
+		if (f.getScore() > 1.0) { // Something went very wrong - Should never be happening
 			System.out.println("p: " + precision + "\tr: " + recall + "\tf1: " + f);
 		}
+		f.setPrecision(precision);
+		f.setRecall(recall);
 		return f;
 	}
 
@@ -501,13 +501,13 @@ public class EvaluationScoreCalculator {
 				this.setHighestPossibleSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, new HashSet<GOterm>())); // In case reference go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						double score = calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
-						if (score > this.getHighestPossibleSimpleGoAnnotationScore())
+						Fscore score = calcSimpleGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
+						if (score.getScore() > this.getHighestPossibleSimpleGoAnnotationScore().getScore())
 								this.setHighestPossibleSimpleGoAnnotationScore(score);
-						if (getHighestPossibleSimpleGoAnnotationScore().equals(1.0))
+						if (getHighestPossibleSimpleGoAnnotationScore().getScore().equals(1.0))
 							break;
 					}
-					if (getHighestPossibleSimpleGoAnnotationScore().equals(1.0))
+					if (getHighestPossibleSimpleGoAnnotationScore().getScore().equals(1.0))
 						break;
 				}
 			}
@@ -515,13 +515,13 @@ public class EvaluationScoreCalculator {
 				this.setHighestPossibleAncestryGoAnnotationScore(this.calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, new HashSet<GOterm>())); // In case reference go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						double score = calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
-						if (score > this.getHighestPossibleAncestryGoAnnotationScore())
+						Fscore score = calcAncestryGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
+						if (score.getScore() > this.getHighestPossibleAncestryGoAnnotationScore().getScore())
 								this.setHighestPossibleAncestryGoAnnotationScore(score);
-						if (getHighestPossibleAncestryGoAnnotationScore().equals(1.0))
+						if (getHighestPossibleAncestryGoAnnotationScore().getScore().equals(1.0))
 							break;
 					}
-					if (getHighestPossibleAncestryGoAnnotationScore().equals(1.0))
+					if (getHighestPossibleAncestryGoAnnotationScore().getScore().equals(1.0))
 						break;
 				}
 			}
@@ -529,13 +529,13 @@ public class EvaluationScoreCalculator {
 				this.setHighestPossibleSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, new HashSet<GOterm>())); // In case reference go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						double score = calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
-						if (score > this.getHighestPossibleSemSimGoAnnotationScore())
+						Fscore score = calcSemSimGoAnnotationScore(this.referenceGoAnnoatations, br.getGoAnnotations());
+						if (score.getScore() > this.getHighestPossibleSemSimGoAnnotationScore().getScore())
 								this.setHighestPossibleSemSimGoAnnotationScore(score);
-						if (getHighestPossibleSemSimGoAnnotationScore().equals(1.0))
+						if (getHighestPossibleSemSimGoAnnotationScore().getScore().equals(1.0))
 							break;
 					}
-					if (getHighestPossibleSemSimGoAnnotationScore().equals(1.0))
+					if (getHighestPossibleSemSimGoAnnotationScore().getScore().equals(1.0))
 						break;
 				}
 			}
@@ -614,27 +614,27 @@ public class EvaluationScoreCalculator {
 		this.referenceGoAnnoatations = referenceGoAnnoatations;
 	}
 
-	public Double getSimpleGoAnnotationScore() {
+	public Fscore getSimpleGoAnnotationScore() {
 		return simpleGoAnnotationScore;
 	}
 
-	public void setSimpleGoAnnotationScore(Double simpleGoAnnotationScore) {
+	public void setSimpleGoAnnotationScore(Fscore simpleGoAnnotationScore) {
 		this.simpleGoAnnotationScore = simpleGoAnnotationScore;
 	}
 
-	public Double getAncestryGoAnnotationScore() {
+	public Fscore getAncestryGoAnnotationScore() {
 		return ancestryGoAnnotationScore;
 	}
 
-	public void setAncestryGoAnnotationScore(Double ancestryGoAnnotationScore) {
+	public void setAncestryGoAnnotationScore(Fscore ancestryGoAnnotationScore) {
 		this.ancestryGoAnnotationScore = ancestryGoAnnotationScore;
 	}
 
-	public Double getSemSimGoAnnotationScore() {
+	public Fscore getSemSimGoAnnotationScore() {
 		return semSimGoAnnotationScore;
 	}
 
-	public void setSemSimGoAnnotationScore(Double semSimGoAnnotationScore) {
+	public void setSemSimGoAnnotationScore(Fscore semSimGoAnnotationScore) {
 		this.semSimGoAnnotationScore = semSimGoAnnotationScore;
 	}
 
@@ -653,27 +653,27 @@ public class EvaluationScoreCalculator {
 		this.competitorAnnotations.put(competitor, annotation);
 	}
 
-	public Double getHighestPossibleSimpleGoAnnotationScore() {
+	public Fscore getHighestPossibleSimpleGoAnnotationScore() {
 		return highestPossibleSimpleGoAnnotationScore;
 	}
 
-	public void setHighestPossibleSimpleGoAnnotationScore(Double highestPossiblesimpleGoAnnotationScore) {
+	public void setHighestPossibleSimpleGoAnnotationScore(Fscore highestPossiblesimpleGoAnnotationScore) {
 		this.highestPossibleSimpleGoAnnotationScore = highestPossiblesimpleGoAnnotationScore;
 	}
 
-	public Double getHighestPossibleAncestryGoAnnotationScore() {
+	public Fscore getHighestPossibleAncestryGoAnnotationScore() {
 		return highestPossibleAncestryGoAnnotationScore;
 	}
 
-	public void setHighestPossibleAncestryGoAnnotationScore(Double highestPossibleancestryGoAnnotationScore) {
+	public void setHighestPossibleAncestryGoAnnotationScore(Fscore highestPossibleancestryGoAnnotationScore) {
 		this.highestPossibleAncestryGoAnnotationScore = highestPossibleancestryGoAnnotationScore;
 	}
 
-	public Double getHighestPossibleSemSimGoAnnotationScore() {
+	public Fscore getHighestPossibleSemSimGoAnnotationScore() {
 		return highestPossibleSemSimGoAnnotationScore;
 	}
 
-	public void setHighestPossibleSemSimGoAnnotationScore(Double highestPossiblesemSimGoAnnotationScore) {
+	public void setHighestPossibleSemSimGoAnnotationScore(Fscore highestPossiblesemSimGoAnnotationScore) {
 		this.highestPossibleSemSimGoAnnotationScore = highestPossiblesemSimGoAnnotationScore;
 	}
 
