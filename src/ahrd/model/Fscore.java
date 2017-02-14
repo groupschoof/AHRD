@@ -12,7 +12,7 @@ public class Fscore {
 	public Fscore(double s, double p, double r) {
 		this.setScore(s);
 		this.setPrecision(p);
-		this.setScore(r);
+		this.setRecall(r);
 	}
 
 	public Double getScore() {

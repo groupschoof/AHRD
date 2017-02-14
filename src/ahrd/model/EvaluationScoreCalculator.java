@@ -30,11 +30,10 @@ public class EvaluationScoreCalculator {
 	 * is based on the Hits' Bit-Scores.
 	 */
 	private Map<String, BlastResult> bestUnchangedBlastResults = new HashMap<String, BlastResult>();
-	private Double evalutionScore;
+	private Fscore evalutionScore;
 	private Double evalScoreMinBestCompScore;
-	private Double truePositivesRate;
 	private Double falsePositivesRate;
-	private Double highestPossibleEvaluationScore;
+	private Fscore highestPossibleEvaluationScore;
 	private Set<GOterm> referenceGoAnnoatations = new HashSet<GOterm>();
 	private Fscore simpleGoAnnotationScore;
 	private Fscore ancestryGoAnnotationScore;
@@ -65,19 +64,6 @@ public class EvaluationScoreCalculator {
 			}
 		}
 		return tp;
-	}
-
-	/**
-	 * TPR (True-Positives-Rate) := TP / (TP + FN) TPR is also known as recall.
-	 * 
-	 * TPR = #shared-tokens / #reference-tokens
-	 * 
-	 * @param assignedTokens
-	 * @param referenceTokens
-	 * @return Double - True-Positives-Rate
-	 */
-	public static Double truePositivesRate(Set<String> assignedTokens, Set<String> referenceTokens) {
-		return truePositives(assignedTokens, referenceTokens) / referenceTokens.size();
 	}
 
 	/**
@@ -136,12 +122,12 @@ public class EvaluationScoreCalculator {
 	 *            - Tokens of the Reference
 	 * @return Double - F-Beta-Score
 	 */
-	public static Double fBetaScore(Set<String> assignedTkns, Set<String> referenceTkns) {
+	public static Fscore fBetaScore(Set<String> assignedTkns, Set<String> referenceTkns) {
 		// Validate Reference:
 		if (referenceTkns == null || referenceTkns.isEmpty())
 			throw new IllegalArgumentException("Cannot calculate F1-Score, got an empty set of Reference-Tokens.");
 		// Calculate f-beta-score:
-		double fBetaScore = 0.0;
+		Fscore fBetaScore = new Fscore();
 		if (assignedTkns != null && !assignedTkns.isEmpty()) {
 			double tp = truePositives(assignedTkns, referenceTkns);
 			// Avoid division by zero:
@@ -151,7 +137,9 @@ public class EvaluationScoreCalculator {
 				// F-Beta-Measure is the harmonic mean of precision and recall
 				// weighted by param beta:
 				Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-				fBetaScore = (1 + bSqr) * (pr * rc) / (bSqr * pr + rc);
+				fBetaScore.setScore((1 + bSqr) * (pr * rc) / (bSqr * pr + rc));
+				fBetaScore.setPrecision(pr);
+				fBetaScore.setRecall(rc);				
 			}
 		}
 		return fBetaScore;
@@ -193,13 +181,11 @@ public class EvaluationScoreCalculator {
 				// Calculate the Evaluation-Score as the F-Beta-Score:
 				setEvalutionScore(fBetaScore(hrdEvlTkns, getReferenceDescription().getTokens()));
 				// Enable calculation of the ROC-Curve:
-				setTruePositivesRate(truePositivesRate(hrdEvlTkns, getReferenceDescription().getTokens()));
 				setFalsePositivesRate(falsePositivesRate(hrdEvlTkns, getReferenceDescription().getTokens(),
 						getProtein().getTokenScoreCalculator().getTokenScores().keySet()));
 			} else {
 				// Well, no Description assigned means scores ZERO:
-				setEvalutionScore(0.0);
-				setTruePositivesRate(0.0);
+				setEvalutionScore(new Fscore());
 				setFalsePositivesRate(0.0);
 			}
 			// Do the competitors
@@ -213,8 +199,8 @@ public class EvaluationScoreCalculator {
 							// Description
 							annot.setEvaluationScore(fBetaScore(annot.getEvaluationTokens(), getReferenceDescription().getTokens()));
 							// Find best performing competitor-method:
-							if (annot.getEvaluationScore() > bestCompEvlScr)
-								bestCompEvlScr = annot.getEvaluationScore();
+							if (annot.getEvaluationScore().getScore() > bestCompEvlScr)
+								bestCompEvlScr = annot.getEvaluationScore().getScore();
 							// GOterm annotations scores
 							if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 								if (getSettings().doCalculateSimpleGoF1Scores())
@@ -241,8 +227,8 @@ public class EvaluationScoreCalculator {
 						cmpt.setEvaluationScore(
 								fBetaScore(cmpt.getEvaluationTokens(), getReferenceDescription().getTokens()));
 						// Find best performing competitor-method:
-						if (cmpt.getEvaluationScore() > bestCompEvlScr)
-							bestCompEvlScr = cmpt.getEvaluationScore();
+						if (cmpt.getEvaluationScore().getScore() > bestCompEvlScr)
+							bestCompEvlScr = cmpt.getEvaluationScore().getScore();
 						// If requested: Evaluate the GO annotations of the best blast result
 						if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 							if (getSettings().doCalculateSimpleGoF1Scores())
@@ -259,7 +245,7 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			// Compare AHRD's performance:
-			setEvalScoreMinBestCompScore(getEvalutionScore() - bestCompEvlScr);
+			setEvalScoreMinBestCompScore(getEvalutionScore().getScore() - bestCompEvlScr);
 		}
 		// Evaluate GO annotations
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
@@ -474,7 +460,7 @@ public class EvaluationScoreCalculator {
 	 * score.
 	 */
 	public void findHighestPossibleEvaluationScore() {
-		setHighestPossibleEvaluationScore(0.0);
+		setHighestPossibleEvaluationScore(new Fscore());
 		for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 			for (BlastResult cmpt : resultsFromBlastDatabase) {
 				// Generate the set of Evaluation-Tokens from the
@@ -483,7 +469,7 @@ public class EvaluationScoreCalculator {
 				cmpt.tokenizeForEvaluation();
 				cmpt.setEvaluationScore(fBetaScore(cmpt.getEvaluationTokens(), getReferenceDescription().getTokens()));
 				// Find best performing BlastResult-Description:
-				if (cmpt.getEvaluationScore() > getHighestPossibleEvaluationScore())
+				if (cmpt.getEvaluationScore().getScore() > getHighestPossibleEvaluationScore().getScore())
 					setHighestPossibleEvaluationScore(cmpt.getEvaluationScore());
 			}
 		}
@@ -566,11 +552,11 @@ public class EvaluationScoreCalculator {
 		this.protein = protein;
 	}
 
-	public Double getEvalutionScore() {
+	public Fscore getEvalutionScore() {
 		return evalutionScore;
 	}
 
-	public void setEvalutionScore(Double evalutionScore) {
+	public void setEvalutionScore(Fscore evalutionScore) {
 		this.evalutionScore = evalutionScore;
 	}
 
@@ -582,14 +568,6 @@ public class EvaluationScoreCalculator {
 		this.evalScoreMinBestCompScore = evalScoreMinBestCompScore;
 	}
 
-	public Double getTruePositivesRate() {
-		return truePositivesRate;
-	}
-
-	public void setTruePositivesRate(Double truePositivesRate) {
-		this.truePositivesRate = truePositivesRate;
-	}
-
 	public Double getFalsePositivesRate() {
 		return falsePositivesRate;
 	}
@@ -598,11 +576,11 @@ public class EvaluationScoreCalculator {
 		this.falsePositivesRate = falsePositivesRate;
 	}
 
-	public Double getHighestPossibleEvaluationScore() {
+	public Fscore getHighestPossibleEvaluationScore() {
 		return highestPossibleEvaluationScore;
 	}
 
-	public void setHighestPossibleEvaluationScore(Double highestPossibleEvaluationScore) {
+	public void setHighestPossibleEvaluationScore(Fscore highestPossibleEvaluationScore) {
 		this.highestPossibleEvaluationScore = highestPossibleEvaluationScore;
 	}
 

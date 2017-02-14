@@ -67,7 +67,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * The evaluationScore is calculated while training or evaluating AHRD's
 	 * performance in comparison with the "Best Blast Hit"-Method:
 	 */
-	private Double evaluationScore;
+	private Fscore evaluationScore;
 	/**
 	 * Evaluation Tokens are <i>not</i> filtered with the TOKEN-BLACKLIST, as we
 	 * want to evaluate <i>all</i> tokens, that are printed out, too. This set
@@ -637,11 +637,11 @@ public class BlastResult implements Comparable<BlastResult> {
 		this.blastDatabaseName = blastDatabaseName;
 	}
 
-	public Double getEvaluationScore() {
+	public Fscore getEvaluationScore() {
 		return evaluationScore;
 	}
 
-	public void setEvaluationScore(Double evaluationScore) {
+	public void setEvaluationScore(Fscore evaluationScore) {
 		this.evaluationScore = evaluationScore;
 	}
 

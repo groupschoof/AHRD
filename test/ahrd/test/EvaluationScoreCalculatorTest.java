@@ -21,6 +21,7 @@ import org.junit.Test;
 import ahrd.model.CompetitorAnnotation;
 import ahrd.model.BlastResult;
 import ahrd.model.EvaluationScoreCalculator;
+import ahrd.model.Fscore;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceDescription;
@@ -58,14 +59,11 @@ public class EvaluationScoreCalculatorTest {
 				"wool", "growth"));
 		Set<String> assignedDesc2 = new HashSet<String>();
 		// Should be 2/4
-		assertEquals(0.5, EvaluationScoreCalculator.truePositivesRate(
-				assignedDesc1, referenceTokens), 0.0);
+		assertEquals(0.5, EvaluationScoreCalculator.fBetaScore(assignedDesc1, referenceTokens).getRecall(), 0.0);
 		// Should be 4/4
-		assertEquals(1.0, EvaluationScoreCalculator.truePositivesRate(
-				referenceTokens, referenceTokens), 0.0);
+		assertEquals(1.0, EvaluationScoreCalculator.fBetaScore(referenceTokens, referenceTokens).getRecall(), 0.0);
 		// Should be 0/4
-		assertEquals(0.0, EvaluationScoreCalculator.truePositivesRate(
-				assignedDesc2, referenceTokens), 0.0);
+		assertEquals(0.0, EvaluationScoreCalculator.fBetaScore(assignedDesc2, referenceTokens).getRecall(), 0.0);
 	}
 
 	@Test
@@ -118,19 +116,19 @@ public class EvaluationScoreCalculatorTest {
 
 		// 2 * 4/4 * 4/4 / (4/4 + 4/4) = 1
 		assertEquals(1.0, EvaluationScoreCalculator.fBetaScore(assignedDesc1,
-				referenceTokens), 0.0);
+				referenceTokens).getScore(), 0.0);
 		// 2 * 2/4 * 2/4 / (2/4 + 2/4) = 0.5
 		assertEquals(0.5, EvaluationScoreCalculator.fBetaScore(assignedDesc2,
-				referenceTokens), 0.0);
+				referenceTokens).getScore(), 0.0);
 		// 2 * 2/4 * 2/2 / (2/4 + 2/2) = 2/3
 		assertEquals((2.0 / 3.0), EvaluationScoreCalculator.fBetaScore(
-				assignedDesc3, referenceTokens), 0.0);
+				assignedDesc3, referenceTokens).getScore(), 0.0);
 		// The order of tokens shouldn't have any effect:
 		assertEquals(1.0, EvaluationScoreCalculator.fBetaScore(assignedDesc4,
-				referenceTokens), 0.0);
+				referenceTokens).getScore(), 0.0);
 		// Zero true-positives should result in a f1-score of zero:
 		assertEquals(0.0, EvaluationScoreCalculator.fBetaScore(assignedDesc5,
-				referenceTokens), 0.0);
+				referenceTokens).getScore(), 0.0);
 	}
 
 	@Test
@@ -211,10 +209,10 @@ public class EvaluationScoreCalculatorTest {
 		}
 		CompetitorAnnotation firstAnnot = new CompetitorAnnotation("AHRDv2_Acc", "AHRD horn growthase");
 		firstAnnot.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0005524"))));
-		firstAnnot.setEvaluationScore(0.1);
+		firstAnnot.setEvaluationScore(new Fscore(0.1, 0.0, 0.0));
 		CompetitorAnnotation secondAnnot = new CompetitorAnnotation("AHRDv2_Acc", "Goat wool growthase");
 		secondAnnot.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0009853"))));
-		secondAnnot.setEvaluationScore(0.5);
+		secondAnnot.setEvaluationScore(new Fscore(0.5, 0.0, 0.0));
 		p.getEvaluationScoreCalculator().addCompetitorAnnotation("blast2go", firstAnnot);
 		p.getEvaluationScoreCalculator().addCompetitorAnnotation("eggNOGmapper", secondAnnot);
 		Map<String, String> blast2goSettings = new HashMap<String, String>();
@@ -233,16 +231,16 @@ public class EvaluationScoreCalculatorTest {
 		// trembl):
 		assertEquals(0.888888888888889, p.getEvaluationScoreCalculator()
 				.getBestUnchangedBlastResults().get("swissprot")
-				.getEvaluationScore(), 0.0);
+				.getEvaluationScore().getScore(), 0.0);
 		assertEquals(0.6, p.getEvaluationScoreCalculator()
-				.getBestUnchangedBlastResults().get("trembl").getEvaluationScore(),
+				.getBestUnchangedBlastResults().get("trembl").getEvaluationScore().getScore(),
 				0.0);
 		assertEquals(0.4444444444444445, p.getEvaluationScoreCalculator()
-				.getBestUnchangedBlastResults().get("tair").getEvaluationScore(),
+				.getBestUnchangedBlastResults().get("tair").getEvaluationScore().getScore(),
 				0.0);
 		// Test Assignment of scores to the two CompetitorAnnotations:
-		assertEquals(0.25, firstAnnot.getEvaluationScore(), 0.0);
-		assertEquals(0.0, secondAnnot.getEvaluationScore(), 0.0);
+		assertEquals(0.25, firstAnnot.getEvaluationScore().getScore(), 0.0);
+		assertEquals(0.0, secondAnnot.getEvaluationScore().getScore(), 0.0);
 		// evaluation-scores should be fine (tested above)
 		// Just test the resulting evalScoreMinBestCompScore:
 		assertEquals(0.111111111111111, p.getEvaluationScoreCalculator()
@@ -252,7 +250,7 @@ public class EvaluationScoreCalculatorTest {
 		assertTrue("FPR should have been set, but is NULL.", p
 				.getEvaluationScoreCalculator().getFalsePositivesRate() != null);
 		assertTrue("TPR should have been set, but is NULL.", p
-				.getEvaluationScoreCalculator().getTruePositivesRate() != null);
+				.getEvaluationScoreCalculator().getEvalutionScore() != null);
 	}
 
 	@Test
@@ -304,7 +302,7 @@ public class EvaluationScoreCalculatorTest {
 				.getHighestPossibleEvaluationScore());
 		assertEquals("Highest possible evaluation score should be 1.0", p
 				.getEvaluationScoreCalculator()
-				.getHighestPossibleEvaluationScore(), 1.0, 0.0);
+				.getHighestPossibleEvaluationScore().getScore(), 1.0, 0.0);
 	}
 
 	@Test
@@ -315,10 +313,10 @@ public class EvaluationScoreCalculatorTest {
 		}
 		CompetitorAnnotation firstAnnot = new CompetitorAnnotation("P04637", "Cellular tumor antigen p53");
 		firstAnnot.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0005524"))));
-		firstAnnot.setEvaluationScore(0.1);
+		firstAnnot.setEvaluationScore(new Fscore(0.1, 0.0, 0.0));
 		CompetitorAnnotation firstAnnotClone = new CompetitorAnnotation("P04637", "Cellular tumor antigen p53");
 		firstAnnotClone.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0005524"))));
-		firstAnnotClone.setEvaluationScore(0.1);
+		firstAnnotClone.setEvaluationScore(new Fscore(0.1, 0.0, 0.0));
 		CompetitorAnnotation secondAnnot = new CompetitorAnnotation("P0C512", "Ribulose bisphosphate carboxylase large chain");
 		secondAnnot.setGoAnnotations(new HashSet<GOterm>(Arrays.asList(goDB.get("GO:0009853"))));
 		// test

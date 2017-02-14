@@ -11,7 +11,7 @@ public class CompetitorAnnotation {
 	private String accession;
 	private String description;
 	private Set<String> evaluationTokens;
-	private Double evaluationScore = 0.0;
+	private Fscore evaluationScore;
 	private Set<GOterm> goAnnotations = new HashSet<GOterm>();
 	private Fscore simpleGoAnnotationScore;
 	private Fscore ancestryGoAnnotationScore;
@@ -53,11 +53,11 @@ public class CompetitorAnnotation {
 		this.evaluationTokens = evaluationTokens;
 	}
 
-	public Double getEvaluationScore() {
+	public Fscore getEvaluationScore() {
 		return evaluationScore;
 	}
 
-	public void setEvaluationScore(Double evaluationScore) {
+	public void setEvaluationScore(Fscore evaluationScore) {
 		this.evaluationScore = evaluationScore;
 	}
 

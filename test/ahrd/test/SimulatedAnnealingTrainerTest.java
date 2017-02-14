@@ -22,6 +22,7 @@ import ahrd.controller.SimulatedAnnealingTrainer;
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
+import ahrd.model.Fscore;
 import ahrd.model.Protein;
 
 public class SimulatedAnnealingTrainerTest {
@@ -43,19 +44,16 @@ public class SimulatedAnnealingTrainerTest {
 		assertTrue("SimulatedAnnealingTrainer should initialize Settings to Training-Mode.",
 				getSettings().isInTrainingMode());
 		Protein p1 = new Protein("protein_one", 200);
-		p1.getEvaluationScoreCalculator().setEvalutionScore(1.0);
+		p1.getEvaluationScoreCalculator().setEvalutionScore(new Fscore(1.0, 0.0, 0.6));
 		p1.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(1.0);
-		p1.getEvaluationScoreCalculator().setTruePositivesRate(0.6);
 		p1.getEvaluationScoreCalculator().setFalsePositivesRate(0.7);
 		Protein p2 = new Protein("protein_two", 210);
-		p2.getEvaluationScoreCalculator().setEvalutionScore(0.8);
+		p2.getEvaluationScoreCalculator().setEvalutionScore(new Fscore(0.8, 0.0, 0.7));
 		p2.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.8);
-		p2.getEvaluationScoreCalculator().setTruePositivesRate(0.7);
 		p2.getEvaluationScoreCalculator().setFalsePositivesRate(0.5);
 		Protein p3 = new Protein("protein_three", 220);
-		p3.getEvaluationScoreCalculator().setEvalutionScore(0.3);
+		p3.getEvaluationScoreCalculator().setEvalutionScore(new Fscore(0.3, 0.0, 0.5));
 		p3.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.3);
-		p3.getEvaluationScoreCalculator().setTruePositivesRate(0.5);
 		p3.getEvaluationScoreCalculator().setFalsePositivesRate(0.3);
 		this.trainer.setProteins(new HashMap<String, Protein>());
 		this.trainer.getProteins().put(p1.getAccession(), p1);

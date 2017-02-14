@@ -31,7 +31,10 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		bw.write("\n");
 		// Column-Names:
 		bw.write(ahrdColumnNames());
-		bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor\tTPR\tFPR");
+		bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score");
+		if (getSettings().doWriteFscoreDetailsToOutput()) {
+			bw.write("\tDiff-to-bestCompetitor\tPPV\tTPR\tFPR");
+		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
 		}
@@ -118,7 +121,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			String csvRow = buildDescriptionLine(prot, "\t");
 
 			// Write out the Evaluator-Score and the Reference-Description:
-			csvRow += buildTrainerColumns(prot);
+			csvRow += buildDescriptionEvaluationColumns(prot);
 			// Append further information, if requested:
 			if (getSettings().getWriteBestBlastHitsToOutput()) {
 				csvRow += buildBestBlastHitsColumns(prot);
@@ -181,7 +184,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 	}
 
 	public String buildHighestPossibleEvaluationScoreColumn(Protein prot) {
-		return "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore());
+		return "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getScore());
 	}
 	
 	public String buildCompetitorColumns(String competitor, Protein prot) {
@@ -190,7 +193,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		if (compAnnots != null) {
 			CompetitorAnnotation annot = compAnnots.get(competitor);
 			if (annot != null) {
-				csvCols += "\t" + annot.getDescription() + "\t" + annot.getEvaluationTokens().size() + "\t" + FRMT.format(annot.getEvaluationScore());
+				csvCols += "\t" + annot.getDescription() + "\t" + annot.getEvaluationTokens().size() + "\t" + FRMT.format(annot.getEvaluationScore().getScore());
 				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 					csvCols += "\t" + combineGoTermsToString(annot.getGoAnnotations());
 					if (getSettings().doCalculateSimpleGoF1Scores()) {
@@ -258,7 +261,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 	 * @return String - Part of the CSV-Row with the columns Evaluator-Score and
 	 *         Reference-Description.
 	 */
-	public String buildTrainerColumns(Protein prot) {
+	public String buildDescriptionEvaluationColumns(Protein prot) {
 		// HEADER:
 		// \tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor
 		String csvCells = "";
@@ -266,19 +269,27 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		if (prot.getEvaluationScoreCalculator().getEvalutionScore() != null) {
 			// HRD-Length ref f1score diff-to-best-competitor:
 			csvCells += "\t";
-			if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null)
-				csvCells += prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getEvaluationTokens()
-						.size();
-			else
+			if (prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null) {
+				csvCells += prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getEvaluationTokens().size();
+			}
+			else {
 				csvCells += "0";
+			}
 			csvCells += "\t" + prot.getEvaluationScoreCalculator().getReferenceDescription().getDescription() + "\t"
 					+ prot.getEvaluationScoreCalculator().getReferenceDescription().getTokens().size() + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore()) + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalScoreMinBestCompScore()) + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getTruePositivesRate()) + "\t"
+					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getScore());
+			if (getSettings().doWriteFscoreDetailsToOutput()) {
+			csvCells += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getEvalScoreMinBestCompScore()) + "\t"
+					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getPrecision()) + "\t"
+					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getRecall()) + "\t"
 					+ FRMT.format(prot.getEvaluationScoreCalculator().getFalsePositivesRate());
-		} else
-			csvCells = "\t\t\t\t\t\t\t";
+			}
+		} else {
+			csvCells = "\t\t\t\t";
+			if (getSettings().doWriteFscoreDetailsToOutput()) {
+				csvCells += "\t\t\t\t";
+			}
+		}
 		return csvCells;
 	}
 
@@ -363,7 +374,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
 				csvRow += "\t\"" + bestBr.getAccession() + " " + bestBr.getDescription() + "\"";
 				if (bestBr.getEvaluationScore() != null) {
-					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"	+ FRMT.format(bestBr.getEvaluationScore());
+					csvRow += "\t" + bestBr.getEvaluationTokens().size() + "\t"	+ FRMT.format(bestBr.getEvaluationScore().getScore());
 					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 						csvRow += "\t" + combineGoTermsToString(bestBr.getGoAnnotations());
 						if (getSettings().doCalculateSimpleGoF1Scores()) {

@@ -97,10 +97,10 @@ public class Trainer extends Evaluator {
 			for (Protein p : getProteins().values()) {
 				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
 				if (e != null) {
-					if (e.getEvalutionScore() != null)
-						avgEvlScr += e.getEvalutionScore();
-					if (e.getTruePositivesRate() != null)
-						avgTruePosRate += e.getTruePositivesRate();
+					if (e.getEvalutionScore() != null) {
+						avgEvlScr += e.getEvalutionScore().getScore();
+						avgTruePosRate += e.getEvalutionScore().getRecall();
+					}
 					if (e.getFalsePositivesRate() != null)
 						avgFalsePosRate += e.getFalsePositivesRate();
 				}
@@ -144,7 +144,7 @@ public class Trainer extends Evaluator {
 		} else { // Otherwise use HRD based scores
 			for (Protein prot : getProteins().values()) {
 				prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
-				avgMaxEvlScr += prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore();
+				avgMaxEvlScr += prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getScore();
 			}
 		}
 		setAvgMaxEvaluationScore(avgMaxEvlScr / getProteins().size());		// calculate average
