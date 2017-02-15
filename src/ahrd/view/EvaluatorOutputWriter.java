@@ -158,8 +158,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getRecall());
 					}
 				}
-				if (getSettings().doCalculateSemSimGoF1Scores())
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getScore()); {
+				if (getSettings().doCalculateSemSimGoF1Scores()) {
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getPrecision());
 						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getRecall());
