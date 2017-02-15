@@ -71,7 +71,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
-			bw.write("\tHighest-Blast-Hit-Evaluation-Score");
+			bw.write("\tHighest-Possible-Evaluation-Score\tHighest-Possible-Evaluation-Score-Precision\tHighest-Possible-Evaluation-Score-Recall");
 		}
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 			bw.write("\tReference-GO-Annotations");
@@ -184,7 +184,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 	}
 
 	public String buildHighestPossibleEvaluationScoreColumn(Protein prot) {
-		return "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getScore());
+		String csvCols = "";
+		csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getScore());
+		csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getPrecision());
+		csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getRecall());
+		return csvCols;
 	}
 	
 	public String buildCompetitorColumns(String competitor, Protein prot) {
