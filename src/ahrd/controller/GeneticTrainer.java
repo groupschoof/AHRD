@@ -129,7 +129,7 @@ public class GeneticTrainer extends Trainer {
 					// Evaluate AHRD's performance for each Protein:
 					calculateEvaluationScores();
 					// Estimate average performance of current Parameters:
-					calcAveragesOfEvalScoreTPRandFPR();
+					calcAveragesOfEvalScorePrecisionAndRecall();
 //					if(getSettings().getParameters().getOrigin().equals("seed")) {
 //						writeProteins(generation);
 //					}

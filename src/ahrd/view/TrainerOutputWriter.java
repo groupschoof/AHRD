@@ -45,7 +45,7 @@ public class TrainerOutputWriter {
 		hdr += "Average Evaluation-Score(F-Score)";
 		if (!isFinalOutput)
 			hdr += "\tDiff-to-curr-Accepted\tAccepted";
-		hdr += "\tAverage True-Positive-Rate\tAverage False-Positive-Rate\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
+		hdr += "\tAverage Precision\tAverage Recall\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight";
 		for (String blastDb : this.sortedBlastDatabases) {
 			hdr += "\t" + blastDb + "-Weight";
 			hdr += "\t" + blastDb + "-Description-Score-Bit-Score-Weight";
@@ -91,8 +91,8 @@ public class TrainerOutputWriter {
 		String col = s.getTemperature().toString() + "\t"
 				+ s.getAvgEvaluationScore() + "\t"
 				+ diffAvgEvalScoreToCurrAccepted + "\t" + accepted + "\t"
-				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
-				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t" + "\t"
+				+ FRMT.format(s.getAvgPrecision()) + "\t"
+				+ FRMT.format(s.getAvgRecall()) + "\t"
 				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreOverlapScoreWeight());
@@ -109,8 +109,8 @@ public class TrainerOutputWriter {
 			Double avgMaxEvalScore) {
 		String col = sFoundAtTemp + "\t" + avgMaxEvalScore + "\t"
 				+ s.getAvgEvaluationScore() + "\t"
-				+ FRMT.format(s.getAvgTruePositivesRate()) + "\t"
-				+ FRMT.format(s.getAvgFalsePositivesRate()) + "\t"
+				+ FRMT.format(s.getAvgPrecision()) + "\t"
+				+ FRMT.format(s.getAvgRecall()) + "\t"
 				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreOverlapScoreWeight());

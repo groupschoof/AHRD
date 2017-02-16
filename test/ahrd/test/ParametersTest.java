@@ -301,8 +301,8 @@ public class ParametersTest {
 		Parameters p = getSettings().getParameters();
 		// Also test evaluation-scores:
 		p.setAvgEvaluationScore(100.00);
-		p.setAvgFalsePositivesRate(0.5);
-		p.setAvgTruePositivesRate(0.5);
+		p.setAvgPrecision(0.5);
+		p.setAvgRecall(0.5);
 		Parameters c = p.clone();
 		assertTrue("Cloned Parameters should still be equal.", p.equals(c));
 		Set<Parameters> h = new HashSet<Parameters>();

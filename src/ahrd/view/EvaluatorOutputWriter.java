@@ -33,7 +33,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		bw.write(ahrdColumnNames());
 		bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score");
 		if (getSettings().doWriteFscoreDetailsToOutput()) {
-			bw.write("\tDiff-to-bestCompetitor\tPPV\tTPR\tFPR");
+			bw.write("\tDiff-to-bestCompetitor\tPrecision\tRecall");
 		}
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			bw.write(buildBestBlastHitsHeader());
@@ -285,13 +285,12 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
 			csvCells += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getEvalScoreMinBestCompScore()) + "\t"
 					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getPrecision()) + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getRecall()) + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getFalsePositivesRate());
+					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getRecall());
 			}
 		} else {
 			csvCells = "\t\t\t\t";
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
-				csvCells += "\t\t\t\t";
+				csvCells += "\t\t\t";
 			}
 		}
 		return csvCells;

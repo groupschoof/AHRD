@@ -245,12 +245,6 @@ public class EvaluationScoreCalculatorTest {
 		// Just test the resulting evalScoreMinBestCompScore:
 		assertEquals(0.111111111111111, p.getEvaluationScoreCalculator()
 				.getEvalScoreMinBestCompScore(), 0.000001);
-
-		// test, if TPR and FPR have been set:
-		assertTrue("FPR should have been set, but is NULL.", p
-				.getEvaluationScoreCalculator().getFalsePositivesRate() != null);
-		assertTrue("TPR should have been set, but is NULL.", p
-				.getEvaluationScoreCalculator().getEvalutionScore() != null);
 	}
 
 	@Test

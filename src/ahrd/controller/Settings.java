@@ -769,21 +769,21 @@ public class Settings implements Cloneable {
 	public void setAvgEvaluationScore(Double avgEvaluationScore) {
 		this.getParameters().setAvgEvaluationScore(avgEvaluationScore);
 	}
-
-	public Double getAvgTruePositivesRate() {
-		return getParameters().getAvgTruePositivesRate();
+	
+	public Double getAvgPrecision() {
+		return getParameters().getAvgPrecision();
 	}
 
-	public void setAvgTruePositivesRate(Double avgTruePositivesRate) {
-		this.getParameters().setAvgTruePositivesRate(avgTruePositivesRate);
+	public void setAvgPrecision(Double avgPrecision) {
+		this.getParameters().setAvgPrecision(avgPrecision);
 	}
 
-	public Double getAvgFalsePositivesRate() {
-		return getParameters().getAvgFalsePositivesRate();
+	public Double getAvgRecall() {
+		return getParameters().getAvgRecall();
 	}
 
-	public void setAvgFalsePositivesRate(Double avgFalsePositivesRate) {
-		this.getParameters().setAvgFalsePositivesRate(avgFalsePositivesRate);
+	public void setAvgRecall(Double avgRecall) {
+		this.getParameters().setAvgRecall(avgRecall);
 	}
 
 	public Integer getTemperature() {

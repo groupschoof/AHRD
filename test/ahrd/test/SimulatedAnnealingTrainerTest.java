@@ -46,34 +46,28 @@ public class SimulatedAnnealingTrainerTest {
 		Protein p1 = new Protein("protein_one", 200);
 		p1.getEvaluationScoreCalculator().setEvalutionScore(new Fscore(1.0, 0.0, 0.6));
 		p1.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(1.0);
-		p1.getEvaluationScoreCalculator().setFalsePositivesRate(0.7);
 		Protein p2 = new Protein("protein_two", 210);
 		p2.getEvaluationScoreCalculator().setEvalutionScore(new Fscore(0.8, 0.0, 0.7));
 		p2.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.8);
-		p2.getEvaluationScoreCalculator().setFalsePositivesRate(0.5);
 		Protein p3 = new Protein("protein_three", 220);
 		p3.getEvaluationScoreCalculator().setEvalutionScore(new Fscore(0.3, 0.0, 0.5));
 		p3.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.3);
-		p3.getEvaluationScoreCalculator().setFalsePositivesRate(0.3);
 		this.trainer.setProteins(new HashMap<String, Protein>());
 		this.trainer.getProteins().put(p1.getAccession(), p1);
 		this.trainer.getProteins().put(p2.getAccession(), p2);
 		this.trainer.getProteins().put(p3.getAccession(), p3);
 		// test
-		trainer.calcAveragesOfEvalScoreTPRandFPR();
+		trainer.calcAveragesOfEvalScorePrecisionAndRecall();
 		// (1.0 + 0.8 + 0.3) / 3 = 0.7
 		assertEquals(0.7, getSettings().getAvgEvaluationScore(), 0.000000000001);
 		// (0.6 + 0.7 + 0.5) / 3 = 0.6
-		assertEquals(0.6, getSettings().getAvgTruePositivesRate(),
-				0.000000000001);
-		// (0.7 + 0.5 + 0.3) / 3 = 0.5
-		assertEquals(0.5, getSettings().getAvgFalsePositivesRate(),
+		assertEquals(0.6, getSettings().getAvgRecall(),
 				0.000000000001);
 		// test robustness for zero scores:
 		for (Protein p : trainer.getProteins().values()) {
 			p.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.0);
 		}
-		trainer.calcAveragesOfEvalScoreTPRandFPR();
+		trainer.calcAveragesOfEvalScorePrecisionAndRecall();
 		assertEquals(getSettings().getAvgEvaluationScore(), 0.7, 0.00000000001);
 	}
 
@@ -93,10 +87,10 @@ public class SimulatedAnnealingTrainerTest {
 		// Scores should be equal:
 		assertNotNull("Avg EvaluationScore should be remembered.",
 				clone.getAvgEvaluationScore());
-		assertNotNull("Avg TPR should be remembered.",
-				clone.getAvgTruePositivesRate());
-		assertNotNull("Avg FPR should be remembered.",
-				clone.getAvgFalsePositivesRate());
+		assertNotNull("Avg Precision (PPV) should be remembered.",
+				clone.getAvgPrecision());
+		assertNotNull("Avg Recall (TPR) should be remembered.",
+				clone.getAvgRecall());
 	}
 
 	@Test

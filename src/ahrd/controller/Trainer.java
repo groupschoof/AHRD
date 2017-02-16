@@ -69,13 +69,13 @@ public class Trainer extends Evaluator {
 	 * If GO term scores have been computed the average is based upon them.
 	 * Otherwise the conventional HRD based scores are used.
 	 */
-	public void calcAveragesOfEvalScoreTPRandFPR() {
+	public void calcAveragesOfEvalScorePrecisionAndRecall() {
 		// average evaluation-score
 		Double avgEvlScr = 0.0;
-		// average TPR:
-		Double avgTruePosRate = 0.0;
-		// average FPR:
-		Double avgFalsePosRate = 0.0;
+		// average Precision (PPV):
+		Double avgPrecision = 0.0;
+		// average Recall (TPR):
+		Double avgRecall = 0.0;
 		// Evaluate GO annotations.
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 			for (Protein p : getProteins().values()) {
@@ -84,11 +84,18 @@ public class Trainer extends Evaluator {
 					//Depending on the settings the go annotation f-score with the highest level of complexity is used
 					if (getSettings().doCalculateSemSimGoF1Scores()) {
 						avgEvlScr += e.getSemSimGoAnnotationScore().getScore();
+						avgPrecision += e.getSemSimGoAnnotationScore().getPrecision();
+						avgRecall += e.getSemSimGoAnnotationScore().getRecall();
 					} else {
 						if (getSettings().doCalculateAncestryGoF1Scores()) {
 							avgEvlScr += e.getAncestryGoAnnotationScore().getScore();
+							avgPrecision += e.getAncestryGoAnnotationScore().getPrecision();
+							avgRecall += e.getAncestryGoAnnotationScore().getRecall();
 						} else {
+							// getSettings().doCalculateSimpleGoF1Scores() Needs to be checked?
 							avgEvlScr += e.getSimpleGoAnnotationScore().getScore();
+							avgPrecision += e.getSimpleGoAnnotationScore().getPrecision();
+							avgRecall += e.getSimpleGoAnnotationScore().getRecall();
 						}
 					}
 				}
@@ -99,10 +106,9 @@ public class Trainer extends Evaluator {
 				if (e != null) {
 					if (e.getEvalutionScore() != null) {
 						avgEvlScr += e.getEvalutionScore().getScore();
-						avgTruePosRate += e.getEvalutionScore().getRecall();
+						avgPrecision += e.getEvalutionScore().getPrecision();
+						avgRecall += e.getEvalutionScore().getRecall();
 					}
-					if (e.getFalsePositivesRate() != null)
-						avgFalsePosRate += e.getFalsePositivesRate();
 				}
 			}
 		}
@@ -110,14 +116,14 @@ public class Trainer extends Evaluator {
 		Double numberOfProts = new Double(getProteins().size());
 		if (avgEvlScr > 0.0)
 			avgEvlScr = avgEvlScr / numberOfProts;
-		if (avgTruePosRate > 0.0)
-			avgTruePosRate = avgTruePosRate / numberOfProts;
-		if (avgFalsePosRate > 0.0)
-			avgFalsePosRate = avgFalsePosRate / numberOfProts;
+		if (avgPrecision > 0.0)
+			avgPrecision = avgPrecision / numberOfProts;
+		if (avgRecall > 0.0)
+			avgRecall = avgRecall / numberOfProts;
 		// done:
 		getSettings().setAvgEvaluationScore(avgEvlScr);
-		getSettings().setAvgTruePositivesRate(avgTruePosRate);
-		getSettings().setAvgFalsePositivesRate(avgFalsePosRate);
+		getSettings().setAvgPrecision(avgPrecision);
+		getSettings().setAvgRecall(avgRecall);
 	}
 
 	/**

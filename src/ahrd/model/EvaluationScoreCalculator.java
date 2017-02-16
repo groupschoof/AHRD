@@ -32,7 +32,6 @@ public class EvaluationScoreCalculator {
 	private Map<String, BlastResult> bestUnchangedBlastResults = new HashMap<String, BlastResult>();
 	private Fscore evalutionScore;
 	private Double evalScoreMinBestCompScore;
-	private Double falsePositivesRate;
 	private Fscore highestPossibleEvaluationScore;
 	private Set<GOterm> referenceGoAnnoatations = new HashSet<GOterm>();
 	private Fscore simpleGoAnnotationScore;
@@ -178,15 +177,11 @@ public class EvaluationScoreCalculator {
 				getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult().tokenizeForEvaluation();
 				Set<String> hrdEvlTkns = getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult()
 						.getEvaluationTokens();
-				// Calculate the Evaluation-Score as the F-Beta-Score:
+				// Calculate the Evaluation-Score as the F-Beta-Score (including Precision and Recall):
 				setEvalutionScore(fBetaScore(hrdEvlTkns, getReferenceDescription().getTokens()));
-				// Enable calculation of the ROC-Curve:
-				setFalsePositivesRate(falsePositivesRate(hrdEvlTkns, getReferenceDescription().getTokens(),
-						getProtein().getTokenScoreCalculator().getTokenScores().keySet()));
 			} else {
 				// Well, no Description assigned means scores ZERO:
 				setEvalutionScore(new Fscore());
-				setFalsePositivesRate(0.0);
 			}
 			// Do the competitors
 			Double bestCompEvlScr = 0.0;
@@ -566,14 +561,6 @@ public class EvaluationScoreCalculator {
 
 	public void setEvalScoreMinBestCompScore(Double evalScoreMinBestCompScore) {
 		this.evalScoreMinBestCompScore = evalScoreMinBestCompScore;
-	}
-
-	public Double getFalsePositivesRate() {
-		return falsePositivesRate;
-	}
-
-	public void setFalsePositivesRate(Double falsePositivesRate) {
-		this.falsePositivesRate = falsePositivesRate;
 	}
 
 	public Fscore getHighestPossibleEvaluationScore() {

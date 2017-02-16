@@ -106,7 +106,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 				// Evaluate AHRD's performance for each Protein:
 				calculateEvaluationScores();
 				// Estimate average performance of current Parameters:
-				calcAveragesOfEvalScoreTPRandFPR();
+				calcAveragesOfEvalScorePrecisionAndRecall();
 			}
 			// Breaking a little bit with the pure simulated annealing
 			// algorithm, we remember the best performing Parameters:
