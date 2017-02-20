@@ -32,7 +32,8 @@ public class EvaluationScoreCalculator {
 	private Map<String, BlastResult> bestUnchangedBlastResults = new HashMap<String, BlastResult>();
 	private Fscore evalutionScore;
 	private Double evalScoreMinBestCompScore;
-	private Fscore highestPossibleEvaluationScore;
+	private Fscore highestPossibleDescriptionScore;
+	private BlastResult blastResultWithHighestPossibleDescriptionScore;
 	private Set<GOterm> referenceGoAnnoatations = new HashSet<GOterm>();
 	private Fscore simpleGoAnnotationScore;
 	private Fscore ancestryGoAnnotationScore;
@@ -454,8 +455,8 @@ public class EvaluationScoreCalculator {
 	 * each BlastResult's Description and remembering the highest achieved
 	 * score.
 	 */
-	public void findHighestPossibleEvaluationScore() {
-		setHighestPossibleEvaluationScore(new Fscore());
+	public void findBlastResultWithHighestPossibleDescriptionScore() {
+		setHighestPossibleDescriptionScore(new Fscore());
 		for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 			for (BlastResult cmpt : resultsFromBlastDatabase) {
 				// Generate the set of Evaluation-Tokens from the
@@ -464,8 +465,10 @@ public class EvaluationScoreCalculator {
 				cmpt.tokenizeForEvaluation();
 				cmpt.setEvaluationScore(fBetaScore(cmpt.getEvaluationTokens(), getReferenceDescription().getTokens()));
 				// Find best performing BlastResult-Description:
-				if (cmpt.getEvaluationScore().getScore() > getHighestPossibleEvaluationScore().getScore())
-					setHighestPossibleEvaluationScore(cmpt.getEvaluationScore());
+				if (cmpt.getEvaluationScore().getScore() > getHighestPossibleDescriptionScore().getScore()) {
+					setHighestPossibleDescriptionScore(cmpt.getEvaluationScore());
+					setBlastResultWithHighestPossibleDescriptionScore(cmpt);
+				}
 			}
 		}
 	}
@@ -563,12 +566,12 @@ public class EvaluationScoreCalculator {
 		this.evalScoreMinBestCompScore = evalScoreMinBestCompScore;
 	}
 
-	public Fscore getHighestPossibleEvaluationScore() {
-		return highestPossibleEvaluationScore;
+	public Fscore getHighestPossibleDescriptionScore() {
+		return highestPossibleDescriptionScore;
 	}
 
-	public void setHighestPossibleEvaluationScore(Fscore highestPossibleEvaluationScore) {
-		this.highestPossibleEvaluationScore = highestPossibleEvaluationScore;
+	public void setHighestPossibleDescriptionScore(Fscore highestPossibleEvaluationScore) {
+		this.highestPossibleDescriptionScore = highestPossibleEvaluationScore;
 	}
 
 	public Set<GOterm> getReferenceGoAnnoatations() {
@@ -640,6 +643,15 @@ public class EvaluationScoreCalculator {
 
 	public void setHighestPossibleSemSimGoAnnotationScore(Fscore highestPossiblesemSimGoAnnotationScore) {
 		this.highestPossibleSemSimGoAnnotationScore = highestPossiblesemSimGoAnnotationScore;
+	}
+
+	public BlastResult getBlastResultWithHighestPossibleDescriptionScore() {
+		return blastResultWithHighestPossibleDescriptionScore;
+	}
+
+	public void setBlastResultWithHighestPossibleDescriptionScore(
+			BlastResult blastResultWithHighestPossibleDescriptionScore) {
+		this.blastResultWithHighestPossibleDescriptionScore = blastResultWithHighestPossibleDescriptionScore;
 	}
 
 }

@@ -78,10 +78,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 		}
 		if (getSettings().doFindHighestPossibleEvaluationScore()) {
-			bw.write("\tHighest-Possible-Description-Evaluation-Score");
+			bw.write("\tBlast-Result-With-Highest-Possible-Description-Score");
+			bw.write("\tHighest-Possible-Description-Score");
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
-				bw.write("\tHighest-Possible-Description-Evaluation-Score-Precision");
-				bw.write("\tHighest-Possible-Description-Evaluation-Score-Recall");
+				bw.write("\tHighest-Possible-Description-Score-Precision");
+				bw.write("\tHighest-Possible-Description-Score-Recall");
 			}
 		}
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
@@ -148,7 +149,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				}
 			}
 			if (getSettings().doFindHighestPossibleEvaluationScore()) {
-				csvRow += buildHighestPossibleEvaluationScoreColumns(prot);
+				csvRow += buildBlastResultWithHighestPossibleDescriptionScoreColumns(prot);
 			}
 			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
 				csvRow += buildReferenceGoAnnotationColumns(prot);
@@ -454,12 +455,18 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		return csvCols;
 	}
 	
-	public String buildHighestPossibleEvaluationScoreColumns(Protein prot) {
+	public String buildBlastResultWithHighestPossibleDescriptionScoreColumns(Protein prot) {
 		String csvCols = "";
-		csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getScore());
+		BlastResult br = prot.getEvaluationScoreCalculator().getBlastResultWithHighestPossibleDescriptionScore();
+		if (br != null) {
+			csvCols += "\t\"" + br.getAccession() + " " + br.getDescription() + "\"";
+		} else {
+			csvCols += "\t";
+		}
+		csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getScore());
 		if (getSettings().doWriteFscoreDetailsToOutput()) {
-			csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getPrecision());
-			csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getRecall());
+			csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getPrecision());
+			csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getRecall());
 		}
 		return csvCols;
 	}

@@ -290,13 +290,13 @@ public class EvaluationScoreCalculatorTest {
 								"best"))));
 		p.getBlastResults().put("swissprot", swissprotRes);
 		// test:
-		p.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
+		p.getEvaluationScoreCalculator().findBlastResultWithHighestPossibleDescriptionScore();
 		assertNotNull("Highest possible evaluation score should be not null", p
 				.getEvaluationScoreCalculator()
-				.getHighestPossibleEvaluationScore());
+				.getHighestPossibleDescriptionScore());
 		assertEquals("Highest possible evaluation score should be 1.0", p
 				.getEvaluationScoreCalculator()
-				.getHighestPossibleEvaluationScore().getScore(), 1.0, 0.0);
+				.getHighestPossibleDescriptionScore().getScore(), 1.0, 0.0);
 	}
 
 	@Test

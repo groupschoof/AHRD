@@ -149,8 +149,8 @@ public class Trainer extends Evaluator {
 			}
 		} else { // Otherwise use HRD based scores
 			for (Protein prot : getProteins().values()) {
-				prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
-				avgMaxEvlScr += prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore().getScore();
+				prot.getEvaluationScoreCalculator().findBlastResultWithHighestPossibleDescriptionScore();
+				avgMaxEvlScr += prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getScore();
 			}
 		}
 		setAvgMaxEvaluationScore(avgMaxEvlScr / getProteins().size());		// calculate average

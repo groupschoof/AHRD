@@ -189,7 +189,7 @@ public class Evaluator extends AHRD {
 	 */
 	public void findHighestPossibleEvaluationScores() {
 		for (Protein prot : getProteins().values()) {
-			prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
+			prot.getEvaluationScoreCalculator().findBlastResultWithHighestPossibleDescriptionScore();
 		}
 	}
 	
