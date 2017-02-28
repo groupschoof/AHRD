@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -119,7 +120,7 @@ public class Settings implements Cloneable {
 	private String pathToProteinsFasta;
 	private String pathToReferencesFasta;
 	private String pathToReferencesDescriptionBlacklist;
-	private List<String> referencesDescriptionBlacklist;
+	private Set<String> referencesDescriptionBlacklist;
 	private String pathToReferencesDescriptionFilter;
 	private List<String> referencesDescriptionFilter;
 	private String pathToReferencesTokenBlacklist;
@@ -154,7 +155,7 @@ public class Settings implements Cloneable {
 	private Double fMeasureBetaParameter = 1.0;
 	private Map<String, Map<String, String>> blastDbSettings = new HashMap<String, Map<String, String>>();
 	private List<String> sortedBlastDatabaseNames;
-	private Map<String, List<String>> blastResultsBlacklists = new HashMap<String, List<String>>();
+	private Map<String, Set<String>> blastResultsBlacklists = new HashMap<String, Set<String>>();
 	private Map<String, List<String>> blastResultsFilter = new HashMap<String, List<String>>();
 	private Map<String, List<String>> tokenBlacklists = new HashMap<String, List<String>>();
 	/**
@@ -305,6 +306,13 @@ public class Settings implements Cloneable {
 		super();
 		this.initialize(pathToYml);
 	}
+	
+	/**
+	 * Default description line blacklist.
+	 * Is applied to all blast databases.
+	 * Blast database specific blacklists are applied in addition.
+	 */
+	private Set<String> defaultBlastResultsBlacklist = new HashSet<String>();
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -332,11 +340,18 @@ public class Settings implements Cloneable {
 		this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
 		this.setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
 		this.setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
+		if (input.get(BLAST_BLACKLIST_KEY) != null) {
+			this.setDefaultBlastResultsBlacklist(new HashSet<String>(fromFile((String) input.get(BLAST_BLACKLIST_KEY))));
+		}
 		// Generate the Blacklists and Filters for each Blast-Database from
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
-			this.blastResultsBlacklists.put(blastDatabaseName,
-					fromFile(getPathToBlastResultsBlackList(blastDatabaseName)));
+			if (getPathToBlastResultsBlackList(blastDatabaseName) != null) {
+				this.blastResultsBlacklists.put(blastDatabaseName, new HashSet<String>(fromFile(getPathToBlastResultsBlackList(blastDatabaseName))));
+			} else {
+				this.blastResultsBlacklists.put(blastDatabaseName, new HashSet<String>());
+			}
+			this.getBlastResultsBlackList(blastDatabaseName).addAll(this.getDefaultBlastResultsBlacklist());
 			this.blastResultsFilter.put(blastDatabaseName, fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
 			this.tokenBlacklists.put(blastDatabaseName, fromFile(getPathToTokenBlacklist(blastDatabaseName)));
 			// Set Database-Weights and Description-Score-Bit-Score-Weight:
@@ -413,7 +428,7 @@ public class Settings implements Cloneable {
 		this.setEvaluateValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_VALID_TOKENS_KEY)));
 		if (input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY) != null) {
 			this.setPathToReferencesDescriptionBlacklist(input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY).toString());
-			this.setReferencesDescriptionBlacklist(fromFile(getPathToReferencesDescriptionBlacklist()));
+			this.setReferencesDescriptionBlacklist(new HashSet<String>(fromFile(getPathToReferencesDescriptionBlacklist())));
 		}
 		if (input.get(REFERENCES_DESCRIPTION_FILTER_KEY) != null) {
 			this.setPathToReferencesDescriptionFilter(input.get(REFERENCES_DESCRIPTION_FILTER_KEY).toString());
@@ -579,7 +594,11 @@ public class Settings implements Cloneable {
 		return getBlastDbSettings(blastDatabaseName).get(BLAST_BLACKLIST_KEY);
 	}
 
-	public List<String> getBlastResultsBlackList(String blastDatabaseName) {
+	public Set<String> getBlastResultsBlackList() {
+		return this.getDefaultBlastResultsBlacklist();
+	}
+	
+	public Set<String> getBlastResultsBlackList(String blastDatabaseName) {
 		return this.blastResultsBlacklists.get(blastDatabaseName);
 	}
 
@@ -1001,11 +1020,11 @@ public class Settings implements Cloneable {
 		this.pathToReferencesTokenBlacklist = pathToReferencesTokenBlacklist;
 	}
 
-	public List<String> getReferencesDescriptionBlacklist() {
+	public Set<String> getReferencesDescriptionBlacklist() {
 		return referencesDescriptionBlacklist;
 	}
 
-	public void setReferencesDescriptionBlacklist(List<String> referencesDescriptionBlacklist) {
+	public void setReferencesDescriptionBlacklist(Set<String> referencesDescriptionBlacklist) {
 		this.referencesDescriptionBlacklist = referencesDescriptionBlacklist;
 	}
 
@@ -1147,5 +1166,13 @@ public class Settings implements Cloneable {
 
 	public void setFindHighestPossibleEvaluationScore(boolean findHighestPossibleEvaluationScore) {
 		this.findHighestPossibleEvaluationScore = findHighestPossibleEvaluationScore;
+	}
+
+	public Set<String> getDefaultBlastResultsBlacklist() {
+		return defaultBlastResultsBlacklist;
+	}
+
+	public void setDefaultBlastResultsBlacklist(Set<String> defaultBlastResultsBlacklist) {
+		this.defaultBlastResultsBlacklist = defaultBlastResultsBlacklist;
 	}
 }

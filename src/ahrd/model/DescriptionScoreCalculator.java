@@ -22,7 +22,7 @@ public class DescriptionScoreCalculator {
 	 * @return TRUE if and only if none of the regular expressions in blacklist
 	 *         matches the argument description. FALSE otherwise.
 	 */
-	public static boolean passesBlacklist(String description, List<String> blacklist) {
+	public static boolean passesBlacklist(String description, Set<String> blacklist) {
 		boolean passesBlacklist = (description != null && !description.equals(""));
 		for (Iterator<String> i = blacklist.iterator(); (i.hasNext() && passesBlacklist);) {
 			Pattern p = Pattern.compile(i.next());

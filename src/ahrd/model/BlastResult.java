@@ -431,7 +431,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 *         the respective blacklist. FALSE otherwise.
 	 */
 	public boolean passesBlacklist(String blastResultDescriptionLine) {
-		List<String> blacklist = getSettings().getBlastResultsBlackList(getBlastDatabaseName());
+		Set<String> blacklist = getSettings().getBlastResultsBlackList(getBlastDatabaseName());
 		return DescriptionScoreCalculator.passesBlacklist(blastResultDescriptionLine, blacklist);
 	}
 
