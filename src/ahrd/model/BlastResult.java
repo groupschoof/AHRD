@@ -444,7 +444,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 *         in which all matches to the respective filters are deleted.
 	 */
 	public String filter(String blastResultDescriptionLine) {
-		Set<String> filter = getSettings().getBlastResultsFilter(getBlastDatabaseName());
+		List<String> filter = getSettings().getBlastResultsFilter(getBlastDatabaseName());
 		return DescriptionScoreCalculator.filter(blastResultDescriptionLine, filter);
 	}
 
@@ -505,9 +505,6 @@ public class BlastResult implements Comparable<BlastResult> {
 	public void generateHRDCandidateForProtein() {
 		// For Training-Purposes:
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
-			if (this.accession.equals("AT1G54590.1")) {
-				System.out.println("Blarg");
-			}
 			// Of course we do have to treat this best-blast-hit
 			// differently than the further to process one below, so
 			// clone:

@@ -172,9 +172,8 @@ public class EvaluationScoreCalculator {
 		if (getReferenceDescription() != null && getReferenceDescription().getDescription() != null) {
 			// First Competitor is the Description assigned by AHRD itself:
 			if (getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult() != null) {
-				// Generate the set of Evaluation-Tokens from the
-				// actually assigned Description, WITHOUT filtering each
-				// Token with the BLACKLIST:
+				// Generate the set of evaluation-tokens from the actually assigned description.
+				// If evaluateValidTokens is set to false: WITHOUT filtering each token with the BLACKLIST.
 				getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult().tokenizeForEvaluation();
 				Set<String> hrdEvlTkns = getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult()
 						.getEvaluationTokens();
@@ -210,18 +209,14 @@ public class EvaluationScoreCalculator {
 					}
 				}
 			}
-			if (this.protein.getAccession().equals("Q9UTR4")) {
-				System.out.println("Whe're here!");
-			}
 			// Other competitors are the best unchanged BlastHits from all
 			// performed Blast-Database-Searches:
 			if (getBestUnchangedBlastResults().size() > 0) {
 				for (String blastDatabase : getBestUnchangedBlastResults().keySet()) {
 					BlastResult cmpt = getBestUnchangedBlastResults().get(blastDatabase);
 					if (cmpt != null) {
-						// Generate the set of Evaluation-Tokens from the
-						// actually assigned Description, WITHOUT filtering each
-						// Token with the BLACKLIST:
+						// Generate the set of evaluation-tokens from the actually assigned description.
+						// If evaluateValidTokens is set to false: WITHOUT filtering each token with the BLACKLIST.
 						cmpt.tokenizeForEvaluation();
 						cmpt.setEvaluationScore(
 								fBetaScore(cmpt.getEvaluationTokens(), getReferenceDescription().getTokens()));
