@@ -122,9 +122,9 @@ public class Settings implements Cloneable {
 	private String pathToReferencesDescriptionBlacklist;
 	private Set<String> referencesDescriptionBlacklist;
 	private String pathToReferencesDescriptionFilter;
-	private List<String> referencesDescriptionFilter;
+	private Set<String> referencesDescriptionFilter;
 	private String pathToReferencesTokenBlacklist;
-	private List<String> referencesTokenBlacklist = new ArrayList<String>();
+	private Set<String> referencesTokenBlacklist = new HashSet<String>();
 	private String pathToInterproDatabase;
 	private String pathToInterproResults;
 	private String pathToOutput;
@@ -156,8 +156,8 @@ public class Settings implements Cloneable {
 	private Map<String, Map<String, String>> blastDbSettings = new HashMap<String, Map<String, String>>();
 	private List<String> sortedBlastDatabaseNames;
 	private Map<String, Set<String>> blastResultsBlacklists = new HashMap<String, Set<String>>();
-	private Map<String, List<String>> blastResultsFilter = new HashMap<String, List<String>>();
-	private Map<String, List<String>> tokenBlacklists = new HashMap<String, List<String>>();
+	private Map<String, Set<String>> blastResultsFilter = new HashMap<String, Set<String>>();
+	private Map<String, Set<String>> tokenBlacklists = new HashMap<String, Set<String>>();
 	/**
 	 * For the <strong>simulated annealing</strong> algorithm, this will be
 	 * current temperature. (Default is 75000)
@@ -313,6 +313,8 @@ public class Settings implements Cloneable {
 	 * Blast database specific blacklists are applied in addition.
 	 */
 	private Set<String> defaultBlastResultsBlacklist = new HashSet<String>();
+	private Set<String> defaultBlastResultsFilter = new HashSet<String>();
+	private Set<String> defaultTokenBlacklist = new HashSet<String>();
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -343,17 +345,27 @@ public class Settings implements Cloneable {
 		if (input.get(BLAST_BLACKLIST_KEY) != null) {
 			this.setDefaultBlastResultsBlacklist(new HashSet<String>(fromFile((String) input.get(BLAST_BLACKLIST_KEY))));
 		}
+		if (input.get(BLAST_FILTER_KEY) != null) {
+			this.setDefaultBlastResultsFilter(new HashSet<String>(fromFile((String) input.get(BLAST_FILTER_KEY))));
+		}
+		if (input.get(TOKEN_BLACKLIST_KEY) != null) {
+			this.setDefaultTokenBlacklist(new HashSet<String>(fromFile((String) input.get(TOKEN_BLACKLIST_KEY))));
+		}
 		// Generate the Blacklists and Filters for each Blast-Database from
 		// their appropriate files:
 		for (String blastDatabaseName : getBlastDatabases()) {
-			if (getPathToBlastResultsBlackList(blastDatabaseName) != null) {
-				this.blastResultsBlacklists.put(blastDatabaseName, new HashSet<String>(fromFile(getPathToBlastResultsBlackList(blastDatabaseName))));
-			} else {
-				this.blastResultsBlacklists.put(blastDatabaseName, new HashSet<String>());
+			this.blastResultsBlacklists.put(blastDatabaseName, new HashSet<String>(this.getDefaultBlastResultsBlacklist()));
+			if (getPathToBlastResultsBlacklist(blastDatabaseName) != null) {
+				this.getBlastResultsBlacklist(blastDatabaseName).addAll(fromFile(getPathToBlastResultsBlacklist(blastDatabaseName)));
 			}
-			this.getBlastResultsBlackList(blastDatabaseName).addAll(this.getDefaultBlastResultsBlacklist());
-			this.blastResultsFilter.put(blastDatabaseName, fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
-			this.tokenBlacklists.put(blastDatabaseName, fromFile(getPathToTokenBlacklist(blastDatabaseName)));
+			this.blastResultsFilter.put(blastDatabaseName, new HashSet<String>(this.getDefaultBlastResultsFilter()));
+			if (getPathToBlastResultsFilter(blastDatabaseName) != null) {
+				this.getBlastResultsFilter(blastDatabaseName).addAll(fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
+			}
+			this.tokenBlacklists.put(blastDatabaseName, new HashSet<String>(this.getDefaultTokenBlacklist()));
+			if (getPathToTokenBlacklist(blastDatabaseName) != null) {
+				this.getTokenBlacklist(blastDatabaseName).addAll(fromFile(getPathToTokenBlacklist(blastDatabaseName)));
+			}
 			// Set Database-Weights and Description-Score-Bit-Score-Weight:
 			this.getParameters().setBlastDbWeight(blastDatabaseName,
 					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
@@ -432,11 +444,11 @@ public class Settings implements Cloneable {
 		}
 		if (input.get(REFERENCES_DESCRIPTION_FILTER_KEY) != null) {
 			this.setPathToReferencesDescriptionFilter(input.get(REFERENCES_DESCRIPTION_FILTER_KEY).toString());
-			this.setReferencesDescriptionFilter(fromFile(getPathToReferencesDescriptionFilter()));
+			this.setReferencesDescriptionFilter(new HashSet<String>(fromFile(getPathToReferencesDescriptionFilter())));
 		}
 		if (input.get(REFERENCES_TOKEN_BLACKLIST_KEY) != null) {
 			this.setPathToReferencesTokenBlacklist(input.get(REFERENCES_TOKEN_BLACKLIST_KEY).toString());
-			this.setReferencesTokenBlacklist(fromFile(getPathToReferencesTokenBlacklist()));
+			this.setReferencesTokenBlacklist(new HashSet<String>(fromFile(getPathToReferencesTokenBlacklist())));
 		}
 		if (input.get(GO_DB_PATH_KEY) != null) {
 			this.setPathToGoDatabase(input.get(GO_DB_PATH_KEY).toString());
@@ -590,15 +602,15 @@ public class Settings implements Cloneable {
 				: DEFAULT_SHORT_ACCESSION_REGEX;
 	}
 
-	private String getPathToBlastResultsBlackList(String blastDatabaseName) {
+	private String getPathToBlastResultsBlacklist(String blastDatabaseName) {
 		return getBlastDbSettings(blastDatabaseName).get(BLAST_BLACKLIST_KEY);
 	}
 
-	public Set<String> getBlastResultsBlackList() {
+	public Set<String> getBlastResultsBlacklist() {
 		return this.getDefaultBlastResultsBlacklist();
 	}
 	
-	public Set<String> getBlastResultsBlackList(String blastDatabaseName) {
+	public Set<String> getBlastResultsBlacklist(String blastDatabaseName) {
 		return this.blastResultsBlacklists.get(blastDatabaseName);
 	}
 
@@ -606,7 +618,7 @@ public class Settings implements Cloneable {
 		return getBlastDbSettings(blastDatabaseName).get(BLAST_FILTER_KEY);
 	}
 
-	public List<String> getBlastResultsFilter(String blastDatabaseName) {
+	public Set<String> getBlastResultsFilter(String blastDatabaseName) {
 		return this.blastResultsFilter.get(blastDatabaseName);
 	}
 
@@ -614,7 +626,7 @@ public class Settings implements Cloneable {
 		return getBlastDbSettings(blastDatabaseName).get(TOKEN_BLACKLIST_KEY);
 	}
 
-	public List<String> getTokenBlackList(String blastDatabaseName) {
+	public Set<String> getTokenBlacklist(String blastDatabaseName) {
 		return this.tokenBlacklists.get(blastDatabaseName);
 	}
 
@@ -1028,19 +1040,19 @@ public class Settings implements Cloneable {
 		this.referencesDescriptionBlacklist = referencesDescriptionBlacklist;
 	}
 
-	public List<String> getReferencesDescriptionFilter() {
+	public Set<String> getReferencesDescriptionFilter() {
 		return referencesDescriptionFilter;
 	}
 
-	public void setReferencesDescriptionFilter(List<String> referencesDescriptionFilter) {
+	public void setReferencesDescriptionFilter(Set<String> referencesDescriptionFilter) {
 		this.referencesDescriptionFilter = referencesDescriptionFilter;
 	}
 
-	public List<String> getReferencesTokenBlacklist() {
+	public Set<String> getReferencesTokenBlacklist() {
 		return referencesTokenBlacklist;
 	}
 
-	public void setReferencesTokenBlacklist(List<String> referencesTokenBlacklist) {
+	public void setReferencesTokenBlacklist(Set<String> referencesTokenBlacklist) {
 		this.referencesTokenBlacklist = referencesTokenBlacklist;
 	}
 
@@ -1174,5 +1186,21 @@ public class Settings implements Cloneable {
 
 	public void setDefaultBlastResultsBlacklist(Set<String> defaultBlastResultsBlacklist) {
 		this.defaultBlastResultsBlacklist = defaultBlastResultsBlacklist;
+	}
+
+	public Set<String> getDefaultBlastResultsFilter() {
+		return defaultBlastResultsFilter;
+	}
+
+	public void setDefaultBlastResultsFilter(Set<String> defaultBlastResultsFilter) {
+		this.defaultBlastResultsFilter = defaultBlastResultsFilter;
+	}
+
+	public Set<String> getDefaultTokenBlacklist() {
+		return defaultTokenBlacklist;
+	}
+
+	public void setDefaultTokenBlacklist(Set<String> defaultTokenBlacklists) {
+		this.defaultTokenBlacklist = defaultTokenBlacklists;
 	}
 }

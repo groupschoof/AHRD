@@ -29,7 +29,7 @@ public class TokenScoreCalculator {
 	// Please enter your initials ___
 	private double tokenHighScore = 0.0;
 
-	public static boolean tokenPassesBlacklist(String token, List<String> blacklist) {
+	public static boolean tokenPassesBlacklist(String token, Set<String> blacklist) {
 		// No Token passes being NULL or empty String
 		boolean passed = (token != null && !token.equals(""));
 		Iterator<String> i = blacklist.iterator();
@@ -51,7 +51,7 @@ public class TokenScoreCalculator {
 	 * @param tokenBlacklist
 	 * @return An instance of Set holding all tokens extracted from description
 	 */
-	public static Set<String> tokenize(String description, List<String> tokenBlacklist) {
+	public static Set<String> tokenize(String description, Set<String> tokenBlacklist) {
 		Set<String> tkns = new HashSet<String>();
 		for (String tokenCandidate : new HashSet<String>(
 				Arrays.asList(description.split(BlastResult.TOKEN_SPLITTER_REGEX)))) {

@@ -418,7 +418,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * in this' tokens field.
 	 */
 	public void tokenize() {
-		List<String> tknBlackList = getSettings().getTokenBlackList(getBlastDatabaseName());
+		Set<String> tknBlackList = getSettings().getTokenBlacklist(getBlastDatabaseName());
 		this.setTokens(TokenScoreCalculator.tokenize(this.getDescription(), tknBlackList));
 	}
 
@@ -431,7 +431,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 *         the respective blacklist. FALSE otherwise.
 	 */
 	public boolean passesBlacklist(String blastResultDescriptionLine) {
-		Set<String> blacklist = getSettings().getBlastResultsBlackList(getBlastDatabaseName());
+		Set<String> blacklist = getSettings().getBlastResultsBlacklist(getBlastDatabaseName());
 		return DescriptionScoreCalculator.passesBlacklist(blastResultDescriptionLine, blacklist);
 	}
 
@@ -444,7 +444,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 *         in which all matches to the respective filters are deleted.
 	 */
 	public String filter(String blastResultDescriptionLine) {
-		List<String> filter = getSettings().getBlastResultsFilter(getBlastDatabaseName());
+		Set<String> filter = getSettings().getBlastResultsFilter(getBlastDatabaseName());
 		return DescriptionScoreCalculator.filter(blastResultDescriptionLine, filter);
 	}
 
@@ -464,7 +464,7 @@ public class BlastResult implements Comparable<BlastResult> {
 		if (getSettings().getEvaluateValidTokens())
 			setEvaluationTokens(getTokens());
 		else
-			setEvaluationTokens(TokenScoreCalculator.tokenize(getDescription(), new ArrayList<String>()));
+			setEvaluationTokens(TokenScoreCalculator.tokenize(getDescription(), new HashSet<String>()));
 	}
 
 	public boolean isValid() {
@@ -505,6 +505,9 @@ public class BlastResult implements Comparable<BlastResult> {
 	public void generateHRDCandidateForProtein() {
 		// For Training-Purposes:
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
+			if (this.accession.equals("AT1G54590.1")) {
+				System.out.println("Blarg");
+			}
 			// Of course we do have to treat this best-blast-hit
 			// differently than the further to process one below, so
 			// clone:
@@ -512,7 +515,7 @@ public class BlastResult implements Comparable<BlastResult> {
 			// Pass best Blast-Hit's Description through filter:
 			theClone.setDescription(filter(theClone.getDescription()));
 			// Tokenize without filtering tokens through the Blacklist:
-			theClone.setTokens(TokenScoreCalculator.tokenize(theClone.getDescription(), new ArrayList<String>()));
+			theClone.setTokens(TokenScoreCalculator.tokenize(theClone.getDescription(), new HashSet<String>()));
 			getProtein().getEvaluationScoreCalculator().addBestUnchangedBlastResult(getBlastDatabaseName(), theClone);
 		}
 		if (passesBlacklist(getDescription())) {

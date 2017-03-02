@@ -42,7 +42,7 @@ public class DescriptionScoreCalculator {
 	 *         Finally the filtered description is trimmed and multiple
 	 *         white-spaces are condensed into a single white-spaces.
 	 */
-	public static String filter(String description, List<String> filter) {
+	public static String filter(String description, Set<String> filter) {
 		String filteredDescLine = description;
 		for (Iterator<String> i = filter.iterator(); i.hasNext();) {
 			Pattern p = Pattern.compile(i.next());

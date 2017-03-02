@@ -1,8 +1,8 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.getSettings;
 import static ahrd.model.TokenScoreCalculator.tokenize;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +21,12 @@ public class CompetitorAnnotation {
 		super();
 		setAccession(accession);
 		setDescription(description);
-		setEvaluationTokens(tokenize(getDescription(), new ArrayList<String>()));
+		if (getSettings().getEvaluateValidTokens()) {
+			setEvaluationTokens(tokenize(getDescription(), getSettings().getDefaultTokenBlacklist()));
+		}
+		else {
+			setEvaluationTokens(tokenize(getDescription(), new HashSet<String>()));
+		}
 	}
 	
 	public CompetitorAnnotation(String accession, String description, Set<GOterm> goAnnots) {

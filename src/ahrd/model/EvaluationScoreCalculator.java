@@ -210,6 +210,9 @@ public class EvaluationScoreCalculator {
 					}
 				}
 			}
+			if (this.protein.getAccession().equals("Q9UTR4")) {
+				System.out.println("Whe're here!");
+			}
 			// Other competitors are the best unchanged BlastHits from all
 			// performed Blast-Database-Searches:
 			if (getBestUnchangedBlastResults().size() > 0) {

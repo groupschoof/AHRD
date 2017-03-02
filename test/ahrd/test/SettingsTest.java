@@ -31,9 +31,9 @@ public class SettingsTest {
 		assertNotNull(getSettings().getBlastDatabases().contains("swissprot"));
 		assertNotNull(getSettings().getBlastDatabases().contains("tair"));
 		assertNotNull(getSettings().getBlastDatabases().contains("trembl"));
-		assertNotNull(getSettings().getTokenBlackList("swissprot"));
-		assertNotNull(getSettings().getTokenBlackList("tair"));
-		assertNotNull(getSettings().getTokenBlackList("trembl"));
+		assertNotNull(getSettings().getTokenBlacklist("swissprot"));
+		assertNotNull(getSettings().getTokenBlacklist("tair"));
+		assertNotNull(getSettings().getTokenBlacklist("trembl"));
 		assertEquals(
 				"Test-Temperature in input.yml is set to 10 and should have been initialized correctly.",
 				new Integer(10), getSettings().getTemperature());

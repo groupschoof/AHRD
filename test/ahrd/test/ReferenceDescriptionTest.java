@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +36,7 @@ public class ReferenceDescriptionTest {
 	public void testTokenizeDescription() {
 		String description = "Sheep wool growth factor putative subfamiLy aCtiviTy";
 		String[] tokens = { "sheep", "wool", "growth", "factor", "putative", "subfamily", "activity" };
-		Set<String> generatedTokens = TokenScoreCalculator.tokenize(description, new ArrayList<String>());
+		Set<String> generatedTokens = TokenScoreCalculator.tokenize(description, new HashSet<String>());
 		assertEquals(7, generatedTokens.size());
 		for (String tkn : tokens) {
 			assertTrue("Generated tokens do not contain '" + tkn + "'!", generatedTokens.contains(tkn));
