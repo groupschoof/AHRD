@@ -461,7 +461,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 *        Model-Class ReferenceDescription.
 	 */
 	public void tokenizeForEvaluation() {
-		if (getSettings().getEvaluateValidTokens())
+		if (getSettings().getEvaluateOnlyValidTokens())
 			setEvaluationTokens(getTokens());
 		else
 			setEvaluationTokens(TokenScoreCalculator.tokenize(getDescription(), new HashSet<String>()));

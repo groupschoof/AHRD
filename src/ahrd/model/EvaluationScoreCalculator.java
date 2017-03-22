@@ -168,7 +168,7 @@ public class EvaluationScoreCalculator {
 	 * subtracted by the best performing competitor, namely the best unchanged
 	 * Blast-Hit.
 	 */
-	public void assignEvlScrsToCompetitors() {
+	public void assignEvaluationScores() {
 		if (getReferenceDescription() != null && getReferenceDescription().getDescription() != null) {
 			// First Competitor is the Description assigned by AHRD itself:
 			if (getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult() != null) {
@@ -209,17 +209,19 @@ public class EvaluationScoreCalculator {
 					}
 				}
 			}
-			// Other competitors are the best unchanged BlastHits from all
-			// performed Blast-Database-Searches:
+			// Other competitors are the best unchanged BlastHits from all Blast-Database-Searches:
 			if (getBestUnchangedBlastResults().size() > 0) {
 				for (String blastDatabase : getBestUnchangedBlastResults().keySet()) {
 					BlastResult cmpt = getBestUnchangedBlastResults().get(blastDatabase);
 					if (cmpt != null) {
-						// Generate the set of evaluation-tokens from the actually assigned description.
-						// If evaluateValidTokens is set to false: WITHOUT filtering each token with the BLACKLIST.
-						cmpt.tokenizeForEvaluation();
-						cmpt.setEvaluationScore(
-								fBetaScore(cmpt.getEvaluationTokens(), getReferenceDescription().getTokens()));
+						// If evaluateValidTokens is set to true: Filter each token with the BLACKLIST.
+						Set<String> bestBlastEvalTokens;
+						if (getSettings().getEvaluateOnlyValidTokens()) {
+							bestBlastEvalTokens = TokenScoreCalculator.tokenize(cmpt.getDescription(), getSettings().getTokenBlacklist(cmpt.getBlastDatabaseName()));
+						} else {
+							bestBlastEvalTokens = cmpt.getTokens();
+						}
+						cmpt.setEvaluationScore(fBetaScore(bestBlastEvalTokens, getReferenceDescription().getTokens()));
 						// Find best performing competitor-method:
 						if (cmpt.getEvaluationScore().getScore() > bestCompEvlScr)
 							bestCompEvlScr = cmpt.getEvaluationScore().getScore();
@@ -241,11 +243,8 @@ public class EvaluationScoreCalculator {
 			// Compare AHRD's performance:
 			setEvalScoreMinBestCompScore(getEvalutionScore().getScore() - bestCompEvlScr);
 		}
-		// Evaluate GO annotations
+		// Evaluate AHRD's GO annotations
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-			/**
-			 * AHRD
-			 */
 			// Calculation of an F1-score based on reference and prediction GO
 			// annotations alone
 			if (getSettings().doCalculateSimpleGoF1Scores())
@@ -457,9 +456,8 @@ public class EvaluationScoreCalculator {
 		setHighestPossibleDescriptionScore(new Fscore());
 		for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 			for (BlastResult cmpt : resultsFromBlastDatabase) {
-				// Generate the set of Evaluation-Tokens from the
-				// actually assigned Description, WITHOUT filtering each
-				// Token with the BLACKLIST:
+				// Generate the set of evaluation-tokens for each description, 
+				// if evaluateValidTokens is set to false, WITHOUT filtering each token with the BLACKLIST.
 				cmpt.tokenizeForEvaluation();
 				cmpt.setEvaluationScore(fBetaScore(cmpt.getEvaluationTokens(), getReferenceDescription().getTokens()));
 				// Find best performing BlastResult-Description:

@@ -21,10 +21,9 @@ public class CompetitorAnnotation {
 		super();
 		setAccession(accession);
 		setDescription(description);
-		if (getSettings().getEvaluateValidTokens()) {
+		if (getSettings().getEvaluateOnlyValidTokens()) {
 			setEvaluationTokens(tokenize(getDescription(), getSettings().getDefaultTokenBlacklist()));
-		}
-		else {
+		} else {
 			setEvaluationTokens(tokenize(getDescription(), new HashSet<String>()));
 		}
 	}

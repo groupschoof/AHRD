@@ -176,7 +176,7 @@ public class Evaluator extends AHRD {
 	 */
 	public void calculateEvaluationScores() {
 		for (Protein prot : getProteins().values()) {
-			prot.getEvaluationScoreCalculator().assignEvlScrsToCompetitors();
+			prot.getEvaluationScoreCalculator().assignEvaluationScores();
 		}
 	}
 

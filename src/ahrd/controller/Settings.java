@@ -97,7 +97,7 @@ public class Settings implements Cloneable {
 	public static final Pattern DEFAULT_DATABASE_GO_REGEX = Pattern
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
-	public static final String EVALUATE_VALID_TOKENS_KEY = "evaluate_valid_tokens";
+	public static final String EVALUATE_ONLY_VALID_TOKENS_KEY = "evaluate_only_valid_tokens";
 	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
 	public static final String GO_DB_PATH_KEY = "go_db_path";
 	public static final String REFERENCE_GO_ANNOTATIONS_PATH_KEY = "reference_go_annotations";
@@ -238,7 +238,7 @@ public class Settings implements Cloneable {
 	 * If set to TRUE the AHRD Evaluation Score is based ONLY on tokens that
 	 * pass the Blacklisting. Otherwise all Tokens are submitted to evaluation.
 	 */
-	private Boolean evaluateValidTokens = true;
+	private Boolean evaluateOnlyValidTokens = true;
 	/**
 	 * The path in witch to keep: - Downloaded reviewed part of Uniprot -
 	 * Downloaded Gene Ontology mysql database dump - Serialized copy of the
@@ -440,7 +440,7 @@ public class Settings implements Cloneable {
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
 		}
 		this.setPreferReferenceWithGoAnnos(Boolean.parseBoolean((String) input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY)));
-		this.setEvaluateValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_VALID_TOKENS_KEY)));
+		this.setEvaluateOnlyValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_ONLY_VALID_TOKENS_KEY)));
 		if (input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY) != null) {
 			this.setPathToReferencesDescriptionBlacklist(input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY).toString());
 			this.setReferencesDescriptionBlacklist(new HashSet<String>(fromFile(getPathToReferencesDescriptionBlacklist())));
@@ -1020,12 +1020,12 @@ public class Settings implements Cloneable {
 		this.preferReferenceWithGoAnnos = preferReferenceWithGoAnnos;
 	}
 
-	public Boolean getEvaluateValidTokens() {
-		return evaluateValidTokens;
+	public Boolean getEvaluateOnlyValidTokens() {
+		return evaluateOnlyValidTokens;
 	}
 
-	public void setEvaluateValidTokens(Boolean evaluateValidTokens) {
-		this.evaluateValidTokens = evaluateValidTokens;
+	public void setEvaluateOnlyValidTokens(Boolean evaluateValidTokens) {
+		this.evaluateOnlyValidTokens = evaluateValidTokens;
 	}
 
 	public String getPathToReferencesDescriptionFilter() {
