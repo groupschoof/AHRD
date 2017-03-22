@@ -215,13 +215,12 @@ public class EvaluationScoreCalculator {
 					BlastResult cmpt = getBestUnchangedBlastResults().get(blastDatabase);
 					if (cmpt != null) {
 						// If evaluateValidTokens is set to true: Filter each token with the BLACKLIST.
-						Set<String> bestBlastEvalTokens;
 						if (getSettings().getEvaluateOnlyValidTokens()) {
-							bestBlastEvalTokens = TokenScoreCalculator.tokenize(cmpt.getDescription(), getSettings().getTokenBlacklist(cmpt.getBlastDatabaseName()));
+							cmpt.setEvaluationTokens(TokenScoreCalculator.tokenize(cmpt.getDescription(), getSettings().getTokenBlacklist(cmpt.getBlastDatabaseName())));
 						} else {
-							bestBlastEvalTokens = cmpt.getTokens();
+							cmpt.setEvaluationTokens(cmpt.getTokens());
 						}
-						cmpt.setEvaluationScore(fBetaScore(bestBlastEvalTokens, getReferenceDescription().getTokens()));
+						cmpt.setEvaluationScore(fBetaScore(cmpt.getEvaluationTokens(), getReferenceDescription().getTokens()));
 						// Find best performing competitor-method:
 						if (cmpt.getEvaluationScore().getScore() > bestCompEvlScr)
 							bestCompEvlScr = cmpt.getEvaluationScore().getScore();
