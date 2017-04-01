@@ -31,7 +31,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		bw.write("\n");
 		// Column-Names:
 		bw.write(ahrdColumnNames());
-		bw.write("\tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score");
+		bw.write("\tHRD-Length\tGround-Truth-Description\tRef-Lenght\tEvaluation-Score");
 		if (getSettings().doWriteFscoreDetailsToOutput()) {
 			bw.write("\tDiff-to-bestCompetitor\tPrecision\tRecall");
 		}
@@ -51,7 +51,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					bw.write("\t" + competitor + "-Description-Evaluation-Score-Precision");
 					bw.write("\t" + competitor + "-Description-Evaluation-Score-Recall");
 				}
-				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 					bw.write("\t" + competitor + "-GO-Annotations");
 					if (getSettings().doCalculateSimpleGoF1Scores()){
 						bw.write("\t" + competitor + "-GO-Annotations-Simple-F-Score");
@@ -85,8 +85,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				bw.write("\tHighest-Possible-Description-Score-Recall");
 			}
 		}
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-			bw.write("\tReference-GO-Annotations");
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+			bw.write("\tGround-Truth-GO-Annotations");
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
 				bw.write("\tAHRD-GO-Annotations-Simple-F-Score");
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
@@ -131,7 +131,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		for (Protein prot : getProteins()) {
 			// Generate the Human Readable Description:
 			String csvRow = buildDescriptionLine(prot, "\t");
-			// Write out the Evaluator-Score and the Reference-Description:
+			// Write out the Evaluator-Score and the Ground-Truth-Description:
 			csvRow += buildDescriptionEvaluationColumns(prot);
 			// Append further information, if requested:
 			if (getSettings().getWriteTokenSetToOutput()) {
@@ -151,8 +151,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			if (getSettings().doFindHighestPossibleEvaluationScore()) {
 				csvRow += buildBlastResultWithHighestPossibleDescriptionScoreColumns(prot);
 			}
-			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
-				csvRow += buildReferenceGoAnnotationColumns(prot);
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+				csvRow += buildGroundTruthGoAnnotationColumns(prot);
 			}
 			if (getSettings().doFindHighestPossibleGoScore()) {
 				if (getSettings().doCalculateSimpleGoF1Scores()) {
@@ -204,7 +204,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						hdr += "\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Precision\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Recall";
 					}
-					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 						hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations";
 						if (getSettings().doCalculateSimpleGoF1Scores()) {
 							hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score";
@@ -238,13 +238,13 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 	 * @param Protein
 	 *            prot
 	 * @return String - Part of the CSV-Row with the columns Evaluator-Score and
-	 *         Reference-Description.
+	 *         Ground-Truth-Description.
 	 */
 	public String buildDescriptionEvaluationColumns(Protein prot) {
 		// HEADER:
-		// \tHRD-Length\tReference-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor
+		// \tHRD-Length\tGround-Truth-Description\tRef-Lenght\tEvaluation-Score\tDiff-to-bestCompetitor
 		String csvCells = "";
-		// HRD-Length reference and AHRD's performance:
+		// HRD-Length ground truth and AHRD's performance:
 		if (prot.getEvaluationScoreCalculator().getEvalutionScore() != null) {
 			// HRD-Length ref f1score diff-to-best-competitor:
 			csvCells += "\t";
@@ -254,8 +254,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			else {
 				csvCells += "0";
 			}
-			csvCells += "\t" + prot.getEvaluationScoreCalculator().getReferenceDescription().getDescription() + "\t"
-					+ prot.getEvaluationScoreCalculator().getReferenceDescription().getTokens().size() + "\t"
+			csvCells += "\t" + prot.getEvaluationScoreCalculator().getGroundTruthDescription().getDescription() + "\t"
+					+ prot.getEvaluationScoreCalculator().getGroundTruthDescription().getTokens().size() + "\t"
 					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getScore());
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
 			csvCells += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getEvalScoreMinBestCompScore()) + "\t"
@@ -322,7 +322,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						csvRow += "\t" + FRMT.format(bestBr.getEvaluationScore().getPrecision());
 						csvRow += "\t" + FRMT.format(bestBr.getEvaluationScore().getRecall());
 					}
-					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 						csvRow += "\t" + combineGoTermsToString(bestBr.getGoAnnotations());
 						if (getSettings().doCalculateSimpleGoF1Scores()) {
 							csvRow += "\t" + FRMT.format(bestBr.getSimpleGoAnnotationScore().getScore());
@@ -354,7 +354,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						csvRow += "\t0\t0";
 					}
-					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 						csvRow += "\t";
 						if (getSettings().doCalculateSimpleGoF1Scores()) {
 							csvRow += "\t0";
@@ -392,7 +392,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					csvCols += "\t" + FRMT.format(annot.getEvaluationScore().getPrecision());
 					csvCols += "\t" + FRMT.format(annot.getEvaluationScore().getRecall());
 				}
-				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 					csvCols += "\t" + combineGoTermsToString(annot.getGoAnnotations());
 					if (getSettings().doCalculateSimpleGoF1Scores()) {
 						csvCols += "\t" + FRMT.format(annot.getSimpleGoAnnotationScore().getScore());
@@ -431,7 +431,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		if (getSettings().doWriteFscoreDetailsToOutput()) {
 			csvCols += "\t0\t0";
 		}
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			csvCols += "\t";
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
 				csvCols += "\t0";
@@ -471,9 +471,9 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		return csvCols;
 	}
 
-	private String buildReferenceGoAnnotationColumns(Protein prot) {
+	private String buildGroundTruthGoAnnotationColumns(Protein prot) {
 		String goColumns = "\t"
-				+ combineGoTermsToString(prot.getEvaluationScoreCalculator().getReferenceGoAnnoatations());
+				+ combineGoTermsToString(prot.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations());
 		if (getSettings().doCalculateSimpleGoF1Scores()) {
 			goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore());
 			if (getSettings().doWriteFscoreDetailsToOutput()) {

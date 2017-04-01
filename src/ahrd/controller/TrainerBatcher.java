@@ -93,9 +93,9 @@ public class TrainerBatcher extends Batcher {
 		batchYml.put(Settings.PROTEINS_FASTA_KEY,
 				getInput().get(Settings.PROTEINS_FASTA_KEY));
 
-		// Set references:
-		batchYml.put(Settings.REFERENCES_FASTA_KEY,
-				getInput().get(Settings.REFERENCES_FASTA_KEY));
+		// Set roundtruth:
+		batchYml.put(Settings.GROUND_TRUTH_FASTA_KEY,
+				getInput().get(Settings.GROUND_TRUTH_FASTA_KEY));
 
 		// Store F-Score-Beta-Parameter, if given:
 		if (getInput().containsKey(Settings.F_MEASURE_BETA_PARAM_KEY)) {

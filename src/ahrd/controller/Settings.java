@@ -63,10 +63,10 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_SCORE_DATABASE_SCORE_WEIGHT = "token_score_database_score_weight";
 	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT = "token_score_overlap_score_weight";
 	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT = "description_score_bit_score_weight";
-	public static final String REFERENCES_FASTA_KEY = "references_fasta";
-	public static final String REFERENCES_DESCRIPTION_FILTER_KEY = "references_description_filter";
-	public static final String REFERENCES_DESCRIPTION_BLACKLIST_KEY = "references_description_blacklist";
-	public static final String REFERENCES_TOKEN_BLACKLIST_KEY = "references_token_blacklist";
+	public static final String GROUND_TRUTH_FASTA_KEY = "ground_truth_fasta";
+	public static final String GROUND_TRUTH_DESCRIPTION_FILTER_KEY = "ground_truth_description_filter";
+	public static final String GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY = "ground_truth_description_blacklist";
+	public static final String GROUND_TRUTH_TOKEN_BLACKLIST_KEY = "ground_truth_token_blacklist";
 	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
 	public static final String TEMPERATURE_KEY = "temperature";
 	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
@@ -100,7 +100,7 @@ public class Settings implements Cloneable {
 	public static final String EVALUATE_ONLY_VALID_TOKENS_KEY = "evaluate_only_valid_tokens";
 	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
 	public static final String GO_DB_PATH_KEY = "go_db_path";
-	public static final String REFERENCE_GO_ANNOTATIONS_PATH_KEY = "reference_go_annotations";
+	public static final String GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY = "ground_truth_go_annotations";
 	public static final String GO_F1_SIMPLE_KEY = "simple_GO_f1_scores";
 	public static final String GO_F1_ANCESTRY_KEY = "ancestry_GO_f1_scores";
 	public static final String GO_F1_SEMSIM_KEY = "semsim_GO_f1_scores";
@@ -118,13 +118,13 @@ public class Settings implements Cloneable {
 	 * Fields:
 	 */
 	private String pathToProteinsFasta;
-	private String pathToReferencesFasta;
-	private String pathToReferencesDescriptionBlacklist;
-	private Set<String> referencesDescriptionBlacklist;
-	private String pathToReferencesDescriptionFilter;
-	private List<String> referencesDescriptionFilter;
-	private String pathToReferencesTokenBlacklist;
-	private Set<String> referencesTokenBlacklist = new HashSet<String>();
+	private String pathToGroundTruthFasta;
+	private String pathToGroundTruthDescriptionBlacklist;
+	private Set<String> groundTruthDescriptionBlacklist;
+	private String pathToGroundTruthDescriptionFilter;
+	private List<String> groundTruthDescriptionFilter;
+	private String pathToGroundTruthTokenBlacklist;
+	private Set<String> groundTruthTokenBlacklist = new HashSet<String>();
 	private String pathToInterproDatabase;
 	private String pathToInterproResults;
 	private String pathToOutput;
@@ -246,25 +246,25 @@ public class Settings implements Cloneable {
 	 */
 	private String pathToGoDatabase;
 	/**
-	 * Path to file containing GO annotations of the query proteins Triggers the
-	 * evaluation of AHRDs GO annotations
+	 * Path to file containing GO annotations of the query proteins.
+	 * One of the requirements to trigger the evaluation of AHRDs GO annotations
 	 */
-	private String pathToReferenceGoAnnotations;
+	private String pathToGroundTruthGoAnnotations;
 	/**
 	 * Toggle set to induce the calculation and output of an F1-score based on
-	 * reference and prediction GO annotations alone. Is set to true as default
+	 * ground truth and prediction GO annotations alone. Is set to true as default
 	 * GO F1-score if non of the three GO F1-score flags are toggled.
 	 */
 	private Boolean calculateSimpleGoF1Scores = false;
 	/**
 	 * Toggle set to induce the calculation and output of an F1-score based on
-	 * reference and prediction GO annotations extended to their complete
+	 * ground truth and prediction GO annotations extended to their complete
 	 * ancestry.
 	 */
 	private Boolean calculateAncestryGoF1Scores = false;
 	/**
 	 * Toggle set to induce the calculation and output of an F1-score based on
-	 * the semantic similarity (based on term information content) of reference
+	 * the semantic similarity (based on term information content) of ground truth
 	 * and prediction GO annotations.
 	 */
 	private Boolean calculateSemSimGoF1Scores = false;
@@ -375,8 +375,8 @@ public class Settings implements Cloneable {
 			this.getParameters().setDescriptionScoreBitScoreWeight(blastDatabaseName,
 					this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
 		}
-		// If started to train the algorithm references are stored in this file:
-		setPathToReferencesFasta((String) input.get(REFERENCES_FASTA_KEY));
+		// If started to train the algorithm ground truth descriptions are stored in this file:
+		setPathToGroundTruthFasta((String) input.get(GROUND_TRUTH_FASTA_KEY));
 		// If started in training-mode the F-Measure's Beta-Parameter can be set
 		// to some other value than 1.0
 		if (input.get(F_MEASURE_BETA_PARAM_KEY) != null)
@@ -441,23 +441,23 @@ public class Settings implements Cloneable {
 		}
 		this.setPreferReferenceWithGoAnnos(Boolean.parseBoolean((String) input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY)));
 		this.setEvaluateOnlyValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_ONLY_VALID_TOKENS_KEY)));
-		if (input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY) != null) {
-			this.setPathToReferencesDescriptionBlacklist(input.get(REFERENCES_DESCRIPTION_BLACKLIST_KEY).toString());
-			this.setReferencesDescriptionBlacklist(new HashSet<String>(fromFile(getPathToReferencesDescriptionBlacklist())));
+		if (input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY) != null) {
+			this.setPathToGroundTruthDescriptionBlacklist(input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY).toString());
+			this.setGroundTruthDescriptionBlacklist(new HashSet<String>(fromFile(getPathToGroundTruthDescriptionBlacklist())));
 		}
-		if (input.get(REFERENCES_DESCRIPTION_FILTER_KEY) != null) {
-			this.setPathToReferencesDescriptionFilter(input.get(REFERENCES_DESCRIPTION_FILTER_KEY).toString());
-			this.setReferencesDescriptionFilter(fromFile(getPathToReferencesDescriptionFilter()));
+		if (input.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY) != null) {
+			this.setPathToGroundTruthDescriptionFilter(input.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY).toString());
+			this.setGroundTruthDescriptionFilter(fromFile(getPathToGroundTruthDescriptionFilter()));
 		}
-		if (input.get(REFERENCES_TOKEN_BLACKLIST_KEY) != null) {
-			this.setPathToReferencesTokenBlacklist(input.get(REFERENCES_TOKEN_BLACKLIST_KEY).toString());
-			this.setReferencesTokenBlacklist(new HashSet<String>(fromFile(getPathToReferencesTokenBlacklist())));
+		if (input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY) != null) {
+			this.setPathToGroundTruthTokenBlacklist(input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY).toString());
+			this.setGroundTruthTokenBlacklist(new HashSet<String>(fromFile(getPathToGroundTruthTokenBlacklist())));
 		}
 		if (input.get(GO_DB_PATH_KEY) != null) {
 			this.setPathToGoDatabase(input.get(GO_DB_PATH_KEY).toString());
 		}
-		if (input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY) != null) {
-			this.setPathToReferenceGoAnnotations(input.get(REFERENCE_GO_ANNOTATIONS_PATH_KEY).toString());
+		if (input.get(GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY) != null) {
+			this.setPathToGroundTruthGoAnnotations(input.get(GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY).toString());
 		}
 		this.setCalculateAncestryGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_ANCESTRY_KEY)));
 		this.setCalculateSemSimGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_SEMSIM_KEY)));
@@ -658,12 +658,12 @@ public class Settings implements Cloneable {
 		return readFile(getPathToProteinsFasta());
 	}
 
-	private String getPathToReferencesFasta() {
-		return pathToReferencesFasta;
+	private String getPathToGroundTruthFasta() {
+		return pathToGroundTruthFasta;
 	}
 
-	public String getReferencesFasta() throws IOException {
-		return readFile(getPathToReferencesFasta());
+	public String getGroundTruthFasta() throws IOException {
+		return readFile(getPathToGroundTruthFasta());
 	}
 
 	public void setPathToProteinsFasta(String pathToProteinsFasta) {
@@ -788,12 +788,12 @@ public class Settings implements Cloneable {
 		this.blastDbSettings = blastDbSettings;
 	}
 
-	public void setPathToReferencesFasta(String pathToReferencesFasta) {
-		this.pathToReferencesFasta = pathToReferencesFasta;
+	public void setPathToGroundTruthFasta(String pathToGroundTruthFasta) {
+		this.pathToGroundTruthFasta = pathToGroundTruthFasta;
 	}
 
 	public boolean isInTrainingMode() {
-		return (getPathToReferencesFasta() != null && getPathToReferencesFasta() != "");
+		return (getPathToGroundTruthFasta() != null && getPathToGroundTruthFasta() != "");
 	}
 
 	/**
@@ -1028,52 +1028,52 @@ public class Settings implements Cloneable {
 		this.evaluateOnlyValidTokens = evaluateValidTokens;
 	}
 
-	public String getPathToReferencesDescriptionFilter() {
-		return pathToReferencesDescriptionFilter;
+	public String getPathToGroundTruthDescriptionFilter() {
+		return pathToGroundTruthDescriptionFilter;
 	}
 
-	public void setPathToReferencesDescriptionFilter(String pathToReferencesDescriptionFilter) {
-		this.pathToReferencesDescriptionFilter = pathToReferencesDescriptionFilter;
+	public void setPathToGroundTruthDescriptionFilter(String pathToGroundTruthDescriptionFilter) {
+		this.pathToGroundTruthDescriptionFilter = pathToGroundTruthDescriptionFilter;
 	}
 
-	public String getPathToReferencesDescriptionBlacklist() {
-		return pathToReferencesDescriptionBlacklist;
+	public String getPathToGroundTruthDescriptionBlacklist() {
+		return pathToGroundTruthDescriptionBlacklist;
 	}
 
-	public void setPathToReferencesDescriptionBlacklist(String pathToReferencesDescriptionBlacklist) {
-		this.pathToReferencesDescriptionBlacklist = pathToReferencesDescriptionBlacklist;
+	public void setPathToGroundTruthDescriptionBlacklist(String pathToGroundTruthDescriptionBlacklist) {
+		this.pathToGroundTruthDescriptionBlacklist = pathToGroundTruthDescriptionBlacklist;
 	}
 
-	public String getPathToReferencesTokenBlacklist() {
-		return pathToReferencesTokenBlacklist;
+	public String getPathToGroundTruthTokenBlacklist() {
+		return pathToGroundTruthTokenBlacklist;
 	}
 
-	public void setPathToReferencesTokenBlacklist(String pathToReferencesTokenBlacklist) {
-		this.pathToReferencesTokenBlacklist = pathToReferencesTokenBlacklist;
+	public void setPathToGroundTruthTokenBlacklist(String pathToGroundTruthTokenBlacklist) {
+		this.pathToGroundTruthTokenBlacklist = pathToGroundTruthTokenBlacklist;
 	}
 
-	public Set<String> getReferencesDescriptionBlacklist() {
-		return referencesDescriptionBlacklist;
+	public Set<String> getGroundTruthDescriptionBlacklist() {
+		return groundTruthDescriptionBlacklist;
 	}
 
-	public void setReferencesDescriptionBlacklist(Set<String> referencesDescriptionBlacklist) {
-		this.referencesDescriptionBlacklist = referencesDescriptionBlacklist;
+	public void setGroundTruthDescriptionBlacklist(Set<String> groundTruthDescriptionBlacklist) {
+		this.groundTruthDescriptionBlacklist = groundTruthDescriptionBlacklist;
 	}
 
-	public List<String> getReferencesDescriptionFilter() {
-		return referencesDescriptionFilter;
+	public List<String> getGroundTruthDescriptionFilter() {
+		return groundTruthDescriptionFilter;
 	}
 
-	public void setReferencesDescriptionFilter(List<String> referencesDescriptionFilter) {
-		this.referencesDescriptionFilter = referencesDescriptionFilter;
+	public void setGroundTruthDescriptionFilter(List<String> groundTruthDescriptionFilter) {
+		this.groundTruthDescriptionFilter = groundTruthDescriptionFilter;
 	}
 
-	public Set<String> getReferencesTokenBlacklist() {
-		return referencesTokenBlacklist;
+	public Set<String> getGroundTruthTokenBlacklist() {
+		return groundTruthTokenBlacklist;
 	}
 
-	public void setReferencesTokenBlacklist(Set<String> referencesTokenBlacklist) {
-		this.referencesTokenBlacklist = referencesTokenBlacklist;
+	public void setGroundTruthTokenBlacklist(Set<String> groundTruthTokenBlacklist) {
+		this.groundTruthTokenBlacklist = groundTruthTokenBlacklist;
 	}
 
 	public String getPathToGoDatabase() {
@@ -1084,20 +1084,20 @@ public class Settings implements Cloneable {
 		this.pathToGoDatabase = pathToGoDatabase;
 	}
 
-	public String getPathToReferenceGoAnnotations() {
-		return pathToReferenceGoAnnotations;
+	public String getPathToGroundTruthGoAnnotations() {
+		return pathToGroundTruthGoAnnotations;
 	}
 
-	public void setPathToReferenceGoAnnotations(String pathToReferenceGoAnnotations) {
-		this.pathToReferenceGoAnnotations = pathToReferenceGoAnnotations;
+	public void setPathToGroundTruthGoAnnotations(String pathToGroundTruthGoAnnotations) {
+		this.pathToGroundTruthGoAnnotations = pathToGroundTruthGoAnnotations;
 	}
 
-	public Boolean hasReferenceGoAnnotations() {
-		return getPathToReferenceGoAnnotations() != null && new File(getPathToReferenceGoAnnotations()).exists();
+	public Boolean hasGroundTruthGoAnnotations() {
+		return getPathToGroundTruthGoAnnotations() != null && new File(getPathToGroundTruthGoAnnotations()).exists();
 	}
 
-	public List<String> getReferenceGoAnnotationsFromFile() throws IOException {
-		return fromFile(getPathToReferenceGoAnnotations());
+	public List<String> getGroundTruthGoAnnotationsFromFile() throws IOException {
+		return fromFile(getPathToGroundTruthGoAnnotations());
 	}
 
 	public Boolean doCalculateSimpleGoF1Scores() {

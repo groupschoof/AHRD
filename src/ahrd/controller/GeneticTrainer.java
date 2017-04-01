@@ -55,12 +55,12 @@ public class GeneticTrainer extends Trainer {
 		try {
 			GeneticTrainer trainer = new GeneticTrainer(args[0]);
 			trainer.setup(false); // false -> Don't log memory and time-usages
-			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 				getSettings().setFindHighestPossibleGoScore(true);
 			}
 			// After the setup the unique short accessions are no longer needed:
 			trainer.setUniqueBlastResultShortAccessions(null);
-			trainer.setupReferenceDescriptions();
+			trainer.setupGroundTruthDescriptions();
 			trainer.setupGoAnnotationEvaluation();
 			// Try to find optimal parameters heuristically:
 			trainer.train();
@@ -123,7 +123,7 @@ public class GeneticTrainer extends Trainer {
 					// Iterate over all Proteins and assign the best scoring Human
 					// Readable Description
 					assignHumanReadableDescriptions();
-					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 						goAnnotsStringToObject();
 					}
 					// Evaluate AHRD's performance for each Protein:

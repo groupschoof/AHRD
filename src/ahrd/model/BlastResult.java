@@ -458,7 +458,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * <code>Settings.evaluateValidTokens</code> for details.
 	 * 
 	 * @Note: This method uses the static respective static method from
-	 *        Model-Class ReferenceDescription.
+	 *        Model-Class GroundTruthDescription.
 	 */
 	public void tokenizeForEvaluation() {
 		if (getSettings().getEvaluateOnlyValidTokens())

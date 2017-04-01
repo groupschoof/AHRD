@@ -16,7 +16,7 @@ import ahrd.model.CompetitorAnnotation;
 import ahrd.model.GOdatabase;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
-import ahrd.model.ReferenceDescription;
+import ahrd.model.GroundTruthDescription;
 import ahrd.view.EvaluatorOutputWriter;
 import ahrd.view.TsvOutputWriter;
 
@@ -26,31 +26,31 @@ public class Evaluator extends AHRD {
 		super(pathToInputYml);
 	}
 
-	public void setupReferenceDescriptions() throws IOException, MissingAccessionException {
-		List<String> fastaEntries = Protein.splitFasta(getSettings().getReferencesFasta());
+	public void setupGroundTruthDescriptions() throws IOException, MissingAccessionException {
+		List<String> fastaEntries = Protein.splitFasta(getSettings().getGroundTruthFasta());
 		for (String fastaEntry : fastaEntries) {
 			if (fastaEntry != null && !fastaEntry.trim().equals("")) {
-				ReferenceDescription rd = ReferenceDescription.constructFromFastaEntry(fastaEntry.trim());
+				GroundTruthDescription rd = GroundTruthDescription.constructFromFastaEntry(fastaEntry.trim());
 				Protein p = getProteins().get(rd.getAccession());
 				if (p == null)
 					throw new MissingAccessionException(
 							"Could not find Protein for Accession '" + rd.getAccession() + "'");
-				p.getEvaluationScoreCalculator().setReferenceDescription(rd);
+				p.getEvaluationScoreCalculator().setGroundTruthDescription(rd);
 			}
 		}
 	}
 
 	public void setupGoAnnotationEvaluation() throws FileNotFoundException, IOException, MissingAccessionException {
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			// Load a Map of all GO terms
 			if (goDB == null) {
 				goDB = new GOdatabase().getMap();
 			}
-			// Load reference GO annotations
-			for (String referenceGoAnnotationFileEntryLine : getSettings().getReferenceGoAnnotationsFromFile()) {
-				String[] referenceGoAnnotationFileEntry = referenceGoAnnotationFileEntryLine.split("\t");
-				String protAcc = referenceGoAnnotationFileEntry[0].trim();
-				String termAcc = referenceGoAnnotationFileEntry[1].trim();
+			// Load ground truth GO annotations
+			for (String groundTruthGoAnnotationFileEntryLine : getSettings().getGroundTruthGoAnnotationsFromFile()) {
+				String[] groundTruthGoAnnotationFileEntry = groundTruthGoAnnotationFileEntryLine.split("\t");
+				String protAcc = groundTruthGoAnnotationFileEntry[0].trim();
+				String termAcc = groundTruthGoAnnotationFileEntry[1].trim();
 				Protein p = getProteins().get(protAcc);
 				if (p == null) {
 					throw new MissingAccessionException("Could not find protein for accession '" + protAcc + "'");
@@ -59,7 +59,7 @@ public class Evaluator extends AHRD {
 				if (term == null) {
 					throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 				}
-				p.getEvaluationScoreCalculator().getReferenceGoAnnoatations().add(term);
+				p.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations().add(term);
 			}
 			// Add GOterm objects to predicted annotations
 			goAnnotsStringToObject();
@@ -134,12 +134,12 @@ public class Evaluator extends AHRD {
 			evaluator.setup(false); // false -> Don't log memory and time-usages
 			// After the setup the unique short accessions are no longer needed:
 			evaluator.setUniqueBlastResultShortAccessions(null);
-			evaluator.setupReferenceDescriptions();
+			evaluator.setupGroundTruthDescriptions();
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			evaluator.assignHumanReadableDescriptions();
 			// Load a Map of all GO terms
-			// Load reference GO annotations
+			// Load ground truth GO annotations
 			// Add GOterm objects to predicted annotations
 			// Annotate the best blast results with GOterm objects
 			evaluator.setupGoAnnotationEvaluation();
@@ -222,7 +222,7 @@ public class Evaluator extends AHRD {
 					annots.put(accession, annot);
 				}
 				// GO annotations
-				if(getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+				if(getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 					// Parse GO annotation lines and add GO annotations to competitor annotations
 					for (String competitorGoAnnotationLine : getSettings().getCompetitorGOAnnotations(competitor)) {
 						String[] values = competitorGoAnnotationLine.split("\t");

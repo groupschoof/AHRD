@@ -39,7 +39,7 @@ write_token_set_to_output: false
 write_best_blast_hits_to_output: true
 write_scores_to_output: false
 output: ./ahrd_output.csv
-references_fasta: ./test/resources/references.fasta
+ground_truth_fasta: ./test/resources/ground_truth.fasta
 competitors:
   blast2go:
     descriptions: ./test/resources/blast2go_descriptions.tsv

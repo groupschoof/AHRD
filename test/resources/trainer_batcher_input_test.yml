@@ -1,7 +1,7 @@
 shell_script: ./test/resources/start_ahrd_batched.sh
 ahrd_call: "java -Xmx2048m -cp ./dist/ahrd.jar ahrd.controller.Trainer #batch#"
 proteins_fasta: ./test/resources/proteins.fasta
-references_fasta: ./test/resources/references.fasta
+ground_truth_fasta: ./test/resources/ground_truth.fasta
 interpro_database: ./test/resources/interpro_31.xml
 interpro_result: ./test/resources/interpro_result.raw
 gene_ontology_result: ./test/resources/go_results.csv

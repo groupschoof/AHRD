@@ -41,7 +41,7 @@ public class ProteinTest {
 				p.getEvaluationScoreCalculator() != null);
 		// Test the opposite:
 		getSettings().setWriteBestBlastHitsToOutput(false);
-		getSettings().setPathToReferencesFasta(null);
+		getSettings().setPathToGroundTruthFasta(null);
 		p = TestUtils.mockProtein();
 		assertTrue(
 				"Expected mocked protein's EvaluationScoreCalculator te be null!",

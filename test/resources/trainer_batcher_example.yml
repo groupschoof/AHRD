@@ -1,7 +1,7 @@
 shell_script: ./start_ahrd_batched.sh
 ahrd_call: "java -Xmx2048m -cp ./dist/ahrd.jar ahrd.controller.Trainer #batch#"
 proteins_fasta: ./test/resources/proteins.fasta
-references_fasta: ./test/resources/references.fasta
+ground_truth_fasta: ./test/resources/ground_truth.fasta
 no_start_positions_in_parameter_space: 1024
 batch_ymls_dir: ./trainer_batch_ymls
 output_dir: ./trainer_results

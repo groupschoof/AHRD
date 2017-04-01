@@ -24,7 +24,7 @@ import ahrd.model.EvaluationScoreCalculator;
 import ahrd.model.Fscore;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
-import ahrd.model.ReferenceDescription;
+import ahrd.model.GroundTruthDescription;
 import ahrd.model.GOdatabase;
 
 public class EvaluationScoreCalculatorTest {
@@ -38,39 +38,39 @@ public class EvaluationScoreCalculatorTest {
 
 	@Test
 	public void testTruePositives() {
-		Set<String> referenceTokens = new HashSet<String>(Arrays.asList(
+		Set<String> groundTruthTokens = new HashSet<String>(Arrays.asList(
 				"sheep", "wool", "growth", "factor"));
 		Set<String> assignedDesc1 = new HashSet<String>(Arrays.asList("goat",
 				"wool", "growth"));
 		Set<String> assignedDesc2 = new HashSet<String>();
 		// Should have 2 TP:
 		assertEquals(2.0, EvaluationScoreCalculator.truePositives(
-				assignedDesc1, referenceTokens), 0.0);
+				assignedDesc1, groundTruthTokens), 0.0);
 		// Should have zero TP:
 		assertEquals(0.0, EvaluationScoreCalculator.truePositives(
-				assignedDesc2, referenceTokens), 0.0);
+				assignedDesc2, groundTruthTokens), 0.0);
 	}
 
 	@Test
 	public void testTruePositivesRate() {
-		Set<String> referenceTokens = new HashSet<String>(Arrays.asList(
+		Set<String> groundTruthTokens = new HashSet<String>(Arrays.asList(
 				"sheep", "wool", "growth", "factor"));
 		Set<String> assignedDesc1 = new HashSet<String>(Arrays.asList("goat",
 				"wool", "growth"));
 		Set<String> assignedDesc2 = new HashSet<String>();
 		// Should be 2/4
-		assertEquals(0.5, EvaluationScoreCalculator.fBetaScore(assignedDesc1, referenceTokens).getRecall(), 0.0);
+		assertEquals(0.5, EvaluationScoreCalculator.fBetaScore(assignedDesc1, groundTruthTokens).getRecall(), 0.0);
 		// Should be 4/4
-		assertEquals(1.0, EvaluationScoreCalculator.fBetaScore(referenceTokens, referenceTokens).getRecall(), 0.0);
+		assertEquals(1.0, EvaluationScoreCalculator.fBetaScore(groundTruthTokens, groundTruthTokens).getRecall(), 0.0);
 		// Should be 0/4
-		assertEquals(0.0, EvaluationScoreCalculator.fBetaScore(assignedDesc2, referenceTokens).getRecall(), 0.0);
+		assertEquals(0.0, EvaluationScoreCalculator.fBetaScore(assignedDesc2, groundTruthTokens).getRecall(), 0.0);
 	}
 
 	@Test
 	public void testFalsePositivesRate() {
 		Set<String> allBlastTokens = new HashSet<String>(Arrays.asList("sheep",
 				"wool", "growth", "factor", "goat", "horn", "tail"));
-		Set<String> referenceTokens = new HashSet<String>(Arrays.asList(
+		Set<String> groundTruthTokens = new HashSet<String>(Arrays.asList(
 				"sheep", "wool", "growth", "factor"));
 		Set<String> assignedDesc1 = new HashSet<String>(Arrays.asList("goat",
 				"wool", "growth"));
@@ -83,21 +83,21 @@ public class EvaluationScoreCalculatorTest {
 
 		// Should be 1 / 3
 		assertEquals((1.0 / 3.0), EvaluationScoreCalculator.falsePositivesRate(
-				assignedDesc1, referenceTokens, allBlastTokens), 0.0);
+				assignedDesc1, groundTruthTokens, allBlastTokens), 0.0);
 		// Should be 0 / 3
 		assertEquals(0.0, EvaluationScoreCalculator.falsePositivesRate(
-				referenceTokens, referenceTokens, allBlastTokens), 0.0);
+				groundTruthTokens, groundTruthTokens, allBlastTokens), 0.0);
 		// Should be 0 / 3
 		assertEquals(0.0, EvaluationScoreCalculator.falsePositivesRate(
-				assignedDesc2, referenceTokens, allBlastTokens), 0.0);
+				assignedDesc2, groundTruthTokens, allBlastTokens), 0.0);
 		// Should be 3 / 3
 		assertEquals(1.0, EvaluationScoreCalculator.falsePositivesRate(
-				assignedDesc3, referenceTokens, allBlastTokens), 0.0);
+				assignedDesc3, groundTruthTokens, allBlastTokens), 0.0);
 	}
 
 	@Test
 	public void testF1Score() {
-		Set<String> referenceTokens = new HashSet<String>(Arrays.asList(
+		Set<String> groundTruthTokens = new HashSet<String>(Arrays.asList(
 				"sheep", "wool", "growth", "factor"));
 		Set<String> assignedDesc1 = new HashSet<String>(Arrays.asList("sheep",
 				"wool", "growth", "factor"));
@@ -116,31 +116,31 @@ public class EvaluationScoreCalculatorTest {
 
 		// 2 * 4/4 * 4/4 / (4/4 + 4/4) = 1
 		assertEquals(1.0, EvaluationScoreCalculator.fBetaScore(assignedDesc1,
-				referenceTokens).getScore(), 0.0);
+				groundTruthTokens).getScore(), 0.0);
 		// 2 * 2/4 * 2/4 / (2/4 + 2/4) = 0.5
 		assertEquals(0.5, EvaluationScoreCalculator.fBetaScore(assignedDesc2,
-				referenceTokens).getScore(), 0.0);
+				groundTruthTokens).getScore(), 0.0);
 		// 2 * 2/4 * 2/2 / (2/4 + 2/2) = 2/3
 		assertEquals((2.0 / 3.0), EvaluationScoreCalculator.fBetaScore(
-				assignedDesc3, referenceTokens).getScore(), 0.0);
+				assignedDesc3, groundTruthTokens).getScore(), 0.0);
 		// The order of tokens shouldn't have any effect:
 		assertEquals(1.0, EvaluationScoreCalculator.fBetaScore(assignedDesc4,
-				referenceTokens).getScore(), 0.0);
+				groundTruthTokens).getScore(), 0.0);
 		// Zero true-positives should result in a f1-score of zero:
 		assertEquals(0.0, EvaluationScoreCalculator.fBetaScore(assignedDesc5,
-				referenceTokens).getScore(), 0.0);
+				groundTruthTokens).getScore(), 0.0);
 	}
 
 	@Test
 	public void testAssignEvlScrsToCompetitors() throws FileNotFoundException, IOException {
 		Protein p = TestUtils.mockProtein();
-		// Mock reference description:
-		ReferenceDescription rd = new ReferenceDescription();
+		// Mock ground truth description:
+		GroundTruthDescription rd = new GroundTruthDescription();
 		rd.setAccession("AHRDv2_Acc");
 		rd.setDescription("AHRD is the best annotator");
 		rd.setTokens(new HashSet<String>(Arrays.asList("ahrd", "is", "the",
 				"best", "annotator")));
-		p.getEvaluationScoreCalculator().setReferenceDescription(rd);
+		p.getEvaluationScoreCalculator().setGroundTruthDescription(rd);
 		// mock description assigned by AHRD:
 		BlastResult ahrdsRes = TestUtils.mockBlastResult(
 				"AHRDv2_Acc",
@@ -251,13 +251,13 @@ public class EvaluationScoreCalculatorTest {
 	public void testFindHighestPossibleEvaluationScore() {
 		// Mock Protein:
 		Protein p = TestUtils.mockProtein();
-		// Mock reference description:
-		ReferenceDescription rd = new ReferenceDescription();
+		// Mock ground truth description:
+		GroundTruthDescription rd = new GroundTruthDescription();
 		rd.setAccession("AHRDv2_Acc");
 		rd.setDescription("AHRD is the best annotator");
 		rd.setTokens(new HashSet<String>(Arrays.asList("ahrd", "is", "the",
 				"best", "annotator")));
-		p.getEvaluationScoreCalculator().setReferenceDescription(rd);
+		p.getEvaluationScoreCalculator().setGroundTruthDescription(rd);
 		// Mock first BlastResults:
 		List<BlastResult> swissprotRes = new ArrayList<BlastResult>();
 		swissprotRes.add(TestUtils.mockBlastResult(
@@ -330,7 +330,7 @@ public class EvaluationScoreCalculatorTest {
 	@Test
 	public void testCalcSimpleGoAnnotationScore() {
 		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
-		getSettings().setPathToReferenceGoAnnotations("./test/resources/sprot_GO_references.goa");
+		getSettings().setPathToGroundTruthGoAnnotations("./test/resources/sprot_GO_ground_truth.goa");
 		getSettings().setCalculateSimpleGoF1Scores(true);
 		Protein p = TestUtils.mockProtein();
 		p.setEvaluationScoreCalculator(new EvaluationScoreCalculator(p));
@@ -341,31 +341,31 @@ public class EvaluationScoreCalculatorTest {
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == 1.0);
 		// |ref| == 0 && |pred| > 0 -> f1 == 0
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == 0.0);
 		// |ref| > 0 && |pred| == 0 -> f1 == 0
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>());
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>());
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == 0.0);
 		// ref == pred -> f1 == 1
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == 1.0);
 		// |ref| > 0 && |pred| > 0 && ref != pred -> f1 == 0
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == 0.0);
 		// |ref| == 2 && |pred| == 2 && |ref^pred| == 1 -> f1 == 2*0.5*0.5/(0.5+0.5) == 0.5
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == 0.5);
 		// |ref| == 1 && |pred| == 2 && |ref^pred| == 1 -> f1 == 2*1*0.5/(1+0.5) == 0.667
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpCellularProcess, bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == (double)2/3);
@@ -374,7 +374,7 @@ public class EvaluationScoreCalculatorTest {
 	@Test
 	public void testCalcAncestryGoAnnotationScore() {
 		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
-		getSettings().setPathToReferenceGoAnnotations("./test/resources/sprot_GO_references.goa");
+		getSettings().setPathToGroundTruthGoAnnotations("./test/resources/sprot_GO_ground_truth.goa");
 		getSettings().setCalculateAncestryGoF1Scores(true);
 		Protein p = TestUtils.mockProtein();
 		p.setEvaluationScoreCalculator(new EvaluationScoreCalculator(p));
@@ -390,26 +390,26 @@ public class EvaluationScoreCalculatorTest {
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore() == 1.0);
 		// |ref| == 0 && |pred| > 0 -> f1 == 0
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore() == 0.0);
 		// |ref| > 0 && |pred| == 0 -> f1 == 0
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>());
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>());
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore() == 0.0);
 		// ref == pred -> f1 == 1
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore() == 1.0);
 		// |ref| == 1 && |pred| == 1 && ref != pred && |ancestry(ref)| == |ancestry(pred)| == 2 && |ancestry(ref)^ancestry(pred)| == 1 -> f1 == 2*0.5*0.5/(0.5+0.5) == 0.5
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore() == 0.5);
 		// ref == ancestry(ref) && pred == ancestry(pred) && |ref| == 2 && |pred| == 2 && ref != pred && |ancestry(ref)| == |ancestry(pred)| == 2 && |ancestry(ref)^ancestry(pred)| == 1 -> f1 == 2*0.5*0.5/(0.5+0.5) == 0.5
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore() == 0.5);
@@ -417,7 +417,7 @@ public class EvaluationScoreCalculatorTest {
 	@Test
 	public void testCalcSemSimGoAnnotationScore() {
 		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
-		getSettings().setPathToReferenceGoAnnotations("./test/resources/sprot_GO_references.goa");
+		getSettings().setPathToGroundTruthGoAnnotations("./test/resources/sprot_GO_ground_truth.goa");
 		getSettings().setCalculateSemSimGoF1Scores(true);
 		Protein p = TestUtils.mockProtein();
 		p.setEvaluationScoreCalculator(new EvaluationScoreCalculator(p));
@@ -439,36 +439,36 @@ public class EvaluationScoreCalculatorTest {
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 1.0);
 		// |ref| == 0 && |pred| > 0 -> f1 == 0
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 0.0);
 		// |ref| > 0 && |pred| == 0 -> f1 == 0
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>());
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>());
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 0.0);
 		// ref == pred -> f1 == 1
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess, bpSingleOrganismProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess, bpSingleOrganismProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpCellularProcess, bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 1.0);
 		// |ref| == 1 && |pred| == 1 && ref != pred && commonAncestor(ref, pred) == rootTerm -> f1 == 0
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 0.0);
 		// ref == root && pred != root -> f1 == 0
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpSingleOrganismProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 0.0);
 		// ref == pred == root -> f1 == 1
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 1.0);
 		// ref == root && pred == root && ref != pred -> f1 == 1
-		p.getEvaluationScoreCalculator().setReferenceGoAnnoatations(new HashSet<GOterm>(Arrays.asList(mfRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(mfRoot)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 1.0);

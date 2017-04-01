@@ -16,17 +16,17 @@ import ahrd.controller.Evaluator;
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.Protein;
-import ahrd.model.ReferenceDescription;
+import ahrd.model.GroundTruthDescription;
 import ahrd.model.TokenScoreCalculator;
 import nu.xom.ParsingException;
 
-public class ReferenceDescriptionTest {
+public class GroundTruthDescriptionTest {
 
 	@Test
-	public void testParsingOfReferences() throws IOException {
+	public void testParsingOfGroundTruth() throws IOException {
 		TestUtils.initTestSettings();
 		String fastaEntry = "AT06g1234 Sheep wool growth factor\nRSSPMSRATVDAAPLLASAAASSGTAPMIEISAAEPKRAPKRVSTTPVTPDRPNSSPPNE\nLIVTVWLFGKMMRSHPTVTRFWPTFRPDW";
-		ReferenceDescription rd = ReferenceDescription.constructFromFastaEntry(fastaEntry);
+		GroundTruthDescription rd = GroundTruthDescription.constructFromFastaEntry(fastaEntry);
 		assertEquals("AT06g1234", rd.getAccession());
 		assertEquals("Sheep wool growth factor", rd.getDescription());
 		assertEquals(4, rd.getTokens().size());
@@ -44,15 +44,15 @@ public class ReferenceDescriptionTest {
 	}
 
 	@Test
-	public void testSwissprotBatch1ReferenceTokens()
+	public void testSwissprotBatch1GroundTruthTokens()
 			throws IOException, MissingAccessionException, MissingProteinException, SAXException, ParsingException {
-		Evaluator e = new Evaluator("./test/resources/evaluator_filter_references_test.yml");
+		Evaluator e = new Evaluator("./test/resources/evaluator_filter_ground_truth_test.yml");
 		e.initializeProteins();
-		e.setupReferenceDescriptions();
+		e.setupGroundTruthDescriptions();
 		for (Iterator<Map.Entry<String, Protein>> iterator = e.getProteins().entrySet().iterator(); iterator
 				.hasNext();) {
 			Protein p = iterator.next().getValue();
-			ReferenceDescription rd = p.getEvaluationScoreCalculator().getReferenceDescription();
+			GroundTruthDescription rd = p.getEvaluationScoreCalculator().getGroundTruthDescription();
 			assertTrue("Reference '" + rd.getAccession() + "' has no tokens after AHRD filtering",
 					!rd.getTokens().isEmpty());
 		}

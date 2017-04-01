@@ -4,18 +4,18 @@ import static ahrd.controller.Settings.getSettings;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ReferenceDescription {
+public class GroundTruthDescription {
 
 	private Set<String> tokens = new HashSet<String>();
 	private String accession;
 	private String description;
 
-	public ReferenceDescription() {
+	public GroundTruthDescription() {
 		super();
 	}
 
-	public static ReferenceDescription constructFromFastaEntry(String fastaEntry) {
-		ReferenceDescription rd = new ReferenceDescription();
+	public static GroundTruthDescription constructFromFastaEntry(String fastaEntry) {
+		GroundTruthDescription rd = new GroundTruthDescription();
 
 		// First line is a combination of Accession and Description
 		String[] fastaData = fastaEntry.split("\n");
@@ -23,26 +23,26 @@ public class ReferenceDescription {
 		rd.setAccession(fastaData[0].split(" ")[0].trim());
 		// Everything after the Accession is considered the description-line:
 		rd.setDescription(fastaData[0].replace(rd.getAccession(), "").trim());
-		// Process the reference's human readable description as requested by
+		// Process the ground truth's human readable description as requested by
 		// the user (Settings) -
 		// NOTE, if the HRD passes the Blacklist and no filtering is
 		// requested the HRD does not have to be processed any further.
-		if (getSettings().getReferencesDescriptionBlacklist() != null
-				&& !getSettings().getReferencesDescriptionBlacklist().isEmpty()) {
+		if (getSettings().getGroundTruthDescriptionBlacklist() != null
+				&& !getSettings().getGroundTruthDescriptionBlacklist().isEmpty()) {
 			if (!DescriptionScoreCalculator.passesBlacklist(rd.getDescription(),
-					getSettings().getReferencesDescriptionBlacklist())) {
+					getSettings().getGroundTruthDescriptionBlacklist())) {
 				// Does NOT pass blacklist
 				rd.setDescription("");
-			} else if (getSettings().getReferencesDescriptionFilter() != null
-					&& !getSettings().getReferencesDescriptionFilter().isEmpty()) {
+			} else if (getSettings().getGroundTruthDescriptionFilter() != null
+					&& !getSettings().getGroundTruthDescriptionFilter().isEmpty()) {
 				// Passes Blacklist AND is requested to be filtered:
 				rd.setDescription(DescriptionScoreCalculator.filter(rd.getDescription(),
-						getSettings().getReferencesDescriptionFilter()));
+						getSettings().getGroundTruthDescriptionFilter()));
 			}
 		}
 		// Tokenize, and if requested in Settings retain only those tokens that
 		// pass the Blacklist:
-		rd.setTokens(TokenScoreCalculator.tokenize(rd.getDescription(), getSettings().getReferencesTokenBlacklist()));
+		rd.setTokens(TokenScoreCalculator.tokenize(rd.getDescription(), getSettings().getGroundTruthTokenBlacklist()));
 		return rd;
 	}
 

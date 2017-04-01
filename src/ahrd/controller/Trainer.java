@@ -77,7 +77,7 @@ public class Trainer extends Evaluator {
 		// average Recall (TPR):
 		Double avgRecall = 0.0;
 		// Evaluate GO annotations.
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) {
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			for (Protein p : getProteins().values()) {
 				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
 				if (e != null) {
@@ -132,7 +132,7 @@ public class Trainer extends Evaluator {
 	 */
 	public void calcAvgMaxEvaluationScore() {
 		double avgMaxEvlScr = 0.0; 		// init average maximum evaluation-score
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasReferenceGoAnnotations()) { 		// Evaluate GO annotations.
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) { 		// Evaluate GO annotations.
 			for (Protein p : getProteins().values()) {
 				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
 				e.findHighestPossibleGoScore();

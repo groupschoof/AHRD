@@ -1,8 +1,8 @@
 proteins_fasta: ./test/resources/proteins.fasta
-references_fasta: ./test/resources/references.fasta
-references_description_blacklist: ./test/resources/blacklist_descline.txt
-references_description_filter: ./test/resources/filter_descline_sprot.txt
-references_token_blacklist: ./test/resources/blacklist_token.txt
+ground_truth_fasta: ./test/resources/ground_truth.fasta
+ground_truth_description_blacklist: ./test/resources/blacklist_descline.txt
+ground_truth_description_filter: ./test/resources/filter_descline_sprot.txt
+ground_truth_token_blacklist: ./test/resources/blacklist_token.txt
 
 blast_dbs:
   swissprot:

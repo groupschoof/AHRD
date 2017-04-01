@@ -1,5 +1,5 @@
 proteins_fasta: ./test/resources/proteins.fasta
-references_fasta: ./test/resources/references.fasta
+ground_truth_fasta: ./test/resources/ground_truth.fasta
 
 blast_dbs:
   swissprot:

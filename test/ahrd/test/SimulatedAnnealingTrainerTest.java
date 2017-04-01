@@ -34,7 +34,7 @@ public class SimulatedAnnealingTrainerTest {
 			MissingProteinException, SAXException, ParsingException {
 		trainer = new SimulatedAnnealingTrainer("./test/resources/trainer_input.yml");
 		trainer.setup(false); // false -> Don't log memory and time-usages
-		trainer.setupReferenceDescriptions();
+		trainer.setupGroundTruthDescriptions();
 		// Sets up description and GOterm annotations of competitors in the EvaluationScoreCalculators of each Protein
 		trainer.setupCompetitors();
 	}

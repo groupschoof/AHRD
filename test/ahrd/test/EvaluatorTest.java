@@ -27,25 +27,25 @@ public class EvaluatorTest {
 	}
 
 	@Test
-	public void testSetupReferenceDescriptions() throws IOException,
+	public void testSetupGroundTruthDescriptions() throws IOException,
 			MissingAccessionException {
 		evaluator.initializeProteins();
-		evaluator.setupReferenceDescriptions();
+		evaluator.setupGroundTruthDescriptions();
 		assertEquals(3, evaluator.getProteins().size());
 		assertNotNull(evaluator.getProteins()
 				.get("gene:chr01.1056:mRNA:chr01.1056")
-				.getEvaluationScoreCalculator().getReferenceDescription());
+				.getEvaluationScoreCalculator().getGroundTruthDescription());
 		assertNotNull(evaluator.getProteins()
 				.get("gene:chr01.502:mRNA:chr01.502")
-				.getEvaluationScoreCalculator().getReferenceDescription());
+				.getEvaluationScoreCalculator().getGroundTruthDescription());
 		assertEquals("Receptor-like protein kinase", evaluator.getProteins()
 				.get("gene:chr01.1056:mRNA:chr01.1056")
-				.getEvaluationScoreCalculator().getReferenceDescription()
+				.getEvaluationScoreCalculator().getGroundTruthDescription()
 				.getDescription());
 		assertEquals(4,
 				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
 						.getEvaluationScoreCalculator()
-						.getReferenceDescription().getTokens().size());
+						.getGroundTruthDescription().getTokens().size());
 	}
 
 	@Test
@@ -65,7 +65,7 @@ public class EvaluatorTest {
 	@Test
 	public void testSetupCompetitors() throws IOException, MissingAccessionException, MissingInterproResultException, SQLException {
 		evaluator.initializeProteins();
-		evaluator.setupReferenceDescriptions();
+		evaluator.setupGroundTruthDescriptions();
 		evaluator.assignHumanReadableDescriptions();
 		evaluator.setupGoAnnotationEvaluation();
 		evaluator.setupCompetitors();
