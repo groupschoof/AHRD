@@ -21,7 +21,7 @@ import ahrd.model.Protein;
 import ahrd.model.TokenScoreCalculator;
 import ahrd.view.TrainerOutputWriter;
 
-public class Trainer extends Evaluator {
+public abstract class Trainer extends Evaluator {
 
 	protected Parameters bestParameters;
 	protected TrainerOutputWriter outWriter;

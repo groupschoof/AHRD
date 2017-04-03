@@ -17,7 +17,7 @@ import ahrd.model.BlastResult;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
 
-public class TsvOutputWriter extends AbstractOutputWriter {
+public class TsvOutputWriter extends OutputWriter {
 
 	protected BufferedWriter hrdScoresWriter;
 

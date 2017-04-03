@@ -9,7 +9,7 @@ import java.util.Collection;
 
 import ahrd.model.Protein;
 
-public class FastaOutputWriter extends AbstractOutputWriter {
+public class FastaOutputWriter extends OutputWriter {
 
 	public FastaOutputWriter(Collection<Protein> proteins) {
 		super(proteins);
