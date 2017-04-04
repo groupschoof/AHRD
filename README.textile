@@ -1,4 +1,4 @@
-	h1. Automated Assignment of Human Readable Descriptions (AHRD)
+h1. Automated Assignment of Human Readable Descriptions (AHRD)
 
 Short descriptions in sequence databases are useful to quickly gain insight into important information about a sequence, for example in search results. We developed a new program called “Automatic assignment of Human Readable Descriptions” (AHRD) with the aim to select descriptions and Gene Ontology terms that are concise, informative and precise. AHRD outperforms competing methods and can overcome problems caused by wrong annotations, lack of similar sequences and partial alignments.
 
@@ -53,9 +53,9 @@ h4. 1.2.1 Get AHRD
 Copy (clone) AHRD to your computer using git via command-line, then change into AHRD's directory, and finally use the latest stable version:
 <pre>git clone https://github.com/groupschoof/AHRD.git
 cd AHRD
-git checkout tags/v3.3</pre>
+git checkout tags/v3.3.3</pre>
 
-Alternativelly without using @git@, you can download AHRD version @v3.3@ ("zip":https://github.com/groupschoof/AHRD/archive/v3.3.zip or "tar.gz":https://github.com/groupschoof/AHRD/archive/v3.3.tar.gz) and extract it.
+Alternativelly without using @git@, you can download AHRD version @v3.3.3@ ("zip":https://github.com/groupschoof/AHRD/archive/v3.3.3.zip or "tar.gz":https://github.com/groupschoof/AHRD/archive/v3.3.3.tar.gz) and extract it.
 
 h4. 1.2.2 Build the executable jar
 
@@ -109,7 +109,7 @@ If you want AHRD to predict your query protein's functions with Gene Ontology (G
 h4. 2.2.3 Required config files
 
 # Input yml with all pathes and parameters according to your needs (see ahrd_example_input.yml and section Parameters)
-# Blacklists and filters (they can either be used as provided or can be adapted to your needs and databases). Each of these files contains a list of valid Java regular expressions, one per line. For details on Java regular expressions please refer to http://docs.oracle.com/javase/tutorial/essential/regex/.
+# Blacklists and filters (they can either be used as provided or can be adapted to your needs and databases). Each of these files contains a list of valid Java regular expressions, one per line. For details on Java regular expressions please refer to http://docs.oracle.com/javase/tutorial/essential/regex/. In the YAML file, the blacklists can be put at the upper most level in order to apply for all blast search results, or can be provided for each blast search result individually. The description filter files have to be specified for each blast search result separately.
 ## *Description blacklist* (Argument @blacklist: ./test/resources/blacklist_descline.txt@) - Any Blast-Hit's description matching one of the regular expressions in this file will be ignored.
 ## *Description filter* for each single blast database (Argument @filter: ./test/resources/filter_descline_sprot.txt@) - Any part of a Blast-Hit description that matches any one of the regular expressions in this file will be deleted from the description.
 ## *Token blacklist* (Argument @token_blacklist: ./test/resources/blacklist_token.txt@) - Blast-Hit's descriptions are composed of words. Any such word matching any one of the regular expressions in this file will be ignored by AHRD's scoring, albeit it will not be deleted from the description and thus might still be seen in the final output.
@@ -195,28 +195,43 @@ token_score_overlap_score_weight: 0.0</pre>
 h3. 2.6 Parameter Optimization
 
 If you have a ground truth of well annotated proteins (at least 1000) from an organism closely related to the proteins you want to annotate, you can optimize AHRD's parameters to reproduce protein function predictions more alike to your ground truth.
- 
-In order to do so you either need to start a simulated annealing approach:
-<pre>java -cp dist/ahrd.jar ahrd.controller.SimulatedAnnealingTrainer trainer_example_input.yml</pre>
 
-Or better start a genetic algorithm approach:
-<pre>java -cp dist/ahrd.jar ahrd.controller.GeneticTrainer trainer_example_input.yml</pre>
+Two approaches for parameter optimization can be chosen from:
+# a genetic algorithm
+# simulated annealing
 
-_Note:_ See @./test/resources/trainer_example_input.yml@ for details.
+Basically the input file is almost identical to the standard AHRD run. The following additional parameters are available to modify the behavior of _both_ approaches; all numeric values given show the _default_ used for the respective parameter:
 
-Basically the input file is almost identical to the standard AHRD run. Only the following additional parameters are available; all numeric values given show the _default_ used for the respective parameter:
-
-# @ground_truth_fasta: path_to_your_ground_truth.fasta@  _Required_ parameter pointing to the fasta formatted file containing the ground truth proteins _including_ the ground truth Human Readable Descriptions. (See @./test/resources/ground_truth.fasta@ for details.) 
-# @path_log: your_log_file.tsv@  Stores the parameters evaluated in any optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set. 
-# @temperature: 75000@  Temperature used in _simulated annealing_ 
-# @cool_down_by: 1@  Dimish temperature by this value after each simulated annealing iteration 
+# @ground_truth_fasta: path_to_your_ground_truth.fasta@  _Required_ parameter pointing to the fasta formatted file containing the ground truth proteins _including_ the ground truth Human Readable Descriptions. (See @./test/resources/ground_truth.fasta@ for details.)
+# @path_log: your_log_file.tsv@ For the genetic algorithm: Stores the best parameters the evaluation found in each successive generation, their F1-Score, the difference in score to the best of the last generation and the method leading the particular parameter set (<b>random</b>ly generated, <b>mutation</b> of a parameter set, <b>recombination</b> of two parameter sets, <b>seed</b> parameter set the algorithm was started with). For the simmulated annealing: Stores the parameters evaluated in any optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set.
 # @f_measure_beta_parameter: 1.0@ The scaling factor used to compute the F-Score of an assigned HRD when comparing it with the reference. See <a href="https://en.wikipedia.org/wiki/F1_score">Wikipedia/F1_score</a> for details.
-# @optimization_acceptance_probability_scaling_factor: 2500000000.0@  Used to scale the probability of accepting a currently evaluated parameter set. @P(Accept) := exp(-delta_scores*scaling_factor/current-temperature)@ 
 # @mutator_mean: 0.25@  Mutate a randomly selected parameter by value gaussian normal distributed with this mean 
 # @mutator_deviation: 0.15@  Mutate a randomly selected parameter by value gaussian normal distributed with this standard deviation 
+ 
+h4. 2.6.1 Parameter Optimization via Genetic Algorithm
+
+To start the genetic algorithm approach:
+<pre>java -cp dist/ahrd.jar ahrd.controller.GeneticTrainer trainer_example_input.yml</pre>
+
+_Note:_ See @./test/resources/genetic_algorithm_trainer_example_input.yml@ for details.
+
+Parameters specific to the genetic algorithm; all numeric values given show the _default_ used for the respective parameter:
+# @number_of_generations: 100@ The number of generations the parameter populations are allowed to evolve over.
+# @population_size: 200@ The number of parameter sets in each generation.
+
+h4. 2.6.1 Parameter Optimization via Simulated Annealing
+
+Alternatively a simulated annealing approach can be used:
+<pre>java -cp dist/ahrd.jar ahrd.controller.SimulatedAnnealingTrainer trainer_example_input.yml</pre>
+
+_Note:_ See @./test/resources/simmulated_annealing_trainer_example_input.yml@ for details.
+
+# @temperature: 75000@  Temperature used in _simulated annealing_ 
+# @cool_down_by: 1@  Dimish temperature by this value after each simulated annealing iteration
+# @optimization_acceptance_probability_scaling_factor: 2500000000.0@  Used to scale the probability of accepting a currently evaluated parameter set. @P(Accept) := exp(-delta_scores*scaling_factor/current-temperature)@
 # @remember_simulated_annealing_path: false@  Set to @true@, if you want the optimization to remember already visited parameter sets and their performance. This increases memory usage but improves final results.  
 
-h4. 2.6.1 Optimization in parallel (Trainer-Batcher)
+h4. 2.6.3 Optimization in parallel (Trainer-Batcher)
 
 Simulated Annealing is a time and resource consuming process. Because AHRD uses quite a number of parameters, the search space is accordingly large. Hence it is recommendable to start independend simulated annealing runs in parallel. Do this using 
 

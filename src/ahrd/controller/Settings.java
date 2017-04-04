@@ -278,11 +278,11 @@ public class Settings implements Cloneable {
 	/**
 	 * The number of generation to be consecutively evolved and evaluated when performing parameter optimization in the genetic trainer
 	 */
-	private int numberOfGenerations = 25;
+	private int numberOfGenerations = 100;
 	/**
 	 * The size of each generation to be evolved and evaluated when performing parameter optimization in the genetic trainer
 	 */
-	private int populationSize = 250;
+	private int populationSize = 200;
 	/**
 	 * Competitors to be compared to AHRD in evaluation run
 	 */
