@@ -40,8 +40,8 @@ public class BatcherTest {
 
 	@Test
 	public void testFindFileInDirectory() {
-		String batchName = "go_results.fasta";
-		String fileToBeFound = "./test/resources/go_results.csv";
+		String batchName = "go_references.fasta";
+		String fileToBeFound = "./test/resources/go_references.csv";
 		String directory = "./test/resources/";
 		assertEquals(fileToBeFound,
 				this.batcher.findFileInDirectory(directory, batchName));
@@ -68,16 +68,15 @@ public class BatcherTest {
 		Map<String, String> sprotBlastDb = (Map<String, String>) ((Map<String, Object>) batchYml
 				.get(Settings.BLAST_DBS_KEY)).get("swissprot");
 		assertEquals("100", sprotBlastDb.get(Settings.BLAST_DB_WEIGHT_KEY));
-		assertEquals("./test/resources/blacklist_descline.txt",
-				sprotBlastDb.get(Settings.BLAST_BLACKLIST_KEY));
 		assertEquals("./test/resources/filter_descline_sprot.txt",
 				sprotBlastDb.get(Settings.BLAST_FILTER_KEY));
-		assertEquals("./test/resources/blacklist_token.txt",
-				sprotBlastDb.get(Settings.TOKEN_BLACKLIST_KEY));
 		assertEquals("./test/resources/sprot_blast_results/batch001.pairwise",
 				sprotBlastDb.get(Settings.BLAST_RESULT_FILE_KEY));
 		assertEquals("./test/resources/swissprot_blast_db.fasta",
 				sprotBlastDb.get(Settings.BLAST_DATABASE_KEY));
+		// Gene-Ontology:
+		assertEquals("./test/resources/gene_ontology_references/batch001.csv",
+				sprotBlastDb.get(Settings.GENE_ONTOLOGY_REFERENCE_KEY).toString());
 		// Verify, that optional FASTA_HEADER_REGEX parameters are also passed
 		// on:
 		assertEquals(
@@ -90,9 +89,6 @@ public class BatcherTest {
 				batchYml.get(Settings.INTERPRO_DATABASE_KEY).toString());
 		assertEquals("./test/resources/interpro_results/batch001.raw", batchYml
 				.get(Settings.INTERPRO_RESULT_KEY).toString());
-		// Gene-Ontology:
-		assertEquals("./test/resources/gene_ontology_results/batch001.csv",
-				batchYml.get(Settings.GENE_ONTOLOGY_RESULT_KEY).toString());
 		// Test Output-File:
 		assertEquals("./test/resources/batch001_ahrd_out.csv",
 				batchYml.get(Settings.OUTPUT_KEY));

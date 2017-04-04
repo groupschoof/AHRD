@@ -194,15 +194,19 @@ token_score_overlap_score_weight: 0.0</pre>
 
 h3. 2.6 Parameter Optimization
 
-If you have well annotated reference proteins (at least 1000) from an organism closely related to the proteins you want to annotate, you can optimize AHRD's parameters to reproduce protein function predictions more alike to your references. In order to do so you need to start a simulated annealing approach:
+If you have a ground truth of well annotated proteins (at least 1000) from an organism closely related to the proteins you want to annotate, you can optimize AHRD's parameters to reproduce protein function predictions more alike to your ground truth.
+ 
+In order to do so you either need to start a simulated annealing approach:
+<pre>java -cp dist/ahrd.jar ahrd.controller.SimulatedAnnealingTrainer trainer_example_input.yml</pre>
 
-<pre>java -cp dist/ahrd.jar ahrd.controller.Trainer trainer_example_input.yml</pre>
+Or better start a genetic algorithm approach:
+<pre>java -cp dist/ahrd.jar ahrd.controller.GeneticTrainer trainer_example_input.yml</pre>
 
 _Note:_ See @./test/resources/trainer_example_input.yml@ for details.
 
 Basically the input file is almost identical to the standard AHRD run. Only the following additional parameters are available; all numeric values given show the _default_ used for the respective parameter:
 
-# @references_fasta: path_to_your_references.fasta@  _Required_ parameter pointing to the fasta formatted file containing the reference proteins _including_ the reference Human Readable Descriptions. (See @./test/resources/references.fasta@ for details.) 
+# @ground_truth_fasta: path_to_your_ground_truth.fasta@  _Required_ parameter pointing to the fasta formatted file containing the ground truth proteins _including_ the ground truth Human Readable Descriptions. (See @./test/resources/ground_truth.fasta@ for details.) 
 # @path_log: your_log_file.tsv@  Stores the parameters evaluated in any optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set. 
 # @temperature: 75000@  Temperature used in _simulated annealing_ 
 # @cool_down_by: 1@  Dimish temperature by this value after each simulated annealing iteration 
@@ -310,7 +314,7 @@ h4. 3.3.2 Parameters controlling Gene Ontology term annotations
 
 AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA files to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @goa_uniprot_all.gpa.gz@ (last visit June 22nd 2016)
 
-To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter @gene_ontology_result@. See example file @./test/resources/ahrd_input_seq_sim_table_go_prediction.yml@ for more details.
+To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter @gene_ontology_reference@. See example file @./test/resources/ahrd_input_seq_sim_table_go_prediction.yml@ for more details.
 
 h5. 3.3.2.0 Prefer reference proteins as candidates that have GO Term annotations
 
@@ -320,7 +324,7 @@ h5. 3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
 
 Unfortunately UniprotKB GOA files use short protein accessions like @W9QFR0@, while the UniprotKB FASTA databases use the long protein accessions with pipes like this @tr|W9QFR0|W9QFR0_9ROSA@. In order to enable AHRD to match the correct short and long accessions, and thus the database GO annotations it uses regular expressions to parse both the long accessions and the GOA files. By default AHRD is setup to handle Uniprot formats, but you can provide custom regular expressions for your own custom GOA files:
 
-# Set the regular expression to extract short protein accessions mapped to GO terms from the database GOA using @database_go_regex@, e.g. @database_go_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})@
+# Set the regular expression to extract short protein accessions mapped to GO terms from the database GOA using @gene_ontology_reference_regex@, e.g. @gene_ontology_reference_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})@
 # Set the Blast database specific regular expression, used to extract the short accessions from long ones with @short_accession_regex:@ For example for TAIR10, use @short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"@.
 
 _Note:_ You must provide the above named match groups @shortAccession@ and @goTerm@, respectively.

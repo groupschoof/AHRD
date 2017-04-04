@@ -70,8 +70,8 @@ public class Evaluator extends AHRD {
 					if (bestBlastResult != null) {
 						for (String blastDb : bestBlastResult.keySet()) {
 						String bestBlastResultShortAccession = bestBlastResult.get(blastDb).getShortAccession();
-							if (getDatabaseGoAnnotations().containsKey(bestBlastResultShortAccession)) {
-								for (String termAcc : getDatabaseGoAnnotations().get(bestBlastResultShortAccession)) {
+							if (getGoAnnotationReference().containsKey(bestBlastResultShortAccession)) {
+								for (String termAcc : getGoAnnotationReference().get(bestBlastResultShortAccession)) {
 									GOterm term = goDB.get(termAcc);
 									if (term == null) {
 										throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
@@ -89,8 +89,8 @@ public class Evaluator extends AHRD {
 					for (List<BlastResult> blastDbResults : prot.getBlastResults().values()) {
 						for (BlastResult br : blastDbResults) {
 							String blastResultShortAccession = br.getShortAccession();
-							if (getDatabaseGoAnnotations().containsKey(blastResultShortAccession)) {
-								for (String termAcc : getDatabaseGoAnnotations().get(blastResultShortAccession)) {
+							if (getGoAnnotationReference().containsKey(blastResultShortAccession)) {
+								for (String termAcc : getGoAnnotationReference().get(blastResultShortAccession)) {
 									GOterm term = goDB.get(termAcc);
 									if (term == null) {
 										throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");

@@ -52,7 +52,7 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_BLACKLIST_KEY = "token_blacklist";
 	public static final String INTERPRO_DATABASE_KEY = "interpro_database";
 	public static final String INTERPRO_RESULT_KEY = "interpro_result";
-	public static final String GENE_ONTOLOGY_RESULT_KEY = "gene_ontology_result";
+	public static final String GENE_ONTOLOGY_REFERENCE_KEY = "gene_ontology_reference";
 	public static final String OUTPUT_KEY = "output";
 	public static final String SIMULATED_ANNEALING_PATH_LOG_KEY = "path_log";
 	public static final String WRITE_SCORES_TO_OUTPUT = "write_scores_to_output";
@@ -93,8 +93,8 @@ public class Settings implements Cloneable {
 			.compile("^>(?<accession>\\S+)\\s+(?<description>.+?)\\s+(((OS|os)=.+)|((GN|gn)=.+))?$");
 	public static final String SHORT_ACCESSION_REGEX_KEY = "short_accession_regex";
 	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
-	public static final String DATABASE_GO_REGEX_KEY = "database_go_regex";
-	public static final Pattern DEFAULT_DATABASE_GO_REGEX = Pattern
+	public static final String GENE_ONTOLOGY_REFERENCE_REGEX_KEY = "gene_ontology_reference_regex";
+	public static final Pattern DEFAULT_GENE_ONTOLOGY_REFERENCE_REGEX = Pattern
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_ONLY_VALID_TOKENS_KEY = "evaluate_only_valid_tokens";
@@ -691,15 +691,15 @@ public class Settings implements Cloneable {
 		this.pathToInterproResults = pathToInterproResults;
 	}
 
-	public String getPathToGeneOntologyResults(String blastDatabaseName) {
-		return getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_RESULT_KEY);
+	public String getPathToGeneOntologyReference(String blastDatabaseName) {
+		return getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_KEY);
 	}
 
 	public boolean hasGeneOntologyAnnotations() {
 		boolean result = false;
 		for (String blastDatabaseName : getBlastDatabases()) {
-			if (getPathToGeneOntologyResults(blastDatabaseName) != null
-					&& new File(getPathToGeneOntologyResults(blastDatabaseName)).exists()) {
+			if (getPathToGeneOntologyReference(blastDatabaseName) != null
+					&& new File(getPathToGeneOntologyReference(blastDatabaseName)).exists()) {
 				result = true;
 			}
 		}
@@ -707,20 +707,20 @@ public class Settings implements Cloneable {
 	}
 
 	public boolean hasGeneOntologyAnnotation(String blastDatabaseName) {
-		if (getPathToGeneOntologyResults(blastDatabaseName) != null
-				&& new File(getPathToGeneOntologyResults(blastDatabaseName)).exists()) {
+		if (getPathToGeneOntologyReference(blastDatabaseName) != null
+				&& new File(getPathToGeneOntologyReference(blastDatabaseName)).exists()) {
 			return true;
 		}
 		return false;
 	}
 
-	public void setPathToGeneOntologyResult(String blastDatabaseName, String path) {
-		getBlastDbSettings(blastDatabaseName).put(GENE_ONTOLOGY_RESULT_KEY, path);
+	public void setPathToGeneOntologyReference(String blastDatabaseName, String path) {
+		getBlastDbSettings(blastDatabaseName).put(GENE_ONTOLOGY_REFERENCE_KEY, path);
 	}
 
-	public void removeAllPathToGeneOntologyResults() {
+	public void removeAllPathToGeneOntologyReferemces() {
 		for (String blastDatabaseName : getBlastDatabases()) {
-			getBlastDbSettings(blastDatabaseName).remove(GENE_ONTOLOGY_RESULT_KEY);
+			getBlastDbSettings(blastDatabaseName).remove(GENE_ONTOLOGY_REFERENCE_KEY);
 		}
 	}
 
@@ -1000,16 +1000,16 @@ public class Settings implements Cloneable {
 
 	/**
 	 * Either returns the custom regular expression pattern used to parse the
-	 * provided database Gene Ontology annotions (GOA) or returns the default
+	 * provided Gene Ontology annotion (GOA) reference or returns the default
 	 * pattern designed to work for UniprotKB GOA files.
 	 * 
 	 * @return Pattern
 	 */
-	public Pattern getDatabaseGoRegex(String blastDatabaseName) {
-		if (getBlastDbSettings(blastDatabaseName).get(DATABASE_GO_REGEX_KEY) != null) {
-			return Pattern.compile(getBlastDbSettings(blastDatabaseName).get(DATABASE_GO_REGEX_KEY).toString());
+	public Pattern getGoReferenceRegex(String blastDatabaseName) {
+		if (getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_REGEX_KEY) != null) {
+			return Pattern.compile(getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_REGEX_KEY).toString());
 		}
-		return DEFAULT_DATABASE_GO_REGEX;
+		return DEFAULT_GENE_ONTOLOGY_REFERENCE_REGEX;
 	}
 
 	public Boolean getPreferReferenceWithGoAnnos() {

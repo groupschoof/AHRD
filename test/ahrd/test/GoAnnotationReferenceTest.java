@@ -23,7 +23,7 @@ import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.Protein;
 
-public class DatabaseGoAnnotationsTest {
+public class GoAnnotationReferenceTest {
 
 	private AHRD ahrd;
 
@@ -37,11 +37,11 @@ public class DatabaseGoAnnotationsTest {
 	public void testHasGeneOntologyAnnotations() {
 		// Should have GO-Annotations with default test-Settings:
 		assertTrue(getSettings().hasGeneOntologyAnnotations());
-		getSettings().removeAllPathToGeneOntologyResults();
+		getSettings().removeAllPathToGeneOntologyReferemces();
 		assertTrue(!getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyResult("swissprot","/not/existing/path.raw");
+		getSettings().setPathToGeneOntologyReference("swissprot","/not/existing/path.raw");
 		assertTrue(!getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
+		getSettings().setPathToGeneOntologyReference("swissprot","./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt");
 		assertTrue(getSettings().hasGeneOntologyAnnotations());
 	}
 
@@ -66,14 +66,14 @@ public class DatabaseGoAnnotationsTest {
 	}
 
 	@Test
-	public void testParseDatabaseGoAnnotations() throws IOException,
+	public void testParseGoAnnotationReference() throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
 			ParsingException {
 		ahrd.setup(false);
-		assertNotNull(ahrd.getDatabaseGoAnnotations());
-		assertTrue(!ahrd.getDatabaseGoAnnotations().isEmpty());
-		assertEquals(4, ahrd.getDatabaseGoAnnotations().size());
-		Set<String> dbGos = ahrd.getDatabaseGoAnnotations()
+		assertNotNull(ahrd.getGoAnnotationReference());
+		assertTrue(!ahrd.getGoAnnotationReference().isEmpty());
+		assertEquals(4, ahrd.getGoAnnotationReference().size());
+		Set<String> dbGos = ahrd.getGoAnnotationReference()
 				.get("AT1G01040");
 		assertTrue(dbGos.contains("GO:0005634"));
 		assertTrue(dbGos.contains("GO:0008026"));

@@ -11,21 +11,18 @@ f_measure_beta_parameter: 1.0
 token_score_bit_score_weight: 0.468
 token_score_database_score_weight: 0.2098
 token_score_overlap_score_weight: 0.3221
+blacklist: ./test/resources/blacklist_descline.txt
+token_blacklist: ./test/resources/blacklist_token.txt
 blast_dbs:
   swissprot:
     weight: 653
     description_score_bit_score_weight: 2.717061
     file: ./test/resources/swissprot_blast8_tabular.txt
     database: ./test/resources/swissprot_blast_db.fasta
-    blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_sprot.txt
-    token_blacklist: ./test/resources/blacklist_token.txt
-
   trembl:
     weight: 904
     description_score_bit_score_weight: 2.590211
     file: ./test/resources/trembl_blast8_tabular.txt
     database: ./test/resources/trembl_blast_db.fasta
-    blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_trembl.txt
-    token_blacklist: ./test/resources/blacklist_token.txt

@@ -9,14 +9,15 @@ token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
 no_start_positions_in_parameter_space: 10
 
+blacklist: ./test/resources/blacklist_descline.txt
+token_blacklist: ./test/resources/blacklist_token.txt
+
 blast_dbs:
   swissprot:
     dir: ./test/resources/sprot_blast_results
     database: ./test/resources/swissprot_blast_db.fasta
     weight: 100
-    blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_sprot.txt
-    token_blacklist: ./test/resources/blacklist_token.txt
     description_score_bit_score_weight: 0.2
 
   tair:
@@ -24,24 +25,20 @@ blast_dbs:
     database: ./test/resources/tair_blast_db.fasta
     fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
     weight: 50
-    blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_tair.txt
-    token_blacklist: ./test/resources/blacklist_token.txt
     description_score_bit_score_weight: 0.4
 
   trembl:
     dir: ./test/resources/trembl_blast_results
     database: ./test/resources/trembl_blast_db.fasta
     weight: 10
-    blacklist: ./test/resources/blacklist_descline.txt
     filter: ./test/resources/filter_descline_trembl.txt
-    token_blacklist: ./test/resources/blacklist_token.txt
     description_score_bit_score_weight: 0.4
 
 interpro_results_dir: ./test/resources/interpro_results
 interpro_database: ./test/resources/interpro_31.xml
 write_token_set_to_output: false
 write_best_blast_hits_to_output: false
-gene_ontology_results_dir: ./test/resources/gene_ontology_results
+gene_ontology_reference_dir: ./test/resources/gene_ontology_references
 find_highest_possible_evaluation_score: true
 output_dir: ./test/resources/

@@ -35,5 +35,5 @@ blast_dbs:
 
 interpro_results_dir: ./test/resources/interpro_results
 interpro_database: ./test/resources/interpro_31.xml
-gene_ontology_results_dir: ./test/resources/gene_ontology_results
+gene_ontology_reference_dir: ./test/resources/gene_ontology_references
 output_dir: ./test/resources/

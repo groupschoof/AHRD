@@ -69,12 +69,8 @@ public class TrainerBatcherTest {
 				"Blast-Database-Weight of swissprot is null or empty String!",
 				assertNotNullAndNotEmpty(sprotBlastDb
 						.get(Settings.BLAST_DB_WEIGHT_KEY)));
-		assertEquals("./test/resources/blacklist_descline.txt",
-				sprotBlastDb.get(Settings.BLAST_BLACKLIST_KEY));
 		assertEquals("./test/resources/filter_descline_sprot.txt",
 				sprotBlastDb.get(Settings.BLAST_FILTER_KEY));
-		assertEquals("./test/resources/blacklist_token.txt",
-				sprotBlastDb.get(Settings.TOKEN_BLACKLIST_KEY));
 		assertEquals("./test/resources/swissprot_blast8_tabular.txt",
 				sprotBlastDb.get(Settings.BLAST_RESULT_FILE_KEY));
 		// Interpro:
@@ -83,8 +79,8 @@ public class TrainerBatcherTest {
 		assertEquals("./test/resources/interpro_result.raw",
 				batchYml.get(Settings.INTERPRO_RESULT_KEY).toString());
 		// Gene-Ontology:
-		assertEquals("./test/resources/go_results.csv",
-				batchYml.get(Settings.GENE_ONTOLOGY_RESULT_KEY).toString());
+		assertEquals("./test/resources/go_references.csv",
+				batchYml.get(Settings.GENE_ONTOLOGY_REFERENCE_KEY).toString());
 		// Test Output-File:
 		assertEquals(
 				"./test/resources/testSimAnnealBatch_ahrd_trainer_out.csv",

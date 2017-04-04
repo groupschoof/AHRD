@@ -27,8 +27,8 @@ public class Batcher {
 	public static final String BLAST_RESULTS_DIR_KEY = "dir";
 	public static final String INTERPRO_RESULTS_DIR_KEY = "interpro_results_dir";
 	public static final String INTERPRO_RESULTS_FILE_KEY = "interpro_results_file";
-	public static final String GENE_ONTOLOGY_RESULTS_DIR_KEY = "gene_ontology_results_dir";
-	public static final String GENE_ONTOLOGY_RESULTS_FILE_KEY = "gene_ontology_results_file";
+	public static final String GENE_ONTOLOGY_REFERENCE_DIR_KEY = "gene_ontology_reference_dir";
+	public static final String GENE_ONTOLOGY_REFERENCE_FILE_KEY = "gene_ontology_reference_file";
 	public static final String BATCH_YMLS_DIR_KEY = "batch_ymls_dir";
 	public static final String OUTPUT_DIR_KEY = "output_dir";
 	public static final String SHELL_SCRIPT_KEY = "shell_script";
@@ -162,12 +162,16 @@ public class Batcher {
 			Map<String, String> blastDbYml = new HashMap<String, String>();
 			blastDbYml.put(Settings.BLAST_DB_WEIGHT_KEY,
 					inputBlastDb.get(Settings.BLAST_DB_WEIGHT_KEY));
-			blastDbYml.put(Settings.BLAST_BLACKLIST_KEY,
-					inputBlastDb.get(Settings.BLAST_BLACKLIST_KEY));
+			if (inputBlastDb.get(Settings.BLAST_BLACKLIST_KEY) != null) {
+				blastDbYml.put(Settings.BLAST_BLACKLIST_KEY,
+						inputBlastDb.get(Settings.BLAST_BLACKLIST_KEY));
+			}
 			blastDbYml.put(Settings.BLAST_FILTER_KEY,
 					inputBlastDb.get(Settings.BLAST_FILTER_KEY));
-			blastDbYml.put(Settings.TOKEN_BLACKLIST_KEY,
-					inputBlastDb.get(Settings.TOKEN_BLACKLIST_KEY));
+			if (inputBlastDb.get(Settings.TOKEN_BLACKLIST_KEY) != null) {
+				blastDbYml.put(Settings.TOKEN_BLACKLIST_KEY,
+						inputBlastDb.get(Settings.TOKEN_BLACKLIST_KEY));
+			}
 			// Blast database in FASTA format to be parsed for Hit sequence
 			// lengths and Hit Human Readable Descriptions:
 			blastDbYml.put(Settings.BLAST_DATABASE_KEY,
@@ -188,6 +192,21 @@ public class Batcher {
 									inputBlastDb.get(BLAST_RESULTS_DIR_KEY),
 									batchName));
 			blast_dbs.put(blastDbName, blastDbYml);
+			// Gene-Ontology-Reference, if given:
+			if (getInput().get(GENE_ONTOLOGY_REFERENCE_DIR_KEY) != null
+					&& !((String) getInput().get(GENE_ONTOLOGY_REFERENCE_DIR_KEY)).equals("")) {
+				blastDbYml.put(
+						Settings.GENE_ONTOLOGY_REFERENCE_KEY,
+						findFileInDirectory(getInput().get(GENE_ONTOLOGY_REFERENCE_DIR_KEY).toString(),	batchName));
+			} else if (inputBlastDb.get(GENE_ONTOLOGY_REFERENCE_FILE_KEY) != null
+					&& !((String) inputBlastDb.get(GENE_ONTOLOGY_REFERENCE_FILE_KEY)).equals("")) {
+				blastDbYml.put(
+						Settings.GENE_ONTOLOGY_REFERENCE_KEY,
+						(String) inputBlastDb.get(GENE_ONTOLOGY_REFERENCE_FILE_KEY));
+			} else {
+				throw new IllegalArgumentException("Missing either " + GENE_ONTOLOGY_REFERENCE_DIR_KEY
+						+ " or " + GENE_ONTOLOGY_REFERENCE_FILE_KEY + " of " + blastDbName + " in batcher_input.yml");
+			}
 		}
 		batchYml.put(Settings.BLAST_DBS_KEY, blast_dbs);
 
@@ -203,15 +222,15 @@ public class Batcher {
 							INTERPRO_RESULTS_FILE_KEY));
 		}
 
-		// Gene-Ontology-Result, if given:
-		if (getInput().get(GENE_ONTOLOGY_RESULTS_DIR_KEY) != null
-				|| getInput().get(GENE_ONTOLOGY_RESULTS_FILE_KEY) != null) {
-			batchYml.put(
-					Settings.GENE_ONTOLOGY_RESULT_KEY,
-					generatePathToFile(batchName,
-							GENE_ONTOLOGY_RESULTS_DIR_KEY,
-							GENE_ONTOLOGY_RESULTS_FILE_KEY));
-		}
+//		// Gene-Ontology-Reference, if given:
+//		if (getInput().get(GENE_ONTOLOGY_REFERENCE_DIR_KEY) != null
+//				|| getInput().get(GENE_ONTOLOGY_REFERENCE_FILE_KEY) != null) {
+//			batchYml.put(
+//					Settings.GENE_ONTOLOGY_REFERENCE_KEY,
+//					generatePathToFile(batchName,
+//							GENE_ONTOLOGY_REFERENCE_DIR_KEY,
+//							GENE_ONTOLOGY_REFERENCE_FILE_KEY));
+//		}
 
 		// Output-File:
 		String outputDir = getInput().get(OUTPUT_DIR_KEY).toString();

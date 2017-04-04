@@ -329,7 +329,7 @@ public class EvaluationScoreCalculatorTest {
 
 	@Test
 	public void testCalcSimpleGoAnnotationScore() {
-		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
+		getSettings().setPathToGeneOntologyReference("swissprot","./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt");
 		getSettings().setPathToGroundTruthGoAnnotations("./test/resources/sprot_GO_ground_truth.goa");
 		getSettings().setCalculateSimpleGoF1Scores(true);
 		Protein p = TestUtils.mockProtein();
@@ -373,7 +373,7 @@ public class EvaluationScoreCalculatorTest {
 	
 	@Test
 	public void testCalcAncestryGoAnnotationScore() {
-		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
+		getSettings().setPathToGeneOntologyReference("swissprot","./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt");
 		getSettings().setPathToGroundTruthGoAnnotations("./test/resources/sprot_GO_ground_truth.goa");
 		getSettings().setCalculateAncestryGoF1Scores(true);
 		Protein p = TestUtils.mockProtein();
@@ -416,7 +416,7 @@ public class EvaluationScoreCalculatorTest {
 	}
 	@Test
 	public void testCalcSemSimGoAnnotationScore() {
-		getSettings().setPathToGeneOntologyResult("swissprot","./test/resources/database_gene_ontology_annotations_uniprotKB_GOA.txt");
+		getSettings().setPathToGeneOntologyReference("swissprot","./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt");
 		getSettings().setPathToGroundTruthGoAnnotations("./test/resources/sprot_GO_ground_truth.goa");
 		getSettings().setCalculateSemSimGoF1Scores(true);
 		Protein p = TestUtils.mockProtein();

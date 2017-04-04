@@ -27,7 +27,7 @@ blast_dbs:
 
 interpro_database: ./test/resources/interpro_31.xml
 interpro_result: ./test/resources/empty_file.txt
-gene_ontology_result: ./test/resources/empty_file.txt
+gene_ontology_reference: ./test/resources/empty_file.txt
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2

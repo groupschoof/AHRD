@@ -2,7 +2,7 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Settings.setSettings;
-import static ahrd.model.DatabaseGoAnnotations.parseDatabaseGoAnnotations;
+import static ahrd.model.GoAnnotationReference.parseGoAnnotationReference;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -37,7 +37,7 @@ public class AHRD {
 
 	private Map<String, Protein> proteins;
 	private Map<String, Double> descriptionScoreBitScoreWeights = new HashMap<String, Double>();
-	private Map<String, Set<String>> databaseGoAnnotations;
+	private Map<String, Set<String>> goAnnotationReference;
 	private Set<String> uniqueBlastResultShortAccessions;
 	private long timestamp;
 	private long memorystamp;
@@ -105,7 +105,7 @@ public class AHRD {
 	 * Constructor initializes this run's settings as a thread-local variable.
 	 * Also conditionally initializes fields
 	 * <code>uniqueBlastResultShortAccessions</code> and
-	 * <code>databaseGoAnnotations</code> required only if AHRD is requested to
+	 * <code>goAnnotationReference</code> required only if AHRD is requested to
 	 * generate Gene Ontology term annotations.
 	 * 
 	 * @param pathToYmlInput
@@ -118,7 +118,7 @@ public class AHRD {
 		// Gene Ontology term annotations:
 		if (getSettings().hasGeneOntologyAnnotations()) {
 			this.setUniqueBlastResultShortAccessions(new HashSet<String>());
-			this.setDatabaseGoAnnotations(new HashMap<String, Set<String>>());
+			this.setGoAnnotationReference(new HashMap<String, Set<String>>());
 		}
 	}
 
@@ -155,9 +155,9 @@ public class AHRD {
 	 * 
 	 * @throws IOException
 	 */
-	public void setUpDatabaseGoAnnotations() throws IOException {
+	public void setUpGoAnnotationReference() throws IOException {
 		if (getSettings().hasGeneOntologyAnnotations()) {
-			setDatabaseGoAnnotations(parseDatabaseGoAnnotations(getUniqueBlastResultShortAccessions()));
+			setGoAnnotationReference(parseGoAnnotationReference(getUniqueBlastResultShortAccessions()));
 		}
 	}
 
@@ -196,10 +196,10 @@ public class AHRD {
 			System.out.println("...parsed blast results in " + takeTime() + "sec, currently occupying "
 					+ takeMemoryUsage() + " MB");
 
-		// Database GO Annotations (for Proteins in the searched Blast Databases)
-		setUpDatabaseGoAnnotations();
+		// GO Annotation Reference (for Proteins in the searched Blast Databases)
+		setUpGoAnnotationReference();
 		if (writeLogMsgs) {
-			System.out.println("...parsed database Gene Ontology Annotations (GOA) in " + takeTime()
+			System.out.println("...parsed Gene Ontology Annotation (GOA) Reference in " + takeTime()
 					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
 		}
 
@@ -235,13 +235,13 @@ public class AHRD {
 			// currentScore - (Token-High-Score / 2)
 			prot.getTokenScoreCalculator().filterTokenScores();
 			// Find the highest scoring Blast-Result:
-			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult(this.getDatabaseGoAnnotations());
+			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult(this.getGoAnnotationReference());
 			// If AHRD is requested to annotate Gene Ontology Terms, do so:
 			if (getSettings().hasGeneOntologyAnnotations()
 					&& prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null
-					&& getDatabaseGoAnnotations().containsKey(
+					&& getGoAnnotationReference().containsKey(
 							prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession())) {
-				prot.setGoResults(getDatabaseGoAnnotations()
+				prot.setGoResults(getGoAnnotationReference()
 						.get(prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession()));
 			} else {
 				prot.setGoResults(new HashSet<String>());
@@ -319,12 +319,12 @@ public class AHRD {
 		this.descriptionScoreBitScoreWeights = descriptionScoreBitScoreWeights;
 	}
 
-	public Map<String, Set<String>> getDatabaseGoAnnotations() {
-		return databaseGoAnnotations;
+	public Map<String, Set<String>> getGoAnnotationReference() {
+		return goAnnotationReference;
 	}
 
-	public void setDatabaseGoAnnotations(Map<String, Set<String>> databaseGoAnnotations) {
-		this.databaseGoAnnotations = databaseGoAnnotations;
+	public void setGoAnnotationReference(Map<String, Set<String>> goaReference) {
+		this.goAnnotationReference = goaReference;
 	}
 
 	public Set<String> getUniqueBlastResultShortAccessions() {

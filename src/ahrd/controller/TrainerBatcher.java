@@ -141,9 +141,9 @@ public class TrainerBatcher extends Batcher {
 		batchYml.put(Settings.INTERPRO_RESULT_KEY,
 				getInput().get(Settings.INTERPRO_RESULT_KEY));
 
-		// Gene-Ontology-Result:
-		batchYml.put(Settings.GENE_ONTOLOGY_RESULT_KEY,
-				getInput().get(Settings.GENE_ONTOLOGY_RESULT_KEY));
+		// Gene-Ontology-Reference:
+		batchYml.put(Settings.GENE_ONTOLOGY_REFERENCE_KEY,
+				getInput().get(Settings.GENE_ONTOLOGY_REFERENCE_KEY));
 
 		// Output-File and Log of simulated annealing's path through parameter-
 		// and score-space:
