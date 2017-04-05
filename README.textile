@@ -21,9 +21,11 @@ h2. Table of contents
 ### "Tab-Delimited Table":#241-tab-delimited-table
 ### "Fasta-Format":#242-fasta-format
 ## "AHRD run using BLASTX results":#25-ahrd-run-using-blastx-results
-## "Parameter Optimization":#26-parameter-optimization
-### "Optimization in parallel (Trainer-Batcher)":#261-optimization-in-parallel-(trainer-batcher)
-## "Computing F-Scores for selected parameter sets (AHRD-Evaluator)":#27-computing-f-scores-for-selected-parameter-sets-(ahrd-evaluator)
+## "Computing F-Scores for selected parameter sets (AHRD-Evaluator)":#26-computing-f-scores-for-selected-parameter-sets-(ahrd-evaluator)
+## "Parameter Optimization":#27-parameter-optimization
+### "Parameter Optimization via Genetic Algorithm:#271-parameter-optimization-via-genetic-algorithm
+### "Parameter Optimization via Simulated Annealing:#272-parameter-optimization-via-simulated-annealing
+### "Optimization in parallel (Trainer-Batcher)":#273-optimization-in-parallel-(trainer-batcher)
 # "Algorithm":#3-algorithm
 ## "Pseudo-Code":#31-pseudo-code
 ## "Used Formulae and Parameters":#32-used-formulae-and-parameters
@@ -192,7 +194,30 @@ Since the algorithm is based on protein sequences and the BLASTX searches are ba
 token_score_database_score_weight: 0.4
 token_score_overlap_score_weight: 0.0</pre>
 
-h3. 2.6 Parameter Optimization
+h3. 2.6 Computing F-Scores for selected parameter sets (AHRD-Evaluator)
+
+Having different parameter sets AHRD enables you to compute their performance in terms of F-Scores for each protein in comparison to a ground truth. Optionally you can also revise the theorectically maximum attainable F-Score and see how well the best Hits from each sequence similarity search perform. In order to do so, use the Evaluator function:
+
+<pre>java -cp ./dist/ahrd.jar ahrd.controller.Evaluator evaluator_example.yml</pre> 
+
+See @./test/resources/evaluator_example.yml@ for more details.
+
+Parameters specific to the Evaluator function are:
+# @ground_truth_fasta: path_to_your_ground_truth.fasta@  _Required_ parameter pointing to the fasta formatted file containing the ground truth proteins _including_ the ground truth Human Readable Descriptions. (See @./test/resources/ground_truth.fasta@ for details.)
+# @ground_truth_go_annotations: path_to_your_ground_truth_go_annotations.goa@ Enables the calculation of F-scores based on the comparison of AHRD-annotated Gene Ontology term versus a ground truth of Genen Ontotoly annotations (goa file). The ground truth annotations have to be provided in tab delimited file containing only two columns (1: short protein accession, 2: GO-term accession). The goa file should not contain column names and every provided protein short accession has to be present in the @proteins_fasta@ file. 
+# @find_highest_possible_evaluation_score: false@ Set to @true@ if you want to see how the best fitting candidate description among the sequence similarity search hits performs. This gives you the theoretical best possible performance that can be achieved with the provided sequence similarity search results. In addition to the F-score itself the accession and description of the best performing candidate protein is written to the output as well. 
+# @find_highest_possible_go_score: false:@ Set to @true@ to include the F-scores of the best fitting candidate Gene Ontology annotations from the sequence similarity search results.
+# @write_scores_to_output: false@ Set to @true@ if you want to see all internal intermediate scores: Token-Scores, Lexical-Scores, and Description-Scores. Use with extreme caution, because this option is meant for developers _only_.
+# @write_best_blast_hits_to_output: false@ Set to @true@ if you want to see the respective best sequence similarity search Hits and their performances.
+# @f_measure_beta_parameter: 1.0@ This parameter is also used by AHRD-Trainer. See section "2.7":#27-parameter-optimization for details.
+# @write_fscore_details_to_output: false@ Set to @true@ to add Precision (ie. positive predictive value) and Recall (ie. true positive rate) to the output of all F-Scores.
+# @simple_GO_f1_scores: false@ Set to @true@ to enable the calculation and output of an F-score based on 'simple' cardinality of Gene Ontology annotations in comparison to the @ground_truth_go_annotations@. If the evaluation of Genen Ontoloy annotations is triggered because @ground_truth_go_annotations@ are supplied and none of the other go-based scores (@ancestry_GO_f1_scores@ or @semsim_GO_f1_scores@) are set to @true@, @simple_GO_f1_scores@ will be set to @true@ automatically (if not explicitly set to @false@).    
+# @ancestry_GO_f1_scores: false@ Set to @true@ to obtain an F-score based on the cardinality of Gene Ontology annotations extended by their ancestry (Adds all term down towards the ontologies root).  
+# @semsim_GO_f1_scores: false@ Set to @true@ to calculate an F-score based on the semantic similarity between the Gene Ontology annotation AHRD made and the ground truth GO annotation. The semantic similarity of GO term sets is derived from their individual information content which in turn is calculated based on the term annotation frequencies in Swiss Prot.  
+  
+
+
+h3. 2.7 Parameter Optimization
 
 If you have a ground truth of well annotated proteins (at least 1000) from an organism closely related to the proteins you want to annotate, you can optimize AHRD's parameters to reproduce protein function predictions more alike to your ground truth.
 
@@ -202,13 +227,13 @@ Two approaches for parameter optimization can be chosen from:
 
 Basically the input file is almost identical to the standard AHRD run. The following additional parameters are available to modify the behavior of _both_ approaches; all numeric values given show the _default_ used for the respective parameter:
 
-# @ground_truth_fasta: path_to_your_ground_truth.fasta@  _Required_ parameter pointing to the fasta formatted file containing the ground truth proteins _including_ the ground truth Human Readable Descriptions. (See @./test/resources/ground_truth.fasta@ for details.)
+
 # @path_log: your_log_file.tsv@ For the genetic algorithm: Stores the best parameters the evaluation found in each successive generation, their F1-Score, the difference in score to the best of the last generation and the method leading the particular parameter set (<b>random</b>ly generated, <b>mutation</b> of a parameter set, <b>recombination</b> of two parameter sets, <b>seed</b> parameter set the algorithm was started with). For the simmulated annealing: Stores the parameters evaluated in any optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set.
 # @f_measure_beta_parameter: 1.0@ The scaling factor used to compute the F-Score of an assigned HRD when comparing it with the reference. See <a href="https://en.wikipedia.org/wiki/F1_score">Wikipedia/F1_score</a> for details.
 # @mutator_mean: 0.25@  Mutate a randomly selected parameter by value gaussian normal distributed with this mean 
 # @mutator_deviation: 0.15@  Mutate a randomly selected parameter by value gaussian normal distributed with this standard deviation 
  
-h4. 2.6.1 Parameter Optimization via Genetic Algorithm
+h4. 2.7.1 Parameter Optimization via Genetic Algorithm
 
 To start the genetic algorithm approach:
 <pre>java -cp dist/ahrd.jar ahrd.controller.GeneticTrainer trainer_example_input.yml</pre>
@@ -219,7 +244,7 @@ Parameters specific to the genetic algorithm; all numeric values given show the 
 # @number_of_generations: 100@ The number of generations the parameter populations are allowed to evolve over.
 # @population_size: 200@ The number of parameter sets in each generation.
 
-h4. 2.6.1 Parameter Optimization via Simulated Annealing
+h4. 2.7.2 Parameter Optimization via Simulated Annealing
 
 Alternatively a simulated annealing approach can be used:
 <pre>java -cp dist/ahrd.jar ahrd.controller.SimulatedAnnealingTrainer trainer_example_input.yml</pre>
@@ -231,7 +256,7 @@ _Note:_ See @./test/resources/simmulated_annealing_trainer_example_input.yml@ fo
 # @optimization_acceptance_probability_scaling_factor: 2500000000.0@  Used to scale the probability of accepting a currently evaluated parameter set. @P(Accept) := exp(-delta_scores*scaling_factor/current-temperature)@
 # @remember_simulated_annealing_path: false@  Set to @true@, if you want the optimization to remember already visited parameter sets and their performance. This increases memory usage but improves final results.  
 
-h4. 2.6.3 Optimization in parallel (Trainer-Batcher)
+h4. 2.7.3 Optimization in parallel (Trainer-Batcher)
 
 Simulated Annealing is a time and resource consuming process. Because AHRD uses quite a number of parameters, the search space is accordingly large. Hence it is recommendable to start independend simulated annealing runs in parallel. Do this using 
 
@@ -247,22 +272,7 @@ The following parameters are specific to the Trainer-Batcher:
 
 _Note_, that the Trainer-Batcher works very much like the AHRD-Batcher (section "2.3":#23-batcher). Particularly you need to respect the _batch-name requirements_ explained there.
 
-The above Trainer-Batcher example input shows how to automatically generated a desired number of input files with different starting points in parameter space. These input files can then directly be used with the above documented AHRD Trainer (section "2.6":#26-parameter-optimization). 
-
-h3. 2.7 Computing F-Scores for selected parameter sets (AHRD-Evaluator)
-
-Having different parameter sets AHRD enables you to compute their performance in terms of F-Scores for each reference protein. Optionally you can also revise the theorectically maximum attainable F-Score and see how well the best Hits from each sequence similarity search perform. In order to do so, use the Evaluator function:
-
-<pre>java -cp ./dist/ahrd.jar ahrd.controller.Evaluator .evaluator_example.yml</pre> 
-
-See @./test/resources/evaluator_example.yml@ for more details.
-
-Parameters specific to the Evaluator function are:
-
-# @find_highest_possible_evaluation_score: false@ Set to @true@ if you want to see how the best fitting candidate description among the sequence similarity search hits performs. This gives you the theoretical best possible performance.
-# @write_scores_to_output: false@ Set to @true@ if you want to see all internal intermediate scores: Token-Scores, Lexical-Scores, and Description-Scores. Use with extreme caution, because this option is meant for developers _only_.
-# @write_best_blast_hits_to_output: false@ Set to @true@ if you want to see the respective best sequence similarity search Hits and their performances.
-# @f_measure_beta_parameter: 1.0@ This parameter is also used by AHRD-Trainer. See section "2.6":#26-parameter-optimization for details.
+The above Trainer-Batcher example input shows how to automatically generated a desired number of input files with different starting points in parameter space. These input files can then directly be used with the above documented AHRD Trainer (section "2.7":#27-parameter-optimization). 
 
 h2. 3 Algorithm
 
