@@ -1,6 +1,5 @@
 proteins_fasta: ./test/resources/proteins.fasta
 ground_truth_fasta: ./test/resources/ground_truth.fasta
-ground_truth_go_annotations: ./test/resources/ground_truth_go_annotations.goa
 output: ./evaluator_output.tsv
 find_highest_possible_evaluation_score: true
 write_scores_to_output: false
@@ -18,8 +17,6 @@ blast_dbs:
     file: ./test/resources/swissprot_blast8_tabular.txt
     database: ./test/resources/swissprot_blast_db.fasta
     filter: ./test/resources/filter_descline_sprot.txt
-    gene_ontology_reference: ./test/resources/go_references.csv 
-    gene_ontology_reference_regex: "^(?<shortAccession>gene:[^\\t]+)}\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"
   trembl:
     weight: 904
     description_score_bit_score_weight: 2.590211
@@ -34,9 +31,6 @@ blast_dbs:
     fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
     short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"
     filter: ./test/resources/filter_descline_tair.txt
-    gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
-    gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"
 competitors:
   blast2go:
     descriptions: ./test/resources/blast2go_descriptions.tsv
-    go_annotations: ./test/resources/blast2go_goterms.tsv

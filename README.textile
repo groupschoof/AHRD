@@ -22,6 +22,7 @@ h2. Table of contents
 ### "Fasta-Format":#242-fasta-format
 ## "AHRD run using BLASTX results":#25-ahrd-run-using-blastx-results
 ## "Computing F-Scores for selected parameter sets (AHRD-Evaluator)":#26-computing-f-scores-for-selected-parameter-sets-(ahrd-evaluator)
+### "Computing Gene Ontology Annotation F-Scores":#261-computing-gene-ontology-annotation-f-Scores
 ## "Parameter Optimization":#27-parameter-optimization
 ### "Parameter Optimization via Genetic Algorithm:#271-parameter-optimization-via-genetic-algorithm
 ### "Parameter Optimization via Simulated Annealing:#272-parameter-optimization-via-simulated-annealing
@@ -198,24 +199,32 @@ h3. 2.6 Computing F-Scores for selected parameter sets (AHRD-Evaluator)
 
 Having different parameter sets AHRD enables you to compute their performance in terms of F-Scores for each protein in comparison to a ground truth. Optionally you can also revise the theorectically maximum attainable F-Score and see how well the best Hits from each sequence similarity search perform. In order to do so, use the Evaluator function:
 
-<pre>java -cp ./dist/ahrd.jar ahrd.controller.Evaluator evaluator_example.yml</pre> 
+<pre>java -cp ./dist/ahrd.jar ahrd.controller.Evaluator evaluator_example_hrd.yml</pre> 
 
-See @./test/resources/evaluator_example.yml@ for more details.
+See @./test/resources/evaluator_example_hrd.yml@ for more details.
 
 Parameters specific to the Evaluator function are:
 # @ground_truth_fasta: path_to_your_ground_truth.fasta@  _Required_ parameter pointing to the fasta formatted file containing the ground truth proteins _including_ the ground truth Human Readable Descriptions. (See @./test/resources/ground_truth.fasta@ for details.)
-# @ground_truth_go_annotations: path_to_your_ground_truth_go_annotations.goa@ Enables the calculation of F-scores based on the comparison of AHRD-annotated Gene Ontology term versus a ground truth of Genen Ontotoly annotations (goa file). The ground truth annotations have to be provided in tab delimited file containing only two columns (1: short protein accession, 2: GO-term accession). The goa file should not contain column names and every provided protein short accession has to be present in the @proteins_fasta@ file. 
 # @find_highest_possible_evaluation_score: false@ Set to @true@ if you want to see how the best fitting candidate description among the sequence similarity search hits performs. This gives you the theoretical best possible performance that can be achieved with the provided sequence similarity search results. In addition to the F-score itself the accession and description of the best performing candidate protein is written to the output as well. 
-# @find_highest_possible_go_score: false:@ Set to @true@ to include the F-scores of the best fitting candidate Gene Ontology annotations from the sequence similarity search results.
 # @write_scores_to_output: false@ Set to @true@ if you want to see all internal intermediate scores: Token-Scores, Lexical-Scores, and Description-Scores. Use with extreme caution, because this option is meant for developers _only_.
 # @write_best_blast_hits_to_output: false@ Set to @true@ if you want to see the respective best sequence similarity search Hits and their performances.
 # @f_measure_beta_parameter: 1.0@ This parameter is also used by AHRD-Trainer. See section "2.7":#27-parameter-optimization for details.
 # @write_fscore_details_to_output: false@ Set to @true@ to add Precision (ie. positive predictive value) and Recall (ie. true positive rate) to the output of all F-Scores.
+# @competitors:@ AHRDs' annotation performance can be compared to one or more of its competitors. Each competitor has to be given a name that will be used to identify it in the output (eg. "@blast2go:@").
+# @descriptions: path_to_competitor_descriptions.tsv@  A competitors description annotations have to be supplied in a tab delimited file of two columns (1: short protein accession, 2: description). The file should not have a column name header. Each protein accession should be present only once (one description per protein). All supplied protein accessions have to be present in the @proteins_fasta@ file too.
+  
+h4. 2.6.1 Computing Gene Ontology Annotation F-Scores
+
+In addition to description annotations, Gene Ontology term annotations can be evaluated as well. 
+
+See @./test/resources/evaluator_example_hrd_and_go.yml@ for more details.
+
+# @ground_truth_go_annotations: path_to_your_ground_truth_go_annotations.goa@ Enables the calculation of F-scores based on the comparison of AHRD-annotated Gene Ontology term versus a ground truth of Genen Ontotoly annotations (goa file). The ground truth annotations have to be provided in tab delimited file containing only two columns (1: short protein accession, 2: GO-term accession). The goa file should not contain column names and every provided protein short accession has to be present in the @proteins_fasta@ file.
+# @find_highest_possible_go_score: false:@ Set to @true@ to include the F-scores of the best fitting candidate Gene Ontology annotations from the sequence similarity search results. 
 # @simple_GO_f1_scores: false@ Set to @true@ to enable the calculation and output of an F-score based on 'simple' cardinality of Gene Ontology annotations in comparison to the @ground_truth_go_annotations@. If the evaluation of Genen Ontoloy annotations is triggered because @ground_truth_go_annotations@ are supplied and none of the other go-based scores (@ancestry_GO_f1_scores@ or @semsim_GO_f1_scores@) are set to @true@, @simple_GO_f1_scores@ will be set to @true@ automatically (if not explicitly set to @false@).    
 # @ancestry_GO_f1_scores: false@ Set to @true@ to obtain an F-score based on the cardinality of Gene Ontology annotations extended by their ancestry (Adds all term down towards the ontologies root).  
 # @semsim_GO_f1_scores: false@ Set to @true@ to calculate an F-score based on the semantic similarity between the Gene Ontology annotation AHRD made and the ground truth GO annotation. The semantic similarity of GO term sets is derived from their individual information content which in turn is calculated based on the term annotation frequencies in Swiss Prot.  
-  
-
+@go_db_path: AHRD_dir/data@ Directory to save a copy of Swiss Prot, the Gene Ontology and data derived from them. This data is stored as a serialized java object in a file named @accGoDb.ser@. If the @go_db_path@ option is unspecified the @data@ subdirectory in the AHRD directory is used. If the directory does not contain a previously created @accGoDb.ser@ file, AHRD downloads a copy of Swissprot (@uniprot_sprot.dat.gz@: 520Mb) and the Gene Ontology  (@go_daily-termdb-tables.tar.gz@: 12Mb). AHRD then derives the mapping of each Gene Ontology term to all its ancestors from the Gene Ontology and the annotation frequency of Gene Ontology terms from Swiss Prot. Once the @accGoDb.ser@ file has been created this process does only have to be repeated if the information becomes out dated and you wish to renew the file. To trigger a recalculation using newer versions of Swiss Prot or Gene Ontology simply delete the @uniprot_sprot.dat.gz@, @go_daily-termdb-tables.tar.gz@ and @accGoDb.ser@ files and run an AHRD evaluation including Gene Ontology annotations again. 
 
 h3. 2.7 Parameter Optimization
 
