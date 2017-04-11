@@ -5,36 +5,36 @@ Short descriptions in sequence databases are useful to quickly gain insight into
 ## Table of contents
 
 * [1 Getting started](#1-getting-started)
-    * [1.1 Requirements](#1-1-requirements)
-    * [1.2 Installation](#1-2-installation)
-        * [1.2.1 Get AHRD](#1-2-1-get-ahrd)
-        * [1.2.2 Build the executable jar](#1-2-2-build-the-executable-jar)
+    * [1.1 Requirements](#11-requirements)
+    * [1.2 Installation](#12-installation)
+        * [1.2.1 Get AHRD](#121-get-ahrd)
+        * [1.2.2 Build the executable jar](#122-build-the-executable-jar)
 * [2. Usage](#2-usage)
-    * [2.1 AHRD example usages](#2-1-ahrd-example-usages)
-    * [2.2 Input](#2-2-input)
-        * [2.2.1 Required input data](#2-2-1-required-input-data)
-        * [2.2.2 Optional input data](#2-2-2-optional-input-data)
-        * [2.2.3 Required config files](#2-2-3-required-config-files)
-            * [2.2.3.1 Test custom blacklists and filters](#2-2-3-1-test-custom-blacklists-and-filters)
-    * [2.3 Batcher](#2-3-batcher)
-    * [2.4. Output](#2-4-output)
-        * [2.4.1 Tab-Delimited Table](#2-4-1-tab-delimited-table)
-        * [2.4.2 Fasta-Format](#2-4-2-fasta-format)
-    * [2.5 AHRD run using BLASTX results](#2-5-ahrd-run-using-blastx-results)
-    * [2.6 Computing F-Scores for selected parameter sets (AHRD-Evaluator)](#2-6-computing-f-scores-for-selected-parameter-sets-ahrd-evaluator)
-        * [2.6.1 Computing Gene Ontology Annotation F-Scores](#2-6-1-computing-gene-ontology-annotation-f-scores)
-    * [2.7 Parameter Optimization](#2-7-parameter-optimization)
-        * [2.7.1 Parameter Optimization via Genetic Algorithm](#2-7-1-parameter-optimization-via-genetic-algorithm)
-        * [2.7.2 Parameter Optimization via Simulated Annealing](#2-7-2-parameter-optimization-via-simulated-annealing)
-        * [2.7.3 Optimization in parallel (Trainer-Batcher)](#2-7-3-optimization-in-parallel-trainer-batcher)
+    * [2.1 AHRD example usages](#21-ahrd-example-usages)
+    * [2.2 Input](#22-input)
+        * [2.2.1 Required input data](#221-required-input-data)
+        * [2.2.2 Optional input data](#222-optional-input-data)
+        * [2.2.3 Required config files](#223-required-config-files)
+            * [2.2.3.1 Test custom blacklists and filters](#2231-test-custom-blacklists-and-filters)
+    * [2.3 Batcher](#23-batcher)
+    * [2.4. Output](#24-output)
+        * [2.4.1 Tab-Delimited Table](#241-tab-delimited-table)
+        * [2.4.2 Fasta-Format](#242-fasta-format)
+    * [2.5 AHRD run using BLASTX results](#25-ahrd-run-using-blastx-results)
+    * [2.6 Computing F-Scores for selected parameter sets (AHRD-Evaluator)](#26-computing-f-scores-for-selected-parameter-sets-ahrd-evaluator)
+        * [2.6.1 Computing Gene Ontology Annotation F-Scores](#261-computing-gene-ontology-annotation-f-scores)
+    * [2.7 Parameter Optimization](#27-parameter-optimization)
+        * [2.7.1 Parameter Optimization via Genetic Algorithm](#271-parameter-optimization-via-genetic-algorithm)
+        * [2.7.2 Parameter Optimization via Simulated Annealing](#272-parameter-optimization-via-simulated-annealing)
+        * [2.7.3 Optimization in parallel (Trainer-Batcher)](#273-optimization-in-parallel-trainer-batcher)
 * [3 Algorithm](#3-algorithm)
-    * [3.1 Pseudo-Code](#3-1-pseudo-code)
-    * [3.2 Used Formulae and Parameters](#3-2-used-formulae-and-parameters)
-    * [3.3 Parameters](#3-3-parameters)
-        * [3.3.1 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)](#3-3-1-parameters-controlling-the-parsing-of-tabular-sequence-similarity-search-result-tables-legacy-blast-blast-and-blat)
-        * [3.3.2 Parameters controlling Gene Ontology term annotations](#3-3-2-parameters-controlling-gene-ontology-term-annotations)
-            * [3.3.2.1 Prefer reference proteins as candidates that have GO Term annotations](#3-3-2-1-prefer-reference-proteins-as-candidates-that-have-go-term-annotations)
-            * [3.3.2.2 Custom reference Gene Ontology annotations (non UniprotKB GOA)](#3-3-2-2-custom-reference-gene-ontology-annotations-non-uniprotkb-goa)
+    * [3.1 Pseudo-Code](#31-pseudo-code)
+    * [3.2 Used Formulae and Parameters](#32-used-formulae-and-parameters)
+    * [3.3 Parameters](#33-parameters)
+        * [3.3.1 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)](#331-parameters-controlling-the-parsing-of-tabular-sequence-similarity-search-result-tables-legacy-blast-blast-and-blat)
+        * [3.3.2 Parameters controlling Gene Ontology term annotations](#332-parameters-controlling-gene-ontology-term-annotations)
+            * [3.3.2.1 Prefer reference proteins as candidates that have GO Term annotations](#3321-prefer-reference-proteins-as-candidates-that-have-go-term-annotations)
+            * [3.3.2.2 Custom reference Gene Ontology annotations (non UniprotKB GOA)](#3322-custom-reference-gene-ontology-annotations-non-uniprotkb-goa)
 * [4 Testing](#4-testing)
 * [5 License](#5-license)
 * [6 Authors](#6-authors)
@@ -58,7 +58,7 @@ Copy (clone) AHRD to your computer using git via command-line, then change into 
             cd AHRD
             git checkout tags/v3.3.3
 
-Alternativelly without using ``git``, you can download AHRD version ``v3.3.3`` ("zip":https://github.com/groupschoof/AHRD/archive/v3.3.3.zip or "tar.gz":https://github.com/groupschoof/AHRD/archive/v3.3.3.tar.gz) and extract it.
+Alternativelly without using ``git``, you can download AHRD version ``v3.3.3`` ([zip](https://github.com/groupschoof/AHRD/archive/v3.3.3.zip) or [tar.gz](https://github.com/groupschoof/AHRD/archive/v3.3.3.tar.gz)) and extract it.
 
 #### 1.2.2 Build the executable jar
 
@@ -355,7 +355,7 @@ _NOTE:_ All above column numbers start counting with zero, i.e. the first column
 
 #### 3.3.2 Parameters controlling Gene Ontology term annotations
 
-AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file ``goa_uniprot_all.gaf.gz`` (last visit Feb 16th 2017)
+AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the [Uniprot server](http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/). To obtain GO annotations for all UniprotKB proteins download file ``goa_uniprot_all.gaf.gz`` (last visit Feb 16th 2017)
 
 To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter ``gene_ontology_reference``. See example file ``./test/resources/ahrd_input_seq_sim_table_go_prediction.yml`` for more details.
 
@@ -367,7 +367,7 @@ The parameter ``prefer_reference_with_go_annos: true`` is highly recommended whe
 
 Unfortunately UniprotKB GOA files use short protein accessions like ``W9QFR0``, while the UniprotKB FASTA databases use the long protein accessions with pipes like this ``tr|W9QFR0|W9QFR0_9ROSA``. In order to enable AHRD to match the correct short and long accessions, and thus the database GO annotations it uses regular expressions to parse both the long accessions and the GOA files. By default AHRD is setup to handle Uniprot formats, but you can provide custom regular expressions for your own custom GOA files:
 
-1. Set the regular expression to extract short protein accessions mapped to GO terms from the database GOA using ``gene_ontology_reference_regex:``. For example for TAIR10 ("ATH_GO_GOSLIM.txt":https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/ATH_GO_GOSLIM.txt.gz, use ``gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"`` (The default is: ``gene_ontology_reference_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})``)
+1. Set the regular expression to extract short protein accessions mapped to GO terms from the database GOA using ``gene_ontology_reference_regex:``. For example for TAIR10 ([ATH_GO_GOSLIM.txt](https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/ATH_GO_GOSLIM.txt.gz)), use ``gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"`` (The default is: ``gene_ontology_reference_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})``)
 1. Set the Blast database specific regular expression, used to extract the short accessions from long ones with ``short_accession_regex:`` For example for TAIR10, use ``short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"``. (The default is: ``"^[^|]+\\|(?<shortAccession>[^|]+)"``)
 
 _Note:_ You must provide the above named match groups ``shortAccession`` and ``goTerm``, respectively.
