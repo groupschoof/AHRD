@@ -55,9 +55,7 @@ AHRD is a Java-Program which requires ``Java 1.7`` or higher and ``ant``.
 Copy (clone) AHRD to your computer using git via command-line, then change into AHRD's directory, and finally use the latest stable version:
 
 <code>git clone https://github.com/groupschoof/AHRD.git
-
 cd AHRD
-
 git checkout tags/v3.3.3</code>
 
 Alternativelly without using ``git``, you can download AHRD version ``v3.3.3`` ("zip":https://github.com/groupschoof/AHRD/archive/v3.3.3.zip or "tar.gz":https://github.com/groupschoof/AHRD/archive/v3.3.3.tar.gz) and extract it.
@@ -104,9 +102,7 @@ Recommended Sequence Similarity Search:
 
 For your query proteins you should start independent BLAST searches e.g.  in the three different databases mentioned above:
 
-<code>
-blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -out query_vs_swissprot.txt
-</code>
+<code> blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -out query_vs_swissprot.txt </code>
 
 #### 2.2.2 Optional input data
 
@@ -131,9 +127,7 @@ As explained in 2.2.3 AHRD makes use of blacklists and filters provided as Java 
 Example Output for test string "activity", and regular expressions "(?i)interacting", and "(?i)activity" applied in serial:
 
 <code>[junit] activity
-
 [junit] (?i)interacting -> activity
-
 [junit] (?i)activity -> </code>
 
 The above example demonstrates how the first regular expression does not match anything in the test string "activity", but after matching it against the second regular expression nothing remains, because the matched substring has been filtered out. As you can see, this test applies all provided regular expression _in order of appearance_ and shows what _remains_ of the provided test string after filtering with the provided regular expressions.
@@ -182,9 +176,7 @@ AHRD's quality-code consists of a three character string, where each character i
 
 To set AHRD to write its output in FASTA-Format set the following switch in the input.yml:
 
-<code>
-output_fasta: true
-</code>
+<code> output_fasta: true </code>
 
 AHRD will write a valid FASTA-File of your query-proteins where the Header will be composed of the same parts as above, but here separated by whitespaces.
 
@@ -193,16 +185,12 @@ AHRD will write a valid FASTA-File of your query-proteins where the Header will 
 In order to run AHRD on BLASTX results instead of BLASTP results you have to modify the following parameters in the ahrd_example_input.yml:
 
 <code>token_score_bit_score_weight: 0.5
-
 token_score_database_score_weight: 0.3
-
 token_score_overlap_score_weight: 0.2</code>
 
 Since the algorithm is based on protein sequences and the BLASTX searches are based on nucleotide sequence there will be a problem calculating the overlap score of the blast result.  To overcome this problem the token_score_overlap_score_weight has to be set to 0.0. Therefore the other two scores have to be raised. These three parameters have to sum up to 1. The resulting parameter configuration could look like this: 
 <code>token_score_bit_score_weight: 0.6
-
 token_score_database_score_weight: 0.4
-
 token_score_overlap_score_weight: 0.0</code>
 
 ### 2.6 Computing F-Scores for selected parameter sets (AHRD-Evaluator)
@@ -324,15 +312,12 @@ Above formulae use the following parameters as given in *./ahrd_example_input.ym
 The weights in the above formulae are
 
 <code>token_score_bit_score_weight: 0.468
-
 token_score_database_score_weight: 0.2098
-
 token_score_overlap_score_weight: 0.3221 </code>
 
 and Blast-Database specific, for example for UniprotKB/Swissprot:
 
 <code>weight: 653
-
 description_score_bit_score_weight: 2.717061 </code>
 
 #### 3.3.1 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)
