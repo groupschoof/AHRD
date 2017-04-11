@@ -54,9 +54,9 @@ AHRD is a Java-Program which requires ``Java 1.7`` or higher and ``ant``.
 
 Copy (clone) AHRD to your computer using git via command-line, then change into AHRD's directory, and finally use the latest stable version:
 
-<code>git clone https://github.com/groupschoof/AHRD.git
-cd AHRD
-git checkout tags/v3.3.3</code>
+            git clone https://github.com/groupschoof/AHRD.git
+            cd AHRD
+            git checkout tags/v3.3.3
 
 Alternativelly without using ``git``, you can download AHRD version ``v3.3.3`` ("zip":https://github.com/groupschoof/AHRD/archive/v3.3.3.zip or "tar.gz":https://github.com/groupschoof/AHRD/archive/v3.3.3.tar.gz) and extract it.
 
@@ -64,7 +64,7 @@ Alternativelly without using ``git``, you can download AHRD version ``v3.3.3`` (
 
 Running
 
-<code>ant dist</code>
+            ant dist
 
 will create the executable JAR-File: ``./dist/ahrd.jar``
 
@@ -80,7 +80,9 @@ In order to parallelize the protein function annotation processes,  AHRD can be 
 
 ### 2.1 AHRD example usages
 
-There are _two_ template AHRD input files provided that you should use according to your use case. All example input files are stored in ``./test/resources`` and are named ``ahrd_example_input*.yml``. You can run AHRD on any of these use cases with <code>java -Xmx2g -jar ./dist/ahrd.jar your_use_case_file.yml</code>
+There are _two_ template AHRD input files provided that you should use according to your use case. All example input files are stored in ``./test/resources`` and are named ``ahrd_example_input*.yml``. You can run AHRD on any of these use cases with
+
+            java -Xmx2g -jar ./dist/ahrd.jar your_use_case_file.yml
 
 | *Use Case* | *Template File* |
 | ---------- | --------------- |
@@ -102,7 +104,7 @@ Recommended Sequence Similarity Search:
 
 For your query proteins you should start independent BLAST searches e.g.  in the three different databases mentioned above:
 
-<code> blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -out query_vs_swissprot.txt </code>
+            blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -out query_vs_swissprot.txt
 
 #### 2.2.2 Optional input data
 
@@ -126,9 +128,9 @@ As explained in 2.2.3 AHRD makes use of blacklists and filters provided as Java 
 
 Example Output for test string "activity", and regular expressions "(?i)interacting", and "(?i)activity" applied in serial:
 
-<code>[junit] activity
-[junit] (?i)interacting -> activity
-[junit] (?i)activity -> </code>
+            [junit] activity
+            [junit] (?i)interacting -> activity
+            [junit] (?i)activity -> 
 
 The above example demonstrates how the first regular expression does not match anything in the test string "activity", but after matching it against the second regular expression nothing remains, because the matched substring has been filtered out. As you can see, this test applies all provided regular expression _in order of appearance_ and shows what _remains_ of the provided test string after filtering with the provided regular expressions.
 
@@ -138,7 +140,8 @@ The above example demonstrates how the first regular expression does not match a
 AHRD provides a function to generate several input.yml files from large datasets, consisting of _batches_ of query proteins. For each of these batches the user is expected to provide the batch's query proteins in FASTA format, and one Blast result file for each database searched. The AHRD batcher will then generate a unique input.yml file and entry in a batch shell script to execute AHRD on the respective batches in parallel for example on a compute cluster using a batch-system like LSF. We recommend this for very large datasets (more than a genome) or computers with low RAM.
 
 To generate the mentioned input.yml files and batcher shell script that can subsequently be used to start AHRD in parallel use the batcher function as follows:
-<code>java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./batcher_input_example.yml</code>
+
+            java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./batcher_input_example.yml
 You will have to edit ``./batcher_input_example.yml`` and provide the following arguments. Note, that in the mentioned directories each file will be interpreted as belonging to one unique Batch, if and only if they have identical file names. 
 
 1. ``shell_script:`` Path to the shell-script file which later contains all the statements to invoke AHRD on each supplied batch in parallel.
@@ -176,7 +179,7 @@ AHRD's quality-code consists of a three character string, where each character i
 
 To set AHRD to write its output in FASTA-Format set the following switch in the input.yml:
 
-<code> output_fasta: true </code>
+            output_fasta: true
 
 AHRD will write a valid FASTA-File of your query-proteins where the Header will be composed of the same parts as above, but here separated by whitespaces.
 
@@ -184,20 +187,21 @@ AHRD will write a valid FASTA-File of your query-proteins where the Header will 
 
 In order to run AHRD on BLASTX results instead of BLASTP results you have to modify the following parameters in the ahrd_example_input.yml:
 
-<code>token_score_bit_score_weight: 0.5
-token_score_database_score_weight: 0.3
-token_score_overlap_score_weight: 0.2</code>
+            token_score_bit_score_weight: 0.5
+            token_score_database_score_weight: 0.3
+            token_score_overlap_score_weight: 0.2
 
-Since the algorithm is based on protein sequences and the BLASTX searches are based on nucleotide sequence there will be a problem calculating the overlap score of the blast result.  To overcome this problem the token_score_overlap_score_weight has to be set to 0.0. Therefore the other two scores have to be raised. These three parameters have to sum up to 1. The resulting parameter configuration could look like this: 
-<code>token_score_bit_score_weight: 0.6
-token_score_database_score_weight: 0.4
-token_score_overlap_score_weight: 0.0</code>
+Since the algorithm is based on protein sequences and the BLASTX searches are based on nucleotide sequence there will be a problem calculating the overlap score of the blast result.  To overcome this problem the token_score_overlap_score_weight has to be set to 0.0. Therefore the other two scores have to be raised. These three parameters have to sum up to 1. The resulting parameter configuration could look like this:
+ 
+            token_score_bit_score_weight: 0.6
+            token_score_database_score_weight: 0.4
+            token_score_overlap_score_weight: 0.0
 
 ### 2.6 Computing F-Scores for selected parameter sets (AHRD-Evaluator)
 
 Having different parameter sets AHRD enables you to compute their performance in terms of F-Scores for each protein in comparison to a ground truth. Optionally you can also revise the theorectically maximum attainable F-Score and see how well the best Hits from each sequence similarity search perform. In order to do so, use the Evaluator function:
 
-<code>java -cp ./dist/ahrd.jar ahrd.controller.Evaluator evaluator_example_hrd.yml</code> 
+            java -cp ./dist/ahrd.jar ahrd.controller.Evaluator evaluator_example_hrd.yml 
 
 See ``./test/resources/evaluator_example_hrd.yml`` for more details.
 
@@ -246,7 +250,8 @@ Then AHRD uses the highest complexity GO based F-score it is requested to calcul
 #### 2.7.1 Parameter Optimization via Genetic Algorithm
 
 To start the genetic algorithm approach:
-<code>java -cp dist/ahrd.jar ahrd.controller.GeneticTrainer trainer_example_input.yml</code>
+
+            java -cp dist/ahrd.jar ahrd.controller.GeneticTrainer trainer_example_input.yml
 
 _Note:_ See ``./test/resources/genetic_algorithm_trainer_example_input.yml`` for details.
 
@@ -257,7 +262,8 @@ Parameters specific to the genetic algorithm; all numeric values given show the 
 #### 2.7.2 Parameter Optimization via Simulated Annealing
 
 Alternatively a simulated annealing approach can be used:
-<code>java -cp dist/ahrd.jar ahrd.controller.SimulatedAnnealingTrainer trainer_example_input.yml</code>
+
+            java -cp dist/ahrd.jar ahrd.controller.SimulatedAnnealingTrainer trainer_example_input.yml
 
 _Note:_ See ``./test/resources/simmulated_annealing_trainer_example_input.yml`` for details.
 
@@ -270,7 +276,7 @@ _Note:_ See ``./test/resources/simmulated_annealing_trainer_example_input.yml`` 
 
 Simulated Annealing is a time and resource consuming process. Because AHRD uses quite a number of parameters, the search space is accordingly large. Hence it is recommendable to start independend simulated annealing runs in parallel. Do this using 
 
-<code>java -cp ./dist/ahrd.jar ahrd.controller.TrainerBatcher ./test/resources/trainer_batcher_example.yml</code>
+            java -cp ./dist/ahrd.jar ahrd.controller.TrainerBatcher ./test/resources/trainer_batcher_example.yml
 
 The following parameters are specific to the Trainer-Batcher:
 
@@ -311,14 +317,14 @@ Above formulae use the following parameters as given in *./ahrd_example_input.ym
 
 The weights in the above formulae are
 
-<code>token_score_bit_score_weight: 0.468
-token_score_database_score_weight: 0.2098
-token_score_overlap_score_weight: 0.3221 </code>
+            token_score_bit_score_weight: 0.468
+            token_score_database_score_weight: 0.2098
+            token_score_overlap_score_weight: 0.3221
 
 and Blast-Database specific, for example for UniprotKB/Swissprot:
 
-<code>weight: 653
-description_score_bit_score_weight: 2.717061 </code>
+            weight: 653
+            description_score_bit_score_weight: 2.717061
 
 #### 3.3.1 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)
 
@@ -368,9 +374,9 @@ _Note:_ You must provide the above named match groups ``shortAccession`` and ``g
 
 ## 4 Testing
 
-If you want to run the complete JUnit Test-Suite execute: <code>ant</code>
+If you want to run the complete JUnit Test-Suite execute: ``ant``
 
-If you want to execute a test run on example proteins use: <code>ant test.run</code>
+If you want to execute a test run on example proteins use: ``ant test.run``
 
 ## 5 License
 
