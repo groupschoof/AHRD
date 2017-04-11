@@ -215,7 +215,7 @@ Parameters specific to the Evaluator function are:
   
 h4. 2.6.1 Computing Gene Ontology Annotation F-Scores
 
-In addition to description annotations, Gene Ontology term annotations can be evaluated as well. 
+In addition to description annotations, Gene Ontology term annotations can be evaluated as well (see section "3.3.2":#332-parameters-controlling-gene-ontology-term-annotations for details on enabling the annoation with Gene Ontology terms). 
 
 See @./test/resources/evaluator_example_hrd_and_go.yml@ for more details.
 
@@ -234,13 +234,16 @@ Two approaches for parameter optimization can be chosen from:
 # a genetic algorithm
 # simulated annealing
 
-Basically the input file is almost identical to the standard AHRD run. The following additional parameters are available to modify the behavior of _both_ approaches; all numeric values given show the _default_ used for the respective parameter:
-
+Basically the input file is almost identical to the AHRD evaluator run. The following additional parameters are available to modify the behavior of _both_ approaches; all numeric values given show the _default_ used for the respective parameter:
 
 # @path_log: your_log_file.tsv@ For the genetic algorithm: Stores the best parameters the evaluation found in each successive generation, their F1-Score, the difference in score to the best of the last generation and the method leading the particular parameter set (<b>random</b>ly generated, <b>mutation</b> of a parameter set, <b>recombination</b> of two parameter sets, <b>seed</b> parameter set the algorithm was started with). For the simmulated annealing: Stores the parameters evaluated in any optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set.
 # @f_measure_beta_parameter: 1.0@ The scaling factor used to compute the F-Score of an assigned HRD when comparing it with the reference. See <a href="https://en.wikipedia.org/wiki/F1_score">Wikipedia/F1_score</a> for details.
 # @mutator_mean: 0.25@  Mutate a randomly selected parameter by value gaussian normal distributed with this mean 
-# @mutator_deviation: 0.15@  Mutate a randomly selected parameter by value gaussian normal distributed with this standard deviation 
+# @mutator_deviation: 0.15@  Mutate a randomly selected parameter by value gaussian normal distributed with this standard deviation
+
+Both approaches either optimize AHRD's parameters according to its description annotation performance _or_ its Gene Ontology term annotation performance.
+Optimization according to Gene Ontology based F-scores is automatically triggered if at least one valid @gene_ontology_reference:@ file is provided _and_ a valid @ground_truth_go_annotations:@ file is provided (section: "2.7":#261-computing-gene-ontology-annotation-f-Scores).
+Then AHRD uses the highest complexity GO based F-score it is requested to calculate (in order of increasing complexity: @simple_GO_f1_scores:@, @ancestry_GO_f1_scores:@ and @semsim_GO_f1_scores:@).
  
 h4. 2.7.1 Parameter Optimization via Genetic Algorithm
 
@@ -346,7 +349,7 @@ _NOTE:_ All above column numbers start counting with zero, i.e. the first column
 
 h4. 3.3.2 Parameters controlling Gene Ontology term annotations
 
-AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA files to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @goa_uniprot_all.gpa.gz@ (last visit June 22nd 2016)
+AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @goa_uniprot_all.gaf.gz@ (last visit Feb 16th 2017)
 
 To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter @gene_ontology_reference@. See example file @./test/resources/ahrd_input_seq_sim_table_go_prediction.yml@ for more details.
 
@@ -358,8 +361,9 @@ h5. 3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
 
 Unfortunately UniprotKB GOA files use short protein accessions like @W9QFR0@, while the UniprotKB FASTA databases use the long protein accessions with pipes like this @tr|W9QFR0|W9QFR0_9ROSA@. In order to enable AHRD to match the correct short and long accessions, and thus the database GO annotations it uses regular expressions to parse both the long accessions and the GOA files. By default AHRD is setup to handle Uniprot formats, but you can provide custom regular expressions for your own custom GOA files:
 
-# Set the regular expression to extract short protein accessions mapped to GO terms from the database GOA using @gene_ontology_reference_regex@, e.g. @gene_ontology_reference_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})@
-# Set the Blast database specific regular expression, used to extract the short accessions from long ones with @short_accession_regex:@ For example for TAIR10, use @short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"@.
+# Set the regular expression to extract short protein accessions mapped to GO terms from the database GOA using @gene_ontology_reference_regex:@. For example for TAIR10 ("ATH_GO_GOSLIM.txt":https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/ATH_GO_GOSLIM.txt.gz, use @gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"@ (The default is: @gene_ontology_reference_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})@)
+
+# Set the Blast database specific regular expression, used to extract the short accessions from long ones with @short_accession_regex:@ For example for TAIR10, use @short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"@. (The default is: @"^[^|]+\\|(?<shortAccession>[^|]+)"@)
 
 _Note:_ You must provide the above named match groups @shortAccession@ and @goTerm@, respectively.
 
