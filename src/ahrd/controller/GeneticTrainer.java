@@ -124,6 +124,7 @@ public class GeneticTrainer extends Trainer {
 					// Readable Description
 					assignHumanReadableDescriptions();
 					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+						assignGeneOntologyTerms();
 						goAnnotsStringToObject();
 					}
 					// Evaluate AHRD's performance for each Protein:

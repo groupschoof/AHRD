@@ -84,7 +84,7 @@ public class GoAnnotationReferenceTest {
 			MissingAccessionException, MissingProteinException, SAXException,
 			ParsingException, MissingInterproResultException, SQLException {
 		ahrd.setup(false);
-		ahrd.assignHumanReadableDescriptions();
+		ahrd.assignGeneOntologyTerms();
 		Protein p = ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056");
 		assertNotNull(p.getGoResults());
 		assertEquals(2, p.getGoResults().size());

@@ -75,9 +75,8 @@ public class DescriptionScoreCalculator {
 	 *            highest scoring BlastResult with GO Terms to annotate the
 	 *            query.
 	 */
-	public void findHighestScoringBlastResult(Map<String, Set<String>> databaseGoAnnotations) {
+	public void findHighestScoringBlastResult() {
 		BlastResult bestScoringBr = null;
-		Set<Double> scoreRankingWithGoAnnos = new HashSet<Double>();
 		Map<Double, BlastResult> scoreRanking = new HashMap<Double, BlastResult>();
 		for (String blastDb : getProtein().getBlastResults().keySet()) {
 			for (BlastResult iterBlastResult : getProtein().getBlastResults().get(blastDb)) {
@@ -86,17 +85,11 @@ public class DescriptionScoreCalculator {
 				// that have at least a single non-blacklisted Token:
 				if (iterBlastResult.getTokens().size() > 0) {
 					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
-					if (databaseGoAnnotations != null && !databaseGoAnnotations.isEmpty()
-							&& databaseGoAnnotations.containsKey(iterBlastResult.getShortAccession())
-							&& getSettings().getPreferReferenceWithGoAnnos())
-						scoreRankingWithGoAnnos.add(iterBlastResult.getDescriptionScore());
 				}
 			}
 		}
 		if (scoreRanking.size() > 0) {
-			Set<Double> usedScoreRankin = scoreRankingWithGoAnnos.isEmpty() ? scoreRanking.keySet()
-					: scoreRankingWithGoAnnos;
-			setDescriptionHighScore(Collections.max(usedScoreRankin));
+			setDescriptionHighScore(Collections.max(scoreRanking.keySet()));
 			bestScoringBr = scoreRanking.get(getDescriptionHighScore());
 		}
 		setHighestScoringBlastResult(bestScoringBr);

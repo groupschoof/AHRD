@@ -138,6 +138,10 @@ public class Evaluator extends AHRD {
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			evaluator.assignHumanReadableDescriptions();
+			// If requested iterate over all Proteins and assign the best scoring Gene Ontology terms
+			if (getSettings().hasGeneOntologyAnnotations()) {
+				evaluator.assignGeneOntologyTerms();
+			}
 			// Load a Map of all GO terms
 			// Load ground truth GO annotations
 			// Add GOterm objects to predicted annotations
