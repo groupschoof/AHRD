@@ -23,7 +23,7 @@ public class EvaluatorTest {
 
 	@Before
 	public void setup() throws IOException {
-		this.evaluator = new Evaluator("./test/resources/evaluator_example.yml");
+		this.evaluator = new Evaluator("./test/resources/evaluator_example_hrd_and_go.yml");
 	}
 
 	@Test
