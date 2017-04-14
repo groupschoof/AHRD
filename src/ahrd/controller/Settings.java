@@ -96,7 +96,6 @@ public class Settings implements Cloneable {
 	public static final String GENE_ONTOLOGY_REFERENCE_REGEX_KEY = "gene_ontology_reference_regex";
 	public static final Pattern DEFAULT_GENE_ONTOLOGY_REFERENCE_REGEX = Pattern
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
-	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_ONLY_VALID_TOKENS_KEY = "evaluate_only_valid_tokens";
 	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
 	public static final String GO_DB_PATH_KEY = "go_db_path";
@@ -228,12 +227,6 @@ public class Settings implements Cloneable {
 	private Integer seqSimSearchTableSubjectEndCol = 9;
 	private Integer seqSimSearchTableEValueCol = 10;
 	private Integer seqSimSearchTableBitScoreCol = 11;
-	/**
-	 * If set to true AHRD will choose the highest scoring BlastResult WITH GO
-	 * Annotations as donor for a query protein's HRD. If no BlastResult has GO
-	 * annotations AHRD works "as normal".
-	 */
-	private Boolean preferReferenceWithGoAnnos = false;
 	/**
 	 * If set to TRUE the AHRD Evaluation Score is based ONLY on tokens that
 	 * pass the Blacklisting. Otherwise all Tokens are submitted to evaluation.
@@ -439,7 +432,6 @@ public class Settings implements Cloneable {
 			this.setSeqSimSearchTableBitScoreCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
 		}
-		this.setPreferReferenceWithGoAnnos(Boolean.parseBoolean((String) input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY)));
 		this.setEvaluateOnlyValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_ONLY_VALID_TOKENS_KEY)));
 		if (input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY) != null) {
 			this.setPathToGroundTruthDescriptionBlacklist(input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY).toString());
@@ -1010,14 +1002,6 @@ public class Settings implements Cloneable {
 			return Pattern.compile(getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_REGEX_KEY).toString());
 		}
 		return DEFAULT_GENE_ONTOLOGY_REFERENCE_REGEX;
-	}
-
-	public Boolean getPreferReferenceWithGoAnnos() {
-		return preferReferenceWithGoAnnos;
-	}
-
-	public void setPreferReferenceWithGoAnnos(Boolean preferReferenceWithGoAnnos) {
-		this.preferReferenceWithGoAnnos = preferReferenceWithGoAnnos;
 	}
 
 	public Boolean getEvaluateOnlyValidTokens() {

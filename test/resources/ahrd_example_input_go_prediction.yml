@@ -2,7 +2,6 @@ proteins_fasta: ./test/resources/proteins.fasta
 token_score_bit_score_weight: 0.468
 token_score_database_score_weight: 0.2098
 token_score_overlap_score_weight: 0.3221
-prefer_reference_with_go_annos: true
 blacklist: ./test/resources/blacklist_descline.txt
 token_blacklist: ./test/resources/blacklist_token.txt
 output: ./ahrd_output.csv
