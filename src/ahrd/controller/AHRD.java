@@ -232,7 +232,7 @@ public class AHRD {
 			prot.getTokenScoreCalculator().assignTokenScores();
 			// Tell informative from non-informative Tokens.
 			// Assign each non-informative a new Score :=
-			// currentScore - (Token-High-Score / 2)
+			// currentScore - (Token-High-Score * Informative-Token-Threshold)
 			prot.getTokenScoreCalculator().filterTokenScores();
 			// Find the highest scoring Blast-Result:
 			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult(this.getGoAnnotationReference());

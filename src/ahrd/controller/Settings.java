@@ -113,6 +113,7 @@ public class Settings implements Cloneable {
 	public static final String COMPETITOR_GOA_FILE_KEY = "go_annotations";
 	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score";
 	public static final String WRITE_FSCORE_DETAILS_TO_OUTPUT = "write_fscore_details_to_output";
+	public static final String INFORMATIVE_TOKEN_THRESHOLD = "informative_token_threshold";
 	
 	/**
 	 * Fields:
@@ -484,6 +485,9 @@ public class Settings implements Cloneable {
 		}
 		this.setFindHighestPossibleGoScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY)));
 		this.setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
+		if (input.get(INFORMATIVE_TOKEN_THRESHOLD) != null) {
+			this.setInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD)));
+		}
 	}
 
 	/**
@@ -754,6 +758,14 @@ public class Settings implements Cloneable {
 
 	public void setTokenScoreOverlapScoreWeight(Double tokenScoreOverlapScoreWeight) {
 		this.getParameters().setTokenScoreOverlapScoreWeight(tokenScoreOverlapScoreWeight);
+	}
+	
+	public double getInformativeTokenThreshold() {
+		return getParameters().getInformativeTokenThreshold();
+	}
+
+	public void setInformativeTokenThreshold(double informativeTokenThreshold) {
+		this.getParameters().setInformativeTokenThreshold(informativeTokenThreshold);
 	}
 
 	public Boolean getWriteTokenSetToOutput() {
