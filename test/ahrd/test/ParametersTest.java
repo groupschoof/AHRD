@@ -40,10 +40,10 @@ public class ParametersTest {
 		for (int i = 0; i < 500; i++) {
 			inds.add(p.parameterToMutateRandomIndex());
 		}
-		assertEquals(9, inds.size());
-		// Parameter-Indices: 0..2 + 2 * 3 (#Blast-Databases) = 9
-		// Indices 0 to 8 should all be present:
-		for (int r = 0; r < 9; r++) {
+		assertEquals(10, inds.size());
+		// Parameter-Indices: 0..3 + 2 * 3 (#Blast-Databases) = 9
+		// Indices 0 to 9 should all be present:
+		for (int r = 0; r < 10; r++) {
 			assertTrue(
 					"Parameter-Index "
 							+ r
@@ -209,11 +209,13 @@ public class ParametersTest {
 						|| !n.getTokenScoreDatabaseScoreWeight().equals(
 								s.getTokenScoreDatabaseScoreWeight()) || !n
 						.getTokenScoreOverlapScoreWeight().equals(
-								s.getTokenScoreOverlapScoreWeight()))
+								s.getTokenScoreOverlapScoreWeight()) || !n
+						.getInformativeTokenThreshold().equals(
+								s.getInformativeTokenThreshold()))
 						|| blastParamDiff);
 		// Extreme Score-Increase should result in mutation of the same
 		// parameter:
-		for (int paramInd = 0; paramInd < 9; paramInd++) {
+		for (int paramInd = 0; paramInd < 10; paramInd++) {
 			n.setLastMutatedParameter(paramInd);
 			Parameters n2 = n.neighbour(1.0);
 			assertEquals(
@@ -234,11 +236,16 @@ public class ParametersTest {
 						"TokenScoreOverlapScoreWeight should have been mutated.",
 						!n.getTokenScoreOverlapScoreWeight().equals(
 								n2.getTokenScoreOverlapScoreWeight()));
-			else if (paramInd > 2) {
+			else if (paramInd == 3)
+				assertTrue(
+						"InformativeTokenThreshold should have been mutated.",
+						!n.getInformativeTokenThreshold().equals(
+								n2.getInformativeTokenThreshold()));
+			else if (paramInd > 3) {
 				String blastDbName = getSettings().getSortedBlastDatabases()
-						.get((new Double(Math.floor((paramInd - 3) / 2.0)))
+						.get((new Double(Math.floor((paramInd - 4) / 2.0)))
 								.intValue());
-				boolean mutatedBlastDbWeight = ! (paramInd % 2 == 0);
+				boolean mutatedBlastDbWeight = ! (paramInd % 2 == 1);
 				if (mutatedBlastDbWeight)
 					assertTrue(
 							"BlastDatabaseWeight of db " + blastDbName

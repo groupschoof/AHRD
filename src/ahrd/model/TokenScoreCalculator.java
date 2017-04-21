@@ -127,25 +127,24 @@ public class TokenScoreCalculator {
 	/**
 	 * Iterates over all Tokens in the Map 'tokenScores' and re-assigns them new
 	 * TokenScores. Each non-informative Token is assigned the new TokenScore :=
-	 * (old TokenScore) - (tokenHighScore / 2).
+	 * (old TokenScore) - (tokenHighScore * Informative-Token-Threshold).
 	 */
 	public void filterTokenScores() {
 		for (String token : getTokenScores().keySet()) {
 			if (!isInformativeToken(token)) {
-				getTokenScores().put(token, new Double(getTokenScores().get(token) - getTokenHighScore() / 2));
+				getTokenScores().put(token, new Double(getTokenScores().get(token) - getTokenHighScore() * getSettings().getInformativeTokenThreshold()));
 			}
 		}
 	}
 
 	/**
-	 * Informative tokens have a token-score greater than half of the
-	 * tokenHighScore.
+	 * Informative tokens have a token-score greater than the tokenHighScore times the Informative-Token-Threshold
 	 * 
 	 * @Note: This method cannot be invoked before having the tokenScores-Set
 	 *        initialized!
 	 */
 	public boolean isInformativeToken(String token) {
-		return getTokenScores().get(token) > getTokenHighScore() / 2;
+		return getTokenScores().get(token) > getTokenHighScore() * getSettings().getInformativeTokenThreshold();
 	}
 
 	/**

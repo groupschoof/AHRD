@@ -238,7 +238,7 @@ public class AHRD {
 			prot.getTokenScoreCalculator().assignTokenScores();
 			// Tell informative from non-informative Tokens.
 			// Assign each non-informative a new Score :=
-			// currentScore - (Token-High-Score / 2)
+			// currentScore - (Token-High-Score * Informative-Token-Threshold)
 			prot.getTokenScoreCalculator().filterTokenScores();
 			// Find the highest scoring Blast-Result:
 			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult();
@@ -321,7 +321,7 @@ public class AHRD {
 			// Filter GO Term-Scores
 			for (String goTerm : goTermScores.keySet()) {
 				if (goTermScores.get(goTerm) < goTermHighScore / 2) {
-					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore / 2));
+					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getInformativeTokenThreshold()));
 				}
 			}
 			// Find highest scoring GO annotation
@@ -337,7 +337,7 @@ public class AHRD {
 						for (String goTerm : reference) {
 							sumGoTermScores += goTermScores.get(goTerm);
 							goTermCount++;
-							if (goTermScores.get(goTerm) > goTermHighScore / 2) {
+							if (goTermScores.get(goTerm) > goTermHighScore * getSettings().getInformativeTokenThreshold()) {
 								informativeGoTermCount++;
 							}
 						}
