@@ -318,6 +318,12 @@ public class AHRD {
 					}
 				}
 			}
+			// Filter GO Term-Scores
+			for (String goTerm : goTermScores.keySet()) {
+				if (goTermScores.get(goTerm) < goTermHighScore / 2) {
+					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore / 2));
+				}
+			}
 			// Find highest scoring GO annotation
 			double goAnnotationTopScore = 0.0;
 			BlastResult highestScoringBlastResult = null;
