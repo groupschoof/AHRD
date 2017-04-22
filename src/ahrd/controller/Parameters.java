@@ -336,7 +336,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		Double itt = getInformativeTokenThreshold();
 		Double mutateBy = itt*mutatePercentageBy();
 		Double updown = Utils.random.nextGaussian();
-		System.out.println(mutateBy);
 		if (itt >= 1.0) {
 			updown = -1.0;
 		}
