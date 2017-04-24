@@ -320,7 +320,7 @@ public class AHRD {
 			}
 			// Filter GO Term-Scores
 			for (String goTerm : goTermScores.keySet()) {
-				if (goTermScores.get(goTerm) < goTermHighScore / 2) {
+				if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getInformativeTokenThreshold()) {
 					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getInformativeTokenThreshold()));
 				}
 			}
