@@ -252,8 +252,11 @@ public class AHRD {
 	 * 
 	 */
 	public void assignGeneOntologyTerms() throws MissingInterproResultException, IOException, SQLException {
+		// Load a Map of all GO terms
+		if (goDB == null) {
+			goDB = new GOdatabase().getMap();
+		}
 		for (Protein protein : this.getProteins().values()) {
-			//Protein protein = null;
 			// calculate total and cumulative go term scores 
 			Map<String, Double> cumulativeGoTermBitScores = new HashMap<String, Double>();
 			Map<String, Double> cumulativeGoTermBlastDatabaseScores = new HashMap<String, Double>();
@@ -306,11 +309,13 @@ public class AHRD {
 				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
 					Set<String> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
 					if (reference != null) { 
-						for (String goTerm : reference) {
-							double goTermScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(goTerm) / totalGoTermBitScore 
-									+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(goTerm) / totalGoTermBlastDatabaseScore
-									+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(goTerm) / totalGoTermOverlapScore;
-							goTermScores.put(goTerm, goTermScore);
+						for (String termAcc : reference) {
+							GOterm term = goDB.get(termAcc);
+							double goTermScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
+									+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
+									+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore
+									+ term.getInformationContent();
+							goTermScores.put(termAcc, goTermScore);
 							if (goTermScore > goTermHighScore) {
 								goTermHighScore = goTermScore;
 							}
@@ -370,7 +375,9 @@ public class AHRD {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
 			Set<GOterm> goSlim = new HashSet<GOterm>();
 			// Load a Map of all GO terms
-			goDB = new GOdatabase().getMap();
+			if (goDB == null) {
+				goDB = new GOdatabase().getMap();
+			}
 			// Load set of GO slim terms
 			for (String goSlimFileEntry : getSettings().getGoSlimFile()) {
 				Pattern p = Settings.getGoSlimFileGotermRegex();
