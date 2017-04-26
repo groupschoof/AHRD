@@ -62,7 +62,10 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 * Should be between 0 and 1.
 	 */
 	private Double informativeTokenThreshold = 0.5;
-	
+	/**
+	 * Weight of the Information Content on the calculation of the goTermScore
+	 */
+	private Double goTermScoreInformationContentWeight;
 	/**
 	 * 
 	 * @param sortedDistinctBlastDatabaseNames
@@ -74,6 +77,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		out.setTokenScoreBitScoreWeight(randomMultipleOfOneTenth());
 		out.setTokenScoreDatabaseScoreWeight(randomMultipleOfOneTenth());
 		out.setTokenScoreOverlapScoreWeight(randomMultipleOfOneTenth());
+		out.setGoTermScoreInformationContentWeight(randomMultipleOfOneTenth());
 		// normalize the randomly chosen weights:
 		out.normalizeTokenScoreWeights();
 		// draw random informative token threshold between 0 an 1
@@ -235,24 +239,27 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	}
 
 	/**
-	 * Normalizes the three weights appearing in the Token-Score-Formula, so
+	 * Normalizes the four weights appearing in the Token-Score-Formula, so
 	 * they sum up to 1.0
 	 */
 	public void normalizeTokenScoreWeights() {
 		double s = roundToNDecimalPlaces(getTokenScoreBitScoreWeight()
 				+ getTokenScoreDatabaseScoreWeight()
-				+ getTokenScoreOverlapScoreWeight(), 4);
+				+ getTokenScoreOverlapScoreWeight() 
+				+ getGoTermScoreInformationContentWeight(), 4);
 		setTokenScoreBitScoreWeight(roundToNDecimalPlaces(
 				getTokenScoreBitScoreWeight() / s, 4));
 		setTokenScoreDatabaseScoreWeight(roundToNDecimalPlaces(
 				getTokenScoreDatabaseScoreWeight() / s, 4));
 		setTokenScoreOverlapScoreWeight(roundToNDecimalPlaces(
 				getTokenScoreOverlapScoreWeight() / s, 4));
+		this.setGoTermScoreInformationContentWeight(roundToNDecimalPlaces(
+				getGoTermScoreInformationContentWeight() / s, 4));
 	}
 
 	/**
 	 * Diminishes or increases Token-Score-Bit-Score-Weight by
-	 * PERCENTAGE_MUTATOR_SEED and normalizes the other two weights in the
+	 * PERCENTAGE_MUTATOR_SEED and normalizes the other three weights in the
 	 * Token-Score-Formula.
 	 */
 	public void mutateTokenScoreBitScoreWeight() {
@@ -269,7 +276,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 
 	/**
 	 * Diminishes or increases Token-Score-Database-Score-Weight by
-	 * PERCENTAGE_MUTATOR_SEED and normalizes the other two weights in the
+	 * PERCENTAGE_MUTATOR_SEED and normalizes the other three weights in the
 	 * Token-Score-Formula.
 	 */
 	public void mutateTokenScoreDatabaseScoreWeight() {
@@ -286,7 +293,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 
 	/**
 	 * Diminishes or increases Token-Score-Overlap-Score-Weight by
-	 * PERCENTAGE_MUTATOR_SEED and normalizes the other two weights in the
+	 * PERCENTAGE_MUTATOR_SEED and normalizes the other three weights in the
 	 * Token-Score-Formula.
 	 */
 	public void mutateTokenScoreOverlapScoreWeight() {
@@ -297,6 +304,23 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		else
 			osw = osw + mutateBy;
 		setTokenScoreOverlapScoreWeight(osw);
+		// normalize:
+		normalizeTokenScoreWeights();
+	}
+	
+	/**
+	 * Diminishes or increases Go-Term-Score-Information-Content-Weight by
+	 * PERCENTAGE_MUTATOR_SEED and normalizes the other three weights in the
+	 * Token-Score-Formula.
+	 */
+	public void mutateGoTermScoreInformationContentWeight() {
+		Double goTermScoreInformationContentWeight = getGoTermScoreInformationContentWeight();
+		Double mutateBy = mutatePercentageBy();
+		if (randomSaveSubtract(goTermScoreInformationContentWeight, mutateBy))
+			goTermScoreInformationContentWeight = goTermScoreInformationContentWeight - mutateBy;
+		else
+			goTermScoreInformationContentWeight = goTermScoreInformationContentWeight + mutateBy;
+		setGoTermScoreInformationContentWeight(goTermScoreInformationContentWeight);
 		// normalize:
 		normalizeTokenScoreWeights();
 	}
@@ -377,6 +401,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		if(rand.nextBoolean())
 			offspring.setTokenScoreOverlapScoreWeight(partner.getTokenScoreOverlapScoreWeight());
 		if(rand.nextBoolean())
+			offspring.setGoTermScoreInformationContentWeight(partner.getGoTermScoreInformationContentWeight());
+		if(rand.nextBoolean())
 			offspring.setInformativeTokenThreshold(partner.getInformativeTokenThreshold());
 		for (String blastDbName : getSettings().getSortedBlastDatabases()) {
 			if(rand.nextBoolean())
@@ -439,6 +465,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				&& ((Parameters) eql).getTokenScoreDatabaseScoreWeight()
 						.equals(this.getTokenScoreDatabaseScoreWeight())
 				&& ((Parameters) eql).getTokenScoreOverlapScoreWeight().equals(this.getTokenScoreOverlapScoreWeight())
+				&& ((Parameters) eql).getGoTermScoreInformationContentWeight().equals(this.getGoTermScoreInformationContentWeight())
 				&& ((Parameters) eql).getInformativeTokenThreshold().equals(this.getInformativeTokenThreshold());
 	}
 
@@ -452,7 +479,9 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		}
 		hashSrc += getTokenScoreBitScoreWeight()
 				+ getTokenScoreDatabaseScoreWeight()
-				+ getTokenScoreOverlapScoreWeight();
+				+ getTokenScoreOverlapScoreWeight()
+				+ getGoTermScoreInformationContentWeight()
+				+ getInformativeTokenThreshold();
 		return hashSrc.hashCode();
 	}
 
@@ -588,6 +617,10 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				return -1;
 			if (this.getTokenScoreOverlapScoreWeight() > other.getTokenScoreOverlapScoreWeight())
 				return 1;
+			if (this.getGoTermScoreInformationContentWeight() < other.getGoTermScoreInformationContentWeight())
+				return -1;
+			if (this.getGoTermScoreInformationContentWeight() > other.getGoTermScoreInformationContentWeight())
+				return 1;
 			if (this.getInformativeTokenThreshold() < other.getInformativeTokenThreshold())
 				return -1;
 			if (this.getInformativeTokenThreshold() > other.getInformativeTokenThreshold())
@@ -620,5 +653,13 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 
 	public void setInformativeTokenThreshold(double informativeTokenThreshold) {
 		this.informativeTokenThreshold = informativeTokenThreshold;
+	}
+
+	public Double getGoTermScoreInformationContentWeight() {
+		return goTermScoreInformationContentWeight;
+	}
+
+	public void setGoTermScoreInformationContentWeight(Double goTermScoreInformationContentWeight) {
+		this.goTermScoreInformationContentWeight = goTermScoreInformationContentWeight;
 	}
 }

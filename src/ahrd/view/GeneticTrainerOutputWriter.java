@@ -19,7 +19,7 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 		hdr += "Average Evaluation-Score(F-Score)";
 		if (!isFinalOutput)
 			hdr += "\tDiff-to-last-Generation\tOrigin";
-		hdr += "\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight\tInformative-Token-Threshold";
+		hdr += "\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight\tGo-Term-Score-Information-Content-Weight\tInformative-Token-Threshold";
 		for (String blastDb : this.sortedBlastDatabases) {
 			hdr += "\t" + blastDb + "-Weight";
 			hdr += "\t" + blastDb + "-Description-Score-Bit-Score-Weight";
@@ -44,6 +44,7 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 				+ FRMT.format(p.getTokenScoreBitScoreWeight()) + "\t"
 				+ FRMT.format(p.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(p.getTokenScoreOverlapScoreWeight()) + "\t"
+				+ FRMT.format(p.getGoTermScoreInformationContentWeight()) + "\t"
 				+ FRMT.format(p.getInformativeTokenThreshold());
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + FRMT.format(p.getBlastDbWeight(blastDb));
@@ -62,6 +63,7 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 				+ s.getTokenScoreBitScoreWeight() + "\t"
 				+ s.getTokenScoreDatabaseScoreWeight() + "\t"
 				+ s.getTokenScoreOverlapScoreWeight() + "\t"
+				+ s.getGoTermScoreInformationContentWeight() + "\t"
 				+ s.getInformativeTokenThreshold();
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + s.getBlastDbWeight(blastDb);

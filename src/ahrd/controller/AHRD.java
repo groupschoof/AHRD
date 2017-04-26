@@ -314,7 +314,7 @@ public class AHRD {
 							double goTermScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
 									+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
 									+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore
-									+ term.getInformationContent();
+									+ getSettings().getGoTermScoreInformationContentWeight() * term.getInformationContent();
 							goTermScores.put(termAcc, goTermScore);
 							if (goTermScore > goTermHighScore) {
 								goTermHighScore = goTermScore;

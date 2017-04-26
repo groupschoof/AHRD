@@ -24,9 +24,10 @@ blast_dbs:
     description_score_bit_score_weight: 0.4
 interpro_database: ./test/resources/interpro_31.xml
 interpro_result: ./test/resources/interpro_result.raw
-token_score_bit_score_weight: 0.5
+token_score_bit_score_weight: 0.4
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
+go_term_score_information_content_weight: 0.1
 write_token_set_to_output: false
 write_best_blast_hits_to_output: true
 write_scores_to_output: false

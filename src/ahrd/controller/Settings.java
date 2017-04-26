@@ -62,6 +62,7 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_SCORE_BIT_SCORE_WEIGHT = "token_score_bit_score_weight";
 	public static final String TOKEN_SCORE_DATABASE_SCORE_WEIGHT = "token_score_database_score_weight";
 	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT = "token_score_overlap_score_weight";
+	public static final String GO_TERM_SCORE_INFORMATION_CONTENT_WEIGHT = "go_term_score_information_content_weight";
 	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT = "description_score_bit_score_weight";
 	public static final String GROUND_TRUTH_FASTA_KEY = "ground_truth_fasta";
 	public static final String GROUND_TRUTH_DESCRIPTION_FILTER_KEY = "ground_truth_description_filter";
@@ -339,6 +340,7 @@ public class Settings implements Cloneable {
 		this.setTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
 		this.setTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
 		this.setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
+		this.setGoTermScoreInformationContentWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_INFORMATION_CONTENT_WEIGHT)));
 		this.setWriteTokenSetToOutput(Boolean.parseBoolean((String) input.get(WRITE_TOKEN_SET_TO_OUTPUT)));
 		this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
 		this.setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
@@ -750,6 +752,14 @@ public class Settings implements Cloneable {
 
 	public void setTokenScoreOverlapScoreWeight(Double tokenScoreOverlapScoreWeight) {
 		this.getParameters().setTokenScoreOverlapScoreWeight(tokenScoreOverlapScoreWeight);
+	}
+	
+	public Double getGoTermScoreInformationContentWeight() {
+		return getParameters().getGoTermScoreInformationContentWeight();
+	}
+
+	public void setGoTermScoreInformationContentWeight(Double goTermScoreInformationContentWeight) {
+		this.getParameters().setGoTermScoreInformationContentWeight(goTermScoreInformationContentWeight);
 	}
 	
 	public double getInformativeTokenThreshold() {
