@@ -331,41 +331,14 @@ public class AHRD {
 				}
 			}
 			// Filter GO Term-Scores
+			HashSet<String> annots = new HashSet<String>();
 			for (String goTerm : goTermScores.keySet()) {
-				if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getInformativeTokenThreshold()) {
-					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getInformativeTokenThreshold()));
+				if (goTermScores.get(goTerm) > goTermHighScore * getSettings().getInformativeTokenThreshold()) {
+					annots.add(goTerm);
 				}
 			}
-			// Find highest scoring GO annotation
-			double goAnnotationTopScore = 0.0;
-			BlastResult highestScoringBlastResult = null;
-			for (String blastDbName : protein.getBlastResults().keySet()) {
-				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
-					double sumGoTermScores = 0.0;
-					int informativeGoTermCount = 0;
-					int goTermCount = 0;
-					Set<String> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
-					if (reference != null) { 
-						for (String goTerm : reference) {
-							sumGoTermScores += goTermScores.get(goTerm);
-							goTermCount++;
-							if (goTermScores.get(goTerm) > goTermHighScore * getSettings().getInformativeTokenThreshold()) {
-								informativeGoTermCount++;
-							}
-						}
-					}
-					double correctionFactor = ((double) informativeGoTermCount) / ((double) goTermCount);
-					double lexicalScore = correctionFactor * sumGoTermScores / goTermHighScore;
-					double relativeBlastScore = getSettings().getDescriptionScoreBitScoreWeight(blastDbName) * blastResult.getBitScore() / maxBitScore;
-					double goAnnotationScore = lexicalScore + relativeBlastScore;
-					if (goAnnotationScore > goAnnotationTopScore) {
-						goAnnotationTopScore = goAnnotationScore;
-						highestScoringBlastResult = blastResult;
-					}
-				}
-			}
-			if (highestScoringBlastResult != null) {
-				protein.setGoResults(getGoAnnotationReference().get(highestScoringBlastResult.getShortAccession()));
+			if (annots.size() > 0) {
+				protein.setGoResults(annots);
 			} else {
 				protein.setGoResults(new HashSet<String>());
 			}
