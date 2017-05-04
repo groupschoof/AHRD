@@ -230,10 +230,6 @@ public class AHRD {
 			// assign the Tokens their Scores:
 			// tokenizeBlastResultDescriptionLines(prot);
 			prot.getTokenScoreCalculator().assignTokenScores();
-			// Tell informative from non-informative Tokens.
-			// Assign each non-informative a new Score :=
-			// currentScore - (Token-High-Score / 2)
-			prot.getTokenScoreCalculator().filterTokenScores();
 			// Find the highest scoring Blast-Result:
 			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult(this.getGoAnnotationReference());
 			// If AHRD is requested to annotate Gene Ontology Terms, do so:

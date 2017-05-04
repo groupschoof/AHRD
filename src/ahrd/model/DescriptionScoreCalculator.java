@@ -103,8 +103,7 @@ public class DescriptionScoreCalculator {
 	}
 
 	public void calcDescriptionScore(BlastResult blastResult) {
-		blastResult.setDescriptionScore(
-				getProtein().getLexicalScoreCalculator().lexicalScore(blastResult) + relativeBlastScore(blastResult));
+		blastResult.setDescriptionScore(getProtein().getTokenScoreCalculator().getTokenHighScore() + relativeBlastScore(blastResult));
 	}
 
 	public double relativeBlastScore(BlastResult br) {
