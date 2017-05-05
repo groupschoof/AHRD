@@ -189,13 +189,12 @@ public class TokenScoreCalculator {
 		Double bitScoreWeight = getSettings().getTokenScoreBitScoreWeight();
 		Double databaseScoreWeight = getSettings().getTokenScoreDatabaseScoreWeight();
 		Double overlapScoreWeight = getSettings().getTokenScoreOverlapScoreWeight();
-		Double informationContentWeight = getSettings().getGoTermScoreInformationContentWeight();
-		double validateSumToOne = roundToNDecimalPlaces(bitScoreWeight + databaseScoreWeight + overlapScoreWeight + informationContentWeight, 9);
+		double validateSumToOne = roundToNDecimalPlaces(bitScoreWeight + databaseScoreWeight + overlapScoreWeight, 9);
 		// Tolerate rounding error <= 10^-3
 		if (!(validateSumToOne >= 0.999 && validateSumToOne <= 1.001))
 			throw new IllegalArgumentException(
-					"The four weights 'bitScoreWeight', 'databaseScoreWeight', 'overlapScoreWeight' and 'informationContentWeight' should sum up to 1, but actually sum up to: "
-							+ (bitScoreWeight + databaseScoreWeight + overlapScoreWeight + informationContentWeight));
+					"The four weights 'bitScoreWeight', 'databaseScoreWeight' and 'overlapScoreWeight' should sum up to 1, but actually sum up to: "
+							+ (bitScoreWeight + databaseScoreWeight + overlapScoreWeight));
 		// Calculate Token-Score:
 		return (bitScoreWeight * getCumulativeTokenBitScores().get(token) / getTotalTokenBitScore()
 				+ databaseScoreWeight * getCumulativeTokenBlastDatabaseScores().get(token)

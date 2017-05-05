@@ -245,16 +245,13 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	public void normalizeTokenScoreWeights() {
 		double s = roundToNDecimalPlaces(getTokenScoreBitScoreWeight()
 				+ getTokenScoreDatabaseScoreWeight()
-				+ getTokenScoreOverlapScoreWeight() 
-				+ getGoTermScoreInformationContentWeight(), 4);
+				+ getTokenScoreOverlapScoreWeight(), 4);
 		setTokenScoreBitScoreWeight(roundToNDecimalPlaces(
 				getTokenScoreBitScoreWeight() / s, 4));
 		setTokenScoreDatabaseScoreWeight(roundToNDecimalPlaces(
 				getTokenScoreDatabaseScoreWeight() / s, 4));
 		setTokenScoreOverlapScoreWeight(roundToNDecimalPlaces(
 				getTokenScoreOverlapScoreWeight() / s, 4));
-		this.setGoTermScoreInformationContentWeight(roundToNDecimalPlaces(
-				getGoTermScoreInformationContentWeight() / s, 4));
 	}
 
 	/**
@@ -309,20 +306,33 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	}
 	
 	/**
-	 * Diminishes or increases Go-Term-Score-Information-Content-Weight by
-	 * PERCENTAGE_MUTATOR_SEED and normalizes the other three weights in the
-	 * Token-Score-Formula.
+	 * Diminishes or increases Go-Term-Score-Information-Content-Weight
 	 */
 	public void mutateGoTermScoreInformationContentWeight() {
-		Double goTermScoreInformationContentWeight = getGoTermScoreInformationContentWeight();
-		Double mutateBy = mutatePercentageBy();
-		if (randomSaveSubtract(goTermScoreInformationContentWeight, mutateBy))
-			goTermScoreInformationContentWeight = goTermScoreInformationContentWeight - mutateBy;
-		else
-			goTermScoreInformationContentWeight = goTermScoreInformationContentWeight + mutateBy;
-		setGoTermScoreInformationContentWeight(goTermScoreInformationContentWeight);
-		// normalize:
-		normalizeTokenScoreWeights();
+		Double icw = getGoTermScoreInformationContentWeight();
+		Double mutateBy = icw*mutatePercentageBy();
+		Double updown = Utils.random.nextGaussian();
+		if (icw >= 1.0) {
+			updown = -1.0;
+		}
+		if (icw <= 0.0) {
+			updown = 1.0;
+			mutateBy = 0.01*mutatePercentageBy();
+		}
+		if (updown < 0) {
+			if (icw - mutateBy < 0.0) {
+				icw = 0.0;
+			} else {
+				icw = icw - mutateBy;
+			}
+		} else {
+			if (icw + mutateBy > 1.0) {
+				icw = 1.0;
+			} else {
+				icw = icw + mutateBy;
+			}
+		}
+		setGoTermScoreInformationContentWeight(icw);
 	}
 
 	/**
@@ -365,6 +375,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		}
 		if (itt <= 0.0) {
 			updown = 1.0;
+			mutateBy = 0.01*mutatePercentageBy();
 		}
 		if (updown < 0) {
 			if (itt - mutateBy < 0.0) {

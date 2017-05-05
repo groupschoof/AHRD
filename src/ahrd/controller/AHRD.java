@@ -311,17 +311,11 @@ public class AHRD {
 					if (reference != null) { 
 						for (String termAcc : reference) {
 							GOterm term = goDB.get(termAcc);
-							double maxFiniteInfoContent = 0.0;
-							for(GOterm ancester : term.getAncestry()){
-								double ancesterInfoContent = ancester.getInformationContent();
-								if (Double.isFinite(ancesterInfoContent) && ancesterInfoContent > maxFiniteInfoContent) {
-									maxFiniteInfoContent = ancesterInfoContent;
-								}
-							}
-							double goTermScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
-									+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
-									+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore
-									+ getSettings().getGoTermScoreInformationContentWeight() * maxFiniteInfoContent;
+							double infoContentScore = 1 - getSettings().getGoTermScoreInformationContentWeight() * term.getProbability();
+							double goTermAbundancyScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
+														+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
+														+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;
+							double goTermScore = goTermAbundancyScore * infoContentScore; 
 							goTermScores.put(termAcc, goTermScore);
 							if (goTermScore > goTermHighScore) {
 								goTermHighScore = goTermScore;
