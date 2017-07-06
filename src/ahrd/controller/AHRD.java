@@ -338,7 +338,8 @@ public class AHRD {
 							goTermCount++;
 						}
 					}
-					double goAnnotationScore = sumGoTermScores / goTermCount;
+					double relativeBlastScore = getSettings().getDescriptionScoreBitScoreWeight(blastDbName) * blastResult.getBitScore() / maxBitScore;
+					double goAnnotationScore = (sumGoTermScores / goTermCount) + relativeBlastScore;
 					if (goAnnotationScore > goAnnotationTopScore) {
 						goAnnotationTopScore = goAnnotationScore;
 						highestScoringBlastResult = blastResult;
