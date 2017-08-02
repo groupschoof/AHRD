@@ -193,7 +193,7 @@ public class TokenScoreCalculator {
 		// Tolerate rounding error <= 10^-3
 		if (!(validateSumToOne >= 0.999 && validateSumToOne <= 1.001))
 			throw new IllegalArgumentException(
-					"The four weights 'bitScoreWeight', 'databaseScoreWeight' and 'overlapScoreWeight' should sum up to 1, but actually sum up to: "
+					"The three weights 'bitScoreWeight', 'databaseScoreWeight' and 'overlapScoreWeight' should sum up to 1, but actually sum up to: "
 							+ (bitScoreWeight + databaseScoreWeight + overlapScoreWeight));
 		// Calculate Token-Score:
 		return (bitScoreWeight * getCumulativeTokenBitScores().get(token) / getTotalTokenBitScore()

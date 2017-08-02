@@ -163,7 +163,7 @@ public class TokenScoreCalculatorTest {
 		assertTrue(p.getTokenScoreCalculator().getTokenScores()
 				.containsKey("three"));
 		assertTrue(p.getTokenScoreCalculator().getTokenHighScore() > 0);
-		assertEquals(0.20666666666666668, p.getTokenScoreCalculator()
+		assertEquals(0.22666666666666668, p.getTokenScoreCalculator()
 				.getTokenHighScore(), 0.0000001);
 	}
 
@@ -236,7 +236,6 @@ public class TokenScoreCalculatorTest {
 		getSettings().setTokenScoreBitScoreWeight(0.5);
 		getSettings().setTokenScoreDatabaseScoreWeight(0.5);
 		getSettings().setTokenScoreOverlapScoreWeight(0.001);
-		getSettings().setGoTermScoreInformationContentWeight(0.0);
 		try {
 			tsc.tokenScore(token, "swissprot");
 		} catch (IllegalArgumentException expectedException) {

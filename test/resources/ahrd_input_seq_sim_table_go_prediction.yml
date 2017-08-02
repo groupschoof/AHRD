@@ -1,8 +1,8 @@
 proteins_fasta: ./test/resources/proteins.fasta
-token_score_bit_score_weight: 0.4
+token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
-go_term_score_information_content_weight: 0.0
+go_term_score_information_content_weight: 0.8
 blacklist: ./test/resources/blacklist_descline.txt
 token_blacklist: ./test/resources/blacklist_token.txt
 output: ./ahrd_output.csv
