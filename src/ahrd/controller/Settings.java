@@ -340,7 +340,9 @@ public class Settings implements Cloneable {
 		this.setTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
 		this.setTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
 		this.setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
-		this.setGoTermScoreInformationContentWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_INFORMATION_CONTENT_WEIGHT)));
+		if (input.get(GO_TERM_SCORE_INFORMATION_CONTENT_WEIGHT) != null) {
+			this.setGoTermScoreInformationContentWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_INFORMATION_CONTENT_WEIGHT)));
+		}
 		this.setWriteTokenSetToOutput(Boolean.parseBoolean((String) input.get(WRITE_TOKEN_SET_TO_OUTPUT)));
 		this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
 		this.setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));

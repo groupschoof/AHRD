@@ -58,15 +58,13 @@ public class ParametersTest {
 		p.setTokenScoreBitScoreWeight(0.5);
 		p.setTokenScoreDatabaseScoreWeight(0.75);
 		p.setTokenScoreOverlapScoreWeight(1.0);
-		p.setGoTermScoreInformationContentWeight(0.3);
 		p.normalizeTokenScoreWeights();
 		assertEquals(
-				"The four weights in the Token-Score-Formula should sum up to 1.0",
+				"The three weights in the Token-Score-Formula should sum up to 1.0",
 				1.0,
 				p.getTokenScoreBitScoreWeight()
 						+ p.getTokenScoreDatabaseScoreWeight()
-						+ p.getTokenScoreOverlapScoreWeight()
-						+ p.getGoTermScoreInformationContentWeight(), 0.0001);
+						+ p.getTokenScoreOverlapScoreWeight(), 0.0001);
 	}
 
 	@Test
@@ -131,21 +129,18 @@ public class ParametersTest {
 		Double dbsw = new Double(p.getTokenScoreDatabaseScoreWeight());
 		Double osw = new Double(p.getTokenScoreOverlapScoreWeight());
 		Double bsw = new Double(p.getTokenScoreBitScoreWeight());
-		Double goTermScoreInformationContentWeight = new Double(p.getGoTermScoreInformationContentWeight());
 		// test:
 		p.mutateTokenScoreBitScoreWeight();
 		assertEquals(
 				1.0,
 				p.getTokenScoreBitScoreWeight()
 						+ p.getTokenScoreDatabaseScoreWeight()
-						+ p.getTokenScoreOverlapScoreWeight()
-						+ p.getGoTermScoreInformationContentWeight(), 0.001);
+						+ p.getTokenScoreOverlapScoreWeight(), 0.001);
 		assertTrue(
 				"All three Token-Score-Weights should have changed.",
 				!dbsw.equals(p.getTokenScoreDatabaseScoreWeight())
 						&& !osw.equals(p.getTokenScoreOverlapScoreWeight())
-						&& !bsw.equals(p.getTokenScoreBitScoreWeight())
-						&& !goTermScoreInformationContentWeight.equals(p.getGoTermScoreInformationContentWeight()));
+						&& !bsw.equals(p.getTokenScoreBitScoreWeight()));
 	}
 
 	@Test
@@ -154,21 +149,18 @@ public class ParametersTest {
 		Double dbsw = new Double(p.getTokenScoreDatabaseScoreWeight());
 		Double osw = new Double(p.getTokenScoreOverlapScoreWeight());
 		Double bsw = new Double(p.getTokenScoreBitScoreWeight());
-		Double goTermScoreInformationContentWeight = new Double(p.getGoTermScoreInformationContentWeight());
 		// test:
 		p.mutateTokenScoreOverlapScoreWeight();
 		assertEquals(
 				1.0,
 				p.getTokenScoreBitScoreWeight()
 						+ p.getTokenScoreDatabaseScoreWeight()
-						+ p.getTokenScoreOverlapScoreWeight()
-						+ p.getGoTermScoreInformationContentWeight(), 0.001);
+						+ p.getTokenScoreOverlapScoreWeight(), 0.001);
 		assertTrue(
 				"All three Token-Score-Weights should have changed.",
 				!dbsw.equals(p.getTokenScoreDatabaseScoreWeight())
 						&& !osw.equals(p.getTokenScoreOverlapScoreWeight())
-						&& !bsw.equals(p.getTokenScoreBitScoreWeight())
-						&& !goTermScoreInformationContentWeight.equals(p.getGoTermScoreInformationContentWeight()));
+						&& !bsw.equals(p.getTokenScoreBitScoreWeight()));
 	}
 
 	@Test
@@ -177,21 +169,18 @@ public class ParametersTest {
 		Double dbsw = new Double(p.getTokenScoreDatabaseScoreWeight());
 		Double osw = new Double(p.getTokenScoreOverlapScoreWeight());
 		Double bsw = new Double(p.getTokenScoreBitScoreWeight());
-		Double goTermScoreInformationContentWeight = new Double(p.getGoTermScoreInformationContentWeight());
 		// test:
 		p.mutateTokenScoreDatabaseScoreWeight();
 		assertEquals(
 				1.0,
 				p.getTokenScoreBitScoreWeight()
 						+ p.getTokenScoreDatabaseScoreWeight()
-						+ p.getTokenScoreOverlapScoreWeight()
-						+ p.getGoTermScoreInformationContentWeight(), 0.001);
+						+ p.getTokenScoreOverlapScoreWeight(), 0.001);
 		assertTrue(
 				"All three Token-Score-Weights should have changed.",
 				!dbsw.equals(p.getTokenScoreDatabaseScoreWeight())
 						&& !osw.equals(p.getTokenScoreOverlapScoreWeight())
-						&& !bsw.equals(p.getTokenScoreBitScoreWeight())
-						&& !goTermScoreInformationContentWeight.equals(p.getGoTermScoreInformationContentWeight()));
+						&& !bsw.equals(p.getTokenScoreBitScoreWeight()));
 	}
 	
 	@Test
@@ -207,14 +196,15 @@ public class ParametersTest {
 				1.0,
 				p.getTokenScoreBitScoreWeight()
 						+ p.getTokenScoreDatabaseScoreWeight()
-						+ p.getTokenScoreOverlapScoreWeight()
-						+ p.getGoTermScoreInformationContentWeight(), 0.001);
+						+ p.getTokenScoreOverlapScoreWeight(), 0.001);
 		assertTrue(
-				"All three Token-Score-Weights should have changed.",
-				!dbsw.equals(p.getTokenScoreDatabaseScoreWeight())
-						&& !osw.equals(p.getTokenScoreOverlapScoreWeight())
-						&& !bsw.equals(p.getTokenScoreBitScoreWeight())
-						&& !goTermScoreInformationContentWeight.equals(p.getGoTermScoreInformationContentWeight()));
+				"The three Token-Score-Weights should not have changed.",
+				dbsw.equals(p.getTokenScoreDatabaseScoreWeight())
+						&& osw.equals(p.getTokenScoreOverlapScoreWeight())
+						&& bsw.equals(p.getTokenScoreBitScoreWeight()));
+		assertTrue(
+				"The goTermScoreInformationContentWeight should have changed.",
+				!goTermScoreInformationContentWeight.equals(p.getGoTermScoreInformationContentWeight()));
 	}
 
 	@Test

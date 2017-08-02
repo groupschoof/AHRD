@@ -10,7 +10,7 @@ write_best_blast_hits_to_output: true
 f_measure_beta_parameter: 1.0
 token_score_bit_score_weight: 0.468
 token_score_database_score_weight: 0.2098
-token_score_overlap_score_weight: 0.2221
+token_score_overlap_score_weight: 0.3221
 go_term_score_information_content_weight: 0.1
 blacklist: ./test/resources/blacklist_descline.txt
 token_blacklist: ./test/resources/blacklist_token.txt

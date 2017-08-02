@@ -17,7 +17,7 @@ public class UtilsTest {
 
 	@Test
 	public void testFromFile() throws IOException {
-		List<String> fromFile = Utils.fromFile("test/resources/go_references.csv");
+		List<String> fromFile = Utils.fromFile("test/resources/ground_truth_go_annotations.goa");
 		assertEquals(6, fromFile.size());
 
 		fromFile = Utils.fromFile("./test/resources/empty_file.txt");

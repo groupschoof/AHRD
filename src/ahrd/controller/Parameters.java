@@ -226,6 +226,21 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	}
 
 	/**
+	 * Returns 100 multiplied with the rounded up absolute of a random Gaussian
+	 * distributed value with mean Settings.MUTATOR_MEAN and deviation
+	 * Settings.MUTATOR_DEVIATION.
+	 * 
+	 * @Note: Only the <strong>absolute</strong> of the random Gaussian is
+	 *        returned, as to subtract or add is decided elsewhere.
+	 * 
+	 * @return Long - The value to add or subtract from the Percentage to
+	 *         mutate.
+	 */
+	public Long mutateBlastDatabaseWeightBy() {
+		return new Double(Math.ceil(100.0 * mutatePercentageBy())).longValue();
+	}
+	
+	/**
 	 * @param blastDatabaseName
 	 */
 	public void mutateDescriptionScoreBitScoreWeight(String blastDatabaseName) {
@@ -239,7 +254,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	}
 
 	/**
-	 * Normalizes the four weights appearing in the Token-Score-Formula, so
+	 * Normalizes the three weights appearing in the Token-Score-Formula, so
 	 * they sum up to 1.0
 	 */
 	public void normalizeTokenScoreWeights() {
@@ -256,51 +271,33 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 
 	/**
 	 * Diminishes or increases Token-Score-Bit-Score-Weight by
-	 * PERCENTAGE_MUTATOR_SEED and normalizes the other three weights in the
+	 * PERCENTAGE_MUTATOR_SEED and normalizes the three weights in the
 	 * Token-Score-Formula.
 	 */
 	public void mutateTokenScoreBitScoreWeight() {
-		Double bsw = getTokenScoreBitScoreWeight();
-		Double mutateBy = mutatePercentageBy();
-		if (randomSaveSubtract(bsw, mutateBy))
-			bsw = bsw - mutateBy;
-		else
-			bsw = bsw + mutateBy;
-		setTokenScoreBitScoreWeight(bsw);
+		setTokenScoreBitScoreWeight(mutateZeroToOne(getTokenScoreBitScoreWeight()));
 		// normalize:
 		normalizeTokenScoreWeights();
 	}
 
 	/**
 	 * Diminishes or increases Token-Score-Database-Score-Weight by
-	 * PERCENTAGE_MUTATOR_SEED and normalizes the other three weights in the
+	 * PERCENTAGE_MUTATOR_SEED and normalizes the three weights in the
 	 * Token-Score-Formula.
 	 */
 	public void mutateTokenScoreDatabaseScoreWeight() {
-		Double dbsw = getTokenScoreDatabaseScoreWeight();
-		Double mutateBy = mutatePercentageBy();
-		if (randomSaveSubtract(dbsw, mutateBy))
-			dbsw = dbsw - mutateBy;
-		else
-			dbsw = dbsw + mutateBy;
-		setTokenScoreDatabaseScoreWeight(dbsw);
+		setTokenScoreDatabaseScoreWeight(mutateZeroToOne(getTokenScoreDatabaseScoreWeight()));
 		// normalize:
 		normalizeTokenScoreWeights();
 	}
 
 	/**
 	 * Diminishes or increases Token-Score-Overlap-Score-Weight by
-	 * PERCENTAGE_MUTATOR_SEED and normalizes the other three weights in the
+	 * PERCENTAGE_MUTATOR_SEED and normalizes the three weights in the
 	 * Token-Score-Formula.
 	 */
 	public void mutateTokenScoreOverlapScoreWeight() {
-		Double osw = getTokenScoreOverlapScoreWeight();
-		Double mutateBy = mutatePercentageBy();
-		if (randomSaveSubtract(osw, mutateBy))
-			osw = osw - mutateBy;
-		else
-			osw = osw + mutateBy;
-		setTokenScoreOverlapScoreWeight(osw);
+		setTokenScoreOverlapScoreWeight(mutateZeroToOne(getTokenScoreOverlapScoreWeight()));
 		// normalize:
 		normalizeTokenScoreWeights();
 	}
@@ -309,30 +306,43 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 * Diminishes or increases Go-Term-Score-Information-Content-Weight
 	 */
 	public void mutateGoTermScoreInformationContentWeight() {
-		Double icw = getGoTermScoreInformationContentWeight();
-		Double mutateBy = icw*mutatePercentageBy();
-		Double updown = Utils.random.nextGaussian();
-		if (icw >= 1.0) {
-			updown = -1.0;
-		}
-		if (icw <= 0.0) {
-			updown = 1.0;
+		setGoTermScoreInformationContentWeight(mutateZeroToOne(getGoTermScoreInformationContentWeight()));
+	}
+
+	/**
+	 * Diminishes or increases Informative-Token-Threshold
+	 */
+	public void mutateInformativeTokenThreshold() {
+		setInformativeTokenThreshold(mutateZeroToOne(getInformativeTokenThreshold()));
+	}
+		
+	/**
+	 * Diminishes or increases a value between zero and one
+	 */
+	public double mutateZeroToOne(double value) {
+		double mutateBy = value*mutatePercentageBy();
+		boolean up = Utils.random.nextBoolean();
+		if (value <= 0.0) {
+			up = true;
 			mutateBy = 0.01*mutatePercentageBy();
 		}
-		if (updown < 0) {
-			if (icw - mutateBy < 0.0) {
-				icw = 0.0;
+		if (value >= 1.0) {
+			up = false;
+		}
+		if (up) {
+			if (value + mutateBy > 1.0) {
+				value = 1.0;
 			} else {
-				icw = icw - mutateBy;
+				value = value + mutateBy;
 			}
 		} else {
-			if (icw + mutateBy > 1.0) {
-				icw = 1.0;
+			if (value - mutateBy < 0.0) {
+				value = 0.0;
 			} else {
-				icw = icw + mutateBy;
+				value = value - mutateBy;
 			}
 		}
-		setGoTermScoreInformationContentWeight(icw);
+		return(value);
 	}
 
 	/**
@@ -351,48 +361,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				+ getSettings().getMutatorMean());
 	}
 
-	/**
-	 * Returns 100 multiplied with the rounded up absolute of a random Gaussian
-	 * distributed value with mean Settings.MUTATOR_MEAN and deviation
-	 * Settings.MUTATOR_DEVIATION.
-	 * 
-	 * @Note: Only the <strong>absolute</strong> of the random Gaussian is
-	 *        returned, as to subtract or add is decided elsewhere.
-	 * 
-	 * @return Long - The value to add or subtract from the Percentage to
-	 *         mutate.
-	 */
-	public Long mutateBlastDatabaseWeightBy() {
-		return new Double(Math.ceil(100.0 * mutatePercentageBy())).longValue();
-	}
-	
-	public void mutateInformativeTokenThreshold() {
-		Double itt = getInformativeTokenThreshold();
-		Double mutateBy = itt*mutatePercentageBy();
-		Double updown = Utils.random.nextGaussian();
-		if (itt >= 1.0) {
-			updown = -1.0;
-		}
-		if (itt <= 0.0) {
-			updown = 1.0;
-			mutateBy = 0.01*mutatePercentageBy();
-		}
-		if (updown < 0) {
-			if (itt - mutateBy < 0.0) {
-				itt = 0.0;
-			} else {
-				itt = itt - mutateBy;
-			}
-		} else {
-			if (itt + mutateBy > 1.0) {
-				itt = 1.0;
-			} else {
-				itt = itt + mutateBy;
-			}
-		}
-		setInformativeTokenThreshold(itt);
-	}
-	
 	/**
 	 * Creates an offspring with a random recombination of the current parameters and a given parameter set.
 	 * 
