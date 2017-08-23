@@ -9,13 +9,13 @@ public class GOterm implements java.io.Serializable {
 	// Used during deserialization to verify that the sender and receiver of a
 	// serialized object have loaded classes for that object that are compatible
 	// with respect to serialization.
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	private String accession;
 	private String name;
 	private String ontology;
 	private Boolean obsolete = false;
-	private Integer frequency = 0;
-	private Double probability = 0.0;
+	private Integer annotationCount = 0;
+	private Double annotationFrequency = 0.0;
 	private Double informationContent = Double.POSITIVE_INFINITY; 
 	/**
 	 * Ancestral Gene Ontology (GO) terms of a particular GOterm include the GOterm instance itself.
@@ -81,20 +81,20 @@ public class GOterm implements java.io.Serializable {
 		this.obsolete = obsolete;
 	}
 
-	public Integer getFrequency() {
-		return frequency;
+	public Integer getAnnotationCount() {
+		return annotationCount;
 	}
 
-	public void setFrequency(Integer frequency) {
-		this.frequency = frequency;
+	public void setAnnotationCount(Integer annotationCount) {
+		this.annotationCount = annotationCount;
 	}
 
-	public Double getProbability() {
-		return probability;
+	public Double getAnnotationFrequency() {
+		return annotationFrequency;
 	}
 
-	public void setProbability(Double probability) {
-		this.probability = probability;
+	public void setAnnotationFrequency(Double annotationFrequency) {
+		this.annotationFrequency = annotationFrequency;
 	}
 
 	public Double getInformationContent() {

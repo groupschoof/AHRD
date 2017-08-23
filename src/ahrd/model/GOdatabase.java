@@ -220,19 +220,19 @@ public class GOdatabase {
 							case "biological_process":
 								bpCount++;
 								for(GOterm parent : ancestry) {
-									parent.setFrequency(parent.getFrequency() + 1);
+									parent.setAnnotationCount(parent.getAnnotationCount() + 1);
 								}
 								break;
 							case "cellular_component":
 								ccCount++;
 								for(GOterm parent : ancestry) {
-									parent.setFrequency(parent.getFrequency() + 1);
+									parent.setAnnotationCount(parent.getAnnotationCount() + 1);
 								}
 								break;
 							case "molecular_function":
 								mfCount++;
 								for(GOterm parent : ancestry) {
-									parent.setFrequency(parent.getFrequency() + 1);
+									parent.setAnnotationCount(parent.getAnnotationCount() + 1);
 								}
 								break;
 							default:
@@ -254,20 +254,20 @@ public class GOdatabase {
 		long processSwissProtElapsedTimeMilli = processSwissProtFinishTime - processSwissProtStartTime;
 		double proccesSwissProtElapsedTimeSec = roundToNDecimalPlaces((double) processSwissProtElapsedTimeMilli /(double) 1000, 1);
 		System.out.println("Time to process SwissProt annotations: " + proccesSwissProtElapsedTimeSec + " s");
-		// Calculate the information content from the term probabilities
+		// Calculate the information content from the term annotation frequencies
 		for (GOterm term : accGoDb.values() ){
 			switch(term.getOntology()) {
 			case "biological_process":
-				term.setProbability((double)term.getFrequency()/bpCount);
-				term.setInformationContent(-1*Math.log(term.getProbability()));
+				term.setAnnotationFrequency((double)term.getAnnotationCount()/bpCount);
+				term.setInformationContent(-1*Math.log(term.getAnnotationFrequency()));
 				break;
 			case "cellular_component":
-				term.setProbability((double)term.getFrequency()/ccCount);
-				term.setInformationContent(-1*Math.log(term.getProbability()));
+				term.setAnnotationFrequency((double)term.getAnnotationCount()/ccCount);
+				term.setInformationContent(-1*Math.log(term.getAnnotationFrequency()));
 				break;
 			case "molecular_function":
-				term.setProbability((double)term.getFrequency()/mfCount);
-				term.setInformationContent(-1*Math.log(term.getProbability()));
+				term.setAnnotationFrequency((double)term.getAnnotationCount()/mfCount);
+				term.setInformationContent(-1*Math.log(term.getAnnotationFrequency()));
 				break;
 			default:
 				break; //meta term: Not counted towards any of the three ontologies
@@ -277,17 +277,17 @@ public class GOdatabase {
 		System.out.println("GO terms in database: " + accGoDb.size());
 		
 		// Check consistency of root term annotation count and information content
-		if (accGoDb.get(bpRootAcc).getFrequency() != bpCount) {
-			System.err.println("Consistency error in GO frequencies of the biological process ontology");
-			System.err.println("Term frequency: " + accGoDb.get(bpRootAcc).getFrequency());
+		if (accGoDb.get(bpRootAcc).getAnnotationCount() != bpCount) {
+			System.out.println("Consistency error in GO frequencies of the biological process ontology");
+			System.out.println("Term frequency: " + accGoDb.get(bpRootAcc).getAnnotationCount());
 		}
-		if (accGoDb.get(ccRootAcc).getFrequency() != ccCount) {
-			System.err.println("Consistency error in GO frequencies of the cellular component ontology");
-			System.err.println("Term frequency: " + accGoDb.get(ccRootAcc).getFrequency());
+		if (accGoDb.get(ccRootAcc).getAnnotationCount() != ccCount) {
+			System.out.println("Consistency error in GO frequencies of the cellular component ontology");
+			System.out.println("Term frequency: " + accGoDb.get(ccRootAcc).getAnnotationCount());
 		}
-		if (accGoDb.get(mfRootAcc).getFrequency() != mfCount) {
-			System.err.println("Consistency error in GO frequencies of the molecular function ontology");
-			System.err.println("Term frequency: " + accGoDb.get(mfRootAcc).getFrequency());
+		if (accGoDb.get(mfRootAcc).getAnnotationCount() != mfCount) {
+			System.out.println("Consistency error in GO frequencies of the molecular function ontology");
+			System.out.println("Term frequency: " + accGoDb.get(mfRootAcc).getAnnotationCount());
 		}
 		if (accGoDb.get(bpRootAcc).getInformationContent() != 0.0) {
 			System.err.println("Root term of biological process ontology has a non zero information content: " + accGoDb.get(bpRootAcc).getInformationContent());
