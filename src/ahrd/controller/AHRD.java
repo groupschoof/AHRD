@@ -311,7 +311,7 @@ public class AHRD {
 					if (reference != null) { 
 						for (String termAcc : reference) {
 							GOterm term = goDB.get(termAcc);
-							double infoContentScore = 1 - getSettings().getGoTermScoreInformationContentWeight() * term.getProbability();
+							double infoContentScore = 1 - getSettings().getGoTermScoreInformationContentWeight() * term.getAnnotationFrequency();
 							double goTermAbundancyScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
 														+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
 														+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;
