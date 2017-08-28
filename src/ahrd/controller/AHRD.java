@@ -248,8 +248,7 @@ public class AHRD {
 		}
 	}
 	/**
-	 * Assign a Gene Ontology terms to each Protein
-	 * 
+	 * Assign Gene Ontology terms to each Protein
 	 */
 	public void assignGeneOntologyTerms() throws MissingInterproResultException, IOException, SQLException {
 		// Load a Map of all GO terms
