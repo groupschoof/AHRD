@@ -9,7 +9,7 @@ public class GOterm implements java.io.Serializable {
 	// Used during deserialization to verify that the sender and receiver of a
 	// serialized object have loaded classes for that object that are compatible
 	// with respect to serialization.
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	private String accession;
 	private String name;
 	private String ontology;
