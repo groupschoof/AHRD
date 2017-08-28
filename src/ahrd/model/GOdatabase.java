@@ -328,6 +328,12 @@ public class GOdatabase {
 				fileIn.close();
 				System.out.println("Sucessfully deserialized. Size: " + goDbFromFile.size() + " terms");
 				return goDbFromFile;
+			} catch (java.io.InvalidClassException exp) {
+				System.out.println("GOterm class incompatibility discovered while deserializing GO database object."
+						+ "\nThe accGoDb.ser file in the ./AHRD/data folder seems to have been created with a differnt build of AHRD."
+						+ "\nPlease trigger the automatic rebuild process for the GO database by deleting the accGoDbOwl.ser file before you run AHRD again.");
+				exp.printStackTrace();
+				return null;
 			} catch (IOException i) {
 				i.printStackTrace();
 				return null;
