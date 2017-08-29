@@ -12,11 +12,19 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GoAnnotationReference {
+public class ReferenceGoAnnotation {
 
-	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
-	public static final String GO_TERM_GROUP_NAME = "goTerm";
+	private static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
+	private static final String GO_TERM_GROUP_NAME = "goTerm";
+	private static final String EVIDENCE_CODE_GROUP_NAME = "evidenceCode";
+	private String goTerm;
+	private String evidenceCode;
 
+	public ReferenceGoAnnotation(String term, String code) {
+		super();
+		this.goTerm = term;
+		this.evidenceCode = code;
+	}
 	/**
 	 * Parses the tabular reference Gene Ontology term annotations (GOA) for
 	 * proteins in the searched Blast databases. These GOAs will then be used to
@@ -32,9 +40,9 @@ public class GoAnnotationReference {
 	 *         Sets of GO terms
 	 * @throws IOException
 	 */
-	public static Map<String, Set<String>> parseGoAnnotationReference(
+	public static Map<String, Set<ReferenceGoAnnotation>> parseGoAnnotationReference(
 			Set<String> uniqueShortAccessions) throws IOException {
-		Map<String, Set<String>> goa = new HashMap<String, Set<String>>();
+		Map<String, Set<ReferenceGoAnnotation>> goa = new HashMap<String, Set<ReferenceGoAnnotation>>();
 		BufferedReader goaIn = null;
 		for (String blastDatabaseName : getSettings().getBlastDatabases()) {
 			if (getSettings().hasGeneOntologyAnnotation(blastDatabaseName)) {
@@ -42,14 +50,18 @@ public class GoAnnotationReference {
 					goaIn = new BufferedReader(new FileReader(getSettings()
 							.getPathToGeneOntologyReference(blastDatabaseName)));
 					Pattern p = getSettings().getGoReferenceRegex(blastDatabaseName);
-					String line, shortAcc, goTerm = "";
+					String line, shortAcc, term, code = "";
 					while ((line = goaIn.readLine()) != null) {
 						Matcher m = p.matcher(line);
 						if (m.find()) {
 							shortAcc = m.group(SHORT_ACCESSION_GROUP_NAME);
 							if (uniqueShortAccessions.contains(shortAcc)) {
-								goTerm = m.group(GO_TERM_GROUP_NAME);
-								addGoAnnotation(goa, shortAcc, goTerm);
+								term = m.group(GO_TERM_GROUP_NAME);
+								code = m.group(EVIDENCE_CODE_GROUP_NAME);
+								if (!goa.containsKey(shortAcc)) {
+									goa.put(shortAcc, new HashSet<ReferenceGoAnnotation>());
+								}
+								goa.get(shortAcc).add(new ReferenceGoAnnotation(term, code));
 							}
 						}
 					}
@@ -61,20 +73,19 @@ public class GoAnnotationReference {
 		return goa;
 	}
 
-	/**
-	 * Adds the Gene Ontology term <code>goTerm</code> to the Set of the
-	 * BlastResult's GO term annotations. In this, the BlastResult is identified
-	 * by its short accession <code>brShortAccession</code>.
-	 * 
-	 * @param goa
-	 * @param brShortAccession
-	 * @param goTerm
-	 */
-	protected static void addGoAnnotation(Map<String, Set<String>> goa,
-			String brShortAccession, String goTerm) {
-		if (!goa.containsKey(brShortAccession)) {
-			goa.put(brShortAccession, new HashSet<String>());
-		}
-		goa.get(brShortAccession).add(goTerm);
+	public String getGoTerm() {
+		return goTerm;
+	}
+
+	public void setGoTerm(String goTerm) {
+		this.goTerm = goTerm;
+	}
+
+	public String getEvidenceCode() {
+		return evidenceCode;
+	}
+
+	public void setEvidenceCode(String evidenceCode) {
+		this.evidenceCode = evidenceCode;
 	}
 }

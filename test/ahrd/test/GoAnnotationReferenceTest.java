@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.Protein;
+import ahrd.model.ReferenceGoAnnotation;
 
 public class GoAnnotationReferenceTest {
 
@@ -73,8 +75,11 @@ public class GoAnnotationReferenceTest {
 		assertNotNull(ahrd.getGoAnnotationReference());
 		assertTrue(!ahrd.getGoAnnotationReference().isEmpty());
 		assertEquals(4, ahrd.getGoAnnotationReference().size());
-		Set<String> dbGos = ahrd.getGoAnnotationReference()
-				.get("AT1G01040");
+		Set<ReferenceGoAnnotation> reference = ahrd.getGoAnnotationReference().get("AT1G01040");
+		Set<String> dbGos = new HashSet<String>();
+		for (ReferenceGoAnnotation annotation : reference) {
+			dbGos.add(annotation.getGoTerm());
+		}
 		assertTrue(dbGos.contains("GO:0005634"));
 		assertTrue(dbGos.contains("GO:0008026"));
 	}

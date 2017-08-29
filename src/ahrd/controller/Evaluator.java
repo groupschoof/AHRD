@@ -17,6 +17,7 @@ import ahrd.model.GOdatabase;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
 import ahrd.model.GroundTruthDescription;
+import ahrd.model.ReferenceGoAnnotation;
 import ahrd.view.EvaluatorOutputWriter;
 import ahrd.view.TsvOutputWriter;
 
@@ -71,7 +72,9 @@ public class Evaluator extends AHRD {
 						for (String blastDb : bestBlastResult.keySet()) {
 						String bestBlastResultShortAccession = bestBlastResult.get(blastDb).getShortAccession();
 							if (getGoAnnotationReference().containsKey(bestBlastResultShortAccession)) {
-								for (String termAcc : getGoAnnotationReference().get(bestBlastResultShortAccession)) {
+								String termAcc;
+								for (ReferenceGoAnnotation annotation : getGoAnnotationReference().get(bestBlastResultShortAccession)) {
+									termAcc = annotation.getGoTerm();
 									GOterm term = goDB.get(termAcc);
 									if (term == null) {
 										throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
@@ -90,7 +93,9 @@ public class Evaluator extends AHRD {
 						for (BlastResult br : blastDbResults) {
 							String blastResultShortAccession = br.getShortAccession();
 							if (getGoAnnotationReference().containsKey(blastResultShortAccession)) {
-								for (String termAcc : getGoAnnotationReference().get(blastResultShortAccession)) {
+								String termAcc;
+								for (ReferenceGoAnnotation annotation : getGoAnnotationReference().get(blastResultShortAccession)) {
+									termAcc = annotation.getGoTerm();
 									GOterm term = goDB.get(termAcc);
 									if (term == null) {
 										throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");

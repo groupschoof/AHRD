@@ -2,8 +2,6 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Settings.setSettings;
-import static ahrd.controller.Utils.roundToNDecimalPlaces;
-import static ahrd.model.GoAnnotationReference.parseGoAnnotationReference;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -28,6 +26,7 @@ import ahrd.model.GOterm;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import ahrd.model.TokenScoreCalculator;
+import ahrd.model.ReferenceGoAnnotation;
 import ahrd.view.FastaOutputWriter;
 import ahrd.view.OutputWriter;
 import ahrd.view.TsvOutputWriter;
@@ -39,7 +38,7 @@ public class AHRD {
 
 	private Map<String, Protein> proteins;
 	private Map<String, Double> descriptionScoreBitScoreWeights = new HashMap<String, Double>();
-	private Map<String, Set<String>> goAnnotationReference;
+	private Map<String, Set<ReferenceGoAnnotation>> goAnnotationReference;
 	private Set<String> uniqueBlastResultShortAccessions;
 	private long timestamp;
 	private long memorystamp;
@@ -124,7 +123,7 @@ public class AHRD {
 		// Gene Ontology term annotations:
 		if (getSettings().hasGeneOntologyAnnotations()) {
 			this.setUniqueBlastResultShortAccessions(new HashSet<String>());
-			this.setGoAnnotationReference(new HashMap<String, Set<String>>());
+			this.setGoAnnotationReference(new HashMap<String, Set<ReferenceGoAnnotation>>());
 		}
 	}
 
@@ -163,7 +162,7 @@ public class AHRD {
 	 */
 	public void setUpGoAnnotationReference() throws IOException {
 		if (getSettings().hasGeneOntologyAnnotations()) {
-			setGoAnnotationReference(parseGoAnnotationReference(getUniqueBlastResultShortAccessions()));
+			setGoAnnotationReference(ReferenceGoAnnotation.parseGoAnnotationReference(getUniqueBlastResultShortAccessions()));
 		}
 	}
 
@@ -272,9 +271,11 @@ public class AHRD {
 					double overlapScore = TokenScoreCalculator.overlapScore(blastResult.getQueryStart(), blastResult.getQueryEnd(),
 							protein.getSequenceLength(), blastResult.getSubjectStart(), blastResult.getSubjectEnd(), blastResult.getSubjectLength());
 					totalGoTermOverlapScore += overlapScore; 
-					Set<String> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
+					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
 					if (reference != null) {
-						for (String goTerm : reference) {
+						String goTerm;
+						for (ReferenceGoAnnotation annotation : reference) {
+							goTerm = annotation.getGoTerm();
 							// calculate cumulative bit score
 							if (!cumulativeGoTermBitScores.containsKey(goTerm)) {
 								cumulativeGoTermBitScores.put(goTerm, new Double(blastResult.getBitScore()));
@@ -306,9 +307,11 @@ public class AHRD {
 			double goTermHighScore = 0.0;
 			for (String blastDbName : protein.getBlastResults().keySet()) {
 				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
-					Set<String> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
-					if (reference != null) { 
-						for (String termAcc : reference) {
+					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
+					if (reference != null) {
+						String termAcc;
+						for (ReferenceGoAnnotation annotation : reference) {
+							termAcc = annotation.getGoTerm();
 							GOterm term = goDB.get(termAcc);
 							double infoContentScore = 1 - getSettings().getGoTermScoreInformationContentWeight() * term.getAnnotationFrequency();
 							double goTermAbundancyScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
@@ -330,10 +333,10 @@ public class AHRD {
 				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
 					double sumGoTermScores = 0.0;
 					int goTermCount = 0;
-					Set<String> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
+					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
 					if (reference != null) { 
-						for (String goTerm : reference) {
-							sumGoTermScores += goTermScores.get(goTerm);
+						for (ReferenceGoAnnotation annotation : reference) {
+							sumGoTermScores += goTermScores.get(annotation.getGoTerm());
 							goTermCount++;
 						}
 					}
@@ -346,7 +349,12 @@ public class AHRD {
 				}
 			}
 			if (highestScoringBlastResult != null) {
-				protein.setGoResults(getGoAnnotationReference().get(highestScoringBlastResult.getShortAccession()));
+				Set<ReferenceGoAnnotation> reference = getGoAnnotationReference().get(highestScoringBlastResult.getShortAccession());
+				Set<String> results = new HashSet<String>();
+				for (ReferenceGoAnnotation annotation : reference) {
+					results.add(annotation.getGoTerm());
+				}
+				protein.setGoResults(results);
 			} else {
 				protein.setGoResults(new HashSet<String>());
 			}
@@ -422,11 +430,11 @@ public class AHRD {
 		this.descriptionScoreBitScoreWeights = descriptionScoreBitScoreWeights;
 	}
 
-	public Map<String, Set<String>> getGoAnnotationReference() {
+	public Map<String, Set<ReferenceGoAnnotation>> getGoAnnotationReference() {
 		return goAnnotationReference;
 	}
 
-	public void setGoAnnotationReference(Map<String, Set<String>> goaReference) {
+	public void setGoAnnotationReference(Map<String, Set<ReferenceGoAnnotation>> goaReference) {
 		this.goAnnotationReference = goaReference;
 	}
 
