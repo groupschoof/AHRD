@@ -114,6 +114,7 @@ public class Settings implements Cloneable {
 	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score";
 	public static final String WRITE_FSCORE_DETAILS_TO_OUTPUT = "write_fscore_details_to_output";
 	public static final String INFORMATIVE_TOKEN_THRESHOLD = "informative_token_threshold";
+	public static final String REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY = "reference_go_annotation_evidence_code_weights";
 	
 	/**
 	 * Fields:
@@ -291,8 +292,7 @@ public class Settings implements Cloneable {
 	 * Adds the precision and recall to the output of all (go based) F-scores 
 	 */
 	private boolean writeFscoreDetailsToOutput = false;
-
-	/**
+		/**
 	 * Construct from contents of file 'AHRD_input.yml'.
 	 * 
 	 * @throws IOException
@@ -301,7 +301,6 @@ public class Settings implements Cloneable {
 		super();
 		this.initialize(pathToYml);
 	}
-	
 	/**
 	 * Default description line blacklist.
 	 * Is applied to all blast databases that don't have a description line blacklist specified.
@@ -317,6 +316,10 @@ public class Settings implements Cloneable {
 	 * Is applied to all blast databases that don't have a token blacklist specified.
 	 */
 	private Set<String> defaultTokenBlacklist = new HashSet<String>();
+	/**
+	 * Weights of reference go annotation evidence codes for prediction of query protein go term annotations  
+	 */
+	private Map<String, Double> evidenceCodeWeights = new HashMap<String, Double>();
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -483,6 +486,44 @@ public class Settings implements Cloneable {
 		this.setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
 		if (input.get(INFORMATIVE_TOKEN_THRESHOLD) != null) {
 			this.setInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD)));
+		}
+		/**
+		 * Initialize default reference go annotation evidence code weights
+		 * (see: http://www.geneontology.org/page/guide-go-evidence-codes)
+		 */
+		//Experimental Evidence codes:
+		getEvidenceCodeWeights().put("EXP", 1.0); //Inferred from Experiment
+		getEvidenceCodeWeights().put("IDA", 1.0); //Inferred from Direct Assay
+		getEvidenceCodeWeights().put("IPI", 1.0); //Inferred from Physical Interaction
+		getEvidenceCodeWeights().put("IMP", 1.0); //Inferred from Mutant Phenotype
+		getEvidenceCodeWeights().put("IGI", 1.0); //Inferred from Genetic Interaction
+		getEvidenceCodeWeights().put("IEP", 1.0); //Inferred from Expression Pattern
+		//Computational Analysis evidence codes:
+		getEvidenceCodeWeights().put("ISS", 1.0); //Inferred from Sequence or structural Similarity
+		getEvidenceCodeWeights().put("ISO", 1.0); //Inferred from Sequence Orthology
+		getEvidenceCodeWeights().put("ISA", 1.0); //Inferred from Sequence Alignment
+		getEvidenceCodeWeights().put("ISM", 1.0); //Inferred from Sequence Model
+		getEvidenceCodeWeights().put("IGC", 1.0); //Inferred from Genomic Context
+		getEvidenceCodeWeights().put("IBA", 1.0); //Inferred from Biological aspect of Ancestor
+		getEvidenceCodeWeights().put("IBD", 1.0); //Inferred from Biological aspect of Descendant
+		getEvidenceCodeWeights().put("IKR", 1.0); //Inferred from Key Residues
+		getEvidenceCodeWeights().put("IRD", 1.0); //Inferred from Rapid Divergence
+		getEvidenceCodeWeights().put("RCA", 1.0); //Reviewed Computational Analysis
+		// Author Statement evidence codes:
+		getEvidenceCodeWeights().put("TAS", 1.0); //Traceable Author Statement
+		getEvidenceCodeWeights().put("NAS", 1.0); //Non-traceable Author Statement
+		// Curatorial Statement codes
+		getEvidenceCodeWeights().put("IC", 1.0); //Inferred By Curator
+		getEvidenceCodeWeights().put("ND", 1.0); //No Biological Data Available
+		// Automatically-Assigned evidence code
+		getEvidenceCodeWeights().put("IEA", 1.0); //Inferred from Electronic Annotation
+		/**
+		 * Override default evidence codes weights if specified in YML input
+		 */
+		if (input.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY) != null) {
+			for (Map.Entry<String, String> pair : ((Map<String, String>) input.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY)).entrySet()) {
+				getEvidenceCodeWeights().put(pair.getKey(), Double.parseDouble(pair.getValue()));
+			}
 		}
 	}
 
@@ -1230,5 +1271,13 @@ public class Settings implements Cloneable {
 
 	public void setDefaultTokenBlacklist(Set<String> defaultTokenBlacklists) {
 		this.defaultTokenBlacklist = defaultTokenBlacklists;
+	}
+
+	public Map<String, Double> getEvidenceCodeWeights() {
+		return evidenceCodeWeights;
+	}
+
+	public void setEvidenceCodeWeights(Map<String, Double> evidenceCodeWeights) {
+		this.evidenceCodeWeights = evidenceCodeWeights;
 	}
 }

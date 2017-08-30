@@ -336,7 +336,7 @@ public class AHRD {
 					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
 					if (reference != null) { 
 						for (ReferenceGoAnnotation annotation : reference) {
-							sumGoTermScores += goTermScores.get(annotation.getGoTerm());
+							sumGoTermScores += goTermScores.get(annotation.getGoTerm()) * getSettings().getEvidenceCodeWeights().get(annotation.getEvidenceCode());
 							goTermCount++;
 						}
 					}
