@@ -88,4 +88,22 @@ public class ReferenceGoAnnotation {
 	public void setEvidenceCode(String evidenceCode) {
 		this.evidenceCode = evidenceCode;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if((obj != null) && (obj.getClass() == this.getClass())) {
+			if (this.goTerm.equals(((ReferenceGoAnnotation)obj).getGoTerm())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	@Override
+    public int hashCode() {
+		return this.goTerm.hashCode();
+	}
 }
