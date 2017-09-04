@@ -61,7 +61,20 @@ public class ReferenceGoAnnotation {
 								if (!goa.containsKey(shortAcc)) {
 									goa.put(shortAcc, new HashSet<ReferenceGoAnnotation>());
 								}
-								goa.get(shortAcc).add(new ReferenceGoAnnotation(term, code));
+								Set<ReferenceGoAnnotation> reference = goa.get(shortAcc);
+								boolean referenceAlreadyContainsTerm = false;
+								for (ReferenceGoAnnotation annotation : reference) {
+									if (annotation.getGoTerm().equals(term)) {
+										referenceAlreadyContainsTerm = true;
+										if (getSettings().getEvidenceCodeWeights().get(code) > getSettings().getEvidenceCodeWeights().get(annotation.getEvidenceCode())) {
+											reference.add(new ReferenceGoAnnotation(term, code));
+										}
+										break;
+									}
+								}
+								if (!referenceAlreadyContainsTerm) {
+									goa.get(shortAcc).add(new ReferenceGoAnnotation(term, code));
+								}
 							}
 						}
 					}
