@@ -273,9 +273,8 @@ public class AHRD {
 					totalGoTermOverlapScore += overlapScore; 
 					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
 					if (reference != null) {
-						String goTerm;
 						for (ReferenceGoAnnotation annotation : reference) {
-							goTerm = annotation.getGoTerm();
+							String goTerm = annotation.getGoTerm();
 							// calculate cumulative bit score
 							if (!cumulativeGoTermBitScores.containsKey(goTerm)) {
 								cumulativeGoTermBitScores.put(goTerm, new Double(blastResult.getBitScore()));
@@ -302,6 +301,33 @@ public class AHRD {
 					}
 				}
 			}
+			// Calculate GO term evidence code scores
+			Map<String, Double> cumulativeGoTermEvidenceCodeWeights = new HashMap<String, Double>();
+			Map<String, Integer> termAnnotationCounts = new HashMap<String, Integer>();
+			for (String blastDbName : protein.getBlastResults().keySet()) {
+				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
+					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
+					if (reference != null) {
+						for (ReferenceGoAnnotation annotation : reference) {
+							String goTerm = annotation.getGoTerm();
+							String code = annotation.getEvidenceCode();
+							// calculate cumulative evidence code score
+							if (!cumulativeGoTermEvidenceCodeWeights.containsKey(goTerm)) {
+								cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeights().get(code));
+							} else {
+								cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeights().get(code) + cumulativeGoTermEvidenceCodeWeights.get(goTerm));
+							}
+							// calculate number of term annotations 
+							if (!termAnnotationCounts.containsKey(goTerm)) {
+								termAnnotationCounts.put(goTerm, 1);
+							} else {
+								termAnnotationCounts.put(goTerm, termAnnotationCounts.get(goTerm) + 1);
+							}
+
+						}
+					}
+				}
+			}
 			// Calculate GO Term-Scores and GO term high score
 			Map<String, Double> goTermScores = new HashMap<String, Double>();
 			double goTermHighScore = 0.0;
@@ -309,15 +335,15 @@ public class AHRD {
 				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
 					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
 					if (reference != null) {
-						String termAcc;
 						for (ReferenceGoAnnotation annotation : reference) {
-							termAcc = annotation.getGoTerm();
+							String termAcc = annotation.getGoTerm();
 							GOterm term = goDB.get(termAcc);
-							double infoContentScore = 1 - getSettings().getGoTermScoreInformationContentWeight() * term.getAnnotationFrequency();
+							double infoContentScore = 1 - (getSettings().getGoTermScoreInformationContentWeight() * term.getAnnotationFrequency());
+							double evidenceCodeScore = 1 - (getSettings().getInformativeTokenThreshold() * (1 - (cumulativeGoTermEvidenceCodeWeights.get(termAcc) / termAnnotationCounts.get(termAcc)))); 
 							double goTermAbundancyScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
 														+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
 														+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;
-							double goTermScore = goTermAbundancyScore * infoContentScore; 
+							double goTermScore = goTermAbundancyScore * infoContentScore * evidenceCodeScore;
 							goTermScores.put(termAcc, goTermScore);
 							if (goTermScore > goTermHighScore) {
 								goTermHighScore = goTermScore;

@@ -65,7 +65,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	/**
 	 * Weight of the Information Content on the calculation of the goTermScore
 	 */
-	private Double goTermScoreInformationContentWeight;
+	private Double goTermScoreInformationContentWeight = 0.5;
 	/**
 	 * 
 	 * @param sortedDistinctBlastDatabaseNames
