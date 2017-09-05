@@ -339,7 +339,7 @@ public class AHRD {
 							String termAcc = annotation.getGoTerm();
 							GOterm term = goDB.get(termAcc);
 							double infoContentScore = 1 - (getSettings().getGoTermScoreInformationContentWeight() * term.getAnnotationFrequency());
-							double evidenceCodeScore = 1 - (getSettings().getInformativeTokenThreshold() * (1 - (cumulativeGoTermEvidenceCodeWeights.get(termAcc) / termAnnotationCounts.get(termAcc)))); 
+							double evidenceCodeScore = 1 - (getSettings().getGoTermScoreEvidenceCodeScoreWeight() * (1 - (cumulativeGoTermEvidenceCodeWeights.get(termAcc) / termAnnotationCounts.get(termAcc)))); 
 							double goTermAbundancyScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
 														+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
 														+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;

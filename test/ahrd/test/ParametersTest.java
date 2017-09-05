@@ -40,7 +40,7 @@ public class ParametersTest {
 		for (int i = 0; i < 500; i++) {
 			inds.add(p.parameterToMutateRandomIndex());
 		}
-		assertEquals(10, inds.size());
+		assertEquals(Parameters.NUMBER_OF_NON_DB_PARAMETERS + 2 * 3, inds.size());
 		// Parameter-Indices: 0..3 + 2 * 3 (#Blast-Databases) = 9
 		// Indices 0 to 9 should all be present:
 		for (int r = 0; r < 10; r++) {
@@ -211,7 +211,7 @@ public class ParametersTest {
 	public void testNeighbour() {
 		// test
 		Parameters n = getSettings().getParameters().neighbour(0.0);
-		assertNotNull("The neighbor of current Settings mus not be NULL.", n);
+		assertNotNull("The neighbor of current Settings must not be NULL.", n);
 		assertTrue(
 				"The neighbour of current Settings must not be the same object as Settings. - Expecting a slightly changed CLONE!",
 				!n.equals(getSettings().getParameters()));
@@ -220,54 +220,38 @@ public class ParametersTest {
 		boolean blastParamDiff = false;
 		for (String blastDbName : getSettings().getBlastDatabases()) {
 			blastParamDiff = blastParamDiff
-					|| (!n.getBlastDbWeight(blastDbName).equals(
-							s.getBlastDbWeight(blastDbName)) || !n
-							.getDescriptionScoreBitScoreWeight(blastDbName)
-							.equals(s
-									.getDescriptionScoreBitScoreWeight(blastDbName)));
+					|| (!n.getBlastDbWeight(blastDbName).equals(s.getBlastDbWeight(blastDbName)) 
+					|| !n.getDescriptionScoreBitScoreWeight(blastDbName).equals(s.getDescriptionScoreBitScoreWeight(blastDbName)));
 		}
 		assertTrue(
 				"The cloned neighbour must differ in exactly one AHRD-parameter-field from the currently set Settings.",
-				(!n.getTokenScoreBitScoreWeight().equals(
-						s.getTokenScoreBitScoreWeight())
-						|| !n.getTokenScoreDatabaseScoreWeight().equals(
-								s.getTokenScoreDatabaseScoreWeight()) || !n
-						.getTokenScoreOverlapScoreWeight().equals(
-								s.getTokenScoreOverlapScoreWeight()) || !n
-						.getInformativeTokenThreshold().equals(
-								s.getInformativeTokenThreshold()))
+				(!n.getTokenScoreBitScoreWeight().equals(s.getTokenScoreBitScoreWeight())
+						|| !n.getTokenScoreDatabaseScoreWeight().equals(s.getTokenScoreDatabaseScoreWeight()) 
+						|| !n.getTokenScoreOverlapScoreWeight().equals(s.getTokenScoreOverlapScoreWeight()) 
+						|| !n.getInformativeTokenThreshold().equals(s.getInformativeTokenThreshold())
+						|| !n.getGoTermScoreInformationContentWeight().equals(s.getGoTermScoreInformationContentWeight())
+						|| !n.getGoTermScoreEvidenceCodeScoreWeight().equals(s.getGoTermScoreEvidenceCodeScoreWeight()))
 						|| blastParamDiff);
 		// Extreme Score-Increase should result in mutation of the same
 		// parameter:
-		for (int paramInd = 0; paramInd < 10; paramInd++) {
+		for (int paramInd = 0; paramInd < Parameters.NUMBER_OF_NON_DB_PARAMETERS + 2 * 3; paramInd++) {
 			n.setLastMutatedParameter(paramInd);
 			Parameters n2 = n.neighbour(1.0);
 			assertEquals(
 					"The neighbor must remember which Parameter has been mutated to evolve him from its parent.",
 					new Integer(paramInd), n2.getLastMutatedParameter());
-			if (paramInd == 0)
-				assertTrue(
-						"TokenScoreBitScoreWeight should have been mutated.",
-						!n.getTokenScoreBitScoreWeight().equals(
-								n2.getTokenScoreBitScoreWeight()));
-			else if (paramInd == 1)
-				assertTrue(
-						"TokenScoreDatabaseScoreWeight should have been mutated.",
-						!n.getTokenScoreDatabaseScoreWeight().equals(
-								n2.getTokenScoreDatabaseScoreWeight()));
-			else if (paramInd == 2)
-				assertTrue(
-						"TokenScoreOverlapScoreWeight should have been mutated.",
-						!n.getTokenScoreOverlapScoreWeight().equals(
-								n2.getTokenScoreOverlapScoreWeight()));
-			else if (paramInd == 3)
-				assertTrue(
-						"InformativeTokenThreshold should have been mutated.",
-						!n.getInformativeTokenThreshold().equals(
-								n2.getInformativeTokenThreshold()));
-			else if (paramInd > 3) {
+			if (paramInd < Parameters.NUMBER_OF_NON_DB_PARAMETERS) {
+				switch (paramInd) {
+				case 0: assertTrue("TokenScoreBitScoreWeight should have been mutated.",!n.getTokenScoreBitScoreWeight().equals(n2.getTokenScoreBitScoreWeight())); break;
+				case 1: assertTrue("TokenScoreDatabaseScoreWeight should have been mutated.",!n.getTokenScoreDatabaseScoreWeight().equals(n2.getTokenScoreDatabaseScoreWeight())); break; 
+				case 2: assertTrue("TokenScoreOverlapScoreWeight should have been mutated.",!n.getTokenScoreOverlapScoreWeight().equals(n2.getTokenScoreOverlapScoreWeight())); break; 
+				case 3: assertTrue("GoTermScoreInformationContentWeight should have been mutated.",!n.getGoTermScoreInformationContentWeight().equals(n2.getGoTermScoreInformationContentWeight())); break; 
+				case 4: assertTrue("InformativeTokenThreshold should have been mutated.",!n.getInformativeTokenThreshold().equals(n2.getInformativeTokenThreshold())); break;
+				case 5: assertTrue("GoTermScoreEvidenceCodeScoreWeight should have been mutated.",!n.getGoTermScoreEvidenceCodeScoreWeight().equals(n2.getGoTermScoreEvidenceCodeScoreWeight())); break;
+				}
+			} else {
 				String blastDbName = getSettings().getSortedBlastDatabases()
-						.get((new Double(Math.floor((paramInd - 4) / 2.0)))
+						.get((new Double(Math.floor((paramInd - Parameters.NUMBER_OF_NON_DB_PARAMETERS) / 2.0)))
 								.intValue());
 				boolean mutatedBlastDbWeight = ! (paramInd % 2 == 1);
 				if (mutatedBlastDbWeight)

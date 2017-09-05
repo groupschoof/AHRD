@@ -45,7 +45,7 @@ public class TrainerOutputWriter {
 		hdr += "Average Evaluation-Score(F-Score)";
 		if (!isFinalOutput)
 			hdr += "\tDiff-to-curr-Accepted\tAccepted";
-		hdr += "\tAverage Precision\tAverage Recall\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight\tInformative-Token-Threshold";
+		hdr += "\tAverage Precision\tAverage Recall\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight\tGo-Term-Score-Information-Content-Weight\tInformative-Token-Threshold\tGo-Term-Score-Evidence-Code-Score-Weight";
 		for (String blastDb : this.sortedBlastDatabases) {
 			hdr += "\t" + blastDb + "-Weight";
 			hdr += "\t" + blastDb + "-Description-Score-Bit-Score-Weight";
@@ -96,7 +96,9 @@ public class TrainerOutputWriter {
 				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreOverlapScoreWeight()) + "\t"
-				+ FRMT.format(s.getInformativeTokenThreshold());
+				+ FRMT.format(s.getGoTermScoreInformationContentWeight()) + "\t"
+				+ FRMT.format(s.getInformativeTokenThreshold()) + "\t"
+				+ FRMT.format(s.getGoTermScoreEvidenceCodeScoreWeight());
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + FRMT.format(s.getBlastDbWeight(blastDb));
 			col += "\t"
@@ -115,7 +117,9 @@ public class TrainerOutputWriter {
 				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreOverlapScoreWeight()) + "\t"
-				+ FRMT.format(s.getInformativeTokenThreshold());
+				+ FRMT.format(s.getGoTermScoreInformationContentWeight()) + "\t"
+				+ FRMT.format(s.getInformativeTokenThreshold()) + "\t"
+				+ FRMT.format(s.getGoTermScoreEvidenceCodeScoreWeight());
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + FRMT.format(s.getBlastDbWeight(blastDb));
 			col += "\t"

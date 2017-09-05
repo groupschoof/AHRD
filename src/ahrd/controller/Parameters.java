@@ -1,7 +1,6 @@
 package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
-import static ahrd.controller.Utils.randomMultipleOfOneTenth;
 import static ahrd.controller.Utils.randomMultipleOfOne;
 import static ahrd.controller.Utils.randomMultipleOfTen;
 import static ahrd.controller.Utils.randomSaveSubtract;
@@ -22,6 +21,8 @@ import java.util.Set;
  * @author Kathrin Klee, Asis Hallab
  */
 public class Parameters implements Cloneable, Comparable<Parameters> {
+	
+	public static final int NUMBER_OF_NON_DB_PARAMETERS = 6;
 
 	private Double tokenScoreBitScoreWeight;
 	private Double tokenScoreDatabaseScoreWeight;
@@ -67,6 +68,10 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 */
 	private Double goTermScoreInformationContentWeight = 0.5;
 	/**
+	 * Weight of the reference go annotation evidence code weights on the calculation of the goTermScore
+	 */
+	private Double goTermScoreEvidenceCodeScoreWeight = 0.5;
+	/**
 	 * 
 	 * @param sortedDistinctBlastDatabaseNames
 	 * @return
@@ -79,6 +84,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		out.setTokenScoreDatabaseScoreWeight(rand.nextDouble());
 		out.setTokenScoreOverlapScoreWeight(rand.nextDouble());
 		out.setGoTermScoreInformationContentWeight(rand.nextDouble());
+		out.setGoTermScoreEvidenceCodeScoreWeight(rand.nextDouble());
 		// normalize the randomly chosen weights:
 		out.normalizeTokenScoreWeights();
 		// draw random informative token threshold between 0 an 1
@@ -123,7 +129,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	public int parameterToMutateRandomIndex() {
 		int randParamInd = 0;
 		// How many Parameters can be mutated?
-		int noOfParams = 4 + 2 * getBlastDatabases().size();
+		int noOfParams = NUMBER_OF_NON_DB_PARAMETERS + 2 * getBlastDatabases().size();
 		// Randomly choose a parameter to change:
 		Random rand = Utils.random;
 		randParamInd = rand.nextInt(noOfParams);
@@ -167,20 +173,19 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 			randParamToMutate = parameterToMutateRandomIndex();
 		}
 		// Once a parameter is chosen by its index, mutate it:
-		if (randParamToMutate < 4) {
-			// Mutate one of the four parameters independent of the number of
-			// Blast-Databases:
-			if (randParamToMutate == 0)
-				ngb.mutateTokenScoreBitScoreWeight();
-			else if (randParamToMutate == 1)
-				ngb.mutateTokenScoreDatabaseScoreWeight();
-			else if (randParamToMutate == 2)
-				ngb.mutateTokenScoreOverlapScoreWeight();
-			else if (randParamToMutate == 3)
-				ngb.mutateInformativeTokenThreshold();
+		if (randParamToMutate < NUMBER_OF_NON_DB_PARAMETERS) {
+			// Mutate one of the six parameters independent of the number of Blast-Databases:
+			switch(randParamToMutate) {
+				case 0: ngb.mutateTokenScoreBitScoreWeight(); break;
+				case 1: ngb.mutateTokenScoreDatabaseScoreWeight(); break;
+				case 2: ngb.mutateTokenScoreOverlapScoreWeight(); break;
+				case 3: ngb.mutateGoTermScoreInformationContentWeight(); break;
+				case 4: ngb.mutateInformativeTokenThreshold(); break;
+				case 5: ngb.mutateGoTermScoreEvidenceCodeScoreWeight(); break; 
+			}
 		} else {
 			// Mutate a Parameter associated with a Blast-Database:
-			int indOfBlastDbToMutate = randParamToMutate - 4;
+			int indOfBlastDbToMutate = randParamToMutate - NUMBER_OF_NON_DB_PARAMETERS;
 			int blastDbIndex = (new Double(
 					Math.floor(indOfBlastDbToMutate / 2.0))).intValue();
 			String blastDbToMutate = getSettings().getSortedBlastDatabases()
@@ -314,6 +319,13 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	public void mutateInformativeTokenThreshold() {
 		setInformativeTokenThreshold(mutateZeroToOne(getInformativeTokenThreshold()));
 	}
+
+	/**
+	 * Diminishes or increases Go-Term-Score-Information-Content-Weight
+	 */
+	public void mutateGoTermScoreEvidenceCodeScoreWeight() {
+		setGoTermScoreEvidenceCodeScoreWeight(mutateZeroToOne(getGoTermScoreEvidenceCodeScoreWeight()));
+	}
 		
 	/**
 	 * Diminishes or increases a value between zero and one
@@ -382,6 +394,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 			offspring.setGoTermScoreInformationContentWeight(partner.getGoTermScoreInformationContentWeight());
 		if(rand.nextBoolean())
 			offspring.setInformativeTokenThreshold(partner.getInformativeTokenThreshold());
+		if(rand.nextBoolean())
+			offspring.setGoTermScoreEvidenceCodeScoreWeight(partner.getGoTermScoreEvidenceCodeScoreWeight());
 		for (String blastDbName : getSettings().getSortedBlastDatabases()) {
 			if(rand.nextBoolean())
 				offspring.setDescriptionScoreBitScoreWeight(blastDbName, partner.getDescriptionScoreBitScoreWeight(blastDbName).toString());
@@ -444,7 +458,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 						.equals(this.getTokenScoreDatabaseScoreWeight())
 				&& ((Parameters) eql).getTokenScoreOverlapScoreWeight().equals(this.getTokenScoreOverlapScoreWeight())
 				&& ((Parameters) eql).getGoTermScoreInformationContentWeight().equals(this.getGoTermScoreInformationContentWeight())
-				&& ((Parameters) eql).getInformativeTokenThreshold().equals(this.getInformativeTokenThreshold());
+				&& ((Parameters) eql).getInformativeTokenThreshold().equals(this.getInformativeTokenThreshold())
+				&& ((Parameters) eql).getGoTermScoreEvidenceCodeScoreWeight().equals(this.getGoTermScoreEvidenceCodeScoreWeight());
 	}
 
 	@Override
@@ -459,7 +474,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				+ getTokenScoreDatabaseScoreWeight()
 				+ getTokenScoreOverlapScoreWeight()
 				+ getGoTermScoreInformationContentWeight()
-				+ getInformativeTokenThreshold();
+				+ getInformativeTokenThreshold()
+				+ getGoTermScoreEvidenceCodeScoreWeight();
 		return hashSrc.hashCode();
 	}
 
@@ -603,6 +619,10 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				return -1;
 			if (this.getInformativeTokenThreshold() > other.getInformativeTokenThreshold())
 				return 1;
+			if (this.getGoTermScoreEvidenceCodeScoreWeight() < other.getGoTermScoreEvidenceCodeScoreWeight())
+				return -1;
+			if (this.getGoTermScoreEvidenceCodeScoreWeight() > other.getGoTermScoreEvidenceCodeScoreWeight())
+				return 1;
 			for (String blastDbName : getSettings().getSortedBlastDatabases()) {
 				if (this.getDescriptionScoreBitScoreWeight(blastDbName) < other.getDescriptionScoreBitScoreWeight(blastDbName))
 					return -1;
@@ -639,5 +659,13 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 
 	public void setGoTermScoreInformationContentWeight(Double goTermScoreInformationContentWeight) {
 		this.goTermScoreInformationContentWeight = goTermScoreInformationContentWeight;
+	}
+
+	public Double getGoTermScoreEvidenceCodeScoreWeight() {
+		return goTermScoreEvidenceCodeScoreWeight;
+	}
+
+	public void setGoTermScoreEvidenceCodeScoreWeight(Double goTermScoreEvidenceCodeScoreWeight) {
+		this.goTermScoreEvidenceCodeScoreWeight = goTermScoreEvidenceCodeScoreWeight;
 	}
 }

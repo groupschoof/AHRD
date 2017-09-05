@@ -805,6 +805,14 @@ public class Settings implements Cloneable {
 		this.getParameters().setGoTermScoreInformationContentWeight(goTermScoreInformationContentWeight);
 	}
 	
+	public Double getGoTermScoreEvidenceCodeScoreWeight() {
+		return getParameters().getGoTermScoreEvidenceCodeScoreWeight();
+	}
+
+	public void setGoTermScoreEvidenceCodeScoreWeight(Double goTermScoreEvidenceCodeScoreWeight) {
+		this.getParameters().setGoTermScoreEvidenceCodeScoreWeight(goTermScoreEvidenceCodeScoreWeight);
+	}
+	
 	public double getInformativeTokenThreshold() {
 		return getParameters().getInformativeTokenThreshold();
 	}
