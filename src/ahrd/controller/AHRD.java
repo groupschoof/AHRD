@@ -352,22 +352,35 @@ public class AHRD {
 					}
 				}
 			}
+			// Filter GO Term-Scores
+			for (String goTerm : goTermScores.keySet()) {
+				if (goTermScores.get(goTerm) < goTermHighScore * 0.5) {
+					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * 0.5));
+				}
+			}
 			// Find highest scoring GO annotation
 			double goAnnotationTopScore = 0.0;
 			BlastResult highestScoringBlastResult = null;
 			for (String blastDbName : protein.getBlastResults().keySet()) {
 				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
 					double sumGoTermScores = 0.0;
+					int informativeGoTermCount = 0;
 					int goTermCount = 0;
 					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
 					if (reference != null) { 
 						for (ReferenceGoAnnotation annotation : reference) {
-							sumGoTermScores += goTermScores.get(annotation.getGoTerm()) * getSettings().getEvidenceCodeWeights().get(annotation.getEvidenceCode());
+							Double goTermScore = goTermScores.get(annotation.getGoTerm());
+							sumGoTermScores += goTermScore * getSettings().getEvidenceCodeWeights().get(annotation.getEvidenceCode());
 							goTermCount++;
+							if (goTermScore > goTermHighScore * 0.5) {
+								informativeGoTermCount++;
+							}
 						}
 					}
+					double correctionFactor = ((double) informativeGoTermCount) / ((double) goTermCount);
+					double lexicalScore = correctionFactor * sumGoTermScores / goTermHighScore;
 					double relativeBlastScore = getSettings().getDescriptionScoreBitScoreWeight(blastDbName) * blastResult.getBitScore() / maxBitScore;
-					double goAnnotationScore = (sumGoTermScores / goTermCount) + relativeBlastScore;
+					double goAnnotationScore = lexicalScore + relativeBlastScore;
 					if (goAnnotationScore > goAnnotationTopScore) {
 						goAnnotationTopScore = goAnnotationScore;
 						highestScoringBlastResult = blastResult;
