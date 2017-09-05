@@ -73,15 +73,15 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 */
 	public static Parameters randomParameters(List<String> sortedDistinctBlastDatabaseNames) {
 		Parameters out = new Parameters();
+		Random rand = Utils.random;
 		// draw random token score weights
-		out.setTokenScoreBitScoreWeight(randomMultipleOfOneTenth());
-		out.setTokenScoreDatabaseScoreWeight(randomMultipleOfOneTenth());
-		out.setTokenScoreOverlapScoreWeight(randomMultipleOfOneTenth());
-		out.setGoTermScoreInformationContentWeight(randomMultipleOfOneTenth());
+		out.setTokenScoreBitScoreWeight(rand.nextDouble());
+		out.setTokenScoreDatabaseScoreWeight(rand.nextDouble());
+		out.setTokenScoreOverlapScoreWeight(rand.nextDouble());
+		out.setGoTermScoreInformationContentWeight(rand.nextDouble());
 		// normalize the randomly chosen weights:
 		out.normalizeTokenScoreWeights();
 		// draw random informative token threshold between 0 an 1
-		Random rand = Utils.random;
 		out.setInformativeTokenThreshold(rand.nextDouble());
 		// Init BlastDbs' Parameters:
 		for (String blastDbName : sortedDistinctBlastDatabaseNames) {
@@ -138,10 +138,9 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 * <li>Token-Score-Bit-Score-Weight</li>
 	 * <li>Token-Score-Database-Score-Weight</li>
 	 * <li>Token-Score-Overlap-Score-Weight</li>
-	 * <li>Blast-Database-Weight</li>
-	 * <li>Description-Score-Bit-Score-Weight (different for each
-	 * Blast-Database)</li>
-	 * <li>Description-Score-Relative-Description-Frequency-Weight</li>
+	 * <li>Informative-Token-Threshold</li>
+	 * <li>Blast-Database-Weight(different for each Blast-Database)</li>
+	 * <li>Description-Score-Bit-Score-Weight (different for each Blast-Database)</li>
 	 * </ul>
 	 * 
 	 * @NOTE: The three <em>Token-Score-Weights</em> <strong>must</strong> sum
