@@ -57,23 +57,25 @@ public class ReferenceGoAnnotation {
 							shortAcc = m.group(SHORT_ACCESSION_GROUP_NAME);
 							if (uniqueShortAccessions.contains(shortAcc)) {
 								term = m.group(GO_TERM_GROUP_NAME);
-								code = m.group(EVIDENCE_CODE_GROUP_NAME);
-								if (!goa.containsKey(shortAcc)) {
-									goa.put(shortAcc, new HashSet<ReferenceGoAnnotation>());
-								}
-								Set<ReferenceGoAnnotation> reference = goa.get(shortAcc);
-								boolean referenceAlreadyContainsTerm = false;
-								for (ReferenceGoAnnotation annotation : reference) {
-									if (annotation.getGoTerm().equals(term)) {
-										referenceAlreadyContainsTerm = true;
-										if (getSettings().getEvidenceCodeWeights().get(code) > getSettings().getEvidenceCodeWeights().get(annotation.getEvidenceCode())) {
-											reference.add(new ReferenceGoAnnotation(term, code));
-										}
-										break;
+								if (!(term.equals(GOdatabase.getBProotacc()) | term.equals(GOdatabase.getCCrootacc()) | term.equals(GOdatabase.getMFrootacc()))) {
+									code = m.group(EVIDENCE_CODE_GROUP_NAME);
+									if (!goa.containsKey(shortAcc)) {
+										goa.put(shortAcc, new HashSet<ReferenceGoAnnotation>());
 									}
-								}
-								if (!referenceAlreadyContainsTerm) {
-									goa.get(shortAcc).add(new ReferenceGoAnnotation(term, code));
+									Set<ReferenceGoAnnotation> reference = goa.get(shortAcc);
+									boolean referenceAlreadyContainsTerm = false;
+									for (ReferenceGoAnnotation annotation : reference) {
+										if (annotation.getGoTerm().equals(term)) {
+											referenceAlreadyContainsTerm = true;
+											if (getSettings().getEvidenceCodeWeights().get(code) > getSettings().getEvidenceCodeWeights().get(annotation.getEvidenceCode())) {
+												reference.add(new ReferenceGoAnnotation(term, code));
+											}
+											break;
+										}
+									}
+									if (!referenceAlreadyContainsTerm) {
+										goa.get(shortAcc).add(new ReferenceGoAnnotation(term, code));
+									}
 								}
 							}
 						}

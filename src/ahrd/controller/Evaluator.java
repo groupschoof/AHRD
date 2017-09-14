@@ -52,15 +52,17 @@ public class Evaluator extends AHRD {
 				String[] groundTruthGoAnnotationFileEntry = groundTruthGoAnnotationFileEntryLine.split("\t");
 				String protAcc = groundTruthGoAnnotationFileEntry[0].trim();
 				String termAcc = groundTruthGoAnnotationFileEntry[1].trim();
-				Protein p = getProteins().get(protAcc);
-				if (p == null) {
-					throw new MissingAccessionException("Could not find protein for accession '" + protAcc + "'");
+				if (!(termAcc.equals(GOdatabase.getBProotacc()) | termAcc.equals(GOdatabase.getCCrootacc()) | termAcc.equals(GOdatabase.getMFrootacc()))) {
+					Protein p = getProteins().get(protAcc);
+					if (p == null) {
+						throw new MissingAccessionException("Could not find protein for accession '" + protAcc + "'");
+					}
+					GOterm term = goDB.get(termAcc);
+					if (term == null) {
+						throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
+					}
+					p.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations().add(term);	
 				}
-				GOterm term = goDB.get(termAcc);
-				if (term == null) {
-					throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
-				}
-				p.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations().add(term);
 			}
 			// Add GOterm objects to predicted annotations
 			goAnnotsStringToObject();

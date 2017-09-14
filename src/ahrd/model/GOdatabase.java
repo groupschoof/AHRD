@@ -335,15 +335,15 @@ public class GOdatabase {
 		fos.close();
 	}
 
-	public static String getBprootacc() {
+	public static String getBProotacc() {
 		return bpRootAcc;
 	}
 
-	public static String getCcrootacc() {
+	public static String getCCrootacc() {
 		return ccRootAcc;
 	}
 
-	public static String getMfrootacc() {
+	public static String getMFrootacc() {
 		return mfRootAcc;
 	}
 
