@@ -359,6 +359,19 @@ public class AHRD {
 					annots.add(goTerm);
 				}
 			}
+			// Remove redundant ancestor terms
+			HashSet<String> annotsToBeRemoved = new HashSet<String>();
+			for (String childAcc : annots) {
+				GOterm child = goDB.get(childAcc);
+				for (GOterm ancestor : child.getAncestry()) {
+					String ancestorAcc = ancestor.getAccession();
+					if (annots.contains(ancestorAcc) && !ancestorAcc.equals(childAcc)) {
+						annotsToBeRemoved.add(ancestorAcc);
+
+					}
+				}
+			}
+			annots.removeAll(annotsToBeRemoved);
 			if (annots.size() > 0) {
 				protein.setGoResults(annots);
 			} else {
