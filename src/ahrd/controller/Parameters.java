@@ -75,9 +75,9 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		Parameters out = new Parameters();
 		Random rand = Utils.random;
 		// draw random token score weights
-		out.setTokenScoreBitScoreWeight(rand.nextDouble());
-		out.setTokenScoreDatabaseScoreWeight(rand.nextDouble());
-		out.setTokenScoreOverlapScoreWeight(rand.nextDouble());
+		out.setTokenScoreBitScoreWeight(roundToNDecimalPlaces(rand.nextDouble(), 4));
+		out.setTokenScoreDatabaseScoreWeight(roundToNDecimalPlaces(rand.nextDouble(), 4));
+		out.setTokenScoreOverlapScoreWeight(roundToNDecimalPlaces(rand.nextDouble(), 4));
 		out.setGoTermScoreInformationContentWeight(rand.nextDouble());
 		// normalize the randomly chosen weights:
 		out.normalizeTokenScoreWeights();
@@ -257,9 +257,9 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 * they sum up to 1.0
 	 */
 	public void normalizeTokenScoreWeights() {
-		double s = roundToNDecimalPlaces(getTokenScoreBitScoreWeight()
+		double s = getTokenScoreBitScoreWeight()
 				+ getTokenScoreDatabaseScoreWeight()
-				+ getTokenScoreOverlapScoreWeight(), 4);
+				+ getTokenScoreOverlapScoreWeight();
 		setTokenScoreBitScoreWeight(roundToNDecimalPlaces(
 				getTokenScoreBitScoreWeight() / s, 4));
 		setTokenScoreDatabaseScoreWeight(roundToNDecimalPlaces(

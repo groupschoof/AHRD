@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,6 +66,29 @@ public class ParametersTest {
 				p.getTokenScoreBitScoreWeight()
 						+ p.getTokenScoreDatabaseScoreWeight()
 						+ p.getTokenScoreOverlapScoreWeight(), 0.0001);
+		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();
+		sortedDistinctBlastDatabaseNames.addAll(getSettings().getBlastDatabases());
+		Collections.sort(sortedDistinctBlastDatabaseNames);
+		p = Parameters.randomParameters(sortedDistinctBlastDatabaseNames);
+		assertEquals(
+				"The three randomly generated and normalized weights in the Token-Score-Formula should sum up to 1.0",
+				1.0,
+				p.getTokenScoreBitScoreWeight()	+ p.getTokenScoreDatabaseScoreWeight() + p.getTokenScoreOverlapScoreWeight(), 0.001);
+		p.mutateTokenScoreBitScoreWeight();
+		assertEquals(
+				"The mutated TokenScoreBitScoreWeight and the other token score weights in the Token-Score-Formula should sum up to 1.0 after beeing normalized",
+				1.0,
+				p.getTokenScoreBitScoreWeight()	+ p.getTokenScoreDatabaseScoreWeight() + p.getTokenScoreOverlapScoreWeight(), 0.001);
+		p.mutateTokenScoreDatabaseScoreWeight();
+		assertEquals(
+				"The mutated TokenScoreDatabaseScoreWeight and the other token score weights in the Token-Score-Formula should sum up to 1.0 after beeing normalized",
+				1.0,
+				p.getTokenScoreBitScoreWeight()	+ p.getTokenScoreDatabaseScoreWeight() + p.getTokenScoreOverlapScoreWeight(), 0.001);
+		p.mutateTokenScoreOverlapScoreWeight();
+		assertEquals(
+				"The mutated TokenScoreOverlapScoreWeight and the other token score weights in the Token-Score-Formula should sum up to 1.0 after beeing normalized",
+				1.0,
+				p.getTokenScoreBitScoreWeight()	+ p.getTokenScoreDatabaseScoreWeight() + p.getTokenScoreOverlapScoreWeight(), 0.001);
 	}
 
 	@Test
