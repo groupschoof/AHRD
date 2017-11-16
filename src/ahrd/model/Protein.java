@@ -1,6 +1,7 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.DEFAULT_LINE_SEP;
+import static ahrd.controller.Settings.ACCESSION_GROUP_NAME;
 import static ahrd.controller.Settings.getSettings;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import ahrd.exception.MissingAccessionException;
 
@@ -63,19 +65,22 @@ public class Protein {
 	}
 
 	public static List<String> splitFasta(String fastaStr) {
-		List<String> fastaEntries = new ArrayList<String>(
-				Arrays.asList(fastaStr.split("(^|\n|\r)>")));
+		List<String> fastaEntries = new ArrayList<String>(Arrays.asList(fastaStr.split("(^|\n|\r)(?=>)")));
 		fastaEntries.removeAll(Arrays.asList("", null));
 		return fastaEntries;
 	}
 
-	public static Protein constructFromFastaEntry(String fastaEntry)
-			throws MissingAccessionException {
+	public static Protein constructFromFastaEntry(String fastaEntry) throws MissingAccessionException {
 		String[] fasta_data = fastaEntry.split(DEFAULT_LINE_SEP);
-		String accession = fasta_data[0].split(" ")[0];
-		if (accession == null || accession.equals("")) {
-			throw new MissingAccessionException(
-					"Missing protein-accession in:\n" + fastaEntry);
+		Matcher m = getSettings().getProteinsFastaRegex().matcher(fasta_data[0]);
+		String acc = "";
+		if (m.find()) {
+			acc = m.group(ACCESSION_GROUP_NAME);
+			if (acc == null || acc.equals("")) {
+				throw new MissingAccessionException("Missing protein-accession in:\n" + fastaEntry);
+			}
+		} else {
+			throw new MissingAccessionException("Missing protein-accession in:\n" + fastaEntry);
 		}
 		String[] sequence_parts = new String[fasta_data.length - 1];
 		System.arraycopy(fasta_data, 1, sequence_parts, 0,
@@ -88,9 +93,9 @@ public class Protein {
 		// sequence's length:
 		Protein p = null;
 		if (getSettings().doOutputFasta())
-			p = new Protein(accession, sequence);
+			p = new Protein(acc, sequence);
 		else
-			p = new Protein(accession, sequence.length());
+			p = new Protein(acc, sequence.length());
 		return p;
 	}
 
@@ -100,13 +105,11 @@ public class Protein {
 	 * @param fastaFileContent
 	 * @return
 	 */
-	public static Map<String, Protein> initializeProteins(
-			String fastaFileContent) throws MissingAccessionException {
+	public static Map<String, Protein> initializeProteins(String fastaFileContent) throws MissingAccessionException {
 		Map<String, Protein> proteins = new HashMap<String, Protein>();
 		List<String> fastaEntries = splitFasta(fastaFileContent);
 		for (String fastaEntry : fastaEntries) {
-			if (fastaEntry != null && !fastaEntry.trim().equals("")
-					&& !fastaEntry.equals("\n")) {
+			if (fastaEntry != null && !fastaEntry.trim().equals("")	&& !fastaEntry.equals("\n")) {
 				Protein prot = constructFromFastaEntry(fastaEntry);
 				proteins.put(prot.accession, prot);
 			}

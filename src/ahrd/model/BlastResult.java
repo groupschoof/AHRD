@@ -1,5 +1,8 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.ACCESSION_GROUP_NAME;
+import static ahrd.controller.Settings.SHORT_ACCESSION_GROUP_NAME;
+import static ahrd.controller.Settings.DESCRIPTION_GROUP_NAME;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.BufferedReader;
@@ -27,10 +30,6 @@ import ahrd.exception.MissingProteinException;
 public class BlastResult implements Comparable<BlastResult> {
 
 	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
-	public static final String FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME = "accession";
-	public static final String FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME = "description";
-	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
-	public static final String GO_TERM_GROUP_NAME = "goTerm";
 
 	private String accession;
 	private String shortAccession;
@@ -358,10 +357,10 @@ public class BlastResult implements Comparable<BlastResult> {
 								+ Settings.FASTA_HEADER_REGEX_KEY
 								+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
 								+ blastDbName + "'.");
-					} else if (blastResults.containsKey(m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
+					} else if (blastResults.containsKey(m.group(ACCESSION_GROUP_NAME).trim())) {
 						// Found the next Blast HIT:
-						acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim();
-						hrd = m.group(FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME).trim();
+						acc = m.group(ACCESSION_GROUP_NAME).trim();
+						hrd = m.group(DESCRIPTION_GROUP_NAME).trim();
 						// Following lines, until the next header, contain
 						// information to be collected:
 						hit = true;

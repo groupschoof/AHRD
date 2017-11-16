@@ -253,7 +253,7 @@ public class AHRD {
 	}
 
 	/**
-	 * If AHRD is requested to annotate GO term in accordance to a GO slim set
+	 * If AHRD is requested to annotate GO terms in accordance to a GO slim set
 	 * 
 	 * @throws IOException
 	 * @throws MissingAccessionException

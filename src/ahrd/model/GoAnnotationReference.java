@@ -1,5 +1,7 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.SHORT_ACCESSION_GROUP_NAME;
+import static ahrd.controller.Settings.GO_TERM_GROUP_NAME;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.BufferedReader;
@@ -13,10 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GoAnnotationReference {
-
-	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
-	public static final String GO_TERM_GROUP_NAME = "goTerm";
-
 	/**
 	 * Parses the tabular reference Gene Ontology term annotations (GOA) for
 	 * proteins in the searched Blast databases. These GOAs will then be used to
