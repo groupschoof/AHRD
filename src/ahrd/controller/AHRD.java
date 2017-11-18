@@ -126,7 +126,7 @@ public class AHRD {
 		setProteins(Protein.initializeProteins(getSettings().getProteinsFasta()));
 	}
 
-	public void parseBlastResults() throws IOException, MissingProteinException, SAXException {
+	public void parseBlastResults() throws IOException, MissingProteinException, MissingAccessionException, SAXException {
 		for (String blastDatabase : getSettings().getBlastDatabases()) {
 			BlastResult.readBlastResults(getProteins(), blastDatabase, getUniqueBlastResultShortAccessions());
 		}

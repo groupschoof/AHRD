@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ahrd.controller.Settings;
+import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 
 /**
@@ -181,7 +182,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * @throws MissingProteinException
 	 */
 	public static void readBlastResults(Map<String, Protein> proteinDb, String blastDbName,
-			Set<String> uniqueAccessions) throws MissingProteinException, IOException {
+			Set<String> uniqueAccessions) throws MissingProteinException, MissingAccessionException, IOException {
 		Map<String, List<BlastResult>> brs = parseBlastResults(proteinDb, blastDbName, uniqueAccessions);
 		parseBlastDatabase(proteinDb, blastDbName, brs);
 	}
@@ -204,7 +205,7 @@ public class BlastResult implements Comparable<BlastResult> {
 	 * @throws IOException
 	 */
 	public static Map<String, List<BlastResult>> parseBlastResults(Map<String, Protein> proteinDb, String blastDbName,
-			Set<String> uniqueShortAccessions) throws MissingProteinException, IOException {
+			Set<String> uniqueShortAccessions) throws MissingProteinException, MissingAccessionException, IOException {
 		Map<String, List<BlastResult>> brs = new HashMap<String, List<BlastResult>>();
 		BufferedReader fastaIn = null;
 		try {
@@ -217,10 +218,19 @@ public class BlastResult implements Comparable<BlastResult> {
 				if (getSettings().getSeqSimSearchTableCommentLineRegex() == null
 						|| !getSettings().getSeqSimSearchTableCommentLineRegex().matcher(str).matches()) {
 					String[] brFields = str.split(getSettings().getSeqSimSearchTableSep());
-					if (!proteinDb.containsKey(brFields[getSettings().getSeqSimSearchTableQueryCol()])) {
-						throw new MissingProteinException("Could not find Protein for Accession '"
-								+ brFields[getSettings().getSeqSimSearchTableQueryCol()] + "' in Protein Database.");
-					} // ELSE
+					Matcher m = getSettings().getSeqSimSearchTableQueryColRegex().matcher(brFields[getSettings().getSeqSimSearchTableQueryCol()]);
+					String acc = "";
+					if (!m.find()){
+						throw new MissingAccessionException("Missing protein-accession in:\n" + brFields[getSettings().getSeqSimSearchTableQueryCol()]);
+					} else {
+						acc = m.group(ACCESSION_GROUP_NAME);
+						if (acc == null || acc.equals("")) {
+							throw new MissingAccessionException("Missing protein-accession in:\n" + brFields[getSettings().getSeqSimSearchTableQueryCol()]);
+						}
+					}
+					if (!proteinDb.containsKey(acc)) {
+						throw new MissingProteinException("Could not find Protein for Accession '" + acc + "' in Protein Database.");
+					}
 					BlastResult br = new BlastResult(brFields[getSettings().getSeqSimSearchTableSubjectCol()],
 							Double.parseDouble(validateDouble(brFields[getSettings().getSeqSimSearchTableEValueCol()])),
 							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableQueryStartCol()]),
