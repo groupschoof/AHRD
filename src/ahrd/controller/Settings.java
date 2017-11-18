@@ -45,8 +45,6 @@ public class Settings implements Cloneable {
 	public static final String PROTEINS_FASTA_KEY = "proteins_fasta";
 	public static final String PROTEINS_FASTA_REGEX_KEY = "proteins_fasta_regex";
 	public static final Pattern DEFAULT_PROTEINS_FASTA_REGEX = Pattern.compile("^>(?<accession>\\S+).*$");
-	public static final String PROTEINS_FASTA_SHORT_ACCESSION_REGEX_KEY = "proteins_fasta_short_accession_regex";
-	public static final Pattern DEFAULT_PROTEINS_FASTA_SHORT_ACCESSION_REGEX = Pattern.compile("^(?<shortAccession>.+)$");
 	public static final String BLAST_DBS_KEY = "blast_dbs";
 	public static final String BLAST_DB_WEIGHT_KEY = "weight";
 	public static final String BLAST_RESULT_FILE_KEY = "file";
@@ -86,6 +84,8 @@ public class Settings implements Cloneable {
 	public static final String SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY = "seq_sim_search_table_comment_line_regex";
 	public static final String SEQ_SIM_SEARCH_TABLE_SEP_KEY = "seq_sim_search_table_sep";
 	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY = "seq_sim_search_table_query_col";
+	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX_KEY = "seq_sim_search_table_query_col_regex";
+	public static final Pattern DEFAULT_SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX = Pattern.compile("^(?<accession>.+)$");
 	public static final String SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY = "seq_sim_search_table_subject_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY = "seq_sim_search_table_query_start_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY = "seq_sim_search_table_query_end_col";
@@ -128,7 +128,6 @@ public class Settings implements Cloneable {
 	 */
 	private String pathToProteinsFasta;
 	private Pattern proteinsFastaRegex;
-	private Pattern proteinsFastaShortAccessionRegex;
 	private String pathToGroundTruthFasta;
 	private String pathToGroundTruthDescriptionBlacklist;
 	private Set<String> groundTruthDescriptionBlacklist;
@@ -233,6 +232,7 @@ public class Settings implements Cloneable {
 	private Pattern seqSimSearchTableCommentLineRegex = null;
 	private String seqSimSearchTableSep = "\t";
 	private Integer seqSimSearchTableQueryCol = 0;
+	private Pattern seqSimSearchTableQueryColRegex;
 	private Integer seqSimSearchTableSubjectCol = 1;
 	private Integer seqSimSearchTableQueryStartCol = 6;
 	private Integer seqSimSearchTableQueryEndCol = 7;
@@ -351,12 +351,7 @@ public class Settings implements Cloneable {
 		} else {
 			this.setProteinsFastaRegex(DEFAULT_PROTEINS_FASTA_REGEX);
 		}
-		if (input.get(PROTEINS_FASTA_SHORT_ACCESSION_REGEX_KEY) != null) {
-			this.setProteinsFastaShortAccessionRegex(Pattern.compile((String) input.get(PROTEINS_FASTA_SHORT_ACCESSION_REGEX_KEY)));
-		} else {
-			this.setProteinsFastaShortAccessionRegex(DEFAULT_PROTEINS_FASTA_SHORT_ACCESSION_REGEX);
-		}
-		this.setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
+				this.setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
 		this.setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
 		this.setPathToOutput((String) input.get(OUTPUT_KEY));
 		if (input.get(HRD_SCORES_OUTPUT_PATH) != null && !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
@@ -433,6 +428,11 @@ public class Settings implements Cloneable {
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY) != null) {
 			this.setSeqSimSearchTableQueryCol(Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY).toString()));
+		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX_KEY) != null) {
+			this.setSeqSimSearchTableQueryColRegex(Pattern.compile((String) input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX_KEY)));
+		} else {
+			this.setSeqSimSearchTableQueryColRegex(DEFAULT_SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX);
 		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY) != null) {
 			this.setSeqSimSearchTableSubjectCol(
@@ -1259,19 +1259,19 @@ public class Settings implements Cloneable {
 		this.proteinsFastaRegex = proteinsFastaRegex;
 	}
 	
-	public Pattern getProteinsFastaShortAccessionRegex() {
-		return proteinsFastaShortAccessionRegex;
-	}
-
-	public void setProteinsFastaShortAccessionRegex(Pattern proteinsFastaShortAccessionRegex) {
-		this.proteinsFastaShortAccessionRegex = proteinsFastaShortAccessionRegex;
-	}
-
 	public Pattern getGroundTruthFastaRegex() {
 		return groundTruthFastaRegex;
 	}
 
 	public void setGroundTruthFastaRegex(Pattern groundTruthFastaRegex) {
 		this.groundTruthFastaRegex = groundTruthFastaRegex;
+	}
+
+	public Pattern getSeqSimSearchTableQueryColRegex() {
+		return seqSimSearchTableQueryColRegex;
+	}
+
+	public void setSeqSimSearchTableQueryColRegex(Pattern seqSimSearchTableQueryColRegex) {
+		this.seqSimSearchTableQueryColRegex = seqSimSearchTableQueryColRegex;
 	}
 }
