@@ -238,7 +238,7 @@ public class BlastResult implements Comparable<BlastResult> {
 							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableSubjectStartCol()]),
 							Integer.parseInt(brFields[getSettings().getSeqSimSearchTableSubjectEndCol()]),
 							Double.parseDouble(brFields[getSettings().getSeqSimSearchTableBitScoreCol()]), blastDbName,
-							proteinDb.get(brFields[getSettings().getSeqSimSearchTableQueryCol()]));
+							proteinDb.get(acc));
 					addBlastResult(brs, br, uniqueShortAccessions);
 				}
 			}
