@@ -152,7 +152,9 @@ public class GOdatabase {
 							matchcount++;
 							GOterm term = idGoDb.get(Integer.parseInt(m.group("term2id")));
 							GOterm parent = idGoDb.get(Integer.parseInt(m.group("term1id")));
-							term.addTermToAncestry(parent);	
+							if (term != null && parent != null) {
+								term.addTermToAncestry(parent);
+							}
 						}
 					}
 					System.out.println(matchcount + " of " + linecount + " graph path lines matched.");

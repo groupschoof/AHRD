@@ -17,6 +17,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
 import ahrd.model.Protein;
@@ -87,7 +88,7 @@ public class BlastResultTest {
 	}
 
 	@Test
-	public void testParseBlastResults() throws MissingProteinException, IOException {
+	public void testParseBlastResults() throws MissingProteinException, MissingAccessionException, IOException {
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "tair", null);
 		assertNotNull(brs);
@@ -122,7 +123,7 @@ public class BlastResultTest {
 	}
 
 	@Test
-	public void testParseBlastDatabase() throws IOException, MissingProteinException {
+	public void testParseBlastDatabase() throws IOException, MissingProteinException, MissingAccessionException {
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "tair", null);
 		BlastResult.parseBlastDatabase(protDb, "tair", brs);
@@ -172,7 +173,7 @@ public class BlastResultTest {
 	}
 
 	@Test
-	public void testParseLongBlastResults() throws IOException, MissingProteinException {
+	public void testParseLongBlastResults() throws IOException, MissingProteinException, MissingAccessionException {
 		TestUtils.initTestSettings();
 		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
@@ -208,7 +209,7 @@ public class BlastResultTest {
 	}
 
 	@Test
-	public void testParseLongBlastDatabase() throws IOException, MissingProteinException {
+	public void testParseLongBlastDatabase() throws IOException, MissingProteinException, MissingAccessionException {
 		TestUtils.initTestSettings();
 		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
 		getSettings().getBlastDbSettings().get("trembl").put("database",
@@ -235,7 +236,7 @@ public class BlastResultTest {
 	}
 
 	@Test
-	public void testFilterBestScoringBlastResultsLong() throws IOException, MissingProteinException {
+	public void testFilterBestScoringBlastResultsLong() throws IOException, MissingProteinException, MissingAccessionException {
 		TestUtils.initTestSettings();
 		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
 		getSettings().getBlastDbSettings().get("trembl").put("database",
@@ -254,7 +255,7 @@ public class BlastResultTest {
 	}
 
 	@Test
-	public void testGenerateHRDCandidateForProtein() throws IOException, MissingProteinException {
+	public void testGenerateHRDCandidateForProtein() throws IOException, MissingProteinException, MissingAccessionException {
 		TestUtils.initTestSettings();
 		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
 		getSettings().getBlastDbSettings().get("trembl").put("database",

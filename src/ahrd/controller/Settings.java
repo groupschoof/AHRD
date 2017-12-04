@@ -43,6 +43,8 @@ public class Settings implements Cloneable {
 	 * Keys to parse the YML-Input:
 	 */
 	public static final String PROTEINS_FASTA_KEY = "proteins_fasta";
+	public static final String PROTEINS_FASTA_REGEX_KEY = "proteins_fasta_regex";
+	public static final Pattern DEFAULT_PROTEINS_FASTA_REGEX = Pattern.compile("^>(?<accession>\\S+).*$");
 	public static final String BLAST_DBS_KEY = "blast_dbs";
 	public static final String BLAST_DB_WEIGHT_KEY = "weight";
 	public static final String BLAST_RESULT_FILE_KEY = "file";
@@ -68,6 +70,7 @@ public class Settings implements Cloneable {
 	public static final String GROUND_TRUTH_DESCRIPTION_FILTER_KEY = "ground_truth_description_filter";
 	public static final String GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY = "ground_truth_description_blacklist";
 	public static final String GROUND_TRUTH_TOKEN_BLACKLIST_KEY = "ground_truth_token_blacklist";
+	public static final String GROUND_TRUTH_FASTA_REGEX_KEY = "ground_truth_fasta_regex";
 	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
 	public static final String TEMPERATURE_KEY = "temperature";
 	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
@@ -82,6 +85,8 @@ public class Settings implements Cloneable {
 	public static final String SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY = "seq_sim_search_table_comment_line_regex";
 	public static final String SEQ_SIM_SEARCH_TABLE_SEP_KEY = "seq_sim_search_table_sep";
 	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY = "seq_sim_search_table_query_col";
+	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX_KEY = "seq_sim_search_table_query_col_regex";
+	public static final Pattern DEFAULT_SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX = Pattern.compile("^(?<accession>.+)$");
 	public static final String SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY = "seq_sim_search_table_subject_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_START_COL_KEY = "seq_sim_search_table_query_start_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_END_COL_KEY = "seq_sim_search_table_query_end_col";
@@ -91,7 +96,7 @@ public class Settings implements Cloneable {
 	public static final String SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY = "seq_sim_search_table_bit_score_col";
 	public static final String FASTA_HEADER_REGEX_KEY = "fasta_header_regex";
 	public static final Pattern DEFAULT_FASTA_HEADER_REGEX = Pattern
-			.compile("^>(?<accession>\\S+)\\s+(?<description>.+?)\\s+(((OS|os)=.+)|((GN|gn)=.+))?$");
+			.compile("^>(?<accession>\\S+)\\s+(?<description>.+?)(\\s+(((OS|os)=.+)|((GN|gn)=.+)))?$");
 	public static final String SHORT_ACCESSION_REGEX_KEY = "short_accession_regex";
 	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
 	public static final String GENE_ONTOLOGY_REFERENCE_REGEX_KEY = "gene_ontology_reference_regex";
@@ -115,11 +120,16 @@ public class Settings implements Cloneable {
 	public static final String WRITE_FSCORE_DETAILS_TO_OUTPUT = "write_fscore_details_to_output";
 	public static final String INFORMATIVE_TOKEN_THRESHOLD = "informative_token_threshold";
 	public static final String REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY = "reference_go_annotation_evidence_code_weights";
+	public static final String ACCESSION_GROUP_NAME = "accession";
+	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
+	public static final String DESCRIPTION_GROUP_NAME = "description";
+	public static final String GO_TERM_GROUP_NAME = "goTerm";
 	
 	/**
 	 * Fields:
 	 */
 	private String pathToProteinsFasta;
+	private Pattern proteinsFastaRegex;
 	private String pathToGroundTruthFasta;
 	private String pathToGroundTruthDescriptionBlacklist;
 	private Set<String> groundTruthDescriptionBlacklist;
@@ -127,6 +137,7 @@ public class Settings implements Cloneable {
 	private List<String> groundTruthDescriptionFilter;
 	private String pathToGroundTruthTokenBlacklist;
 	private Set<String> groundTruthTokenBlacklist = new HashSet<String>();
+	private Pattern groundTruthFastaRegex;
 	private String pathToInterproDatabase;
 	private String pathToInterproResults;
 	private String pathToOutput;
@@ -223,6 +234,7 @@ public class Settings implements Cloneable {
 	private Pattern seqSimSearchTableCommentLineRegex = null;
 	private String seqSimSearchTableSep = "\t";
 	private Integer seqSimSearchTableQueryCol = 0;
+	private Pattern seqSimSearchTableQueryColRegex;
 	private Integer seqSimSearchTableSubjectCol = 1;
 	private Integer seqSimSearchTableQueryStartCol = 6;
 	private Integer seqSimSearchTableQueryEndCol = 7;
@@ -332,7 +344,12 @@ public class Settings implements Cloneable {
 		Map<String, Object> input = (Map<String, Object>) reader.read();
 		this.blastDbSettings = (Map<String, Map<String, String>>) input.get(BLAST_DBS_KEY);
 		this.setPathToProteinsFasta((String) input.get(PROTEINS_FASTA_KEY));
-		this.setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
+		if (input.get(PROTEINS_FASTA_REGEX_KEY) != null) {
+			this.setProteinsFastaRegex(Pattern.compile((String) input.get(PROTEINS_FASTA_REGEX_KEY)));
+		} else {
+			this.setProteinsFastaRegex(DEFAULT_PROTEINS_FASTA_REGEX);
+		}
+				this.setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
 		this.setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
 		this.setPathToOutput((String) input.get(OUTPUT_KEY));
 		if (input.get(HRD_SCORES_OUTPUT_PATH) != null && !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
@@ -413,6 +430,11 @@ public class Settings implements Cloneable {
 		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY) != null) {
 			this.setSeqSimSearchTableQueryCol(Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY).toString()));
 		}
+		if (input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX_KEY) != null) {
+			this.setSeqSimSearchTableQueryColRegex(Pattern.compile((String) input.get(SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX_KEY)));
+		} else {
+			this.setSeqSimSearchTableQueryColRegex(DEFAULT_SEQ_SIM_SEARCH_TABLE_QUERY_COL_REGEX);
+		}
 		if (input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY) != null) {
 			this.setSeqSimSearchTableSubjectCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_SUBJECT_COL_KEY).toString()));
@@ -452,6 +474,11 @@ public class Settings implements Cloneable {
 		if (input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY) != null) {
 			this.setPathToGroundTruthTokenBlacklist(input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY).toString());
 			this.setGroundTruthTokenBlacklist(new HashSet<String>(fromFile(getPathToGroundTruthTokenBlacklist())));
+		}
+		if (input.get(GROUND_TRUTH_FASTA_REGEX_KEY) != null) {
+			this.setGroundTruthFastaRegex(Pattern.compile((String) input.get(GROUND_TRUTH_FASTA_REGEX_KEY)));
+		} else {
+			this.setGroundTruthFastaRegex(DEFAULT_FASTA_HEADER_REGEX);
 		}
 		if (input.get(GO_DB_PATH_KEY) != null) {
 			this.setPathToGoDatabase(input.get(GO_DB_PATH_KEY).toString());
@@ -1287,5 +1314,29 @@ public class Settings implements Cloneable {
 
 	public void setEvidenceCodeWeights(Map<String, Double> evidenceCodeWeights) {
 		this.evidenceCodeWeights = evidenceCodeWeights;
+	}
+
+	public Pattern getProteinsFastaRegex() {
+		return proteinsFastaRegex;
+	}
+
+	public void setProteinsFastaRegex(Pattern proteinsFastaRegex) {
+		this.proteinsFastaRegex = proteinsFastaRegex;
+	}
+	
+	public Pattern getGroundTruthFastaRegex() {
+		return groundTruthFastaRegex;
+	}
+
+	public void setGroundTruthFastaRegex(Pattern groundTruthFastaRegex) {
+		this.groundTruthFastaRegex = groundTruthFastaRegex;
+	}
+
+	public Pattern getSeqSimSearchTableQueryColRegex() {
+		return seqSimSearchTableQueryColRegex;
+	}
+
+	public void setSeqSimSearchTableQueryColRegex(Pattern seqSimSearchTableQueryColRegex) {
+		this.seqSimSearchTableQueryColRegex = seqSimSearchTableQueryColRegex;
 	}
 }
