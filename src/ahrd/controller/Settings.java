@@ -1319,6 +1319,14 @@ public class Settings implements Cloneable {
 	public void setEvidenceCodeWeights(Map<String, Double> evidenceCodeWeights) {
 		this.evidenceCodeWeights = evidenceCodeWeights;
 	}
+	
+	public Double getEvidenceCodeWeight(String code) {
+		if (getEvidenceCodeWeights().containsKey(code)) {
+			return getEvidenceCodeWeights().get(code);
+		} else {
+			return 1.0;
+		}
+	}
 
 	public Pattern getProteinsFastaRegex() {
 		return proteinsFastaRegex;

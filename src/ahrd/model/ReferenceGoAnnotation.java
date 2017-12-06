@@ -66,7 +66,7 @@ public class ReferenceGoAnnotation {
 								for (ReferenceGoAnnotation annotation : reference) {
 									if (annotation.getGoTerm().equals(term)) {
 										referenceAlreadyContainsTerm = true;
-										if (getSettings().getEvidenceCodeWeights().get(code) > getSettings().getEvidenceCodeWeights().get(annotation.getEvidenceCode())) {
+										if (getSettings().getEvidenceCodeWeight(code) > getSettings().getEvidenceCodeWeight(annotation.getEvidenceCode())) {
 											reference.add(new ReferenceGoAnnotation(term, code));
 										}
 										break;

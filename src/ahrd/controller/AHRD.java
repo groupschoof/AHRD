@@ -313,9 +313,9 @@ public class AHRD {
 							String code = annotation.getEvidenceCode();
 							// calculate cumulative evidence code score
 							if (!cumulativeGoTermEvidenceCodeWeights.containsKey(goTerm)) {
-								cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeights().get(code));
+								cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeight(code));
 							} else {
-								cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeights().get(code) + cumulativeGoTermEvidenceCodeWeights.get(goTerm));
+								cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeight(code) + cumulativeGoTermEvidenceCodeWeights.get(goTerm));
 							}
 							// calculate number of term annotations 
 							if (!termAnnotationCounts.containsKey(goTerm)) {
@@ -370,7 +370,7 @@ public class AHRD {
 					if (reference != null) { 
 						for (ReferenceGoAnnotation annotation : reference) {
 							Double goTermScore = goTermScores.get(annotation.getGoTerm());
-							sumGoTermScores += goTermScore * getSettings().getEvidenceCodeWeights().get(annotation.getEvidenceCode());
+							sumGoTermScores += goTermScore * getSettings().getEvidenceCodeWeight(annotation.getEvidenceCode());
 							goTermCount++;
 							if (goTermScore > goTermHighScore * getSettings().getInformativeTokenThreshold()) {
 								informativeGoTermCount++;
