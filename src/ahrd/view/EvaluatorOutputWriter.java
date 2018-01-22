@@ -11,6 +11,7 @@ import java.util.Map;
 import ahrd.controller.AHRD;
 import ahrd.model.BlastResult;
 import ahrd.model.CompetitorAnnotation;
+import ahrd.model.Fscore;
 import ahrd.model.Protein;
 
 public class EvaluatorOutputWriter extends TsvOutputWriter {
@@ -33,7 +34,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		bw.write(ahrdColumnNames());
 		bw.write("\tHRD-Length\tGround-Truth-Description\tRef-Lenght\tEvaluation-Score");
 		if (getSettings().doWriteFscoreDetailsToOutput()) {
-			bw.write("\tDiff-to-bestCompetitor\tPrecision\tRecall");
+			bw.write("\tDiff-to-bestCompetitor\tPrecision\tRecall\tRemaining-Uncertainty\tMissing-Information");
 		}
 		if (getSettings().getWriteTokenSetToOutput()) {
 			bw.write("\t\"Tokens (tkn->score)\"");
@@ -50,6 +51,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
 					bw.write("\t" + competitor + "-Description-Evaluation-Score-Precision");
 					bw.write("\t" + competitor + "-Description-Evaluation-Score-Recall");
+					bw.write("\t" + competitor + "-Description-Evaluation-Score-Remaining-Uncertainty");
+					bw.write("\t" + competitor + "-Description-Evaluation-Score-Missing-Information");
 				}
 				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 					bw.write("\t" + competitor + "-GO-Annotations");
@@ -58,6 +61,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
 							bw.write("\t" + competitor + "-GO-Annotations-Simple-F-Score-Precision");
 							bw.write("\t" + competitor + "-GO-Annotations-Simple-F-Score-Recall");
+							bw.write("\t" + competitor + "-GO-Annotations-Simple-F-Score-Remaining-Uncertainty");
+							bw.write("\t" + competitor + "-GO-Annotations-Simple-F-Score-Missing-Information");
 						}
 					}
 					if (getSettings().doCalculateAncestryGoF1Scores()){
@@ -65,6 +70,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
 							bw.write("\t" + competitor + "-GO-Annotations-Ancestry-F-Score-Precision");
 							bw.write("\t" + competitor + "-GO-Annotations-Ancestry-F-Score-Recall");
+							bw.write("\t" + competitor + "-GO-Annotations-Ancestry-F-Score-Remaining-Uncertainty");
+							bw.write("\t" + competitor + "-GO-Annotations-Ancestry-F-Score-Missing-Information");
 						}
 					}
 					if (getSettings().doCalculateSemSimGoF1Scores()){
@@ -72,7 +79,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
 							bw.write("\t" + competitor + "-GO-Annotations-SemSim-F-Score-Precision");
 							bw.write("\t" + competitor + "-GO-Annotations-SemSim-F-Score-Recall");
-						}
+							bw.write("\t" + competitor + "-GO-Annotations-SemSim-F-Score-Remaining-Uncertainty");
+							bw.write("\t" + competitor + "-GO-Annotations-SemSim-F-Score-Missing-Information");						}
 					}
 				}
 			}
@@ -83,6 +91,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
 				bw.write("\tHighest-Possible-Description-Score-Precision");
 				bw.write("\tHighest-Possible-Description-Score-Recall");
+				bw.write("\tHighest-Possible-Description-Score-Remaining-Uncertainty");
+				bw.write("\tHighest-Possible-Description-Score-Missing-Information");
 			}
 		}
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
@@ -90,38 +100,38 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
 				bw.write("\tAHRD-GO-Annotations-Simple-F-Score");
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
-					bw.write("\tAHRD-GO-Annotations-Simple-F-Score-Precision\tAHRD-GO-Annotations-Simple-F-Score-Recall");
+					bw.write("\tAHRD-GO-Annotations-Simple-F-Score-Precision\tAHRD-GO-Annotations-Simple-F-Score-Recall\tAHRD-GO-Annotations-Simple-F-Score-Remaining-Uncertainty\tAHRD-GO-Annotations-Simple-F-Score-Missing-Information");
 				}
 			}
 			if (getSettings().doCalculateAncestryGoF1Scores()) {
 				bw.write("\tAHRD-GO-Annotations-Ancestry-F-Score");
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
-					bw.write("\tAHRD-GO-Annotations-Ancestry-F-Score-Precision\tAHRD-GO-Annotations-Ancestry-F-Score-Recall");
+					bw.write("\tAHRD-GO-Annotations-Ancestry-F-Score-Precision\tAHRD-GO-Annotations-Ancestry-F-Score-Recall\tAHRD-GO-Annotations-Ancestry-F-Score-Remaining-Uncertainty\tAHRD-GO-Annotations-Ancestry-F-Score-Missing-Information");
 				}
 			}
 			if (getSettings().doCalculateSemSimGoF1Scores()) {
 				bw.write("\tAHRD-GO-Annotations-SemSim-F-Score");
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
-					bw.write("\tAHRD-GO-Annotations-SemSim-F-Score-Precision\tAHRD-GO-Annotations-SemSim-F-Score-Recall");
+					bw.write("\tAHRD-GO-Annotations-SemSim-F-Score-Precision\tAHRD-GO-Annotations-SemSim-F-Score-Recall\tAHRD-GO-Annotations-SemSim-F-Score-Remaining-Uncertainty\tAHRD-GO-Annotations-SemSim-F-Score-Missing-Information");
 				}
 			}
 			if (getSettings().doFindHighestPossibleGoScore()) {
 				if (getSettings().doCalculateSimpleGoF1Scores()) {
 					bw.write("\tHighest-Possible-BlastResult-GO-Annotations-Simple-F-Score");
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						bw.write("\tHighest-Possible-BlastResult-GO-Annotations-Simple-F-Score-Precision\tHighest-Possible-BlastResult-GO-Annotations-Simple-F-Score-Recall");
+						bw.write("\tHighest-Possible-BlastResult-GO-Annotations-Simple-F-Score-Precision\tHighest-Possible-BlastResult-GO-Annotations-Simple-F-Score-Recall\tHighest-Possible-BlastResult-GO-Annotations-Simple-F-Score-Remaining-Uncertainty\tHighest-Possible-BlastResult-GO-Annotations-Simple-F-Score-Missing-Information");
 					}
 				}
 				if (getSettings().doCalculateAncestryGoF1Scores()) {
 					bw.write("\tHighest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score");
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						bw.write("\tHighest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score-Precision\tHighest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score-Recall");
+						bw.write("\tHighest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score-Precision\tHighest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score-Recall\tHighest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score-Remaining-Uncertainty\tHighest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score-Missing-Information");
 					}
 				}
 				if (getSettings().doCalculateSemSimGoF1Scores()) {
 					bw.write("\tHighest-Possible-BlastResult-GO-Annotations-SemSim-F-Score");
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						bw.write("\tHighest-Possible-BlastResult-GO-Annotations-SemSim-F-Score-Precision\tHighest-Possible-BlastResult-GO-Annotations-SemSim-F-Score-Recall");
+						bw.write("\tHighest-Possible-BlastResult-GO-Annotations-SemSim-F-Score-Precision\tHighest-Possible-BlastResult-GO-Annotations-SemSim-F-Score-Recall\tHighest-Possible-BlastResult-GO-Annotations-SemSim-F-Score-Remaining-Uncertainty\tHighest-Possible-BlastResult-GO-Annotations-SemSim-F-Score-Missing-Information");
 					}
 				}
 			}
@@ -158,22 +168,19 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				if (getSettings().doCalculateSimpleGoF1Scores()) {
 					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore().getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore().getPrecision());
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore().getRecall());
+						csvRow += buildFscoreDetailsColumns(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore());
 					}
 				}
 				if (getSettings().doCalculateAncestryGoF1Scores()) {
 					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getPrecision());
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getRecall());
+						csvRow += buildFscoreDetailsColumns(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore());
 					}
 				}
 				if (getSettings().doCalculateSemSimGoF1Scores()) {
 					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getPrecision());
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getRecall());
+						csvRow += buildFscoreDetailsColumns(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore());
 					}
 				}
 			}
@@ -202,7 +209,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				if (getSettings().isInTrainingMode()) {
 					hdr += "\tBest-BlastHit-against-" + blastDb + "-Description-Length\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score";
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						hdr += "\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Precision\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Recall";
+						hdr += "\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Precision\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Recall\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Remaining-Uncertainty\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Missing-Information";
 					}
 					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 						hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations";
@@ -211,6 +218,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
 								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Precision";
 								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Recall";
+								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Remaining-Uncertainty";
+								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Missing-Information";
 							}
 						}
 						if (getSettings().doCalculateAncestryGoF1Scores()) {
@@ -218,6 +227,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
 								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Precision";
 								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Recall";
+								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Remaining-Uncertainty";
+								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Missing-Information";
 							}
 						}
 						if (getSettings().doCalculateSemSimGoF1Scores()) {
@@ -225,6 +236,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
 								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Precision";
 								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Recall";
+								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Remaining-Uncertainty";
+								hdr += "\tBest-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Missing-Information";
 							}
 						}
 					}
@@ -258,14 +271,13 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					+ prot.getEvaluationScoreCalculator().getGroundTruthDescription().getTokens().size() + "\t"
 					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getScore());
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
-			csvCells += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getEvalScoreMinBestCompScore()) + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getPrecision()) + "\t"
-					+ FRMT.format(prot.getEvaluationScoreCalculator().getEvalutionScore().getRecall());
+			csvCells += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getEvalScoreMinBestCompScore())
+					+ buildFscoreDetailsColumns(prot.getEvaluationScoreCalculator().getEvalutionScore());
 			}
 		} else {
 			csvCells = "\t\t\t\t";
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
-				csvCells += "\t\t\t";
+				csvCells += "\t\t\t\t\t";
 			}
 		}
 		return csvCells;
@@ -309,6 +321,15 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		return csvCells;
 	}
 
+	private String buildFscoreDetailsColumns(Fscore f) {
+		String csvCells = "";
+		csvCells += "\t" + FRMT.format(f.getPrecision());
+		csvCells += "\t" + FRMT.format(f.getRecall());
+		csvCells += "\t" + FRMT.format(f.getRemainingUncertainty());
+		csvCells += "\t" + FRMT.format(f.getMissingInformation());
+		return csvCells;
+	}
+	
 	public String buildBestBlastHitsColumns(Protein prot) {
 		String csvRow = "";
 		for (String blastDb : getSettings().getBlastDatabases()) {
@@ -319,30 +340,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					csvRow += "\t" + bestBr.getEvaluationTokens().size();
 					csvRow += "\t" + FRMT.format(bestBr.getEvaluationScore().getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						csvRow += "\t" + FRMT.format(bestBr.getEvaluationScore().getPrecision());
-						csvRow += "\t" + FRMT.format(bestBr.getEvaluationScore().getRecall());
+						csvRow += buildFscoreDetailsColumns(bestBr.getEvaluationScore());
 					}
 					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 						csvRow += "\t" + combineGoTermsToString(bestBr.getGoAnnotations());
 						if (getSettings().doCalculateSimpleGoF1Scores()) {
 							csvRow += "\t" + FRMT.format(bestBr.getSimpleGoAnnotationScore().getScore());
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
-								csvRow += "\t" + FRMT.format(bestBr.getSimpleGoAnnotationScore().getPrecision());
-								csvRow += "\t" + FRMT.format(bestBr.getSimpleGoAnnotationScore().getRecall());
+								csvRow += buildFscoreDetailsColumns(bestBr.getSimpleGoAnnotationScore());
 							}
 						}
 						if (getSettings().doCalculateAncestryGoF1Scores()) {
 							csvRow += "\t" + FRMT.format(bestBr.getAncestryGoAnnotationScore().getScore());
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
-								csvRow += "\t" + FRMT.format(bestBr.getAncestryGoAnnotationScore().getPrecision());
-								csvRow += "\t" + FRMT.format(bestBr.getAncestryGoAnnotationScore().getRecall());
+								csvRow += buildFscoreDetailsColumns(bestBr.getAncestryGoAnnotationScore());
 							}
 						}
 						if (getSettings().doCalculateSemSimGoF1Scores()) {
 							csvRow += "\t" + FRMT.format(bestBr.getSemSimGoAnnotationScore().getScore());
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
-								csvRow += "\t" + FRMT.format(bestBr.getSemSimGoAnnotationScore().getPrecision());
-								csvRow += "\t" + FRMT.format(bestBr.getSemSimGoAnnotationScore().getRecall());
+								csvRow += buildFscoreDetailsColumns(bestBr.getSemSimGoAnnotationScore());
 							}
 						}
 					}
@@ -352,26 +369,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				if (getSettings().isInTrainingMode()) {
 					csvRow += "\t0\t0";
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						csvRow += "\t0\t0";
+						csvRow += "\t0\t0\t0\t0";
 					}
 					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 						csvRow += "\t";
 						if (getSettings().doCalculateSimpleGoF1Scores()) {
 							csvRow += "\t0";
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
-								csvRow += "\t0\t0";
+								csvRow += "\t0\t0\t0\t0";
 							}
 						}
 						if (getSettings().doCalculateAncestryGoF1Scores()) {
 							csvRow += "\t0";
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
-								csvRow += "\t0\t0";
+								csvRow += "\t0\t0\t0\t0";
 							}
 						}
 						if (getSettings().doCalculateSemSimGoF1Scores()) {
 							csvRow += "\t0";
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
-								csvRow += "\t0\t0";
+								csvRow += "\t0\t0\t0\t0";
 							}
 						}
 					}
@@ -389,30 +406,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			if (annot != null) {
 				csvCols += "\t" + annot.getDescription() + "\t" + annot.getEvaluationTokens().size() + "\t" + FRMT.format(annot.getEvaluationScore().getScore());
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
-					csvCols += "\t" + FRMT.format(annot.getEvaluationScore().getPrecision());
-					csvCols += "\t" + FRMT.format(annot.getEvaluationScore().getRecall());
+					csvCols += buildFscoreDetailsColumns(annot.getEvaluationScore());
 				}
 				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 					csvCols += "\t" + combineGoTermsToString(annot.getGoAnnotations());
 					if (getSettings().doCalculateSimpleGoF1Scores()) {
 						csvCols += "\t" + FRMT.format(annot.getSimpleGoAnnotationScore().getScore());
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
-							csvCols += "\t" + FRMT.format(annot.getSimpleGoAnnotationScore().getPrecision());
-							csvCols += "\t" + FRMT.format(annot.getSimpleGoAnnotationScore().getRecall());
+							csvCols += buildFscoreDetailsColumns(annot.getSimpleGoAnnotationScore());
 						}
 					}
 					if (getSettings().doCalculateAncestryGoF1Scores()) {
 						csvCols += "\t" + FRMT.format(annot.getAncestryGoAnnotationScore().getScore());
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
-							csvCols += "\t" + FRMT.format(annot.getAncestryGoAnnotationScore().getPrecision());
-							csvCols += "\t" + FRMT.format(annot.getAncestryGoAnnotationScore().getRecall());
+							csvCols += buildFscoreDetailsColumns(annot.getAncestryGoAnnotationScore());
 						}
 					}
 					if (getSettings().doCalculateSemSimGoF1Scores()) {
 						csvCols += "\t" + FRMT.format(annot.getSemSimGoAnnotationScore().getScore());
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
-							csvCols += "\t" + FRMT.format(annot.getSemSimGoAnnotationScore().getPrecision());
-							csvCols += "\t" + FRMT.format(annot.getSemSimGoAnnotationScore().getRecall());
+							csvCols += buildFscoreDetailsColumns(annot.getSemSimGoAnnotationScore());
 						}
 					}
 				}
@@ -429,26 +442,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		String csvCols = "";
 		csvCols += "\t\t0\t0";
 		if (getSettings().doWriteFscoreDetailsToOutput()) {
-			csvCols += "\t0\t0";
+			csvCols += "\t0\t0\t0\t0";
 		}
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			csvCols += "\t";
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
 				csvCols += "\t0";
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
-					csvCols += "\t0\t0";
+					csvCols += "\t0\t0\t0\t0";
 				}
 			}
 			if (getSettings().doCalculateAncestryGoF1Scores()) {
 				csvCols += "\t0";
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
-					csvCols += "\t0\t0";
+					csvCols += "\t0\t0\t0\t0";
 				}
 			}
 			if (getSettings().doCalculateSemSimGoF1Scores()) {
 				csvCols += "\t0";
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
-					csvCols += "\t0\t0";
+					csvCols += "\t0\t0\t0\t0";
 				}
 			}
 		}
@@ -465,8 +478,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		}
 		csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getScore());
 		if (getSettings().doWriteFscoreDetailsToOutput()) {
-			csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getPrecision());
-			csvCols += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getRecall());
+			csvCols += buildFscoreDetailsColumns(prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore());
 		}
 		return csvCols;
 	}
@@ -477,22 +489,19 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		if (getSettings().doCalculateSimpleGoF1Scores()) {
 			goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore());
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
-				goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getPrecision());
-				goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getRecall());
+				goColumns += buildFscoreDetailsColumns(prot.getEvaluationScoreCalculator().getSimpleGoAnnotationScore());
 			}
 		}
 		if (getSettings().doCalculateAncestryGoF1Scores()) {
 			goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore());
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
-				goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getPrecision());
-				goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getRecall());
+				goColumns += buildFscoreDetailsColumns(prot.getEvaluationScoreCalculator().getAncestryGoAnnotationScore());
 			}
 		}
 		if (getSettings().doCalculateSemSimGoF1Scores()) {
 			goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore());
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
-				goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getPrecision());
-				goColumns += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getRecall());
+				goColumns += buildFscoreDetailsColumns(prot.getEvaluationScoreCalculator().getSemSimGoAnnotationScore());
 			}
 		}
 		return goColumns;
