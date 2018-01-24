@@ -129,22 +129,12 @@ public class EvaluationScoreCalculator {
 		Fscore fBetaScore = new Fscore();
 		if (assignedTkns != null && !assignedTkns.isEmpty()) {
 			double tp = truePositives(assignedTkns, groundTruthTkns);
-			double fp = assignedTkns.size()- tp;
-			double fn = groundTruthTkns.size() - tp;
 			// Avoid division by zero:
 			if (tp > 0.0) {
 				double pr = tp / assignedTkns.size();
 				double rc = tp / groundTruthTkns.size();
-				double ru = fp / assignedTkns.size();
-				double mi = fn / groundTruthTkns.size();
-				// F-Beta-Measure is the harmonic mean of precision and recall
-				// weighted by param beta:
-				Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-				fBetaScore.setScore((1 + bSqr) * (pr * rc) / (bSqr * pr + rc));
 				fBetaScore.setPrecision(pr);
 				fBetaScore.setRecall(rc);
-				fBetaScore.setRemainingUncertainty(ru);
-				fBetaScore.setMissingInformation(mi);
 			}
 		}
 		return fBetaScore;
@@ -282,21 +272,13 @@ public class EvaluationScoreCalculator {
 			}
 			f.setRecall((double) truePositive / groundTruth.size());
 			f.setPrecision((double) truePositive / prediction.size());
-			f.setRemainingUncertainty((double) (prediction.size() - truePositive) / prediction.size());
-			f.setMissingInformation((double) (groundTruth.size() - truePositive) / groundTruth.size());
 		} else {
 			if (groundTruth.size() == 0) {
 				f.setRecall(1.0);
-				f.setMissingInformation(0.0);
 			}
 			if (prediction.size() == 0) {
 				f.setPrecision(1.0);
-				f.setRemainingUncertainty(0.0);
 			}
-		}
-		if (f.getPrecision() > 0.0 && f.getRecall() > 0.0) {
-			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f.setScore((1 + bSqr) * f.getPrecision() * f.getRecall() / (bSqr * f.getPrecision() + f.getRecall()));
 		}
 		return f;
 	}
@@ -321,8 +303,6 @@ public class EvaluationScoreCalculator {
 		int truePositive = 0;
 		Double recall = 0.0;
 		Double precision = 0.0;
-		Double remainingUncertainty = 0.0;
-		Double missingInformation = 0.0;
 		if (groundTruthAncestry.size() > 0 && predictionAncestry.size() > 0) {
 			for (Iterator<GOterm> groundTruthIter = groundTruthAncestry.iterator(); groundTruthIter.hasNext();) {
 				if (predictionAncestry.contains(groundTruthIter.next())) {
@@ -331,26 +311,16 @@ public class EvaluationScoreCalculator {
 			}
 			recall = (double) truePositive / groundTruthAncestry.size();
 			precision = (double) truePositive / predictionAncestry.size();
-			remainingUncertainty = (double) (predictionAncestry.size() - truePositive) / predictionAncestry.size();
-			missingInformation = (double) (groundTruthAncestry.size() - truePositive) / groundTruthAncestry.size();
 		} else {
 			if (groundTruthAncestry.size() == 0) {
 				recall = 1.0;
-				missingInformation = 0.0;
 			}
 			if (predictionAncestry.size() == 0) {
 				precision = 1.0;
-				remainingUncertainty = 0.0;
 			}
-		}
-		if (precision > 0.0 && recall > 0.0) {
-			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f.setScore((1 + bSqr) * precision * recall / (bSqr * precision + recall));
 		}
 		f.setPrecision(precision);
 		f.setRecall(recall);
-		f.setRemainingUncertainty(remainingUncertainty);
-		f.setMissingInformation(missingInformation);
 		return f;
 	}
 
@@ -364,9 +334,6 @@ public class EvaluationScoreCalculator {
 		Fscore f = new Fscore();
 		Double recall = 0.0;
 		Double precision = 0.0;
-		Double remainingUncertainty = 0.0;
-		Double missingInformation = 0.0;
-		// Recall
 		/**
 		 * Find the information content of the ground truth: Usually the
 		 * information content of the terms themselves, but if they havn't been
@@ -399,10 +366,8 @@ public class EvaluationScoreCalculator {
 			}
 			if (infoContentGroundTruth > 0.0) {
 				recall = infoContentPrediction / infoContentGroundTruth;
-				missingInformation = (infoContentGroundTruth - infoContentPrediction) / infoContentGroundTruth;
 			} else {
 				recall = 1.0;
-				missingInformation = 0.0;
 			}
 			//precision
 			infoContentPrediction = 0.0;
@@ -430,32 +395,22 @@ public class EvaluationScoreCalculator {
 			}
 			if (infoContentPrediction > 0.0) {
 				precision = infoContentGroundTruth / infoContentPrediction;
-				remainingUncertainty = (infoContentPrediction - infoContentGroundTruth) / infoContentPrediction;
 			} else {
 				precision = 1.0;
-				remainingUncertainty = 0.0;
 			}
 		} else {
 			if (groundTruth.size() == 0) {
 				recall = 1.0;
-				missingInformation = 0.0;
 			}
 			if (prediction.size() == 0) {
 				precision = 1.0;
-				remainingUncertainty = 0.0;
 			}
-		}
-		if (precision > 0.0 && recall > 0.0) {
-			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f.setScore((1 + bSqr) * precision * recall / (bSqr * precision + recall));
 		}
 		if (f.getScore() > 1.0) { // Something went very wrong - Should never be happening
 			System.out.println("p: " + precision + "\tr: " + recall + "\tf1: " + f);
 		}
 		f.setPrecision(precision);
 		f.setRecall(recall);
-		f.setRemainingUncertainty(remainingUncertainty);
-		f.setMissingInformation(missingInformation);
 		return f;
 	}
 
