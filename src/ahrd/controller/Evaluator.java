@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.BlastResult;
@@ -19,6 +20,7 @@ import ahrd.model.Protein;
 import ahrd.model.GroundTruthDescription;
 import ahrd.model.ReferenceGoAnnotation;
 import ahrd.view.EvaluatorOutputWriter;
+import ahrd.view.PrecisionRecallCurveOutputWriter;
 import ahrd.view.TsvOutputWriter;
 
 public class Evaluator extends AHRD {
@@ -128,6 +130,59 @@ public class Evaluator extends AHRD {
 		}
 	}
 	
+	private void writePrecisionRecallCurve() throws FileNotFoundException, IOException{
+		// Load a Map of all GO terms
+		if (goDB == null)
+			goDB = new GOdatabase().getMap();
+		// Open file for output and write header
+		PrecisionRecallCurveOutputWriter outputWriter = new PrecisionRecallCurveOutputWriter();
+		// Iterate over annotation confidence thresholds
+		for(int i=0; i<=100; i++) {
+			double threshold = ((double) i) * 0.01;
+			double meanSimpleGoAnnotationScorePrecision = 0.0;
+			double meanSimpleGoAnnotationScoreRecall = 0.0;
+			double meanAncestryGoAnnotationScorePrecision = 0.0;
+			double meanAncestryGoAnnotationScoreRecall = 0.0;
+			double meanSemSimGoAnnotationScorePrecision = 0.0;
+			double meanSemSimGoAnnotationScoreRecall = 0.0;
+			// Iterate over proteins
+			for (Protein protein : getProteins().values()) {
+				Set<GOterm> above = new HashSet<GOterm>();
+				for (GOterm term : protein.getGoResultsTermsConfidence().keySet()) {
+					if (protein.getGoResultsTermsConfidence().get(term) >= threshold) {
+						above.add(term);
+					}
+				}
+				protein.setGoResultsTerms(above);
+				protein.getEvaluationScoreCalculator().assignEvaluationScores();
+				if (getSettings().doCalculateSimpleGoF1Scores()){
+					meanSimpleGoAnnotationScorePrecision += protein.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getPrecision();
+					meanSimpleGoAnnotationScoreRecall += protein.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getRecall();
+				}
+				if (getSettings().doCalculateAncestryGoF1Scores()){
+					meanAncestryGoAnnotationScorePrecision += protein.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getPrecision();
+					meanAncestryGoAnnotationScoreRecall += protein.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getRecall();
+				}
+				if (getSettings().doCalculateSemSimGoF1Scores()){
+					meanSemSimGoAnnotationScorePrecision += protein.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getPrecision();
+					meanSemSimGoAnnotationScoreRecall += protein.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getRecall();
+				}
+			}
+			meanSimpleGoAnnotationScorePrecision = meanSimpleGoAnnotationScorePrecision / (double) getProteins().size();
+			meanSimpleGoAnnotationScoreRecall = meanSimpleGoAnnotationScoreRecall / (double) getProteins().size();
+			meanAncestryGoAnnotationScorePrecision = meanAncestryGoAnnotationScorePrecision / (double) getProteins().size();
+			meanAncestryGoAnnotationScoreRecall = meanAncestryGoAnnotationScoreRecall / (double) getProteins().size();
+			meanSemSimGoAnnotationScorePrecision = meanSemSimGoAnnotationScorePrecision / (double) getProteins().size();
+			meanSemSimGoAnnotationScoreRecall = meanSemSimGoAnnotationScoreRecall / (double) getProteins().size();
+			outputWriter.writeIterationOutput(threshold, 
+					meanSimpleGoAnnotationScorePrecision, meanSimpleGoAnnotationScoreRecall, 
+					meanAncestryGoAnnotationScorePrecision, meanAncestryGoAnnotationScoreRecall, 
+					meanSemSimGoAnnotationScorePrecision, meanSemSimGoAnnotationScoreRecall);
+		}
+		// close output file
+		outputWriter.cleanUp();
+	}
+	
 	/**
 	 * @param args
 	 */
@@ -167,6 +222,10 @@ public class Evaluator extends AHRD {
 			TsvOutputWriter ow = new EvaluatorOutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
 			System.out.println("Written output into:\n" + getSettings().getPathToOutput());
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().getPathToGoAnnotationPrecisionRecallCurveFile() != null) {
+				evaluator.writePrecisionRecallCurve();
+				System.out.println("Written data for precision recall curve into:\n" + getSettings().getPathToGoAnnotationPrecisionRecallCurveFile());
+			}
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);

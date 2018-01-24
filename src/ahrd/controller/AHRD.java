@@ -329,7 +329,7 @@ public class AHRD {
 				}
 			}
 			// Calculate GO Term-Scores and GO term high score
-			Map<String, Double> goTermScores = new HashMap<String, Double>();
+			Map<GOterm, Double> goTermScores = new HashMap<GOterm, Double>();
 			double goTermHighScore = 0.0;
 			for (String blastDbName : protein.getBlastResults().keySet()) {
 				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
@@ -344,7 +344,7 @@ public class AHRD {
 														+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
 														+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;
 							double goTermScore = goTermAbundancyScore * infoContentScore * evidenceCodeScore;
-							goTermScores.put(termAcc, goTermScore);
+							goTermScores.put(term, goTermScore);
 							if (goTermScore > goTermHighScore) {
 								goTermHighScore = goTermScore;
 							}
@@ -353,7 +353,7 @@ public class AHRD {
 				}
 			}
 			// Filter GO Term-Scores
-			for (String goTerm : goTermScores.keySet()) {
+			for (GOterm goTerm : goTermScores.keySet()) {
 				if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getInformativeTokenThreshold()) {
 					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getInformativeTokenThreshold()));
 				}
@@ -369,7 +369,7 @@ public class AHRD {
 					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
 					if (reference != null) { 
 						for (ReferenceGoAnnotation annotation : reference) {
-							Double goTermScore = goTermScores.get(annotation.getGoTerm());
+							Double goTermScore = goTermScores.get(goDB.get(annotation.getGoTerm()));
 							sumGoTermScores += goTermScore * getSettings().getEvidenceCodeWeight(annotation.getEvidenceCode());
 							goTermCount++;
 							if (goTermScore > goTermHighScore * getSettings().getInformativeTokenThreshold()) {
@@ -397,6 +397,8 @@ public class AHRD {
 			} else {
 				protein.setGoResults(new HashSet<String>());
 			}
+			// Annotate protein with all goTerms while using goTermScore as annotation confidence
+			protein.setGoResultsTermsConfidence(goTermScores); 
 		}
 	}
 

@@ -26,6 +26,7 @@ public class Protein {
 	private Set<String> goResults = new HashSet<String>();
 	private Set<GOterm> goResultsTerms = new HashSet<GOterm>();
 	private Set<GOterm> goSlimTerms = new HashSet<GOterm>();
+	private Map<GOterm, Double> goResultsTermsConfidence = new HashMap<GOterm, Double>();
 	private TokenScoreCalculator tokenScoreCalculator;
 	private LexicalScoreCalculator lexicalScoreCalculator;
 	private DescriptionScoreCalculator descriptionScoreCalculator;
@@ -286,6 +287,14 @@ public class Protein {
 
 	public void setGoSlimTerms(Set<GOterm> goSlimTerms) {
 		this.goSlimTerms = goSlimTerms;
+	}
+
+	public Map<GOterm, Double> getGoResultsTermsConfidence() {
+		return goResultsTermsConfidence;
+	}
+
+	public void setGoResultsTermsConfidence(Map<GOterm, Double> goResultsTermsConfidence) {
+		this.goResultsTermsConfidence = goResultsTermsConfidence;
 	}
 
 }

@@ -125,6 +125,7 @@ public class Settings implements Cloneable {
 	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
 	public static final String DESCRIPTION_GROUP_NAME = "description";
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
+	public static final String GO_ANNOTATION_PRECISION_RECALL_CURVE_KEY = "go_annotation_precision_recall_curve";
 	
 	/**
 	 * Fields:
@@ -333,7 +334,10 @@ public class Settings implements Cloneable {
 	 * Weights of reference go annotation evidence codes for prediction of query protein go term annotations  
 	 */
 	private Map<String, Double> evidenceCodeWeights = new HashMap<String, Double>();
-
+	/**
+	 * File to write data for precision recall curves in (based on confidence of go annotations)
+	 */
+	private String pathToGoAnnotationPrecisionRecallCurveFile;
 	/**
 	 * Initializes an Instance with content read from a YML-File:
 	 * 
@@ -518,6 +522,7 @@ public class Settings implements Cloneable {
 		if (input.get(INFORMATIVE_TOKEN_THRESHOLD) != null) {
 			this.setInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD)));
 		}
+		this.setPathToGoAnnotationPrecisionRecallCurveFile((String) input.get(GO_ANNOTATION_PRECISION_RECALL_CURVE_KEY));
 		/**
 		 * Initialize default reference go annotation evidence code weights
 		 * (see: http://www.geneontology.org/page/guide-go-evidence-codes)
@@ -1350,5 +1355,13 @@ public class Settings implements Cloneable {
 
 	public void setSeqSimSearchTableQueryColRegex(Pattern seqSimSearchTableQueryColRegex) {
 		this.seqSimSearchTableQueryColRegex = seqSimSearchTableQueryColRegex;
+	}
+
+	public String getPathToGoAnnotationPrecisionRecallCurveFile() {
+		return pathToGoAnnotationPrecisionRecallCurveFile;
+	}
+
+	public void setPathToGoAnnotationPrecisionRecallCurveFile(String pathToGoAnnotationPrecisionRecallCurveFile) {
+		this.pathToGoAnnotationPrecisionRecallCurveFile = pathToGoAnnotationPrecisionRecallCurveFile;
 	}
 }
