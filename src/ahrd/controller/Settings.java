@@ -126,6 +126,8 @@ public class Settings implements Cloneable {
 	public static final String DESCRIPTION_GROUP_NAME = "description";
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
 	public static final String GO_ANNOTATION_PRECISION_RECALL_CURVE_KEY = "go_annotation_precision_recall_curve";
+	public static final String GO_TERM_CENTRIC_TERMS_PATH_KEY = "go_term_centric_terms";
+	public static final Pattern GO_TERM_CENTRIC_TERMS_FILE_GOTERM_REGEX = Pattern.compile("^(?<goTerm>GO:\\d{7})$");
 	
 	/**
 	 * Fields:
@@ -338,6 +340,11 @@ public class Settings implements Cloneable {
 	 * File to write data for precision recall curves in (based on confidence of go annotations)
 	 */
 	private String pathToGoAnnotationPrecisionRecallCurveFile;
+	/**
+	 * Path to file containing a few Gene Ontology terms. Triggers the
+	 * output of confidence coefficients for the accusation of the query proteins with each GO term in the file
+	 */
+	private String pathToGoTermCentricTerms;
 	/**
 	 * Initializes an Instance with content read from a YML-File:
 	 * 
@@ -561,6 +568,10 @@ public class Settings implements Cloneable {
 				getEvidenceCodeWeights().put(pair.getKey(), Double.parseDouble(pair.getValue()));
 			}
 		}
+		if (input.get(GO_TERM_CENTRIC_TERMS_PATH_KEY) != null) {
+			this.setPathToGoTermCentricTerms(input.get(GO_TERM_CENTRIC_TERMS_PATH_KEY).toString());
+		}
+		
 	}
 
 	/**
@@ -1363,5 +1374,21 @@ public class Settings implements Cloneable {
 
 	public void setPathToGoAnnotationPrecisionRecallCurveFile(String pathToGoAnnotationPrecisionRecallCurveFile) {
 		this.pathToGoAnnotationPrecisionRecallCurveFile = pathToGoAnnotationPrecisionRecallCurveFile;
+	}
+
+	public String getPathToGoTermCentricTerms() {
+		return pathToGoTermCentricTerms;
+	}
+
+	public void setPathToGoTermCentricTerms(String pathToGoTermCentricTerms) {
+		this.pathToGoTermCentricTerms = pathToGoTermCentricTerms;
+	}
+	
+	public Boolean hasGoTermCentricTermsFile() {
+		return getPathToGoTermCentricTerms() != null && new File(getPathToGoTermCentricTerms()).exists(); 
+	}
+	
+	public List<String> getGoTermCentricTerms() throws IOException {
+		return fromFile(getPathToGoTermCentricTerms());
 	}
 }

@@ -8,11 +8,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ahrd.controller.AHRD;
+import ahrd.controller.Settings;
+import ahrd.exception.MissingAccessionException;
 import ahrd.model.BlastResult;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
@@ -20,6 +26,7 @@ import ahrd.model.Protein;
 public class TsvOutputWriter extends OutputWriter {
 
 	protected BufferedWriter hrdScoresWriter;
+	protected List<String> goCentricTerms = new LinkedList<String>();
 
 	public TsvOutputWriter(Collection<Protein> proteins) {
 		super(proteins);
@@ -38,6 +45,20 @@ public class TsvOutputWriter extends OutputWriter {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
 			bw.write("\tGO-Slim-Annotation");
 		}
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
+			// Load set of GO centric terms
+			for (String goCentricTermFileEntry : getSettings().getGoTermCentricTerms()) {
+				Pattern p = Settings.GO_TERM_CENTRIC_TERMS_FILE_GOTERM_REGEX;
+				Matcher m = p.matcher(goCentricTermFileEntry);
+				if (m.find()) {
+					String termAcc = m.group("goTerm");
+					goCentricTerms.add(termAcc);
+				}
+			}
+			for (String termAcc : goCentricTerms) {
+				bw.write("\t" + termAcc);				
+			}
+		}
 		bw.write("\n");
 
 		for (Protein prot : getProteins()) {
@@ -46,7 +67,11 @@ public class TsvOutputWriter extends OutputWriter {
 			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
 				csvRow += "\t" + combineGoTermsToString(prot.getGoSlimTerms());
 			}
-			
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
+				for (String termAcc : goCentricTerms) {
+					csvRow += "\t" + prot.getGoCentricTermConfidences().get(termAcc);				
+				}
+			}
 			// Write row to CSV:
 			csvRow += "\n";
 			bw.write(csvRow);

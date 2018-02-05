@@ -43,6 +43,7 @@ public class AHRD {
 	private long timestamp;
 	private long memorystamp;
 	protected Map<String, GOterm> goDB;
+	protected Set<GOterm> goCentricTerms = new HashSet<GOterm>();
 
 	protected long takeTime() {
 		// Measure time:
@@ -79,9 +80,10 @@ public class AHRD {
 			// Log
 			System.out.println("...assigned highestest scoring human readable descriptions in " + ahrd.takeTime()
 					+ "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
-			// If requested assign GO slim terms in addition to detailed GO term
-			// annotation
+			// If requested assign GO slim terms in addition to detailed GO term annotation
 			ahrd.annotateWithGoSlim();
+			// If requested term centric annotation is performed as well
+			ahrd.termCentricAnnotation();
 			// Write result to output-file:
 			System.out.println("Writing output to '" + getSettings().getPathToOutput() + "'.");
 			OutputWriter ow = initializeOutputWriter(ahrd.getProteins().values());
@@ -352,6 +354,8 @@ public class AHRD {
 					}
 				}
 			}
+			// Annotate protein with all goTerms while using goTermScore as annotation confidence
+			protein.setGoResultsTermsConfidence(new HashMap<GOterm, Double>(goTermScores));
 			// Filter GO Term-Scores
 			for (GOterm goTerm : goTermScores.keySet()) {
 				if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getInformativeTokenThreshold()) {
@@ -397,8 +401,6 @@ public class AHRD {
 			} else {
 				protein.setGoResults(new HashSet<String>());
 			}
-			// Annotate protein with all goTerms while using goTermScore as annotation confidence
-			protein.setGoResultsTermsConfidence(goTermScores); 
 		}
 	}
 
@@ -450,6 +452,44 @@ public class AHRD {
 					if (highestInfoContentGoSlimTerm != null) {
 						prot.getGoSlimTerms().add(highestInfoContentGoSlimTerm);	
 					}
+				}
+			}
+		}
+	}
+
+	public void termCentricAnnotation() throws IOException, MissingAccessionException {
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
+			
+			// Load a Map of all GO terms
+			if (goDB == null) {
+				goDB = new GOdatabase().getMap();
+			}
+			// Load set of GO centric terms
+			for (String goCentricTermFileEntry : getSettings().getGoTermCentricTerms()) {
+				Pattern p = Settings.GO_TERM_CENTRIC_TERMS_FILE_GOTERM_REGEX;
+				Matcher m = p.matcher(goCentricTermFileEntry);
+				if (m.find()) {
+					String termAcc = m.group("goTerm");
+					GOterm term = goDB.get(termAcc);
+					if (term == null)
+						throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
+					goCentricTerms.add(term);
+				}
+			}
+			// Determine protein-goTerm association confidence (term centric annotation):
+			// The term itself and its child terms are considered for each term.
+			// From these terms the maximum confidence is used
+			for (Protein protein : getProteins().values()) {
+				for (GOterm term : this.goCentricTerms) {
+					Double confidence = 0.0;
+					for (GOterm potentialChild : protein.getGoResultsTermsConfidence().keySet()) {
+						if (potentialChild.getAncestry().contains(term)) {
+							if (protein.getGoResultsTermsConfidence().get(potentialChild) > confidence) {
+								confidence = protein.getGoResultsTermsConfidence().get(potentialChild);
+							}
+						}
+					}
+					protein.getGoCentricTermConfidences().put(term.getAccession(), confidence);
 				}
 			}
 		}

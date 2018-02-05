@@ -27,6 +27,7 @@ public class Protein {
 	private Set<GOterm> goResultsTerms = new HashSet<GOterm>();
 	private Set<GOterm> goSlimTerms = new HashSet<GOterm>();
 	private Map<GOterm, Double> goResultsTermsConfidence = new HashMap<GOterm, Double>();
+	private Map<String, Double> goCentricTermConfidences = new HashMap<String, Double>();
 	private TokenScoreCalculator tokenScoreCalculator;
 	private LexicalScoreCalculator lexicalScoreCalculator;
 	private DescriptionScoreCalculator descriptionScoreCalculator;
@@ -295,6 +296,14 @@ public class Protein {
 
 	public void setGoResultsTermsConfidence(Map<GOterm, Double> goResultsTermsConfidence) {
 		this.goResultsTermsConfidence = goResultsTermsConfidence;
+	}
+
+	public Map<String, Double> getGoCentricTermConfidences() {
+		return goCentricTermConfidences;
+	}
+
+	public void setGoCentricTermConfidences(Map<String, Double> goCentricTermConfidences) {
+		this.goCentricTermConfidences = goCentricTermConfidences;
 	}
 
 }
