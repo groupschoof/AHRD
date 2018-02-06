@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,7 +17,6 @@ import java.util.regex.Pattern;
 
 import ahrd.controller.AHRD;
 import ahrd.controller.Settings;
-import ahrd.exception.MissingAccessionException;
 import ahrd.model.BlastResult;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
@@ -69,7 +67,7 @@ public class TsvOutputWriter extends OutputWriter {
 			}
 			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
 				for (String termAcc : goCentricTerms) {
-					csvRow += "\t" + prot.getGoCentricTermConfidences().get(termAcc);				
+					csvRow += "\t" + FRMT.format(prot.getGoCentricTermConfidences().get(termAcc));				
 				}
 			}
 			// Write row to CSV:

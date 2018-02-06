@@ -14,6 +14,7 @@ import java.util.Set;
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.BlastResult;
 import ahrd.model.CompetitorAnnotation;
+import ahrd.model.Fscore;
 import ahrd.model.GOdatabase;
 import ahrd.model.GOterm;
 import ahrd.model.Protein;
@@ -131,9 +132,6 @@ public class Evaluator extends AHRD {
 	}
 	
 	private void writePrecisionRecallCurve() throws FileNotFoundException, IOException{
-		// Load a Map of all GO terms
-		if (goDB == null)
-			goDB = new GOdatabase().getMap();
 		// Open file for output and write header
 		PrecisionRecallCurveOutputWriter outputWriter = new PrecisionRecallCurveOutputWriter();
 		// Iterate over annotation confidence thresholds
@@ -174,13 +172,55 @@ public class Evaluator extends AHRD {
 			meanAncestryGoAnnotationScoreRecall = meanAncestryGoAnnotationScoreRecall / (double) getProteins().size();
 			meanSemSimGoAnnotationScorePrecision = meanSemSimGoAnnotationScorePrecision / (double) getProteins().size();
 			meanSemSimGoAnnotationScoreRecall = meanSemSimGoAnnotationScoreRecall / (double) getProteins().size();
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
 			outputWriter.writeIterationOutput(threshold, 
 					meanSimpleGoAnnotationScorePrecision, meanSimpleGoAnnotationScoreRecall, 
 					meanAncestryGoAnnotationScorePrecision, meanAncestryGoAnnotationScoreRecall, 
-					meanSemSimGoAnnotationScorePrecision, meanSemSimGoAnnotationScoreRecall);
+					meanSemSimGoAnnotationScorePrecision, meanSemSimGoAnnotationScoreRecall,
+					calcTermCentricScores(threshold));
+			} else {
+				outputWriter.writeIterationOutput(threshold, 
+						meanSimpleGoAnnotationScorePrecision, meanSimpleGoAnnotationScoreRecall, 
+						meanAncestryGoAnnotationScorePrecision, meanAncestryGoAnnotationScoreRecall, 
+						meanSemSimGoAnnotationScorePrecision, meanSemSimGoAnnotationScoreRecall);
+			}
 		}
 		// close output file
 		outputWriter.cleanUp();
+	}
+	
+	protected Map<String, Fscore> calcTermCentricScores(double threshold) {
+		Map<String, Fscore> scores = new HashMap<String, Fscore>();
+		for (GOterm term : this.goCentricTerms) {
+			int truePositive = 0;
+			int falsePositive = 0;
+			int falseNegative = 0;
+			for (Protein protein : this.getProteins().values()) {
+				// Is the term predicted at the specified threshold ?
+				boolean prediction = protein.getGoCentricTermConfidences().get(term.getAccession()) > threshold;
+				// Is the term or any of its children in the ground truth?
+				boolean groundTruth = false;
+				for (GOterm groundTruthTerm : protein.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations()) {
+					groundTruth = groundTruthTerm.getAncestry().contains(term);
+					if (groundTruth) {
+						break;
+					}
+				}
+				if (groundTruth) {
+					if (prediction) {
+						truePositive += 1;
+					} else {
+						falseNegative += 1;
+					}
+				} else {
+					if (prediction) {
+						falsePositive += 1;
+					}
+				}
+			}
+			scores.put(term.getAccession(), new Fscore(truePositive, falsePositive, falseNegative));
+		}
+		return scores;
 	}
 	
 	/**
@@ -201,6 +241,9 @@ public class Evaluator extends AHRD {
 			// If requested iterate over all Proteins and assign the best scoring Gene Ontology terms
 			if (getSettings().hasGeneOntologyAnnotations()) {
 				evaluator.assignGeneOntologyTerms();
+				// If requested term centric annotation is performed as well
+				evaluator.termCentricAnnotation();
+
 			}
 			// Load a Map of all GO terms
 			// Load ground truth GO annotations
@@ -222,6 +265,7 @@ public class Evaluator extends AHRD {
 			TsvOutputWriter ow = new EvaluatorOutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
 			System.out.println("Written output into:\n" + getSettings().getPathToOutput());
+			// If requested, write data for a precision recall curve to disk 
 			if (getSettings().hasGeneOntologyAnnotations() && getSettings().getPathToGoAnnotationPrecisionRecallCurveFile() != null) {
 				evaluator.writePrecisionRecallCurve();
 				System.out.println("Written data for precision recall curve into:\n" + getSettings().getPathToGoAnnotationPrecisionRecallCurveFile());
