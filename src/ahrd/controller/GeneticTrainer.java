@@ -119,18 +119,7 @@ public class GeneticTrainer extends Trainer {
 			for (Parameters individual : population) {
 				if (individual.getAvgEvaluationScore() == null) {
 					getSettings().setParameters(individual);
-					reinitializeBlastResults();
-					// Iterate over all Proteins and assign the best scoring Human
-					// Readable Description
-					assignHumanReadableDescriptions();
-					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
-						assignGeneOntologyTerms();
-						goAnnotsStringToObject();
-					}
-					// Evaluate AHRD's performance for each Protein:
-					calculateEvaluationScores();
-					// Estimate average performance of current Parameters:
-					calcAveragesOfEvalScorePrecisionAndRecall();
+					scoreCurrentParameters();
 //					if(getSettings().getParameters().getOrigin().equals("seed")) {
 //						writeProteins(generation);
 //					}

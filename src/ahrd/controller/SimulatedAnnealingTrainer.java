@@ -96,18 +96,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 						getAlreadyTestedParameters(getSettings()
 								.getParameters()));
 			} else {
-				reinitializeBlastResults();
-				// Iterate over all Proteins and assign the best scoring Human
-				// Readable Description
-				assignHumanReadableDescriptions();
-				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
-					assignGeneOntologyTerms();
-					goAnnotsStringToObject();
-				}
-				// Evaluate AHRD's performance for each Protein:
-				calculateEvaluationScores();
-				// Estimate average performance of current Parameters:
-				calcAveragesOfEvalScorePrecisionAndRecall();
+				scoreCurrentParameters();
 			}
 			// Breaking a little bit with the pure simulated annealing
 			// algorithm, we remember the best performing Parameters:

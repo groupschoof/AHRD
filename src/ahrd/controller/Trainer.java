@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,9 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ahrd.exception.MissingAccessionException;
+import ahrd.exception.MissingInterproResultException;
 import ahrd.model.BlastResult;
 import ahrd.model.DescriptionScoreCalculator;
 import ahrd.model.EvaluationScoreCalculator;
+import ahrd.model.Fscore;
+import ahrd.model.GOterm;
 import ahrd.model.Protein;
 import ahrd.model.TokenScoreCalculator;
 import ahrd.view.TrainerOutputWriter;
@@ -63,13 +68,42 @@ public abstract class Trainer extends Evaluator {
 			}
 		}
 	}
+	
+	/**
+	 * Uses the currently assigned set of parameters to annotate the proteins with either GO terms or Human Readable Descriptions.
+	 * From the annotation an Fscore as well as Precision and Recall are derived by comparison to a ground truth.
+	 * If term centric annotation is requested is will be derived from the protein centric go annotation and the scores are calculated based on the term centric annotation
+	 * @throws MissingInterproResultException
+	 * @throws IOException
+	 * @throws SQLException
+	 * @throws MissingAccessionException
+	 */
+	protected void scoreCurrentParameters() throws MissingInterproResultException, IOException, SQLException, MissingAccessionException {
+		reinitializeBlastResults();
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+			assignGeneOntologyTerms(); // Iterate over Proteins and assign go terms
+			if(getSettings().hasGoTermCentricTermsFile()){
+				termCentricAnnotation(); // Use Protein centric go annotations to derive term centric annotations (with confidence coefficients)
+			} else {
+				goAnnotsStringToObject(); // Needed only when evaluation is to be based on protein centric go annotations  
+				calculateEvaluationScores(); // Evaluate AHRD's performance for each Protein
+			}
+		} else {
+			assignHumanReadableDescriptions(); // Iterate over all Proteins and assign the best scoring Human Readable Description
+			calculateEvaluationScores(); // Evaluate AHRD's performance for each Protein
+		}
+		// Estimate average performance of current Parameters:
+		calcAveragesOfEvalScorePrecisionAndRecall();
+	}
 
 	/**
 	 * Calculates the average of AHRD's EvaluationScore (objective-function).
 	 * If GO term scores have been computed the average is based upon them.
+	 * Further, if the GO annotations have been requested to be performed in a term centric manner the average scores are based upon them.  
 	 * Otherwise the conventional HRD based scores are used.
 	 */
 	public void calcAveragesOfEvalScorePrecisionAndRecall() {
+		Double numberOfProts = new Double(getProteins().size());
 		// average evaluation-score
 		Double avgEvlScr = 0.0;
 		// average Precision (PPV):
@@ -78,27 +112,57 @@ public abstract class Trainer extends Evaluator {
 		Double avgRecall = 0.0;
 		// Evaluate GO annotations.
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
-			for (Protein p : getProteins().values()) {
-				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
-				if (e != null) {
-					//Depending on the settings the go annotation f-score with the highest level of complexity is used
-					if (getSettings().doCalculateSemSimGoF1Scores()) {
-						avgEvlScr += e.getSemSimGoAnnotationScore().getScore();
-						avgPrecision += e.getSemSimGoAnnotationScore().getPrecision();
-						avgRecall += e.getSemSimGoAnnotationScore().getRecall();
-					} else {
-						if (getSettings().doCalculateAncestryGoF1Scores()) {
-							avgEvlScr += e.getAncestryGoAnnotationScore().getScore();
-							avgPrecision += e.getAncestryGoAnnotationScore().getPrecision();
-							avgRecall += e.getAncestryGoAnnotationScore().getRecall();
-						} else {
-							// getSettings().doCalculateSimpleGoF1Scores() Needs to be checked?
-							avgEvlScr += e.getSimpleGoAnnotationScore().getScore();
-							avgPrecision += e.getSimpleGoAnnotationScore().getPrecision();
-							avgRecall += e.getSimpleGoAnnotationScore().getRecall();
+			if (getSettings().hasGoTermCentricTermsFile()) { // Evaluate term centric go annotations
+				Map<String, Fscore> bestTermCentricScores = new HashMap<String, Fscore>();
+				for (GOterm term : this.goCentricTerms) {
+					bestTermCentricScores.put(term.getAccession(), new Fscore());
+				}
+				// Iterate over annotation confidence thresholds
+				for(int i=0; i<=100; i++) {
+					double threshold = ((double) i) * 0.01;
+					Map<String, Fscore> scores = this.calcTermCentricScores(threshold);
+					for (String termAcc : scores.keySet()) {
+						if (scores.get(termAcc).getScore() > bestTermCentricScores.get(termAcc).getScore()) {
+							bestTermCentricScores.put(termAcc, scores.get(termAcc));
 						}
 					}
 				}
+				// Average over all term centric terms
+				for (String termAcc : bestTermCentricScores.keySet()) {
+					avgEvlScr += bestTermCentricScores.get(termAcc).getScore();
+					avgPrecision += bestTermCentricScores.get(termAcc).getPrecision();
+					avgRecall += bestTermCentricScores.get(termAcc).getRecall();
+				}
+				avgEvlScr = avgEvlScr / (double) bestTermCentricScores.size();
+				avgPrecision = avgPrecision / (double) bestTermCentricScores.size();
+				avgRecall = avgRecall / (double) bestTermCentricScores.size();
+			} else { // Evaluate protein centric go annotations 
+				for (Protein p : getProteins().values()) {
+					EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
+					if (e != null) {
+						//Depending on the settings the go annotation f-score with the highest level of complexity is used
+						if (getSettings().doCalculateSemSimGoF1Scores()) {
+							avgEvlScr += e.getSemSimGoAnnotationScore().getScore();
+							avgPrecision += e.getSemSimGoAnnotationScore().getPrecision();
+							avgRecall += e.getSemSimGoAnnotationScore().getRecall();
+						} else {
+							if (getSettings().doCalculateAncestryGoF1Scores()) {
+								avgEvlScr += e.getAncestryGoAnnotationScore().getScore();
+								avgPrecision += e.getAncestryGoAnnotationScore().getPrecision();
+								avgRecall += e.getAncestryGoAnnotationScore().getRecall();
+							} else {
+								// getSettings().doCalculateSimpleGoF1Scores() Needs to be checked?
+								avgEvlScr += e.getSimpleGoAnnotationScore().getScore();
+								avgPrecision += e.getSimpleGoAnnotationScore().getPrecision();
+								avgRecall += e.getSimpleGoAnnotationScore().getRecall();
+							}
+						}
+					}
+				}
+				// average each number:
+				avgEvlScr = avgEvlScr / numberOfProts;
+				avgPrecision = avgPrecision / numberOfProts;
+				avgRecall = avgRecall / numberOfProts;
 			}
 		} else { // Otherwise use HRD based scores
 			for (Protein p : getProteins().values()) {
@@ -111,16 +175,12 @@ public abstract class Trainer extends Evaluator {
 					}
 				}
 			}
-		}
-		// average each number:
-		Double numberOfProts = new Double(getProteins().size());
-		if (avgEvlScr > 0.0)
+			// average each number:
 			avgEvlScr = avgEvlScr / numberOfProts;
-		if (avgPrecision > 0.0)
 			avgPrecision = avgPrecision / numberOfProts;
-		if (avgRecall > 0.0)
 			avgRecall = avgRecall / numberOfProts;
-		// done:
+		}
+		// Annotate the current settings with the averaged scores:
 		getSettings().setAvgEvaluationScore(avgEvlScr);
 		getSettings().setAvgPrecision(avgPrecision);
 		getSettings().setAvgRecall(avgRecall);
