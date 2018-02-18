@@ -19,12 +19,12 @@ public class Fscore {
 	
 	public Fscore(int truePositive, int falsePositive, int falseNegative) {
 		if (truePositive + falsePositive == 0) {
-			this.precision = 0.0;
+			this.precision = 1.0;
 		} else {
 			this.precision = (double)truePositive / (double)(truePositive + falsePositive);
 		}
 		if (truePositive + falseNegative == 0) {
-			this.setRecall(0.0);
+			this.setRecall(1.0);
 		} else {
 			this.setRecall((double)truePositive / (double)(truePositive + falseNegative));
 		}
