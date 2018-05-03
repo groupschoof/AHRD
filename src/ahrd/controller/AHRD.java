@@ -459,7 +459,6 @@ public class AHRD {
 
 	public void termCentricAnnotation() throws IOException, MissingAccessionException {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
-			
 			// Load a Map of all GO terms
 			if (goDB == null) {
 				goDB = new GOdatabase().getMap();
@@ -479,8 +478,9 @@ public class AHRD {
 			// Determine protein-goTerm association confidence (term centric annotation):
 			// The term itself and its child terms are considered for each term.
 			// From these terms the maximum confidence is used
-			for (Protein protein : getProteins().values()) {
-				for (GOterm term : this.goCentricTerms) {
+			for (GOterm term : this.goCentricTerms) {
+				Double maxConfidence = 0.0;
+				for (Protein protein : getProteins().values()) {
 					Double confidence = 0.0;
 					for (GOterm potentialChild : protein.getGoResultsTermsConfidence().keySet()) {
 						if (potentialChild.getAncestry().contains(term)) {
@@ -490,6 +490,15 @@ public class AHRD {
 						}
 					}
 					protein.getGoCentricTermConfidences().put(term.getAccession(), confidence);
+					// Determine highest association confidence between this GOterm and all proteins  
+					if (confidence > maxConfidence) {
+						maxConfidence = confidence;
+					}
+				}
+				System.out.println(term.getAccession() + " maxConfidence: " + maxConfidence);
+				// Scale the protein-GOterm association confidences according to the highest one so they end up using all the 'space' between 0 and 1 
+				for (Protein protein : getProteins().values()) {
+					protein.getGoCentricTermConfidences().put(term.getAccession(), protein.getGoCentricTermConfidences().get(term.getAccession()) / maxConfidence);
 				}
 			}
 		}

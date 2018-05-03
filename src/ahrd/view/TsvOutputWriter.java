@@ -62,9 +62,11 @@ public class TsvOutputWriter extends OutputWriter {
 		for (Protein prot : getProteins()) {
 			// Generate the Human Readable Description:
 			String csvRow = buildDescriptionLine(prot, "\t");
+			// If requested write GoSlimTerms
 			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
 				csvRow += "\t" + combineGoTermsToString(prot.getGoSlimTerms());
 			}
+			// If requested write GOterm centric protein-term association confidences 
 			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
 				for (String termAcc : goCentricTerms) {
 					csvRow += "\t" + FRMT.format(prot.getGoCentricTermConfidences().get(termAcc));				
