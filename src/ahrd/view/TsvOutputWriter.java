@@ -136,7 +136,7 @@ public class TsvOutputWriter extends OutputWriter {
 				goCentricTerms.add(termAcc);
 			}
 		}
-		String colNames = null; 
+		String colNames = "";
 		for (String termAcc : goCentricTerms) {
 			colNames = colNames + "\t" + termAcc;				
 		}
