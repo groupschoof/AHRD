@@ -243,7 +243,6 @@ public class Evaluator extends AHRD {
 				evaluator.assignGeneOntologyTerms();
 				// If requested term centric annotation is performed as well
 				evaluator.termCentricAnnotation();
-
 			}
 			// Load a Map of all GO terms
 			// Load ground truth GO annotations

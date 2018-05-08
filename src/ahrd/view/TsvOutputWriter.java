@@ -44,18 +44,7 @@ public class TsvOutputWriter extends OutputWriter {
 			bw.write("\tGO-Slim-Annotation");
 		}
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
-			// Load set of GO centric terms
-			for (String goCentricTermFileEntry : getSettings().getGoTermCentricTerms()) {
-				Pattern p = Settings.GO_TERM_CENTRIC_TERMS_FILE_GOTERM_REGEX;
-				Matcher m = p.matcher(goCentricTermFileEntry);
-				if (m.find()) {
-					String termAcc = m.group("goTerm");
-					goCentricTerms.add(termAcc);
-				}
-			}
-			for (String termAcc : goCentricTerms) {
-				bw.write("\t" + termAcc);				
-			}
+			bw.write(this.goTermCentricColumnNames());
 		}
 		bw.write("\n");
 
@@ -126,6 +115,32 @@ public class TsvOutputWriter extends OutputWriter {
 						.write(prot.getAccession() + "\t" + br.getAccession() + "\t" + br.getDescriptionScore() + "\n");
 			}
 		}
+	}
+	
+	/**
+	 * AHRD can be requested to annotate proteins with go terms in a term centric way.
+	 * This behavior can be triggered by suppling the go term centric terms in a separate file, 
+	 * in addition to suppling all the information needed to annotate proteins with go terms in the traditional way.
+	 * For every go term centric term a column will be put in AHRDs output with association confidence scores with each protein.
+	 * This method creates the names for these columns
+	 * @return A string with the column names for the go term centric terms
+	 * @throws IOException
+	 */
+	protected String goTermCentricColumnNames() throws IOException {
+		// Load set of GO centric terms
+		for (String goCentricTermFileEntry : getSettings().getGoTermCentricTerms()) {
+			Pattern p = Settings.GO_TERM_CENTRIC_TERMS_FILE_GOTERM_REGEX;
+			Matcher m = p.matcher(goCentricTermFileEntry);
+			if (m.find()) {
+				String termAcc = m.group("goTerm");
+				goCentricTerms.add(termAcc);
+			}
+		}
+		String colNames = null; 
+		for (String termAcc : goCentricTerms) {
+			colNames = colNames + "\t" + termAcc;				
+		}
+		return colNames;
 	}
 	
 	public String combineGoTermsToString(Set<GOterm> gos) {

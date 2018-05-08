@@ -126,6 +126,9 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				}
 			}
 		}
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
+			bw.write(this.goTermCentricColumnNames());
+		}
 		bw.write("\n");
 
 		for (Protein prot : getProteins()) {
@@ -177,7 +180,12 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 				}
 			}
-
+			// If requested write GOterm centric protein-term association confidences 
+			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
+				for (String termAcc : goCentricTerms) {
+					csvRow += "\t" + FRMT.format(prot.getGoCentricTermConfidences().get(termAcc));				
+				}
+			}
 			// Write row to CSV:
 			csvRow += "\n";
 			bw.write(csvRow);

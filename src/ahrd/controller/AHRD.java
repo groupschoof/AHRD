@@ -495,7 +495,6 @@ public class AHRD {
 						maxConfidence = confidence;
 					}
 				}
-				System.out.println(term.getAccession() + " maxConfidence: " + maxConfidence);
 				// Scale the protein-GOterm association confidences according to the highest one so they end up using all the 'space' between 0 and 1 
 				for (Protein protein : getProteins().values()) {
 					protein.getGoCentricTermConfidences().put(term.getAccession(), protein.getGoCentricTermConfidences().get(term.getAccession()) / maxConfidence);
