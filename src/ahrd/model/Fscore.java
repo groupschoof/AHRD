@@ -6,6 +6,9 @@ public class Fscore {
 	private Double score = 0.0;
 	private Double precision = 0.0; // positive predictive value (PPV) = TP / prediction 
 	private Double recall = 0.0; // true positive rate (TPR) = TP / groundTruth
+	private int truePositives = 0;
+	private int falsePositives = 0;
+	private int falseNegatives = 0;
 
 	public Fscore() {
 		super();
@@ -18,6 +21,9 @@ public class Fscore {
 	}
 	
 	public Fscore(int truePositive, int falsePositive, int falseNegative) {
+		this.truePositives = truePositive;
+		this.falsePositives = falsePositive;
+		this.falseNegatives = falseNegative;
 		if (truePositive + falsePositive == 0) {
 			this.precision = 1.0;
 		} else {
@@ -62,4 +68,16 @@ public class Fscore {
 		this.calcScore();
 	}
 
+	public int getTruePositives() {
+		return truePositives;
+	}
+
+	public int getFalsePositives() {
+		return falsePositives;
+	}
+
+	public int getFalseNegatives() {
+		return falseNegatives;
+	}
+	
 }

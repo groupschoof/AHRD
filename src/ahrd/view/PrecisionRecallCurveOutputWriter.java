@@ -63,7 +63,7 @@ public class PrecisionRecallCurveOutputWriter {
 		}
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoTermCentricTermsFile()) {
 			for (String termAcc : goCentricTerms) {
-				header += "\t" + termAcc + "-Precision" + "\t" + termAcc + "-Recall";
+				header += "\t" + termAcc + "-Precision" + "\t" + termAcc + "-Recall" + "\t" + termAcc + "-TruePositives" + "\t" + termAcc + "-FalsePositives" + "\t" + termAcc + "-FalseNegatives";
 			}
 		}
 		header += "\n";
@@ -106,6 +106,9 @@ public class PrecisionRecallCurveOutputWriter {
 		for (String term : this.goCentricTerms) {
 			line += "\t" + FRMT.format(goCentricScores.get(term).getPrecision());
 			line += "\t" + FRMT.format(goCentricScores.get(term).getRecall());
+			line += "\t" + goCentricScores.get(term).getTruePositives();
+			line += "\t" + goCentricScores.get(term).getFalsePositives();
+			line += "\t" + goCentricScores.get(term).getFalseNegatives();
 		}
 		line += "\n";
 		this.outBufWrtr.write(line); 
