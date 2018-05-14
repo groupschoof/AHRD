@@ -325,7 +325,7 @@ public class EvaluationScoreCalculator {
 	}
 
 	/**
-	 * Calculates an 1 score from recall and precision based on the semantic
+	 * Calculates an F-score from recall and precision based on the semantic
 	 * similarity of the ground truth and prediction GO term sets.
 	 * 
 	 * @return Double - F score
@@ -334,7 +334,6 @@ public class EvaluationScoreCalculator {
 		Fscore f = new Fscore();
 		Double recall = 0.0;
 		Double precision = 0.0;
-		// Recall
 		/**
 		 * Find the information content of the ground truth: Usually the
 		 * information content of the terms themselves, but if they havn't been
@@ -342,60 +341,80 @@ public class EvaluationScoreCalculator {
 		 * infinite info content from their ancestry is used as fallback.
 		 */
 		if (groundTruth.size() > 0 && prediction.size() > 0) {
+			// Recall
 			Double infoContentGroundTruth = 0.0;
-			Double infoContentPrediction = 0.0;
-			for (Iterator<GOterm> groundTruthIter = groundTruth.iterator(); groundTruthIter.hasNext();) {
-				GOterm groundTruthTerm = groundTruthIter.next();
+			Double commonInfoContentPrediction = 0.0;
+			for (GOterm groundTruthTerm : groundTruth) {
 				Double maxInfoContentAncestry = 0.0;
-				for (Iterator<GOterm> ancestryIter = groundTruthTerm.getAncestry().iterator(); ancestryIter.hasNext();) {
-					Double infoContent = ancestryIter.next().getInformationContent();
-					if (!Double.isInfinite(infoContent) && infoContent > maxInfoContentAncestry) {
+				for (GOterm ancestryTerm : groundTruthTerm.getAncestry()) {
+					Double infoContent = ancestryTerm.getInformationContent();
+					if (Double.isFinite(infoContent) && infoContent > maxInfoContentAncestry) {
 						maxInfoContentAncestry = infoContent;
 					}
 				}
 				infoContentGroundTruth += maxInfoContentAncestry;
 				Double maxCommonInfoContentPrediction = 0.0;
-				for (Iterator<GOterm> predictionIter = prediction.iterator(); predictionIter
-						.hasNext();) {
-					Double infoContent = maxCommonInfoContent(groundTruthTerm, predictionIter.next());
-					if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContentPrediction) {
+				for (GOterm predictionTerm : prediction) {
+					Double infoContent = maxCommonInformationContent(groundTruthTerm, predictionTerm);
+					if (Double.isFinite(infoContent) && infoContent > maxCommonInfoContentPrediction) {
 						maxCommonInfoContentPrediction = infoContent;
 					}
 				}
-				infoContentPrediction += maxCommonInfoContentPrediction;
+				commonInfoContentPrediction += maxCommonInfoContentPrediction;
 			}
 			if (infoContentGroundTruth > 0.0) {
-				recall = infoContentPrediction / infoContentGroundTruth;
+				recall = commonInfoContentPrediction / infoContentGroundTruth;
 			} else {
 				recall = 1.0;
 			}
-
-			infoContentPrediction = 0.0;
-			infoContentGroundTruth = 0.0;
-			for (Iterator<GOterm> predictionIter = prediction.iterator(); predictionIter
-					.hasNext();) {
-				GOterm predictionTerm = predictionIter.next();
+			// Precision
+			Double infoContentPrediction = 0.0;
+			Double commonInfoContentGroundTruth = 0.0;
+			for (GOterm predictionTerm : prediction) {
 				Double maxInfoContentAncestry = 0.0;
-				for (Iterator<GOterm> ancestryIter = predictionTerm.getAncestry().iterator(); ancestryIter.hasNext();) {
-					Double infoContent = ancestryIter.next().getInformationContent();
-					if (!Double.isInfinite(infoContent) && infoContent > maxInfoContentAncestry) {
+				for (GOterm ancestryTerm : predictionTerm.getAncestry()) {
+					Double infoContent = ancestryTerm.getInformationContent();
+					if (Double.isFinite(infoContent) && infoContent > maxInfoContentAncestry) {
 						maxInfoContentAncestry = infoContent;
 					}
 				}
-				infoContentPrediction += maxInfoContentAncestry;
-				Double maxCommonInfoContentGroundTruth = 0.0;
-				for (Iterator<GOterm> groundTruthIter = groundTruth.iterator(); groundTruthIter
-						.hasNext();) {
-					Double infoContent = maxCommonInfoContent(predictionTerm, groundTruthIter.next());
-					if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContentGroundTruth) {
-						maxCommonInfoContentGroundTruth = infoContent;
+				Double maxCommonInfoContentGroundTruth = -1.0;
+				for (GOterm groundTruthTerm : groundTruth) {
+					Set<GOterm> commonAncestry = new HashSet<GOterm>(predictionTerm.getAncestry());
+					commonAncestry.retainAll(groundTruthTerm.getAncestry());
+					/*
+					 * If the maxCommonInfoContent remains negative, the commonAncestry is empty.
+					 * -> This means the predicted GO term and the ground truth GO term are from different ontologies.
+					 * If the maxCommonInfoContent turns out to 0.0, the predicted GO term and the ground truth GO term are from the same ontology but only share the root term in their ancestries.
+					 */
+					Double maxCommonInfoContent = -1.0;
+					for (GOterm ancestryTerm : commonAncestry) {
+						Double infoContent = ancestryTerm.getInformationContent();
+						if (Double.isFinite(infoContent) && infoContent > maxCommonInfoContent) {
+							maxCommonInfoContent = infoContent;
+						}
+					}
+					if (maxCommonInfoContent > maxCommonInfoContentGroundTruth) {
+						maxCommonInfoContentGroundTruth = maxCommonInfoContent;
 					}
 				}
-				infoContentGroundTruth += maxCommonInfoContentGroundTruth;
-
+				/*
+				 * If the maxCommonInfoContentGroundTruth remains negative, there are no GO terms in the ground truth within the same ontology as the predicted GO term.
+				 * -> This means in the ontology of the predicted GO term is no knowledge available for the protein in question.
+				 * -> Thus the prediction also can't be proven wrong and should not be penalized.
+				 * -> Consequently the predicted GO term's information content will not be added to the information content of the prediction.   
+				 * If the maxCommonInfoContentGroundTruth turns out to 0.0, ground truth GO terms were available in the same ontology but the only common ancestor was the root term.
+				 * -> Thus information about the function of the proteins was available and the prediction was very wrong.
+				 * -> Consequently the predicted GO term's information content will be added to the information content of the prediction while 0 will be added to the information content common with the ground truth.
+				 * -> This results in a penalizing of the prediction to the full extent. 
+				 */
+				if (maxCommonInfoContentGroundTruth >= 0.0) {
+					infoContentPrediction += maxInfoContentAncestry;
+					commonInfoContentGroundTruth += maxCommonInfoContentGroundTruth;
+				}
 			}
 			if (infoContentPrediction > 0.0) {
-				precision = infoContentGroundTruth / infoContentPrediction;
+				precision = commonInfoContentGroundTruth / infoContentPrediction;
 			} else {
 				precision = 1.0;
 			}
@@ -415,13 +434,13 @@ public class EvaluationScoreCalculator {
 		return f;
 	}
 
-	private Double maxCommonInfoContent(GOterm firstTerm, GOterm secondTerm) {
+	private Double maxCommonInformationContent(GOterm firstTerm, GOterm secondTerm) {
 		Set<GOterm> commonAncestry = new HashSet<GOterm>(firstTerm.getAncestry());
 		commonAncestry.retainAll(secondTerm.getAncestry());
 		Double maxCommonInfoContent = 0.0;
-		for (Iterator<GOterm> ancestryIter = commonAncestry.iterator(); ancestryIter.hasNext();) {
-			Double infoContent = ancestryIter.next().getInformationContent();
-			if (!Double.isInfinite(infoContent) && infoContent > maxCommonInfoContent) {
+		for (GOterm ancestryTerm : commonAncestry) {
+			Double infoContent = ancestryTerm.getInformationContent();
+			if (Double.isFinite(infoContent) && infoContent > maxCommonInfoContent) {
 				maxCommonInfoContent = infoContent;
 			}
 		}
