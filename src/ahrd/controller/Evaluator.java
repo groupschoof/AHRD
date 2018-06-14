@@ -2,6 +2,8 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 
+import static ahrd.model.AhrdDb.closeDb;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -49,13 +51,11 @@ public class Evaluator extends AHRD {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.Evaluator input.yml\n");
+		System.out.println("Usage:\njava -Xmx30g -cp ahrd.jar ahrd.controller.Evaluator input.yml\n");
 
 		try {
 			Evaluator evaluator = new Evaluator(args[0]);
 			evaluator.setup(false); // false -> Don't log memory and time-usages
-			// After the setup the unique short accessions are no longer needed:
-			evaluator.setUniqueBlastResultShortAccessions(null);
 			evaluator.setupReferences();
 			// Blast2GO is another competitor in the field of annotation of
 			// predicted Proteins. AHRD might be compared with B2Gs performance:
@@ -76,8 +76,9 @@ public class Evaluator extends AHRD {
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
+		} finally {
+			closeDb();
 		}
-
 	}
 
 	/**

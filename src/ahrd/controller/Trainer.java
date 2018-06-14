@@ -2,6 +2,8 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 
+import static ahrd.model.AhrdDb.closeDb;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -31,14 +33,11 @@ public class Trainer extends Evaluator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out
-				.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.Trainer input.yml\n");
+		System.out.println("Usage:\njava -Xmx30g -cp ahrd.jar ahrd.controller.Trainer input.yml\n");
 
 		try {
 			Trainer trainer = new Trainer(args[0]);
 			trainer.setup(false); // false -> Don't log memory and time-usages
-			// After the setup the unique short accessions are no longer needed:
-			trainer.setUniqueBlastResultShortAccessions(null);
 			trainer.setupReferences();
 			// Blast2GO is another competitor in the field of annotation of
 			// predicted Proteins. AHRD might be compared with B2Gs performance:
@@ -53,20 +52,17 @@ public class Trainer extends Evaluator {
 			// Write final output
 			Settings bestSettings = getSettings().clone();
 			bestSettings.setParameters(trainer.getBestParameters());
-			trainer.outWriter.writeFinalOutput(bestSettings,
-					trainer.getAvgMaxEvaluationScore(),
+			trainer.outWriter.writeFinalOutput(bestSettings, trainer.getAvgMaxEvaluationScore(),
 					trainer.getBestParametersFoundAtTemperature());
-			System.out
-					.println("Logged path through parameter- and score-space into:\n"
-							+ getSettings()
-									.getPathToSimulatedAnnealingPathLog());
-			System.out.println("Written output into:\n"
-					+ getSettings().getPathToOutput());
+			System.out.println("Logged path through parameter- and score-space into:\n"
+					+ getSettings().getPathToSimulatedAnnealingPathLog());
+			System.out.println("Written output into:\n" + getSettings().getPathToOutput());
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
+		} finally {
+			closeDb();
 		}
-
 	}
 
 	/**
@@ -90,19 +86,15 @@ public class Trainer extends Evaluator {
 	 * @throws MissingInterproResultException
 	 * @throws SQLException
 	 */
-	public void train() throws MissingInterproResultException, IOException,
-			SQLException {
+	public void train() throws MissingInterproResultException, IOException, SQLException {
 		while (getSettings().getTemperature() > 0) {
 			// If we run simulated annealing remembering tested Parameters and
 			// their scores,
 			// do not calculate current Parameter's performance, if already done
 			// in former cycle:
 			if (getSettings().rememberSimulatedAnnealingPath()
-					&& getTestedParameters().contains(
-							getSettings().getParameters())) {
-				getSettings().setParameters(
-						getAlreadyTestedParameters(getSettings()
-								.getParameters()));
+					&& getTestedParameters().contains(getSettings().getParameters())) {
+				getSettings().setParameters(getAlreadyTestedParameters(getSettings().getParameters()));
 			} else {
 				// Iterate over all Proteins and assign the best scoring Human
 				// Readable Description
@@ -118,8 +110,7 @@ public class Trainer extends Evaluator {
 			// If started with this option, remember currently evaluated
 			// Parameters:
 			if (getSettings().rememberSimulatedAnnealingPath())
-				getTestedParameters()
-						.add(getSettings().getParameters().clone());
+				getTestedParameters().add(getSettings().getParameters().clone());
 			// Remember difference in avg. evaluation-scores, *before* accepting
 			// or rejecting current Parameters:
 			Double diffScores = diffEvalScoreToCurrentlyAcceptedParams();
@@ -128,8 +119,7 @@ public class Trainer extends Evaluator {
 			// Parameters:
 			int acceptedCurrParameters = acceptOrRejectParameters();
 			// Write output of current iteration:
-			this.outWriter.writeIterationOutput(getSettings(), diffScores,
-					acceptedCurrParameters);
+			this.outWriter.writeIterationOutput(getSettings(), diffScores, acceptedCurrParameters);
 			// Try a slightly changes set of Parameters:
 			initNeighbouringSettings();
 			// Cool down temperature:
@@ -144,8 +134,7 @@ public class Trainer extends Evaluator {
 	 */
 	public void findBestSettings() {
 		if (getBestParameters() == null
-				|| getSettings().getAvgEvaluationScore() > getBestParameters()
-						.getAvgEvaluationScore()) {
+				|| getSettings().getAvgEvaluationScore() > getBestParameters().getAvgEvaluationScore()) {
 			setBestParameters(getSettings().getParameters().clone());
 			setBestParametersFoundAtTemperature(getSettings().getTemperature());
 		}
@@ -157,15 +146,12 @@ public class Trainer extends Evaluator {
 	 * the euclidean distance in the parameter-space Instance.
 	 */
 	public void initNeighbouringSettings() {
-		getSettings().setParameters(
-				getAcceptedParameters().neighbour(
-						diffEvalScoreToCurrentlyAcceptedParams()));
+		getSettings().setParameters(getAcceptedParameters().neighbour(diffEvalScoreToCurrentlyAcceptedParams()));
 	}
 
 	public Double diffEvalScoreToCurrentlyAcceptedParams() {
-		return (getAcceptedParameters() != null) ? getSettings()
-				.getAvgEvaluationScore()
-				- getAcceptedParameters().getAvgEvaluationScore() : 0.0;
+		return (getAcceptedParameters() != null)
+				? getSettings().getAvgEvaluationScore() - getAcceptedParameters().getAvgEvaluationScore() : 0.0;
 	}
 
 	/**
@@ -178,22 +164,19 @@ public class Trainer extends Evaluator {
 	 */
 	public Double acceptanceProbability() {
 		// Scaling-Factor referenced for reading convenience. ;-)
-		Double sf = getSettings()
-				.getOptimizationAcceptanceProbabilityScalingFactor();
+		Double sf = getSettings().getOptimizationAcceptanceProbabilityScalingFactor();
 		// If current Settings perform better than the so far found best, accept
 		// them:
 		double p = 1.0;
 		// If not, generate Acceptance-Probability based on Score-Difference and
 		// current Temperature:
-		if (getAcceptedParameters() != null
-				&& diffEvalScoreToCurrentlyAcceptedParams() < 0.0) {
+		if (getAcceptedParameters() != null && diffEvalScoreToCurrentlyAcceptedParams() < 0.0) {
 			// In this case the difference in avg. evaluation scores of current
 			// to accepted parameters is always NEGATIVE.
 			// Hence the following formula can be written as:
 			// p := exp((delta.scores*sf)/T.curr), where delta.score is a
 			// negative real value.
-			p = Math.exp(diffEvalScoreToCurrentlyAcceptedParams() * sf
-					/ getSettings().getTemperature());
+			p = Math.exp(diffEvalScoreToCurrentlyAcceptedParams() * sf / getSettings().getTemperature());
 		}
 		return p;
 	}
@@ -204,8 +187,7 @@ public class Trainer extends Evaluator {
 	 * @Note: Temperature is a global Setting.
 	 */
 	public void coolDown() {
-		getSettings().setTemperature(
-				getSettings().getTemperature() - getSettings().getCoolDownBy());
+		getSettings().setTemperature(getSettings().getTemperature() - getSettings().getCoolDownBy());
 	}
 
 	/**
@@ -265,8 +247,7 @@ public class Trainer extends Evaluator {
 		double acceptCurrSettingsProb = acceptanceProbability();
 		if (acceptCurrSettingsProb == 1.0) {
 			if (getAcceptedParameters() == null
-					|| getAcceptedParameters().getAvgEvaluationScore() < getSettings()
-							.getAvgEvaluationScore()) {
+					|| getAcceptedParameters().getAvgEvaluationScore() < getSettings().getAvgEvaluationScore()) {
 				accepted = 3; // Accepted better performing parameters
 			} else {
 				accepted = 2; // Accepted equally well performing parameters
@@ -294,8 +275,7 @@ public class Trainer extends Evaluator {
 	 */
 	public Parameters getAlreadyTestedParameters(Parameters current) {
 		Parameters alreadyTested = null;
-		for (Parameters iterParams : getTestedParameters().toArray(
-				new Parameters[] {})) {
+		for (Parameters iterParams : getTestedParameters().toArray(new Parameters[] {})) {
 			if (current.equals(iterParams))
 				alreadyTested = iterParams;
 		}
@@ -308,14 +288,11 @@ public class Trainer extends Evaluator {
 	 */
 	public void calcAvgMaxEvaluationScore() {
 		for (Protein prot : getProteins().values()) {
-			prot.getEvaluationScoreCalculator()
-					.findHighestPossibleEvaluationScore();
+			prot.getEvaluationScoreCalculator().findHighestPossibleEvaluationScore();
 			setAvgMaxEvaluationScore(getAvgMaxEvaluationScore()
-					+ prot.getEvaluationScoreCalculator()
-							.getHighestPossibleEvaluationScore());
+					+ prot.getEvaluationScoreCalculator().getHighestPossibleEvaluationScore());
 		}
-		setAvgMaxEvaluationScore(getAvgMaxEvaluationScore()
-				/ getProteins().size());
+		setAvgMaxEvaluationScore(getAvgMaxEvaluationScore() / getProteins().size());
 	}
 
 	public Parameters getAcceptedParameters() {
@@ -350,8 +327,7 @@ public class Trainer extends Evaluator {
 		return bestParametersFoundAtTemperature;
 	}
 
-	public void setBestParametersFoundAtTemperature(
-			Integer bestParametersFoundAtTemperature) {
+	public void setBestParametersFoundAtTemperature(Integer bestParametersFoundAtTemperature) {
 		this.bestParametersFoundAtTemperature = bestParametersFoundAtTemperature;
 	}
 
