@@ -335,7 +335,7 @@ To have AHRD annotate your proteins with GO terms, you just need to provide the 
 
 h5. 3.3.2.0 Prefer reference proteins as candidates that have GO Term annotations
 
-The parameter @prefer_reference_with_go_annos: true@ is highly recommended when aiming to annotate your query proteins with GO Terms. If this parameter is set to true only those candidate references are considered that also have GO Term annotations. However, if you put more emphasis on Human Readable Descriptions and are prepared to accept a couple of your queries to not get any GO Term predictions you can switch this off with @prefer_reference_with_go_annos: false@ or just omit the parameter as by default it is set to @false@.  
+The parameter @prefer_reference_with_go_annos: true@ can be used when aiming to annotate your query proteins with GO Terms. If this parameter is set to true only those candidate references are considered that also have GO Term annotations. However, if you put more emphasis on Human Readable Descriptions and are prepared to accept a couple of your queries to not get any GO Term predictions you can switch this off with @prefer_reference_with_go_annos: false@ or just omit the parameter as by default it is set to @false@. We recommend the default behaviour.
 
 h5. 3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
 
