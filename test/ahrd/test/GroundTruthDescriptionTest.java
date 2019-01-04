@@ -23,9 +23,9 @@ import nu.xom.ParsingException;
 public class GroundTruthDescriptionTest {
 
 	@Test
-	public void testParsingOfGroundTruth() throws IOException {
+	public void testParsingOfGroundTruth() throws IOException, MissingAccessionException {
 		TestUtils.initTestSettings();
-		String fastaEntry = "AT06g1234 Sheep wool growth factor\nRSSPMSRATVDAAPLLASAAASSGTAPMIEISAAEPKRAPKRVSTTPVTPDRPNSSPPNE\nLIVTVWLFGKMMRSHPTVTRFWPTFRPDW";
+		String fastaEntry = ">AT06g1234 Sheep wool growth factor\nRSSPMSRATVDAAPLLASAAASSGTAPMIEISAAEPKRAPKRVSTTPVTPDRPNSSPPNE\nLIVTVWLFGKMMRSHPTVTRFWPTFRPDW";
 		GroundTruthDescription rd = GroundTruthDescription.constructFromFastaEntry(fastaEntry);
 		assertEquals("AT06g1234", rd.getAccession());
 		assertEquals("Sheep wool growth factor", rd.getDescription());

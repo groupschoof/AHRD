@@ -54,7 +54,7 @@ public class ProteinTest {
 		// NOTE: We expect this method to be called with a split String, read
 		// from a FASTA-File.
 		// The splitting is done for '>'!
-		String input = "MySequence | more information | we don't need\n"
+		String input = ">MySequence | more information | we don't need\n"
 				+ "MADDSKFCFFLVSTFLLLAVVVNVTLAANYVPGDDILLNCGGPDNLPDADGRKWGTDIGS\n"
 				+ "KYMLGSKSSTSDAADQKPSVPQVPFMSARVFQSEFTYSFPVASGRKFVRLYFYPSSYNKL\n"
 				+ "NATNAIFNVASGQYTLLRNFSAAQTAEALNYDYLTKEFSINVRWKYLHCNVISPSGDTGM\n"
@@ -87,7 +87,7 @@ public class ProteinTest {
 		// NOTE: We expect this method to be called with a split String, read
 		// from a FASTA-File.
 		// The splitting is done for '>'!
-		String input = "MySequence | more information | we don't need\n"
+		String input = ">MySequence | more information | we don't need\n"
 				+ "MADDSKFCFFLVSTFLLLAVVVNVTLAANYVPGDDILLNCGGPDNLPDADGRKWGTDIGS\n"
 				+ "KYMLGSKSSTSDAADQKPSVPQVPFMSARVFQSEFTYSFPVASGRKFVRLYFYPSSYNKL\n"
 				+ "NATNAIFNVASGQYTLLRNFSAAQTAEALNYDYLTKEFSINVRWKYLHCNVISPSGDTGM\n"
@@ -129,8 +129,8 @@ public class ProteinTest {
 		List<String> fastaEntries = Protein.splitFasta(str);
 		assertEquals(
 				Arrays.asList(
-						"Protein One->Expressed in stupid user\nSPGYDASMTDSRSSGISMSIGGRSLASEDSDGLTPSAVFSQIMNPKGR",
-						"Protein Two\nMADDSKFCFFLVSTFLLLAVVVNVTLAANYVPGDDILLNCGGPDNLPDADGRKWGTDIGS"),
+						">Protein One->Expressed in stupid user\nSPGYDASMTDSRSSGISMSIGGRSLASEDSDGLTPSAVFSQIMNPKGR",
+						">Protein Two\nMADDSKFCFFLVSTFLLLAVVVNVTLAANYVPGDDILLNCGGPDNLPDADGRKWGTDIGS"),
 				fastaEntries);
 	}
 

@@ -1,8 +1,14 @@
 package ahrd.model;
 
+import static ahrd.controller.Settings.ACCESSION_GROUP_NAME;
+import static ahrd.controller.Settings.DESCRIPTION_GROUP_NAME;
+import static ahrd.controller.Settings.DEFAULT_LINE_SEP;
 import static ahrd.controller.Settings.getSettings;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+
+import ahrd.exception.MissingAccessionException;
 
 public class GroundTruthDescription {
 
@@ -14,15 +20,21 @@ public class GroundTruthDescription {
 		super();
 	}
 
-	public static GroundTruthDescription constructFromFastaEntry(String fastaEntry) {
+	public static GroundTruthDescription constructFromFastaEntry(String fastaEntry) throws MissingAccessionException {
 		GroundTruthDescription rd = new GroundTruthDescription();
-
-		// First line is a combination of Accession and Description
-		String[] fastaData = fastaEntry.split("\n");
-		// First token before whitespace-char is the Accession
-		rd.setAccession(fastaData[0].split(" ")[0].trim());
-		// Everything after the Accession is considered the description-line:
-		rd.setDescription(fastaData[0].replace(rd.getAccession(), "").trim());
+		
+		String[] fasta_data = fastaEntry.split(DEFAULT_LINE_SEP);
+		Matcher m = getSettings().getGroundTruthFastaRegex().matcher(fasta_data[0]);
+		if (m.find()) {
+			rd.setAccession(m.group(ACCESSION_GROUP_NAME));
+			if (rd.getAccession() == null || rd.getAccession().equals("")) {
+				throw new MissingAccessionException("Missing protein-accession in:\n" + fastaEntry);
+			} else {
+				rd.setDescription(m.group(DESCRIPTION_GROUP_NAME));
+			}
+		} else {
+			throw new MissingAccessionException("Missing protein-accession in:\n" + fastaEntry);
+		}
 		// Process the ground truth's human readable description as requested by
 		// the user (Settings) -
 		// NOTE, if the HRD passes the Blacklist and no filtering is
