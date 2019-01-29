@@ -67,13 +67,6 @@ public class DescriptionScoreCalculator {
 	/**
 	 * Assigns each BlastResult's Description-Line its AHRD-Score and then finds
 	 * the highest scoring one.
-	 * 
-	 * @param databaseGoAnnotations
-	 *            Map of BlastResults' shortAccesions as keys and their Sets of
-	 *            annotated GO Terms as values. If NOT null and any of the query
-	 *            proteins' hits of GO Term annotations, AHRD will use the
-	 *            highest scoring BlastResult with GO Terms to annotate the
-	 *            query.
 	 */
 	public void findHighestScoringBlastResult() {
 		BlastResult bestScoringBr = null;
