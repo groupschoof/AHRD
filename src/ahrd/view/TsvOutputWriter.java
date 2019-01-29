@@ -107,7 +107,7 @@ public class TsvOutputWriter extends OutputWriter {
 		return combineGoTermsToString(gos, ", ");
 	}
 
-	public String combineGoTermsToString(Set<GOterm> gos, String seperator) {
+	public String combineGoTermsToString(Set<GOterm> gos, String separator) {
 		String goLine = "";
 		if (gos != null) {
 			List<String> sortedGos = new ArrayList<String>();
@@ -118,7 +118,7 @@ public class TsvOutputWriter extends OutputWriter {
 			for (Iterator<String> iter = sortedGos.iterator(); iter.hasNext();) {
 				goLine += iter.next();
 				if (iter.hasNext())
-					goLine += seperator;
+					goLine += separator;
 			}
 
 		}

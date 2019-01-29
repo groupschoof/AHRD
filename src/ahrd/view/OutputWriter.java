@@ -37,19 +37,19 @@ public abstract class OutputWriter {
 
 	public abstract void writeOutput() throws IOException;
 
-	public String buildDescriptionLine(Protein protein, String seperator) {
-		String descLine = protein.getAccession() + seperator;
+	public String buildDescriptionLine(Protein protein, String separator) {
+		String descLine = protein.getAccession() + separator;
 		// Blast-Results
 		if (protein.getDescriptionScoreCalculator()
 				.getHighestScoringBlastResult() != null) {
 			BlastResult br = protein.getDescriptionScoreCalculator()
 					.getHighestScoringBlastResult();
-			descLine += br.getAccession() + seperator + qualityCode(protein)
-					+ seperator + br.getDescription() + seperator;
+			descLine += br.getAccession() + separator + qualityCode(protein)
+					+ separator + br.getDescription() + separator;
 		} else {
 			// Maintain Table's Column-Structure, if writing tab delimited
 			// values:
-			if (seperator.equals("\t"))
+			if (separator.equals("\t"))
 				descLine += "\t\tUnknown protein\t";
 			else
 				descLine += "Unknown protein";
@@ -64,7 +64,7 @@ public abstract class OutputWriter {
 			if (i.hasNext())
 				descLine += ", ";
 		}
-		descLine += seperator;
+		descLine += separator;
 		// Gene-Ontology-Results:
 		descLine += combineGoTermStrings(protein.getGoResults());
 		
@@ -75,7 +75,7 @@ public abstract class OutputWriter {
 		return combineGoTermStrings(gos, ", ");
 	}
 	
-	public String combineGoTermStrings(Set<String> gos, String seperator) {
+	public String combineGoTermStrings(Set<String> gos, String separator) {
 		String goLine = "";
 		List<String> sortedGOs = new ArrayList<String>(gos);
 		Collections.sort(sortedGOs);
@@ -83,7 +83,7 @@ public abstract class OutputWriter {
 			String gor = i.next();
 			goLine += gor;
 			if (i.hasNext())
-				goLine += seperator;
+				goLine += separator;
 		}
 		return goLine;
 	}
