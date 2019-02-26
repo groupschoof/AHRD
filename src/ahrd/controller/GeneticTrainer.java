@@ -13,6 +13,9 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
@@ -88,14 +91,8 @@ public class GeneticTrainer extends Trainer {
 	 * survivors, mutants of fit survivors and random parameter sets for the
 	 * rest in each succeeding generation.
 	 * 
-	 * @throws IOException
-	 * @throws MissingInterproResultException
-	 * @throws SQLException
-	 * @throws MissingAccessionException 
-	 * @throws ParsingException 
-	 * @throws MissingProteinException 
 	 */
-	public void train() throws MissingInterproResultException, IOException, SQLException, MissingAccessionException, MissingProteinException, ParsingException {
+	public void train() throws Exception {
 		Set<Parameters> population = new HashSet<Parameters>();
 		// Set up first generation
 		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();

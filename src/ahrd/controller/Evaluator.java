@@ -10,6 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.BlastResult;
 import ahrd.model.CompetitorAnnotation;
@@ -40,7 +43,7 @@ public class Evaluator extends AHRD {
 		}
 	}
 
-	public void setupGoAnnotationEvaluation() throws FileNotFoundException, IOException, MissingAccessionException {
+	public void setupGoAnnotationEvaluation() throws Exception {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			// Load a Map of all GO terms
 			if (goDB == null) {
@@ -105,7 +108,7 @@ public class Evaluator extends AHRD {
 		}
 	}
 
-	public void goAnnotsStringToObject() throws FileNotFoundException, IOException, MissingAccessionException {
+	public void goAnnotsStringToObject() throws Exception {
 		// Load a Map of all GO terms
 		if (goDB == null)
 			goDB = new GOdatabase().getMap();

@@ -22,5 +22,42 @@
 	<classpathentry kind="lib" path="lib/yamlbeans-1.06.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.35-bin.jar"/>
 	<classpathentry kind="lib" path="lib/commons-compress-1.12.jar"/>
+	<classpathentry kind="lib" path="lib/owlapi-distribution-4.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.7.22.jar"/>
+	<classpathentry kind="lib" path="lib/guava-20.0.jar"/>
+	<classpathentry kind="lib" path="lib/javax.inject-1.jar"/>
+	<classpathentry kind="lib" path="lib/caffeine-2.5.6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.5.jar"/>
+	<classpathentry kind="lib" path="lib/hppcrt-0.7.5.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.2.5.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-cache-4.2.5.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.2.4.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-annotations-2.8.5.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-2.8.5.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-databind-2.8.5.jar"/>
+	<classpathentry kind="lib" path="lib/jcl-over-slf4j-1.7.22.jar"/>
+	<classpathentry kind="lib" path="lib/jsonld-java-0.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/jsonld-java-sesame-0.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/jsr305-3.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/semargl-core-0.7.jar"/>
+	<classpathentry kind="lib" path="lib/semargl-rdf-0.7.jar"/>
+	<classpathentry kind="lib" path="lib/semargl-rdfa-0.7.jar"/>
+	<classpathentry kind="lib" path="lib/semargl-sesame-0.7.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-model-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-api-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-binary-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-datatypes-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-languages-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-n3-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-nquads-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-ntriples-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-rdfjson-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-rdfxml-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-trig-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-trix-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-rio-turtle-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/sesame-util-2.7.16.jar"/>
+	<classpathentry kind="lib" path="lib/xz-1.6.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

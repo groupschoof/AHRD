@@ -9,20 +9,54 @@ import java.nio.channels.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
+
+import javax.annotation.Nonnull;
+
 import org.apache.commons.compress.archivers.tar.*;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDocumentFormat;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.reasoner.ConsoleProgressMonitor;
+import org.semanticweb.owlapi.reasoner.Node;
+import org.semanticweb.owlapi.reasoner.NodeSet;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
+import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
+import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
+import org.semanticweb.owlapi.search.EntitySearcher;
+import org.semanticweb.owlapi.util.DefaultPrefixManager;
+
 import java.lang.Math;
+
 
 public class GOdatabase {
 
 	private static final String reviewedUniProtURL = "ftp://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz";
 	private static final String reviewedUniProtFileName = "uniprot_sprot.dat.gz";
 	private static final Pattern reviewedUniProtGoAnnotationRegex = Pattern.compile("^DR\\s{3}GO;\\s+(?<goTerm>GO:\\d{7}).*");
-	private static final String geneOntologyMYSQLdumpURL = "http://archive.geneontology.org/latest-termdb/go_daily-termdb-tables.tar.gz";
-	private static final String geneOntologyMYSQLdumpFileName = "go_daily-termdb-tables.tar.gz";
+	private static final String geneOntologyMonthlyOwlReleaseURL = "http://current.geneontology.org/ontology/go-basic.owl";
+	private static final String geneOntologyMonthlyOwlReleaseFileName = "go-basic.owl";
+	private static final String geneOntologyOwlPrefix = "http://purl.obolibrary.org/obo/GO_";
 	private static final Pattern geneOntologyMYSQLdumpTermTableRegex = Pattern.compile("^(?<id>\\d+)\\t(?<name>[^\\t]+)\\t(?<termtype>[^\\t]+)\\t(?<acc>[^\\t]+)\\t(?<isobsolete>\\d)\\t(?<isroot>\\d)\\t(?<isrelation>\\d)$");
 	private static final Pattern geneOntologyMYSQLdumpGraphPathRegex = Pattern.compile("^(?<id>\\d+)\\t(?<term1id>\\d+)\\t(?<term2id>\\d+)\\t(?<relationshiptypeid>1|25)\\t(?<distance>\\d+)\\t(?<relationdistance>\\d+)$");
 	private static final Pattern geneOntologyMYSQLdumpTermSynonymRegex = Pattern.compile("^(?<termid>\\d+)\\t(?<termsynonym>[^\\t]+)\\t(?<accsynonym>GO:\\d{7})\\t(?<synonymtypeid>[^\\t]+)\\t(?<synonymcategoryid>[^\\t]+)$");
@@ -32,7 +66,7 @@ public class GOdatabase {
 	private static final String serializedAccGoDBFileName = "accGoDb.ser";
 	private Map<String, GOterm> goDb = new HashMap<String, GOterm>();
 	
-	public GOdatabase() throws FileNotFoundException, IOException {
+	public GOdatabase() throws Exception {
 		String pathToGoDatabase = new String();
 		if (getSettings().getPathToGoDatabase() != null) {
 			pathToGoDatabase = getSettings().getPathToGoDatabase();
@@ -48,8 +82,111 @@ public class GOdatabase {
 		} else {
 			goDb = buildGoDbFromFile(pathToGoDatabase);
 		}
+		
+		// New way to build the database using OWLAPI (https://github.com/owlcs/owlapi)
+		Map<String, GOterm> goDbBuildFromOWL = buildGoDbFromOWL(pathToGoDatabase);
 	}
 	
+	private HashMap<String, GOterm> buildGoDbFromOWL(String pathToGoDatabase) throws Exception {
+		System.out.println("Building GO database using OWLAPI (https://github.com/owlcs/owlapi):");
+		HashMap<String, GOterm> accGoDb = new HashMap<String, GOterm>();
+
+		String reviewedUniProtFilePath =  pathToGoDatabase + reviewedUniProtFileName;		
+		// Download SwissProt if not already on drive
+		if (!new File(reviewedUniProtFilePath).exists()) {
+			System.out.println("Downloading reviewed Uniprot (aprox. 550MB) from:\n"+ reviewedUniProtURL); 
+			download(reviewedUniProtURL, reviewedUniProtFilePath);
+		}
+
+		String geneOntologyMonthlyOwlReleasePath = pathToGoDatabase + geneOntologyMonthlyOwlReleaseFileName;
+		// Download gene ontology OWL if not alrady on drive
+		if (!new File(geneOntologyMonthlyOwlReleasePath).exists()) {
+			System.out.println("Downloading GO database (aprox. 150MB) from: " + geneOntologyMonthlyOwlReleaseURL);
+			download(geneOntologyMonthlyOwlReleaseURL, geneOntologyMonthlyOwlReleasePath);
+		}
+				
+		// Get hold of a manager to work with
+		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		// Load the gene ontology from file
+		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(new File(geneOntologyMonthlyOwlReleasePath));
+		// Print the ontology ID
+		System.out.println("Loaded ontology: " + ontology.getOntologyID());
+		// Print the format of the ontology
+		System.out.println("Ontology format:" + manager.getOntologyFormat(ontology).getKey());
+		// An OWLReasoner provides the basic query functionality needed, for example the ability
+        // to obtain the subclasses of a class etc. To do this reasoner factory is used.
+		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createReasoner(ontology);
+		// Ask the reasoner to do all the necessary work now
+        reasoner.precomputeInferences();
+        // Determine if the ontology is actually consistent.
+        System.out.println("Consistent: " + reasoner.isConsistent());
+		//OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+		// Iterate over all classes and store terms in map
+		for (OWLClass cls : ontology.getClassesInSignature()) {
+			String id = "";
+			String label = "";
+			String nameSpace = "";
+	        for(OWLAnnotation axiom : EntitySearcher.getAnnotations(cls, ontology)) {
+	    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#id"))) {
+	    			if(axiom.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+	    	            id = val.getLiteral();
+	    	        }
+	    		}
+	    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.w3.org/2000/01/rdf-schema#label"))) {
+	    			if(axiom.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+	    	            label = val.getLiteral();
+	    	        }
+	    		}
+	    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#hasOBONamespace"))) {
+	    			if(axiom.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+	    	            nameSpace = val.getLiteral();
+	    	        }
+	    		}
+	    	}
+	        if(!id.equals("")) {
+	        	accGoDb.put(id, new GOterm(id, label, nameSpace));
+	        }
+        }
+		System.out.println("Size of accGoDb based on OWL: " + accGoDb.size());
+		// Iterate over all classes again and store ancestry
+		Integer ancestryCounter = 0;
+		for (OWLClass cls : ontology.getClassesInSignature()) {
+			String childId = "";
+			for(OWLAnnotation axiom : EntitySearcher.getAnnotations(cls, ontology)) {
+	    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#id"))) {
+	    			if(axiom.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+	    	            childId = val.getLiteral();
+	    	        }
+	    		}
+			}
+			if (!childId.equals("")) {
+				Set<GOterm> ancestry = new HashSet<GOterm>();
+		    	Set<OWLClass> superClses = reasoner.getSuperClasses(cls, false).getFlattened();
+		    	for (OWLClass superCls : superClses) {
+		    		for(OWLAnnotation axiom : EntitySearcher.getAnnotations(superCls, ontology)) {
+			    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#id"))) {
+			    			if(axiom.getValue() instanceof OWLLiteral) {
+			    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+			    	            ancestry.add(accGoDb.get(val.getLiteral()));
+			    	        }
+			    		}
+		    		}
+		    	}
+		    	ancestryCounter += ancestry.size();
+		    	accGoDb.get(childId).setAncestry(ancestry);
+			}
+		}
+		
+		System.out.println("Number of ancestry terms: " + ancestryCounter);
+		return accGoDb;
+	}
+
 	// Deserialize previously generated GO database
 	@SuppressWarnings("unchecked")
 	private HashMap<String, GOterm> deserializeAccGoDb(String serializedAccGoDBFilePath) {
@@ -74,7 +211,7 @@ public class GOdatabase {
 		return null;
 	}
 
-	private HashMap<String, GOterm> buildGoDbFromFile(String pathToGoDatabase) throws FileNotFoundException, IOException {
+	private HashMap<String, GOterm> buildGoDbFromFile(String pathToGoDatabase) throws Exception {
 		System.out.println("Building GO database:");
 		HashMap<String, GOterm> accGoDb = new HashMap<String, GOterm>();
 
@@ -85,19 +222,20 @@ public class GOdatabase {
 			download(reviewedUniProtURL, reviewedUniProtFilePath);
 		}
 
-		String geneOntologyMYSQLdumpFilePath = pathToGoDatabase + geneOntologyMYSQLdumpFileName;
-		// Download gene ontology mysql data base dump if not alrady on drive
-		if (!new File(geneOntologyMYSQLdumpFilePath).exists()) {
-			System.out.println("Downloading GO database (aprox. 12MB) from:\n" + geneOntologyMYSQLdumpURL);
-			download(geneOntologyMYSQLdumpURL, geneOntologyMYSQLdumpFilePath);
-		}
+		String geneOntologyMonthlyOwlReleasePath = pathToGoDatabase + geneOntologyMonthlyOwlReleaseFileName;
+		// Download gene ontology OWL if not alrady on drive
+		if (!new File(geneOntologyMonthlyOwlReleasePath).exists()) {
+			System.out.println("Downloading GO database (aprox. 150MB) from:\n" + geneOntologyMonthlyOwlReleaseURL);
+			download(geneOntologyMonthlyOwlReleaseURL, geneOntologyMonthlyOwlReleasePath);
+		}		
 		
 		Map<Integer, GOterm> idGoDb = new HashMap<Integer, GOterm>();
 		
+		//////////////////////////////////////////////////////////////////////////////////////
 		TarArchiveInputStream tais = null;
 		// Read term table and fill ID based GO term database
 		try {
-			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMYSQLdumpFilePath)));
+			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMonthlyOwlReleasePath)));
 			TarArchiveEntry entry = tais.getNextTarEntry();
 			while (entry != null) {
 				if (entry.getName().equals("go_daily-termdb-tables/term.txt")) {
@@ -130,7 +268,7 @@ public class GOdatabase {
 
 		// Read graph path table and fill the terms ancestry in goDB
 		try {
-			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMYSQLdumpFilePath)));
+			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMonthlyOwlReleasePath)));
 			TarArchiveEntry entry = tais.getNextTarEntry();
 			BufferedReader br = null;			
 			while (entry != null) {
@@ -168,7 +306,7 @@ public class GOdatabase {
 	
 		// Read in term synonyms and add them to accession based GO database
 		try {
-			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMYSQLdumpFilePath)));
+			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMonthlyOwlReleasePath)));
 			TarArchiveEntry entry = tais.getNextTarEntry();
 			BufferedReader br = null;			
 			while (entry != null) {

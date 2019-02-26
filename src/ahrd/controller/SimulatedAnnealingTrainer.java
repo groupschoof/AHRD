@@ -8,6 +8,9 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.view.TrainerOutputWriter;
@@ -77,13 +80,9 @@ public class SimulatedAnnealingTrainer extends Trainer {
 	/**
 	 * As of now performs hill-climbing to optimize parameters.
 	 * 
-	 * @throws IOException
-	 * @throws MissingInterproResultException
-	 * @throws SQLException
-	 * @throws MissingAccessionException 
+	 * @throws Exception
 	 */
-	public void train() throws MissingInterproResultException, IOException,
-			SQLException, MissingAccessionException {
+	public void train() throws Exception {
 		while (getSettings().getTemperature() > 0) {
 			// If we run simulated annealing remembering tested Parameters and
 			// their scores,

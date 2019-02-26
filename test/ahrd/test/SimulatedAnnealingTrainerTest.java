@@ -15,6 +15,8 @@ import nu.xom.ParsingException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.xml.sax.SAXException;
 
 import ahrd.controller.Parameters;
@@ -73,7 +75,7 @@ public class SimulatedAnnealingTrainerTest {
 
 	@Test
 	public void testRememberSimulatedAnnealingPath()
-			throws MissingInterproResultException, IOException, SQLException, MissingAccessionException {
+			throws Exception {
 		// Just do two cycles:
 		getSettings().setTemperature(2);
 		Parameters p = getSettings().getParameters().clone();

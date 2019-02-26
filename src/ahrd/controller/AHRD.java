@@ -16,6 +16,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.xml.sax.SAXException;
 
 import ahrd.exception.MissingAccessionException;
@@ -255,10 +257,9 @@ public class AHRD {
 	/**
 	 * If AHRD is requested to annotate GO terms in accordance to a GO slim set
 	 * 
-	 * @throws IOException
-	 * @throws MissingAccessionException
+	 * @throws Exception 
 	 */
-	public void annotateWithGoSlim() throws IOException, MissingAccessionException {
+	public void annotateWithGoSlim() throws Exception{
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
 			Set<GOterm> goSlim = new HashSet<GOterm>();
 			// Load a Map of all GO terms
