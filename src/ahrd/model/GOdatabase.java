@@ -15,36 +15,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.compress.archivers.tar.*;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLDocumentFormat;
-import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLLiteral;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
-import org.semanticweb.owlapi.reasoner.ConsoleProgressMonitor;
-import org.semanticweb.owlapi.reasoner.Node;
-import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.search.EntitySearcher;
-import org.semanticweb.owlapi.util.DefaultPrefixManager;
 
 import java.lang.Math;
 
@@ -56,7 +39,8 @@ public class GOdatabase {
 	private static final Pattern reviewedUniProtGoAnnotationRegex = Pattern.compile("^DR\\s{3}GO;\\s+(?<goTerm>GO:\\d{7}).*");
 	private static final String geneOntologyMonthlyOwlReleaseURL = "http://current.geneontology.org/ontology/go-basic.owl";
 	private static final String geneOntologyMonthlyOwlReleaseFileName = "go-basic.owl";
-	private static final String geneOntologyOwlPrefix = "http://purl.obolibrary.org/obo/GO_";
+	private static final String geneOntologyMYSQLdumpURL = "http://archive.geneontology.org/latest-termdb/go_daily-termdb-tables.tar.gz";
+	private static final String geneOntologyMYSQLdumpFileName = "go_daily-termdb-tables.tar.gz";
 	private static final Pattern geneOntologyMYSQLdumpTermTableRegex = Pattern.compile("^(?<id>\\d+)\\t(?<name>[^\\t]+)\\t(?<termtype>[^\\t]+)\\t(?<acc>[^\\t]+)\\t(?<isobsolete>\\d)\\t(?<isroot>\\d)\\t(?<isrelation>\\d)$");
 	private static final Pattern geneOntologyMYSQLdumpGraphPathRegex = Pattern.compile("^(?<id>\\d+)\\t(?<term1id>\\d+)\\t(?<term2id>\\d+)\\t(?<relationshiptypeid>1|25)\\t(?<distance>\\d+)\\t(?<relationdistance>\\d+)$");
 	private static final Pattern geneOntologyMYSQLdumpTermSynonymRegex = Pattern.compile("^(?<termid>\\d+)\\t(?<termsynonym>[^\\t]+)\\t(?<accsynonym>GO:\\d{7})\\t(?<synonymtypeid>[^\\t]+)\\t(?<synonymcategoryid>[^\\t]+)$");
@@ -64,6 +48,7 @@ public class GOdatabase {
 	private static final String ccRootAcc = "GO:0005575";
 	private static final String mfRootAcc = "GO:0003674";
 	private static final String serializedAccGoDBFileName = "accGoDb.ser";
+	private static final String serializedAccGoDbOwlFileName = "accGoDbOwl.ser";
 	private Map<String, GOterm> goDb = new HashMap<String, GOterm>();
 	
 	public GOdatabase() throws Exception {
@@ -94,7 +79,7 @@ public class GOdatabase {
 		String reviewedUniProtFilePath =  pathToGoDatabase + reviewedUniProtFileName;		
 		// Download SwissProt if not already on drive
 		if (!new File(reviewedUniProtFilePath).exists()) {
-			System.out.println("Downloading reviewed Uniprot (aprox. 550MB) from:\n"+ reviewedUniProtURL); 
+			System.out.println("Downloading reviewed Uniprot (aprox. 570MB) from:\n"+ reviewedUniProtURL); 
 			download(reviewedUniProtURL, reviewedUniProtFilePath);
 		}
 
@@ -126,46 +111,65 @@ public class GOdatabase {
 		// Iterate over all classes and store terms in map
 		for (OWLClass cls : ontology.getClassesInSignature()) {
 			String id = "";
+			Set<String> altIds = new HashSet<String>();
 			String label = "";
 			String nameSpace = "";
+			Boolean deprecated = false;
 	        for(OWLAnnotation axiom : EntitySearcher.getAnnotations(cls, ontology)) {
-	    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#id"))) {
+	        	IRI axiomIri = axiom.getProperty().getIRI();
+	    		if(axiomIri.equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#id"))) {
 	    			if(axiom.getValue() instanceof OWLLiteral) {
 	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
 	    	            id = val.getLiteral();
 	    	        }
 	    		}
-	    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.w3.org/2000/01/rdf-schema#label"))) {
+	    		if(axiomIri.equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#hasAlternativeId"))) {
+	    			if(axiom.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+	    	            altIds.add(val.getLiteral());
+	    	        }
+	    		}
+	    		if(axiomIri.equals(IRI.create("http://www.w3.org/2000/01/rdf-schema#label"))) {
 	    			if(axiom.getValue() instanceof OWLLiteral) {
 	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
 	    	            label = val.getLiteral();
 	    	        }
 	    		}
-	    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#hasOBONamespace"))) {
+	    		if(axiomIri.equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#hasOBONamespace"))) {
 	    			if(axiom.getValue() instanceof OWLLiteral) {
 	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
 	    	            nameSpace = val.getLiteral();
 	    	        }
 	    		}
+	        	if(axiomIri.equals(IRI.create("http://www.w3.org/2002/07/owl#deprecated"))) {
+	        		if(axiom.getValue() instanceof OWLLiteral) {
+	        			OWLLiteral val = (OWLLiteral) axiom.getValue();
+	        			deprecated = val.parseBoolean();
+	        		}
+	        	}
 	    	}
-	        if(!id.equals("")) {
-	        	accGoDb.put(id, new GOterm(id, label, nameSpace));
+	        if (!id.equals("")) {
+	        	GOterm term = new GOterm(id, label, nameSpace, deprecated);
+	        	accGoDb.put(id, term);
+	        	for (String altId : altIds) {
+	        		accGoDb.put(altId, term);
+	        	}
 	        }
         }
 		System.out.println("Size of accGoDb based on OWL: " + accGoDb.size());
 		// Iterate over all classes again and store ancestry
 		Integer ancestryCounter = 0;
 		for (OWLClass cls : ontology.getClassesInSignature()) {
-			String childId = "";
+			String id = "";
 			for(OWLAnnotation axiom : EntitySearcher.getAnnotations(cls, ontology)) {
 	    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#id"))) {
 	    			if(axiom.getValue() instanceof OWLLiteral) {
 	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
-	    	            childId = val.getLiteral();
+	    	            id = val.getLiteral();
 	    	        }
 	    		}
 			}
-			if (!childId.equals("")) {
+			if (!id.equals("")){
 				Set<GOterm> ancestry = new HashSet<GOterm>();
 		    	Set<OWLClass> superClses = reasoner.getSuperClasses(cls, false).getFlattened();
 		    	for (OWLClass superCls : superClses) {
@@ -179,11 +183,136 @@ public class GOdatabase {
 		    		}
 		    	}
 		    	ancestryCounter += ancestry.size();
-		    	accGoDb.get(childId).setAncestry(ancestry);
-			}
+	    	   	if (accGoDb.get(id) == null) {
+		    		System.err.println("Id " + id + " not found in accGoDb!");
+		    	} else {
+		    		accGoDb.get(id).setAncestry(ancestry);
+		    	}
+	    	}
 		}
 		
-		System.out.println("Number of ancestry terms: " + ancestryCounter);
+		System.out.println("Number of ancestry relations retrieved from OWL: " + ancestryCounter);
+		
+		// Read in SwissProt annotations
+		// Counts each annotation towards a GO term and its complete ancestry  
+		System.out.println("Reading and counting aprox 3 million SwissProt annotations ...");
+		int bpCount = 0;
+		int ccCount = 0;
+		int mfCount = 0;
+		String line = new String();
+		Integer linecount = 0;
+		Integer matchcount = 0;
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(reviewedUniProtFilePath))));
+			while ((line = br.readLine()) != null) {
+				linecount++;
+				Matcher m = reviewedUniProtGoAnnotationRegex.matcher(line);
+				if (m.matches()) {
+					matchcount++;
+					String termAcc = m.group("goTerm");
+					GOterm term = accGoDb.get(termAcc);
+					if (term == null) {
+						System.err.println("Error: GO-accession (" + termAcc + ") of SwissProt annotation not found in Gene Ontology.");
+					} else {
+						Set<GOterm> ancestry = term.getAncestry();
+						if (!term.getObsolete()) {
+							switch(term.getOntology()) {
+							case "biological_process":
+								bpCount++;
+								for(GOterm parent : ancestry) {
+									parent.setFrequency(parent.getFrequency() + 1);
+								}
+								break;
+							case "cellular_component":
+								ccCount++;
+								for(GOterm parent : ancestry) {
+									parent.setFrequency(parent.getFrequency() + 1);
+								}
+								break;
+							case "molecular_function":
+								mfCount++;
+								for(GOterm parent : ancestry) {
+									parent.setFrequency(parent.getFrequency() + 1);
+								}
+								break;
+							default:
+								break; //meta term: Not counted towards any of the three ontologies
+							}
+
+						}
+					}
+				}
+			}
+		} finally {
+			br.close();
+		}
+		System.out.println(matchcount + " of " + linecount + " SwissProt lines matched.");
+		System.out.println("bpCount: " + bpCount);
+		System.out.println("ccCount: " + ccCount);
+		System.out.println("mfCount: " + mfCount);
+	
+		// Calculate the information content from the term probabilities
+		int metacount = 0;
+		for (GOterm term : accGoDb.values() ){
+			switch(term.getOntology()) {
+			case "biological_process":
+				term.setProbability((double)term.getFrequency()/bpCount);
+				term.setInformationContent(-1*Math.log(term.getProbability()));
+				break;
+			case "cellular_component":
+				term.setProbability((double)term.getFrequency()/ccCount);
+				term.setInformationContent(-1*Math.log(term.getProbability()));
+				break;
+			case "molecular_function":
+				term.setProbability((double)term.getFrequency()/mfCount);
+				term.setInformationContent(-1*Math.log(term.getProbability()));
+				break;
+			default:
+				metacount++;//meta term: Not counted towards any of the three ontologies; omit storing in accession based term database  
+				break;
+			}
+		}
+		System.out.println("metacount: " + metacount);
+		System.out.println("Finished calculating information content.");
+		System.out.println("Size of accGoDb: " + accGoDb.size());
+		
+		// Check consistency of root term annotation count and information content
+		if (accGoDb.get(bpRootAcc).getFrequency() != bpCount) {
+			System.out.println("Consistency error in GO frequencies of the biological process ontology");
+			System.out.println("Term frequency: " + accGoDb.get(bpRootAcc).getFrequency());
+		}
+		if (accGoDb.get(ccRootAcc).getFrequency() != ccCount) {
+			System.out.println("Consistency error in GO frequencies of the cellular component ontology");
+			System.out.println("Term frequency: " + accGoDb.get(ccRootAcc).getFrequency());
+		}
+		if (accGoDb.get(mfRootAcc).getFrequency() != mfCount) {
+			System.out.println("Consistency error in GO frequencies of the molecular function ontology");
+			System.out.println("Term frequency: " + accGoDb.get(mfRootAcc).getFrequency());
+		}
+		if (accGoDb.get(bpRootAcc).getInformationContent() != 0.0) {
+			System.out.println("Root term of biological process ontology has a non zero information content: " + accGoDb.get(bpRootAcc).getInformationContent());
+		}
+		if (accGoDb.get(ccRootAcc).getInformationContent() != 0.0) {
+			System.out.println("Root term of cellular component has a non zero information content: " + accGoDb.get(ccRootAcc).getInformationContent());
+		}
+		if (accGoDb.get(mfRootAcc).getInformationContent() != 0.0) {
+			System.out.println("Root term of molecular function ontology has a non zero information content: " + accGoDb.get(mfRootAcc).getInformationContent());
+		}
+
+		// Serialize accession based GO database and write it to file	
+		try {
+			String serializedAccGoDBFilePath = pathToGoDatabase + serializedAccGoDbOwlFileName;
+			FileOutputStream fileOut = new FileOutputStream(serializedAccGoDBFilePath);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(accGoDb);
+			out.close();
+			fileOut.close();
+			System.out.println("Serialized data (aprox. 10MB) saved in: " + serializedAccGoDBFilePath);
+		} catch (IOException i) {
+			i.printStackTrace();
+		}
+		System.out.println("Done building new GO database based on OWL file!");
 		return accGoDb;
 	}
 
@@ -222,20 +351,19 @@ public class GOdatabase {
 			download(reviewedUniProtURL, reviewedUniProtFilePath);
 		}
 
-		String geneOntologyMonthlyOwlReleasePath = pathToGoDatabase + geneOntologyMonthlyOwlReleaseFileName;
-		// Download gene ontology OWL if not alrady on drive
-		if (!new File(geneOntologyMonthlyOwlReleasePath).exists()) {
-			System.out.println("Downloading GO database (aprox. 150MB) from:\n" + geneOntologyMonthlyOwlReleaseURL);
-			download(geneOntologyMonthlyOwlReleaseURL, geneOntologyMonthlyOwlReleasePath);
-		}		
+		String geneOntologyMYSQLdumpFilePath = pathToGoDatabase + geneOntologyMYSQLdumpFileName;
+		// Download gene ontology mysql data base dump if not alrady on drive
+		if (!new File(geneOntologyMYSQLdumpFilePath).exists()) {
+			System.out.println("Downloading GO database (aprox. 12MB) from:\n" + geneOntologyMYSQLdumpURL);
+			download(geneOntologyMYSQLdumpURL, geneOntologyMYSQLdumpFilePath);
+		}
 		
 		Map<Integer, GOterm> idGoDb = new HashMap<Integer, GOterm>();
 		
-		//////////////////////////////////////////////////////////////////////////////////////
 		TarArchiveInputStream tais = null;
 		// Read term table and fill ID based GO term database
 		try {
-			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMonthlyOwlReleasePath)));
+			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMYSQLdumpFilePath)));
 			TarArchiveEntry entry = tais.getNextTarEntry();
 			while (entry != null) {
 				if (entry.getName().equals("go_daily-termdb-tables/term.txt")) {
@@ -268,7 +396,7 @@ public class GOdatabase {
 
 		// Read graph path table and fill the terms ancestry in goDB
 		try {
-			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMonthlyOwlReleasePath)));
+			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMYSQLdumpFilePath)));
 			TarArchiveEntry entry = tais.getNextTarEntry();
 			BufferedReader br = null;			
 			while (entry != null) {
@@ -306,7 +434,7 @@ public class GOdatabase {
 	
 		// Read in term synonyms and add them to accession based GO database
 		try {
-			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMonthlyOwlReleasePath)));
+			tais = new TarArchiveInputStream(new GZIPInputStream(new FileInputStream(geneOntologyMYSQLdumpFilePath)));
 			TarArchiveEntry entry = tais.getNextTarEntry();
 			BufferedReader br = null;			
 			while (entry != null) {
