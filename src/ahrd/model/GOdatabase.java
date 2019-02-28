@@ -67,9 +67,13 @@ public class GOdatabase {
 		} else {
 			goDb = buildGoDbFromFile(pathToGoDatabase);
 		}
-		
 		// New way to build the database using OWLAPI (https://github.com/owlcs/owlapi)
-		Map<String, GOterm> goDbBuildFromOWL = buildGoDbFromOWL(pathToGoDatabase);
+		String serializedAccGoDbOwlFilePath = pathToGoDatabase + serializedAccGoDbOwlFileName;
+		if (new File(serializedAccGoDbOwlFilePath).exists()) {
+			Map<String, GOterm> goDbBuildFromOWL = deserializeAccGoDb(serializedAccGoDbOwlFilePath);
+		} else {
+			Map<String, GOterm> goDbBuildFromOWL = buildGoDbFromOWL(pathToGoDatabase);
+		}
 	}
 	
 	private HashMap<String, GOterm> buildGoDbFromOWL(String pathToGoDatabase) throws Exception {
@@ -106,7 +110,7 @@ public class GOdatabase {
         reasoner.precomputeInferences();
         // Determine if the ontology is actually consistent.
         System.out.println("Consistent: " + reasoner.isConsistent());
-		//OWLDataFactory dataFactory = manager.getOWLDataFactory();
+		OWLDataFactory dataFactory = manager.getOWLDataFactory();
 
 		// Iterate over all classes and store terms in map
 		for (OWLClass cls : ontology.getClassesInSignature()) {
@@ -115,35 +119,35 @@ public class GOdatabase {
 			String label = "";
 			String nameSpace = "";
 			Boolean deprecated = false;
-	        for(OWLAnnotation axiom : EntitySearcher.getAnnotations(cls, ontology)) {
-	        	IRI axiomIri = axiom.getProperty().getIRI();
-	    		if(axiomIri.equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#id"))) {
-	    			if(axiom.getValue() instanceof OWLLiteral) {
-	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+	        for(OWLAnnotation annotation : EntitySearcher.getAnnotations(cls, ontology)) {
+	        	String annotationIri = annotation.getProperty().getIRI().toString();
+	        	if(annotationIri.equals("http://www.geneontology.org/formats/oboInOwl#id")) {
+	    			if(annotation.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) annotation.getValue();
 	    	            id = val.getLiteral();
 	    	        }
 	    		}
-	    		if(axiomIri.equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#hasAlternativeId"))) {
-	    			if(axiom.getValue() instanceof OWLLiteral) {
-	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+	    		if(annotationIri.equals("http://www.geneontology.org/formats/oboInOwl#hasAlternativeId")) {
+	    			if(annotation.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) annotation.getValue();
 	    	            altIds.add(val.getLiteral());
 	    	        }
 	    		}
-	    		if(axiomIri.equals(IRI.create("http://www.w3.org/2000/01/rdf-schema#label"))) {
-	    			if(axiom.getValue() instanceof OWLLiteral) {
-	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+	    		if(annotationIri.equals("http://www.w3.org/2000/01/rdf-schema#label")) {
+	    			if(annotation.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) annotation.getValue();
 	    	            label = val.getLiteral();
 	    	        }
 	    		}
-	    		if(axiomIri.equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#hasOBONamespace"))) {
-	    			if(axiom.getValue() instanceof OWLLiteral) {
-	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+	    		if(annotationIri.equals("http://www.geneontology.org/formats/oboInOwl#hasOBONamespace")) {
+	    			if(annotation.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) annotation.getValue();
 	    	            nameSpace = val.getLiteral();
 	    	        }
 	    		}
-	        	if(axiomIri.equals(IRI.create("http://www.w3.org/2002/07/owl#deprecated"))) {
-	        		if(axiom.getValue() instanceof OWLLiteral) {
-	        			OWLLiteral val = (OWLLiteral) axiom.getValue();
+	        	if(annotationIri.equals("http://www.w3.org/2002/07/owl#deprecated")) {
+	        		if(annotation.getValue() instanceof OWLLiteral) {
+	        			OWLLiteral val = (OWLLiteral) annotation.getValue();
 	        			deprecated = val.parseBoolean();
 	        		}
 	        	}
@@ -159,27 +163,24 @@ public class GOdatabase {
 		System.out.println("Size of accGoDb based on OWL: " + accGoDb.size());
 		// Iterate over all classes again and store ancestry
 		Integer ancestryCounter = 0;
+		long start = System.currentTimeMillis();
 		for (OWLClass cls : ontology.getClassesInSignature()) {
 			String id = "";
-			for(OWLAnnotation axiom : EntitySearcher.getAnnotations(cls, ontology)) {
-	    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#id"))) {
-	    			if(axiom.getValue() instanceof OWLLiteral) {
-	    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
+			for(OWLAnnotation annotation : EntitySearcher.getAnnotations(cls, ontology, dataFactory.getOWLAnnotationProperty(IRI.create("http://www.geneontology.org/formats/oboInOwl#id")))) {
+	    			if(annotation.getValue() instanceof OWLLiteral) {
+	    	            OWLLiteral val = (OWLLiteral) annotation.getValue();
 	    	            id = val.getLiteral();
 	    	        }
-	    		}
 			}
 			if (!id.equals("")){
 				Set<GOterm> ancestry = new HashSet<GOterm>();
 		    	Set<OWLClass> superClses = reasoner.getSuperClasses(cls, false).getFlattened();
 		    	for (OWLClass superCls : superClses) {
-		    		for(OWLAnnotation axiom : EntitySearcher.getAnnotations(superCls, ontology)) {
-			    		if(axiom.getProperty().getIRI().equals(IRI.create("http://www.geneontology.org/formats/oboInOwl#id"))) {
-			    			if(axiom.getValue() instanceof OWLLiteral) {
-			    	            OWLLiteral val = (OWLLiteral) axiom.getValue();
-			    	            ancestry.add(accGoDb.get(val.getLiteral()));
-			    	        }
-			    		}
+		    		for(OWLAnnotation annotation : EntitySearcher.getAnnotations(superCls, ontology, dataFactory.getOWLAnnotationProperty(IRI.create("http://www.geneontology.org/formats/oboInOwl#id")))) {
+		    			if(annotation.getValue() instanceof OWLLiteral) {
+		    	            OWLLiteral val = (OWLLiteral) annotation.getValue();
+		    	            ancestry.add(accGoDb.get(val.getLiteral()));
+		    	        }
 		    		}
 		    	}
 		    	ancestryCounter += ancestry.size();
@@ -190,12 +191,23 @@ public class GOdatabase {
 		    	}
 	    	}
 		}
-		
+		long finish = System.currentTimeMillis();
+		long timeElapsedMilli = finish - start;
+		double timeElapsedSec = (double) timeElapsedMilli / (double) 1000;
+
 		System.out.println("Number of ancestry relations retrieved from OWL: " + ancestryCounter);
+		System.out.println("Time to process the ancestry: " + timeElapsedMilli + " ms");
+		System.out.println("Time to process the ancestry: " + timeElapsedSec + " s");
+		
+		manager = null;
+		ontology = null;
+		reasonerFactory = null;
+		reasoner = null;
 		
 		// Read in SwissProt annotations
 		// Counts each annotation towards a GO term and its complete ancestry  
 		System.out.println("Reading and counting aprox 3 million SwissProt annotations ...");
+		start = System.currentTimeMillis();
 		int bpCount = 0;
 		int ccCount = 0;
 		int mfCount = 0;
@@ -251,7 +263,11 @@ public class GOdatabase {
 		System.out.println("bpCount: " + bpCount);
 		System.out.println("ccCount: " + ccCount);
 		System.out.println("mfCount: " + mfCount);
-	
+		finish = System.currentTimeMillis();
+		timeElapsedMilli = finish - start;
+		timeElapsedSec = (double) timeElapsedMilli /(double)1000;
+		System.out.println("Time to process swissProt annotations: " + timeElapsedMilli + " ms");
+		System.out.println("Time to process swissProt annotations: " + timeElapsedSec + " s");
 		// Calculate the information content from the term probabilities
 		int metacount = 0;
 		for (GOterm term : accGoDb.values() ){
@@ -462,6 +478,7 @@ public class GOdatabase {
 		// Read in SwissProt annotations
 		// Counts each annotation towards a GO term and its complete ancestry  
 		System.out.println("Reading and counting aprox 2.7 million SwissProt annotations ...");
+		long start = System.currentTimeMillis();
 		int bpCount = 0;
 		int ccCount = 0;
 		int mfCount = 0;
@@ -519,6 +536,11 @@ public class GOdatabase {
 		System.out.println("bpCount: " + bpCount);
 		System.out.println("ccCount: " + ccCount);
 		System.out.println("mfCount: " + mfCount);
+		long finish = System.currentTimeMillis();
+		long timeElapsedMilli = finish - start;
+		double timeElapsedMin = timeElapsedMilli/(double)(1000*60);
+		System.out.println("Time to process swissProt annotations :" + timeElapsedMilli + "milliseconds");
+		System.out.println("Time to process swissProt annotations :" + timeElapsedMin + "min");
 	
 		// Calculate the information content from the term probabilities
 		mapIter = idGoDb.entrySet().iterator();
