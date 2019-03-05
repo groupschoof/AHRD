@@ -183,10 +183,15 @@ public class GOdatabase {
 		    	        }
 		    		}
 		    	}
-		    	ancestryCounter += ancestry.size();
 	    	   	if (accGoDb.get(id) == null) {
 		    		System.err.println("Id " + id + " not found in accGoDb!");
 		    	} else {
+		    		/* Add the go term itself to its own ancestry.
+		    		 * It was this way in the deprecated mysql dumps and is kept up this way here, to not break other methods using the GOdatabase.
+		    		 * (a particular example: ahrd.model.EvaluationScoreCalculator.calcSemSimGoAnnotationScore())  
+		    		 */
+		    		ancestry.add(accGoDb.get(id));
+		    		ancestryCounter += ancestry.size();
 		    		accGoDb.get(id).setAncestry(ancestry);
 		    	}
 	    	}
