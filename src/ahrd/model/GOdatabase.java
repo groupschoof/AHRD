@@ -22,6 +22,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
@@ -45,7 +46,7 @@ public class GOdatabase {
 	private static final String serializedAccGoDbOwlFileName = "accGoDbOwl.ser";
 	private Map<String, GOterm> goDb = new HashMap<String, GOterm>();
 	
-	public GOdatabase() throws Exception {
+	public GOdatabase() throws OWLOntologyCreationException, IOException {
 		String pathToGoDatabase = new String();
 		if (getSettings().getPathToGoDatabase() != null) {
 			pathToGoDatabase = getSettings().getPathToGoDatabase();
@@ -64,7 +65,7 @@ public class GOdatabase {
 		}
 	}
 	
-	private HashMap<String, GOterm> buildGoDbFromOWL(String pathToGoDatabase) throws Exception {
+	private HashMap<String, GOterm> buildGoDbFromOWL(String pathToGoDatabase) throws IOException, OWLOntologyCreationException  {
 		System.out.println("Building GO database using OWLAPI (https://github.com/owlcs/owlapi)");
 		HashMap<String, GOterm> accGoDb = new HashMap<String, GOterm>();
 

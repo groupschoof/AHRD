@@ -90,9 +90,14 @@ public class GeneticTrainer extends Trainer {
 	 * Random first generation. Survival of the fittest, recombination of fit
 	 * survivors, mutants of fit survivors and random parameter sets for the
 	 * rest in each succeeding generation.
+	 * @throws SQLException 
+	 * @throws IOException 
+	 * @throws MissingInterproResultException 
+	 * @throws MissingAccessionException 
+	 * @throws OWLOntologyCreationException 
 	 * 
 	 */
-	public void train() throws Exception {
+	public void train() throws MissingInterproResultException, IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
 		Set<Parameters> population = new HashSet<Parameters>();
 		// Set up first generation
 		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();

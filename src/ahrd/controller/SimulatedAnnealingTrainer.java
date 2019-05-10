@@ -79,10 +79,14 @@ public class SimulatedAnnealingTrainer extends Trainer {
 
 	/**
 	 * As of now performs hill-climbing to optimize parameters.
+	 * @throws SQLException 
+	 * @throws IOException 
+	 * @throws MissingInterproResultException 
+	 * @throws MissingAccessionException 
+	 * @throws OWLOntologyCreationException 
 	 * 
-	 * @throws Exception
 	 */
-	public void train() throws Exception {
+	public void train() throws MissingInterproResultException, IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
 		while (getSettings().getTemperature() > 0) {
 			// If we run simulated annealing remembering tested Parameters and
 			// their scores,

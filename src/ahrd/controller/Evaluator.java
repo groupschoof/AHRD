@@ -43,7 +43,7 @@ public class Evaluator extends AHRD {
 		}
 	}
 
-	public void setupGoAnnotationEvaluation() throws Exception {
+	public void setupGoAnnotationEvaluation() throws OWLOntologyCreationException, IOException, MissingAccessionException {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			// Load a Map of all GO terms
 			if (goDB == null) {
@@ -108,7 +108,7 @@ public class Evaluator extends AHRD {
 		}
 	}
 
-	public void goAnnotsStringToObject() throws Exception {
+	public void goAnnotsStringToObject() throws MissingAccessionException, OWLOntologyCreationException, IOException {
 		// Load a Map of all GO terms
 		if (goDB == null)
 			goDB = new GOdatabase().getMap();

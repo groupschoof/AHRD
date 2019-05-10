@@ -256,10 +256,12 @@ public class AHRD {
 
 	/**
 	 * If AHRD is requested to annotate GO terms in accordance to a GO slim set
+	 * @throws IOException 
+	 * @throws OWLOntologyCreationException 
+	 * @throws MissingAccessionException 
 	 * 
-	 * @throws Exception 
 	 */
-	public void annotateWithGoSlim() throws Exception{
+	public void annotateWithGoSlim() throws OWLOntologyCreationException, IOException, MissingAccessionException {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
 			Set<GOterm> goSlim = new HashSet<GOterm>();
 			// Load a Map of all GO terms
