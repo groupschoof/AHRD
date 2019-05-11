@@ -16,6 +16,7 @@ import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
+import nu.xom.ParsingException;
 
 public class AhrdTest {
 
@@ -73,7 +74,7 @@ public class AhrdTest {
 	}
 
 	@Test
-	public void testParseInterproResults() throws Exception {
+	public void testParseInterproResults() throws IOException, ParsingException {
 		ahrd.setProteins(TestUtils.mockProteinDb());
 		// TODO: The Interpro-Database should be mocked:
 		InterproResult.initialiseInterproDb();

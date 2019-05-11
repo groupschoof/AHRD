@@ -14,13 +14,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
-import ahrd.exception.MissingProteinException;
 import ahrd.view.GeneticTrainerOutputWriter;
-import nu.xom.ParsingException;
 
 public class GeneticTrainer extends Trainer {
 

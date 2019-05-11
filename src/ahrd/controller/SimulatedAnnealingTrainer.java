@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;

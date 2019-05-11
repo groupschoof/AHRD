@@ -2,7 +2,6 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.model.BlastResult;

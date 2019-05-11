@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.xml.sax.SAXException;
 
 import ahrd.controller.Evaluator;
@@ -65,7 +64,7 @@ public class EvaluatorTest {
 	}
 	
 	@Test
-	public void testSetupCompetitors() throws Exception {
+	public void testSetupCompetitors() throws IOException, MissingAccessionException, MissingInterproResultException, SQLException, OWLOntologyCreationException {
 		evaluator.initializeProteins();
 		evaluator.setupGroundTruthDescriptions();
 		evaluator.assignHumanReadableDescriptions();
