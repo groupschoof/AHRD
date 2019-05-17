@@ -85,7 +85,7 @@ public class EvaluatorTest {
 		assertNotNull(evaluator.getProteins()
 				.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getEvaluationScoreCalculator().getCompetitorAnnotations());
-		assertEquals(1, evaluator.getProteins()
+		assertEquals(2, evaluator.getProteins()
 				.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getEvaluationScoreCalculator().getCompetitorAnnotations().size());
 		assertEquals("nrpb6a dna binding dna-directed rna polymerase",
@@ -106,7 +106,7 @@ public class EvaluatorTest {
 		assertNotNull(evaluator.getProteins()
 				.get("P04637")
 				.getEvaluationScoreCalculator().getCompetitorAnnotations());
-		assertEquals(1, evaluator.getProteins()
+		assertEquals(2, evaluator.getProteins()
 				.get("P04637")
 				.getEvaluationScoreCalculator().getCompetitorAnnotations().size());
 		assertEquals("", evaluator.getProteins()
