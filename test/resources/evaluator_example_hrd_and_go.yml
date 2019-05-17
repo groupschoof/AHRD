@@ -5,6 +5,7 @@ output: ./evaluator_output.tsv
 find_highest_possible_evaluation_score: true
 find_highest_possible_go_score: true
 write_scores_to_output: false
+semsim_GO_f1_scores: true
 write_best_blast_hits_to_output: true
 f_measure_beta_parameter: 1.0
 blacklist: ./test/resources/blacklist_descline.txt
@@ -19,8 +20,7 @@ blast_dbs:
     file: ./test/resources/swissprot_blast8_tabular.txt
     database: ./test/resources/swissprot_blast_db.fasta
     filter: ./test/resources/filter_descline_sprot.txt
-    gene_ontology_reference: ./test/resources/go_references.csv 
-    gene_ontology_reference_regex: "^(?<shortAccession>gene:[^\\t]+)}\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"
+    gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt 
   trembl:
     weight: 904
     description_score_bit_score_weight: 2.590211
