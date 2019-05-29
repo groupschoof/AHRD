@@ -48,7 +48,9 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			bw.write(buildBestBlastHitsHeader());
 		}
 		if (getSettings().hasCompetitors()) {
-			for (String competitor : getSettings().getCompetitorSettings().keySet()) {
+			List<String> competitorList = new ArrayList<>(getSettings().getCompetitorSettings().keySet());
+			Collections.sort(competitorList);
+			for (String competitor : competitorList) {
 				bw.write("\t" + competitor + "-Description\t" + competitor + "-Description-Length\t" + competitor + "-Description-Evaluation-Score");
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
 					bw.write("\t" + competitor + "-Description-Evaluation-Score-Precision");
