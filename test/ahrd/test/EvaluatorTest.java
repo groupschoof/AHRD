@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.xml.sax.SAXException;
 
 import ahrd.controller.Evaluator;
@@ -63,7 +64,7 @@ public class EvaluatorTest {
 	}
 	
 	@Test
-	public void testSetupCompetitors() throws IOException, MissingAccessionException, MissingInterproResultException, SQLException {
+	public void testSetupCompetitors() throws IOException, MissingAccessionException, MissingInterproResultException, SQLException, OWLOntologyCreationException {
 		evaluator.initializeProteins();
 		evaluator.setupGroundTruthDescriptions();
 		evaluator.assignHumanReadableDescriptions();
@@ -84,7 +85,7 @@ public class EvaluatorTest {
 		assertNotNull(evaluator.getProteins()
 				.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getEvaluationScoreCalculator().getCompetitorAnnotations());
-		assertEquals(1, evaluator.getProteins()
+		assertEquals(2, evaluator.getProteins()
 				.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getEvaluationScoreCalculator().getCompetitorAnnotations().size());
 		assertEquals("nrpb6a dna binding dna-directed rna polymerase",
@@ -105,7 +106,7 @@ public class EvaluatorTest {
 		assertNotNull(evaluator.getProteins()
 				.get("P04637")
 				.getEvaluationScoreCalculator().getCompetitorAnnotations());
-		assertEquals(1, evaluator.getProteins()
+		assertEquals(2, evaluator.getProteins()
 				.get("P04637")
 				.getEvaluationScoreCalculator().getCompetitorAnnotations().size());
 		assertEquals("", evaluator.getProteins()

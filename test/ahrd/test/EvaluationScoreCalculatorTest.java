@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static ahrd.controller.Settings.getSettings;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +16,7 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import ahrd.model.CompetitorAnnotation;
 import ahrd.model.BlastResult;
@@ -132,7 +132,7 @@ public class EvaluationScoreCalculatorTest {
 	}
 
 	@Test
-	public void testAssignEvlScrsToCompetitors() throws FileNotFoundException, IOException {
+	public void testAssignEvlScrsToCompetitors() throws OWLOntologyCreationException, IOException {
 		Protein p = TestUtils.mockProtein();
 		// Mock ground truth description:
 		GroundTruthDescription rd = new GroundTruthDescription();
@@ -300,7 +300,7 @@ public class EvaluationScoreCalculatorTest {
 	}
 
 	@Test
-	public void testAddCompetitorAnnotion() throws FileNotFoundException, IOException {
+	public void testAddCompetitorAnnotion() throws Exception {
 		Protein p = TestUtils.mockProtein();
 		if (goDB == null) {
 			goDB = new GOdatabase().getMap();

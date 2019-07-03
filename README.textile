@@ -208,7 +208,7 @@ Parameters specific to the Evaluator function are:
 # @write_best_blast_hits_to_output: false@ Set to @true@ if you want to see the respective best sequence similarity search Hits and their performances.
 # @f_measure_beta_parameter: 1.0@ This parameter is also used by AHRD-Trainer. See section "2.7":#27-parameter-optimization for details.
 # @write_fscore_details_to_output: false@ Set to @true@ to add Precision (ie. positive predictive value) and Recall (ie. true positive rate) to the output of all F-Scores.
-# @competitors:@ AHRDs' annotation performance can be compared to one or more of its competitors. Each competitor has to be given a name that will be used to identify it in the output (eg. "@blast2go:@").
+# @competitors:@ AHRDs' annotation performance can be compared to one or more of its competitors. Each competitor has to be given a name that will be used to identify it in the output (eg. "@blast2go:@"). The columns regarding competitors are ordered alphabetically in the output file.
 # @descriptions: path_to_competitor_descriptions.tsv@  A competitors description annotations have to be supplied in a tab delimited file of two columns (1: short protein accession, 2: description). The file should not have a column name header. Each protein accession should be present only once (one description per protein). All supplied protein accessions have to be present in the @proteins_fasta@ file too.
   
 h4. 2.6.1 Computing Gene Ontology Annotation F-Scores

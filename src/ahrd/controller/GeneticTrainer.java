@@ -13,11 +13,11 @@ import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
-import ahrd.exception.MissingProteinException;
 import ahrd.view.GeneticTrainerOutputWriter;
-import nu.xom.ParsingException;
 
 public class GeneticTrainer extends Trainer {
 
@@ -87,15 +87,14 @@ public class GeneticTrainer extends Trainer {
 	 * Random first generation. Survival of the fittest, recombination of fit
 	 * survivors, mutants of fit survivors and random parameter sets for the
 	 * rest in each succeeding generation.
-	 * 
-	 * @throws IOException
-	 * @throws MissingInterproResultException
-	 * @throws SQLException
+	 * @throws SQLException 
+	 * @throws IOException 
+	 * @throws MissingInterproResultException 
 	 * @throws MissingAccessionException 
-	 * @throws ParsingException 
-	 * @throws MissingProteinException 
+	 * @throws OWLOntologyCreationException 
+	 * 
 	 */
-	public void train() throws MissingInterproResultException, IOException, SQLException, MissingAccessionException, MissingProteinException, ParsingException {
+	public void train() throws MissingInterproResultException, IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
 		Set<Parameters> population = new HashSet<Parameters>();
 		// Set up first generation
 		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();

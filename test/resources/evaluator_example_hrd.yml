@@ -34,3 +34,5 @@ blast_dbs:
 competitors:
   blast2go:
     descriptions: ./test/resources/blast2go_descriptions.tsv
+  eggNogMapper:
+    descriptions: ./test/resources/emapper_descriptions.tsv

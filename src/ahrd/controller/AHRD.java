@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.xml.sax.SAXException;
 
 import ahrd.exception.MissingAccessionException;
@@ -249,8 +250,9 @@ public class AHRD {
 	}
 	/**
 	 * Assign Gene Ontology terms to each Protein
+	 * @throws OWLOntologyCreationException 
 	 */
-	public void assignGeneOntologyTerms() throws MissingInterproResultException, IOException, SQLException {
+	public void assignGeneOntologyTerms() throws MissingInterproResultException, IOException, SQLException, OWLOntologyCreationException {
 		// Load a Map of all GO terms
 		if (goDB == null) {
 			goDB = new GOdatabase().getMap();
@@ -367,11 +369,12 @@ public class AHRD {
 
 	/**
 	 * If AHRD is requested to annotate GO terms in accordance to a GO slim set
+	 * @throws IOException 
+	 * @throws OWLOntologyCreationException 
+	 * @throws MissingAccessionException 
 	 * 
-	 * @throws IOException
-	 * @throws MissingAccessionException
 	 */
-	public void annotateWithGoSlim() throws IOException, MissingAccessionException {
+	public void annotateWithGoSlim() throws OWLOntologyCreationException, IOException, MissingAccessionException {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
 			Set<GOterm> goSlim = new HashSet<GOterm>();
 			// Load a Map of all GO terms

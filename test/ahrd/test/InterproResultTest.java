@@ -93,7 +93,7 @@ public class InterproResultTest {
 	}
 
 	@Test
-	public void testFilterInterproResults() throws Exception {
+	public void testFilterInterproResults() throws MissingInterproResultException {
 		Protein p = TestUtils.mockProtein();
 		InterproResult ipr1 = new InterproResult("IPR:000001", "short name 1",
 				"domain");

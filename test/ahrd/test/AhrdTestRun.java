@@ -11,7 +11,7 @@ public class AhrdTestRun {
 	}
 
 	@Test
-	public void testRun() throws Exception {
+	public void testRun() {
 		String[] args = {"./test/resources/ahrd_input_test_run.yml"};
 		AHRD.main(args);
 		// No error?, then we are happy..

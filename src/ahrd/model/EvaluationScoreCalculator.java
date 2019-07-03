@@ -337,7 +337,7 @@ public class EvaluationScoreCalculator {
 	}
 
 	/**
-	 * Calculates an 1 score from recall and precision based on the semantic
+	 * Calculates an F score from recall and precision based on the semantic
 	 * similarity of the ground truth and prediction GO term sets.
 	 * 
 	 * @return Double - F score

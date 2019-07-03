@@ -5,7 +5,10 @@ import static ahrd.controller.Settings.getSettings;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import ahrd.controller.AHRD;
@@ -45,7 +48,9 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			bw.write(buildBestBlastHitsHeader());
 		}
 		if (getSettings().hasCompetitors()) {
-			for (String competitor : getSettings().getCompetitorSettings().keySet()) {
+			List<String> competitorList = new ArrayList<>(getSettings().getCompetitorSettings().keySet());
+			Collections.sort(competitorList);
+			for (String competitor : competitorList) {
 				bw.write("\t" + competitor + "-Description\t" + competitor + "-Description-Length\t" + competitor + "-Description-Evaluation-Score");
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
 					bw.write("\t" + competitor + "-Description-Evaluation-Score-Precision");
@@ -144,9 +149,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				csvRow += buildBestBlastHitsColumns(prot);
 			}
 			if (getSettings().hasCompetitors()) {
-				for (String competitor : getSettings().getCompetitorSettings().keySet()) {
-					csvRow += buildCompetitorColumns(competitor, prot);
-				}
+				List<String> competitorList = new ArrayList<>(getSettings().getCompetitorSettings().keySet());
+				Collections.sort(competitorList);
+			for (String competitor : competitorList) {
+				csvRow += buildCompetitorColumns(competitor, prot);
+			}
 			}
 			if (getSettings().doFindHighestPossibleEvaluationScore()) {
 				csvRow += buildBlastResultWithHighestPossibleDescriptionScoreColumns(prot);

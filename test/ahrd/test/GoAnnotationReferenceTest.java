@@ -14,6 +14,7 @@ import nu.xom.ParsingException;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.xml.sax.SAXException;
 
 import ahrd.controller.AHRD;
@@ -82,7 +83,7 @@ public class GoAnnotationReferenceTest {
 	@Test
 	public void testAnnotatesGoTerms() throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
-			ParsingException, MissingInterproResultException, SQLException {
+			ParsingException, MissingInterproResultException, SQLException, OWLOntologyCreationException {
 		ahrd.setup(false);
 		ahrd.assignGeneOntologyTerms();
 		Protein p = ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056");
