@@ -245,7 +245,7 @@ public class Settings implements Cloneable {
 	 * Annotations as donor for a query protein's HRD. If no BlastResult has GO
 	 * annotations AHRD works "as normal".
 	 */
-	private Boolean preferReferenceWithGoAnnos = false;
+	private Boolean preferReferenceWithGoAnnos = true;
 	/**
 	 * If set to TRUE the AHRD Evaluation Score is based ONLY on tokens that
 	 * pass the Blacklisting. Otherwise all Tokens are submitted to evaluation.
