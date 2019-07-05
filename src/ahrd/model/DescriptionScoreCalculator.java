@@ -77,7 +77,7 @@ public class DescriptionScoreCalculator {
 	 */
 	public void findHighestScoringBlastResult(Map<String, Set<String>> databaseGoAnnotations) {
 		BlastResult bestScoringBr = null;
-		Set<Double> scoreRankingWithGoAnnos = new HashSet<Double>();
+		Map<Double, BlastResult> scoreRankingWithGoAnnos = new HashMap<Double, BlastResult>();
 		Map<Double, BlastResult> scoreRanking = new HashMap<Double, BlastResult>();
 		for (String blastDb : getProtein().getBlastResults().keySet()) {
 			for (BlastResult iterBlastResult : getProtein().getBlastResults().get(blastDb)) {
@@ -89,15 +89,14 @@ public class DescriptionScoreCalculator {
 					if (databaseGoAnnotations != null && !databaseGoAnnotations.isEmpty()
 							&& databaseGoAnnotations.containsKey(iterBlastResult.getShortAccession())
 							&& getSettings().getPreferReferenceWithGoAnnos())
-						scoreRankingWithGoAnnos.add(iterBlastResult.getDescriptionScore());
+						scoreRankingWithGoAnnos.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
 				}
 			}
 		}
 		if (scoreRanking.size() > 0) {
-			Set<Double> usedScoreRankin = scoreRankingWithGoAnnos.isEmpty() ? scoreRanking.keySet()
-					: scoreRankingWithGoAnnos;
-			setDescriptionHighScore(Collections.max(usedScoreRankin));
-			bestScoringBr = scoreRanking.get(getDescriptionHighScore());
+			Map<Double, BlastResult> usedScoreRanking = scoreRankingWithGoAnnos.isEmpty() ? scoreRanking : scoreRankingWithGoAnnos;
+			setDescriptionHighScore(Collections.max(usedScoreRanking.keySet()));
+			bestScoringBr = usedScoreRanking.get(getDescriptionHighScore());
 		}
 		setHighestScoringBlastResult(bestScoringBr);
 	}
