@@ -461,7 +461,9 @@ public class Settings implements Cloneable {
 			this.setSeqSimSearchTableBitScoreCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
 		}
-		this.setPreferReferenceWithGoAnnos(Boolean.parseBoolean((String) input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY)));
+		if (input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY) != null) { 
+			this.setPreferReferenceWithGoAnnos(Boolean.parseBoolean((String) input.get(PREFER_REFERENCE_WITH_GO_ANNOS_KEY)));
+		}
 		this.setEvaluateOnlyValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_ONLY_VALID_TOKENS_KEY)));
 		if (input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY) != null) {
 			this.setPathToGroundTruthDescriptionBlacklist(input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY).toString());

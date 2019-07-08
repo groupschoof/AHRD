@@ -159,4 +159,13 @@ public class SettingsTest {
 				"Path through Parameter-Space should be remembered, but flag is set to FALSE.",
 				getSettings().rememberSimulatedAnnealingPath());
 	}
+	
+	@Test
+	public void testPreferReferenceWithGoAnnos() {
+		assertTrue(
+				"Provided that everything is in place to annotate the query with GO term annotations,\n"
+				+ " blast results with GO annotations should be preferred to those missing them.\n"
+				+ " Thus the flag preferReferenceWithGoAnnos should be set to TRUE by default, but it is set to FALSE.",
+				getSettings().getPreferReferenceWithGoAnnos());
+	}
 }
