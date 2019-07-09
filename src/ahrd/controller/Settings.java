@@ -122,6 +122,8 @@ public class Settings implements Cloneable {
 	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
 	public static final String DESCRIPTION_GROUP_NAME = "description";
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
+	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
+	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
 	
 	/**
 	 * Fields:
@@ -334,6 +336,14 @@ public class Settings implements Cloneable {
 	 * Is applied to all blast databases that don't have a token blacklist specified.
 	 */
 	private Set<String> defaultTokenBlacklist = new HashSet<String>();
+	/**
+	 * Triggers the calculation and output of the highest possible precision of descriptions and gene ontology terms.
+	 */
+	private boolean findHighestPossiblePrecision = false;
+	/**
+	 * Triggers the calculation and output of the highest possible recall of descriptions and gene ontology terms.
+	 */
+	private boolean findHighestPossibleRecall = false;
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -513,6 +523,8 @@ public class Settings implements Cloneable {
 		}
 		this.setFindHighestPossibleGoScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY)));
 		this.setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
+		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
+		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
 	}
 
 	/**
@@ -1275,5 +1287,21 @@ public class Settings implements Cloneable {
 
 	public void setSeqSimSearchTableQueryColRegex(Pattern seqSimSearchTableQueryColRegex) {
 		this.seqSimSearchTableQueryColRegex = seqSimSearchTableQueryColRegex;
+	}
+
+	public boolean doFindHighestPossiblePrecision() {
+		return findHighestPossiblePrecision;
+	}
+
+	public void setFindHighestPossiblePrecision(boolean findHighestPossiblePrecision) {
+		this.findHighestPossiblePrecision = findHighestPossiblePrecision;
+	}
+
+	public boolean doFindHighestPossibleRecall() {
+		return findHighestPossibleRecall;
+	}
+
+	public void setFindHighestPossibleRecall(boolean findHighestPossibleRecall) {
+		this.findHighestPossibleRecall = findHighestPossibleRecall;
 	}
 }

@@ -85,7 +85,7 @@ public class Evaluator extends AHRD {
 				}
 			}
 			// If highest possible GO-annotation scores are requested all BlastResults have to be annotated first
-			if (getSettings().doFindHighestPossibleGoScore()) {
+			if (getSettings().doFindHighestPossibleGoScore() || getSettings().doFindHighestPossiblePrecision() || getSettings().doFindHighestPossibleRecall()) {
 				for (Protein prot : getProteins().values()) {
 					for (List<BlastResult> blastDbResults : prot.getBlastResults().values()) {
 						for (BlastResult br : blastDbResults) {
@@ -155,6 +155,12 @@ public class Evaluator extends AHRD {
 			// If requested, calculate the highest possibly achievable score for go annotations:
 			if (getSettings().doFindHighestPossibleGoScore())
 				evaluator.findHighestPossibleGoScores();
+			// If requested, calculate the highest possibly achievable precision for descriptions and go annotations:
+			if (getSettings().doFindHighestPossiblePrecision())
+				evaluator.findHighestPossiblePrecision();
+			// If requested, calculate the highest possibly achievable recall for descriptions and go annotations:
+			if (getSettings().doFindHighestPossibleRecall())
+				evaluator.findHighestPossibleRecall();
 			// Generate Output:
 			TsvOutputWriter ow = new EvaluatorOutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
@@ -205,7 +211,19 @@ public class Evaluator extends AHRD {
 			prot.getEvaluationScoreCalculator().findHighestPossibleGoScore();
 		}
 	}
+	
+	private void findHighestPossiblePrecision() {
+		for (Protein prot : getProteins().values()) {
+			prot.getEvaluationScoreCalculator().findBlastResultWithHighestPossiblePrecision();
+		}		
+	}
 
+	private void findHighestPossibleRecall() {
+		for (Protein prot : getProteins().values()) {
+			prot.getEvaluationScoreCalculator().findBlastResultWithHighestPossibleRecall();
+		}		
+	}
+	
 	/**
 	 * Annotation files must be tab separated and w/o column headers. 
 	 * @throws IOException 

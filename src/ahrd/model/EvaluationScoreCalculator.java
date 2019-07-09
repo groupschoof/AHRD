@@ -41,6 +41,14 @@ public class EvaluationScoreCalculator {
 	private Fscore highestPossibleSimpleGoAnnotationScore;
 	private Fscore highestPossibleAncestryGoAnnotationScore;
 	private Fscore highestPossibleSemSimGoAnnotationScore;
+	private Double highestPossibleDescriptionPrecision;
+	private Double highestPossibleSimpleGoAnnotationPrecision;
+	private Double highestPossibleAncestryGoAnnotationPrecision;
+	private Double highestPossibleSemSimGoAnnotationPrecision;
+	private Double highestPossibleDescriptionRecall;
+	private Double highestPossibleSimpleGoAnnotationRecall;
+	private Double highestPossibleAncestryGoAnnotationRecall;
+	private Double highestPossibleSemSimGoAnnotationRecall;
 
 	public EvaluationScoreCalculator(Protein protein) {
 		super();
@@ -520,6 +528,137 @@ public class EvaluationScoreCalculator {
 		}
 	}
 
+	public void findBlastResultWithHighestPossiblePrecision() {
+		// find the blast result with the description that results in the highest possible precision 
+		setHighestPossibleDescriptionPrecision(0.0);
+		for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+			for (BlastResult br : resultsFromBlastDatabase) {
+				// Generate the set of evaluation-tokens for each description, 
+				// if evaluateValidTokens is set to false, WITHOUT filtering each token with the BLACKLIST.
+				br.tokenizeForEvaluation();
+				br.setEvaluationScore(fBetaScore(br.getEvaluationTokens(), getGroundTruthDescription().getTokens()));
+				// Find best performing BlastResult-Description:
+				if (br.getEvaluationScore().getPrecision() > getHighestPossibleDescriptionPrecision()) {
+					setHighestPossibleDescriptionPrecision(br.getEvaluationScore().getPrecision());
+				}
+				if (getHighestPossibleDescriptionPrecision().equals(1.0))
+					break;
+			}
+		}
+		// find the blast result with the go annotations that results in the highest possible precision
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+			if (getSettings().doCalculateSimpleGoF1Scores()) {
+				this.setHighestPossibleSimpleGoAnnotationPrecision(0.0);
+				//this.setHighestPossibleSimpleGoAnnotationPrecision(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getPrecision()); // In case ground truth go annotation is empty
+				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+					for (BlastResult br : resultsFromBlastDatabase) {
+						Fscore score = calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						if (score.getPrecision() > this.getHighestPossibleSimpleGoAnnotationPrecision())
+								this.setHighestPossibleSimpleGoAnnotationPrecision(score.getPrecision());
+						if (getHighestPossibleSimpleGoAnnotationPrecision().equals(1.0))
+							break;
+					}
+					if (getHighestPossibleSimpleGoAnnotationPrecision().equals(1.0))
+						break;
+				}
+			}
+			if (getSettings().doCalculateAncestryGoF1Scores()) {
+				this.setHighestPossibleAncestryGoAnnotationPrecision(0.0);
+				//this.setHighestPossibleAncestryGoAnnotationPrecision(calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getPrecision()); // In case ground truth go annotation is empty
+				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+					for (BlastResult br : resultsFromBlastDatabase) {
+						Fscore score = calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						if (score.getPrecision() > this.getHighestPossibleAncestryGoAnnotationPrecision())
+								this.setHighestPossibleAncestryGoAnnotationPrecision(score.getPrecision());
+						if (getHighestPossibleAncestryGoAnnotationPrecision().equals(1.0))
+							break;
+					}
+					if (getHighestPossibleAncestryGoAnnotationPrecision().equals(1.0))
+						break;
+				}
+			}
+			if (getSettings().doCalculateSemSimGoF1Scores()) {
+				this.setHighestPossibleSemSimGoAnnotationPrecision(0.0);
+				//this.setHighestPossibleSemSimGoAnnotationPrecision(calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getPrecision()); // In case ground truth go annotation is empty
+				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+					for (BlastResult br : resultsFromBlastDatabase) {
+						Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						if (score.getPrecision() > this.getHighestPossibleSemSimGoAnnotationPrecision())
+								this.setHighestPossibleSemSimGoAnnotationPrecision(score.getPrecision());
+						if (getHighestPossibleSemSimGoAnnotationPrecision().equals(1.0))
+							break;
+					}
+					if (getHighestPossibleSemSimGoAnnotationPrecision().equals(1.0))
+						break;
+				}
+			}
+		}
+	}
+
+	public void findBlastResultWithHighestPossibleRecall() {
+		// find the blast result with the description that results in the highest possible recall 
+		setHighestPossibleDescriptionRecall(0.0);
+		for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+			for (BlastResult br : resultsFromBlastDatabase) {
+				// Generate the set of evaluation-tokens for each description, 
+				// if evaluateValidTokens is set to false, WITHOUT filtering each token with the BLACKLIST.
+				br.tokenizeForEvaluation();
+				br.setEvaluationScore(fBetaScore(br.getEvaluationTokens(), getGroundTruthDescription().getTokens()));
+				// Find best performing BlastResult-Description:
+				if (br.getEvaluationScore().getRecall() > getHighestPossibleDescriptionRecall()) {
+					setHighestPossibleDescriptionRecall(br.getEvaluationScore().getRecall());
+				}
+				if (getHighestPossibleDescriptionRecall().equals(1.0))
+					break;
+			}
+		}
+		// find the blast result with the go annotations that results in the highest possible recall
+		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+			if (getSettings().doCalculateSimpleGoF1Scores()) {
+				this.setHighestPossibleSimpleGoAnnotationRecall(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getRecall()); // In case ground truth go annotation is empty
+				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+					for (BlastResult br : resultsFromBlastDatabase) {
+						Fscore score = calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						if (score.getRecall() > this.getHighestPossibleSimpleGoAnnotationRecall())
+								this.setHighestPossibleSimpleGoAnnotationRecall(score.getRecall());
+						if (getHighestPossibleSimpleGoAnnotationRecall().equals(1.0))
+							break;
+					}
+					if (getHighestPossibleSimpleGoAnnotationRecall().equals(1.0))
+						break;
+				}
+			}
+			if (getSettings().doCalculateAncestryGoF1Scores()) {
+				this.setHighestPossibleAncestryGoAnnotationRecall(calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getRecall()); // In case ground truth go annotation is empty
+				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+					for (BlastResult br : resultsFromBlastDatabase) {
+						Fscore score = calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						if (score.getRecall() > this.getHighestPossibleAncestryGoAnnotationRecall())
+								this.setHighestPossibleAncestryGoAnnotationRecall(score.getRecall());
+						if (getHighestPossibleAncestryGoAnnotationRecall().equals(1.0))
+							break;
+					}
+					if (getHighestPossibleAncestryGoAnnotationRecall().equals(1.0))
+						break;
+				}
+			}
+			if (getSettings().doCalculateSemSimGoF1Scores()) {
+				this.setHighestPossibleSemSimGoAnnotationRecall(calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getRecall()); // In case ground truth go annotation is empty
+				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
+					for (BlastResult br : resultsFromBlastDatabase) {
+						Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						if (score.getRecall() > this.getHighestPossibleSemSimGoAnnotationRecall())
+								this.setHighestPossibleSemSimGoAnnotationRecall(score.getRecall());
+						if (getHighestPossibleSemSimGoAnnotationRecall().equals(1.0))
+							break;
+					}
+					if (getHighestPossibleSemSimGoAnnotationRecall().equals(1.0))
+						break;
+				}
+			}
+		}
+	}
+	
 	public GroundTruthDescription getGroundTruthDescription() {
 		return groundTruthDescription;
 	}
@@ -646,6 +785,70 @@ public class EvaluationScoreCalculator {
 	public void setBlastResultWithHighestPossibleDescriptionScore(
 			BlastResult blastResultWithHighestPossibleDescriptionScore) {
 		this.blastResultWithHighestPossibleDescriptionScore = blastResultWithHighestPossibleDescriptionScore;
+	}
+
+	public Double getHighestPossibleDescriptionPrecision() {
+		return highestPossibleDescriptionPrecision;
+	}
+
+	public void setHighestPossibleDescriptionPrecision(Double highestPossibleDescriptionPrecision) {
+		this.highestPossibleDescriptionPrecision = highestPossibleDescriptionPrecision;
+	}
+
+	public Double getHighestPossibleSimpleGoAnnotationPrecision() {
+		return highestPossibleSimpleGoAnnotationPrecision;
+	}
+
+	public void setHighestPossibleSimpleGoAnnotationPrecision(Double highestPossibleSimpleGoAnnotationPrecision) {
+		this.highestPossibleSimpleGoAnnotationPrecision = highestPossibleSimpleGoAnnotationPrecision;
+	}
+
+	public Double getHighestPossibleAncestryGoAnnotationPrecision() {
+		return highestPossibleAncestryGoAnnotationPrecision;
+	}
+
+	public void setHighestPossibleAncestryGoAnnotationPrecision(Double highestPossibleAncestryGoAnnotationPrecision) {
+		this.highestPossibleAncestryGoAnnotationPrecision = highestPossibleAncestryGoAnnotationPrecision;
+	}
+
+	public Double getHighestPossibleSemSimGoAnnotationPrecision() {
+		return highestPossibleSemSimGoAnnotationPrecision;
+	}
+
+	public void setHighestPossibleSemSimGoAnnotationPrecision(Double highestPossibleSemSimGoAnnotationPrecision) {
+		this.highestPossibleSemSimGoAnnotationPrecision = highestPossibleSemSimGoAnnotationPrecision;
+	}
+
+	public Double getHighestPossibleDescriptionRecall() {
+		return highestPossibleDescriptionRecall;
+	}
+
+	public void setHighestPossibleDescriptionRecall(Double highestPossibleDescriptionRecall) {
+		this.highestPossibleDescriptionRecall = highestPossibleDescriptionRecall;
+	}
+
+	public Double getHighestPossibleSimpleGoAnnotationRecall() {
+		return highestPossibleSimpleGoAnnotationRecall;
+	}
+
+	public void setHighestPossibleSimpleGoAnnotationRecall(Double highestPossibleSimpleGoAnnotationRecall) {
+		this.highestPossibleSimpleGoAnnotationRecall = highestPossibleSimpleGoAnnotationRecall;
+	}
+
+	public Double getHighestPossibleAncestryGoAnnotationRecall() {
+		return highestPossibleAncestryGoAnnotationRecall;
+	}
+
+	public void setHighestPossibleAncestryGoAnnotationRecall(Double highestPossibleAncestryGoAnnotationRecall) {
+		this.highestPossibleAncestryGoAnnotationRecall = highestPossibleAncestryGoAnnotationRecall;
+	}
+
+	public Double getHighestPossibleSemSimGoAnnotationRecall() {
+		return highestPossibleSemSimGoAnnotationRecall;
+	}
+
+	public void setHighestPossibleSemSimGoAnnotationRecall(Double highestPossibleSemSimGoAnnotationRecall) {
+		this.highestPossibleSemSimGoAnnotationRecall = highestPossibleSemSimGoAnnotationRecall;
 	}
 
 }

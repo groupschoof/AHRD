@@ -90,6 +90,12 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				bw.write("\tHighest-Possible-Description-Score-Recall");
 			}
 		}
+		if (getSettings().doFindHighestPossiblePrecision()) {
+			bw.write("\tHighest-Possible-Description-Precision");
+		}
+		if (getSettings().doFindHighestPossiblePrecision()) {
+			bw.write("\tHighest-Possible-Description-Recall");
+		}
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			bw.write("\tGround-Truth-GO-Annotations");
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
@@ -130,6 +136,28 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 				}
 			}
+			if (getSettings().doFindHighestPossiblePrecision()) {
+				if (getSettings().doCalculateSimpleGoF1Scores()) {
+					bw.write("\tHighest-Possible-Simple-GO-Annotations-Precision");
+				}
+				if (getSettings().doCalculateAncestryGoF1Scores()) {
+					bw.write("\tHighest-Possible-Ancestry-GO-Annotations-Precision");
+				}
+				if (getSettings().doCalculateSemSimGoF1Scores()) {
+					bw.write("\tHighest-Possible-SemSim-GO-Annotations-Precision");
+				}
+			}
+			if (getSettings().doFindHighestPossibleRecall()) {
+				if (getSettings().doCalculateSimpleGoF1Scores()) {
+					bw.write("\tHighest-Possible-Simple-GO-Annotations-Recall");
+				}
+				if (getSettings().doCalculateAncestryGoF1Scores()) {
+					bw.write("\tHighest-Possible-Ancestry-GO-Annotations-Recall");
+				}
+				if (getSettings().doCalculateSemSimGoF1Scores()) {
+					bw.write("\tHighest-Possible-SemSim-GO-Annotations-Recall");
+				}
+			}
 		}
 		bw.write("\n");
 
@@ -158,6 +186,12 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			if (getSettings().doFindHighestPossibleEvaluationScore()) {
 				csvRow += buildBlastResultWithHighestPossibleDescriptionScoreColumns(prot);
 			}
+			if (getSettings().doFindHighestPossiblePrecision()) {
+				csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionPrecision());
+			}
+			if (getSettings().doFindHighestPossibleRecall()) {
+				csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionRecall());
+			}
 			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 				csvRow += buildGroundTruthGoAnnotationColumns(prot);
 			}
@@ -184,7 +218,28 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 				}
 			}
-
+			if (getSettings().doFindHighestPossiblePrecision()) {
+				if (getSettings().doCalculateSimpleGoF1Scores()) {
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationPrecision());
+				}
+				if (getSettings().doCalculateAncestryGoF1Scores()) {
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationPrecision());
+				}
+				if (getSettings().doCalculateSemSimGoF1Scores()) {
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationPrecision());
+				}
+			}
+			if (getSettings().doFindHighestPossibleRecall()) {
+				if (getSettings().doCalculateSimpleGoF1Scores()) {
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationRecall());
+				}
+				if (getSettings().doCalculateAncestryGoF1Scores()) {
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationRecall());
+				}
+				if (getSettings().doCalculateSemSimGoF1Scores()) {
+					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationRecall());
+				}
+			}
 			// Write row to CSV:
 			csvRow += "\n";
 			bw.write(csvRow);
