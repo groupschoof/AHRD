@@ -194,50 +194,50 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 				csvRow += buildGroundTruthGoAnnotationColumns(prot);
-			}
-			if (getSettings().doFindHighestPossibleGoScore()) {
-				if (getSettings().doCalculateSimpleGoF1Scores()) {
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore().getScore());
-					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore().getPrecision());
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore().getRecall());
+				if (getSettings().doFindHighestPossibleGoScore()) {
+					if (getSettings().doCalculateSimpleGoF1Scores()) {
+						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore().getScore());
+						if (getSettings().doWriteFscoreDetailsToOutput()) {
+							csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore().getPrecision());
+							csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationScore().getRecall());
+						}
+					}
+					if (getSettings().doCalculateAncestryGoF1Scores()) {
+						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getScore());
+						if (getSettings().doWriteFscoreDetailsToOutput()) {
+							csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getPrecision());
+							csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getRecall());
+						}
+					}
+					if (getSettings().doCalculateSemSimGoF1Scores()) {
+						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getScore());
+						if (getSettings().doWriteFscoreDetailsToOutput()) {
+							csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getPrecision());
+							csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getRecall());
+						}
 					}
 				}
-				if (getSettings().doCalculateAncestryGoF1Scores()) {
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getScore());
-					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getPrecision());
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationScore().getRecall());
+				if (getSettings().doFindHighestPossiblePrecision()) {
+					if (getSettings().doCalculateSimpleGoF1Scores()) {
+						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationPrecision());
+					}
+					if (getSettings().doCalculateAncestryGoF1Scores()) {
+						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationPrecision());
+					}
+					if (getSettings().doCalculateSemSimGoF1Scores()) {
+						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationPrecision());
 					}
 				}
-				if (getSettings().doCalculateSemSimGoF1Scores()) {
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getScore());
-					if (getSettings().doWriteFscoreDetailsToOutput()) {
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getPrecision());
-						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore().getRecall());
+				if (getSettings().doFindHighestPossibleRecall()) {
+					if (getSettings().doCalculateSimpleGoF1Scores()) {
+						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationRecall());
 					}
-				}
-			}
-			if (getSettings().doFindHighestPossiblePrecision()) {
-				if (getSettings().doCalculateSimpleGoF1Scores()) {
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationPrecision());
-				}
-				if (getSettings().doCalculateAncestryGoF1Scores()) {
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationPrecision());
-				}
-				if (getSettings().doCalculateSemSimGoF1Scores()) {
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationPrecision());
-				}
-			}
-			if (getSettings().doFindHighestPossibleRecall()) {
-				if (getSettings().doCalculateSimpleGoF1Scores()) {
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSimpleGoAnnotationRecall());
-				}
-				if (getSettings().doCalculateAncestryGoF1Scores()) {
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationRecall());
-				}
-				if (getSettings().doCalculateSemSimGoF1Scores()) {
-					csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationRecall());
+					if (getSettings().doCalculateAncestryGoF1Scores()) {
+						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleAncestryGoAnnotationRecall());
+					}
+					if (getSettings().doCalculateSemSimGoF1Scores()) {
+						csvRow += "\t" + FRMT.format(prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationRecall());
+					}
 				}
 			}
 			// Write row to CSV:
