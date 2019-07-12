@@ -93,7 +93,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		if (getSettings().doFindHighestPossiblePrecision()) {
 			bw.write("\tHighest-Possible-Description-Precision");
 		}
-		if (getSettings().doFindHighestPossiblePrecision()) {
+		if (getSettings().doFindHighestPossibleRecall()) {
 			bw.write("\tHighest-Possible-Description-Recall");
 		}
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
