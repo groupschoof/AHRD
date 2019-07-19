@@ -141,10 +141,6 @@ public class EvaluationScoreCalculator {
 			if (tp > 0.0) {
 				double pr = tp / assignedTkns.size();
 				double rc = tp / groundTruthTkns.size();
-				// F-Beta-Measure is the harmonic mean of precision and recall
-				// weighted by param beta:
-				Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-				fBetaScore.setScore((1 + bSqr) * (pr * rc) / (bSqr * pr + rc));
 				fBetaScore.setPrecision(pr);
 				fBetaScore.setRecall(rc);				
 			}
@@ -292,10 +288,6 @@ public class EvaluationScoreCalculator {
 				f.setPrecision(1.0);
 			}
 		}
-		if (f.getPrecision() > 0.0 && f.getRecall() > 0.0) {
-			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f.setScore((1 + bSqr) * f.getPrecision() * f.getRecall() / (bSqr * f.getPrecision() + f.getRecall()));
-		}
 		return f;
 	}
 
@@ -334,10 +326,6 @@ public class EvaluationScoreCalculator {
 			if (predictionAncestry.size() == 0) {
 				precision = 1.0;
 			}
-		}
-		if (precision > 0.0 && recall > 0.0) {
-			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f.setScore((1 + bSqr) * precision * recall / (bSqr * precision + recall));
 		}
 		f.setPrecision(precision);
 		f.setRecall(recall);
@@ -426,10 +414,6 @@ public class EvaluationScoreCalculator {
 			if (prediction.size() == 0) {
 				precision = 1.0;
 			}
-		}
-		if (precision > 0.0 && recall > 0.0) {
-			Double bSqr = getSettings().getFMeasureBetaParameter() * getSettings().getFMeasureBetaParameter();
-			f.setScore((1 + bSqr) * precision * recall / (bSqr * precision + recall));
 		}
 		if (f.getScore() > 1.0) { // Something went very wrong - Should never be happening
 			System.out.println("p: " + precision + "\tr: " + recall + "\tf1: " + f);
