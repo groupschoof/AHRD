@@ -168,4 +168,12 @@ public class SettingsTest {
 				+ " Thus the flag preferReferenceWithGoAnnos should be set to TRUE by default, but it is set to FALSE.",
 				getSettings().getPreferReferenceWithGoAnnos());
 	}
+	
+	@Test
+	public void testEvaluateOnlyValidTokens() {
+		assertTrue(
+				"The flag evaluateOnlyValidTokens should be set to TRUE by default, but it is set to FALSE.",
+				getSettings().getEvaluateOnlyValidTokens());
+	}
+	
 }
