@@ -39,12 +39,25 @@ public class EvaluatorTest {
 		assertNotNull(evaluator.getProteins()
 				.get("gene:chr01.502:mRNA:chr01.502")
 				.getEvaluationScoreCalculator().getGroundTruthDescription());
+		assertNotNull(evaluator.getProteins()
+				.get("P04637")
+				.getEvaluationScoreCalculator().getGroundTruthDescription());
+		// Default behavior is to filter the ground truth tokens with the defaultTokenBlacklist thus excluding "like" and "protein".
 		assertEquals("Receptor-like protein kinase", evaluator.getProteins()
 				.get("gene:chr01.1056:mRNA:chr01.1056")
 				.getEvaluationScoreCalculator().getGroundTruthDescription()
 				.getDescription());
-		assertEquals(4,
+		assertEquals(2,
 				evaluator.getProteins().get("gene:chr01.1056:mRNA:chr01.1056")
+						.getEvaluationScoreCalculator()
+						.getGroundTruthDescription().getTokens().size());
+		// None of this protein's tokens should be affected by the filtering.
+		assertEquals("Cellular tumor antigen p53", evaluator.getProteins()
+				.get("P04637")
+				.getEvaluationScoreCalculator().getGroundTruthDescription()
+				.getDescription());
+		assertEquals(4,
+				evaluator.getProteins().get("P04637")
 						.getEvaluationScoreCalculator()
 						.getGroundTruthDescription().getTokens().size());
 	}

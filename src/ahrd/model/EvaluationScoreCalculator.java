@@ -53,6 +53,28 @@ public class EvaluationScoreCalculator {
 	public EvaluationScoreCalculator(Protein protein) {
 		super();
 		setProtein(protein);
+		// In case the ground truth description is empty or has no valid tokens left after the token blacklist is applied,
+		// a blast result with an empty description (eg. after the token blacklist is applied) will result in a evaluation score of 1.
+		// To make sure the same score is given if no result exists for a database, an empty bestUnchangedBlastResult is set as default for each database.
+		// In the vast majority of cases it will be replaced with a proper blast result.
+		if (getSettings().getWriteBestBlastHitsToOutput()) {
+			for (String blastDbName : getSettings().getBlastDatabases()) {
+				BlastResult emptyBlastResult = new BlastResult(blastDbName, "", "");
+				emptyBlastResult.setShortAccession("");
+				emptyBlastResult.setBitScore(Double.MIN_VALUE);
+				getBestUnchangedBlastResults().put(blastDbName, emptyBlastResult);
+			}
+		}
+		// Necessary if the ground truth description is empty or has no valid tokens left after the token blacklist is applied.
+		// Also necessary if the ground truth go annotation is empty.
+		// In both cases no annotation should result in an evaluation score of 1.
+		// To ensure so an empty CompetitorAnnoation is created for each competitor.
+		// In the vast majority of cases these CompetitorAnnotations will be replaced by proper annotations read from file.
+		if (getSettings().hasCompetitors()) {
+			for (String competitor : getSettings().getCompetitorSettings().keySet()) {
+				addCompetitorAnnotation(competitor, new CompetitorAnnotation("", ""));
+			}
+		}
 	}
 
 	/**
@@ -130,21 +152,23 @@ public class EvaluationScoreCalculator {
 	 * @return Double - F-Beta-Score
 	 */
 	public static Fscore fBetaScore(Set<String> assignedTkns, Set<String> groundTruthTkns) {
-		// Validate Ground Truth:
-		if (groundTruthTkns == null || groundTruthTkns.isEmpty())
-			throw new IllegalArgumentException("Cannot calculate F1-Score, got an empty set of Ground-Truth-Tokens.");
-		// Calculate f-beta-score:
 		Fscore fBetaScore = new Fscore();
-		if (assignedTkns != null && !assignedTkns.isEmpty()) {
+		// Validate Ground Truth:
+		if (groundTruthTkns!=null && !groundTruthTkns.isEmpty() && assignedTkns!=null && !assignedTkns.isEmpty()) {
 			double tp = truePositives(assignedTkns, groundTruthTkns);
 			// Avoid division by zero:
 			if (tp > 0.0) {
-				double pr = tp / assignedTkns.size();
-				double rc = tp / groundTruthTkns.size();
-				fBetaScore.setPrecision(pr);
-				fBetaScore.setRecall(rc);				
+				fBetaScore.setPrecision(tp / assignedTkns.size());
+				fBetaScore.setRecall(tp / groundTruthTkns.size());
 			}
-		}
+		} else {
+			if (groundTruthTkns==null || groundTruthTkns.isEmpty()) {
+				fBetaScore.setRecall(1.0);
+			}
+			if (assignedTkns==null || assignedTkns.isEmpty()) {
+				fBetaScore.setPrecision(1.0);
+			}
+		}	
 		return fBetaScore;
 	}
 
@@ -174,18 +198,18 @@ public class EvaluationScoreCalculator {
 	public void assignEvaluationScores() {
 		if (getGroundTruthDescription() != null && getGroundTruthDescription().getDescription() != null) {
 			// First Competitor is the Description assigned by AHRD itself:
+			Set<String> hrdEvlTkns;
 			if (getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult() != null) {
 				// Generate the set of evaluation-tokens from the actually assigned description.
 				// If evaluateValidTokens is set to false: WITHOUT filtering each token with the BLACKLIST.
 				getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult().tokenizeForEvaluation();
-				Set<String> hrdEvlTkns = getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult()
-						.getEvaluationTokens();
-				// Calculate the Evaluation-Score as the F-Beta-Score (including Precision and Recall):
-				setEvalutionScore(fBetaScore(hrdEvlTkns, getGroundTruthDescription().getTokens()));
+				hrdEvlTkns = getProtein().getDescriptionScoreCalculator().getHighestScoringBlastResult().getEvaluationTokens();
 			} else {
-				// Well, no Description assigned means scores ZERO:
-				setEvalutionScore(new Fscore());
+				// Well, no Description assigned means no tokens:
+				hrdEvlTkns = new HashSet<String>();
 			}
+			// Calculate the Evaluation-Score as the F-Beta-Score (including Precision and Recall):
+			setEvalutionScore(fBetaScore(hrdEvlTkns, getGroundTruthDescription().getTokens()));
 			// Do the competitors
 			Double bestCompEvlScr = 0.0;
 			if (getSettings().hasCompetitors()) {

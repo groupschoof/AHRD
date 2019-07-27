@@ -261,7 +261,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		for (String blastDb : getSettings().getBlastDatabases()) {
 			if (blastDb != null && !blastDb.equals("")) {
 				hdr += ("\tBest-BlastHit-against-" + blastDb + "-Accession-and-Description");
-				if (getSettings().isInTrainingMode()) {
+				if (getSettings().isInEvaluationMode()) {
 					hdr += "\tBest-BlastHit-against-" + blastDb + "-Description-Length\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score";
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						hdr += "\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Precision\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Recall";
@@ -377,7 +377,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 				BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
 				csvRow += "\t\"" + bestBr.getAccession() + " " + bestBr.getDescription() + "\"";
-				if (getSettings().isInTrainingMode()) {
+				if (getSettings().isInEvaluationMode()) {
 					csvRow += "\t" + bestBr.getEvaluationTokens().size();
 					csvRow += "\t" + FRMT.format(bestBr.getEvaluationScore().getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
@@ -411,7 +411,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				}
 			} else {
 				csvRow += "\t";
-				if (getSettings().isInTrainingMode()) {
+				if (getSettings().isInEvaluationMode()) {
 					csvRow += "\t0\t0";
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						csvRow += "\t0\t0";
