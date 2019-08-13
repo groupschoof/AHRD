@@ -163,10 +163,10 @@ public class EvaluationScoreCalculator {
 			}
 		} else {
 			if (groundTruthTkns==null || groundTruthTkns.isEmpty()) {
-				fBetaScore.setRecall(1.0);
+				fBetaScore.setRecall(Double.NaN);
 			}
 			if (assignedTkns==null || assignedTkns.isEmpty()) {
-				fBetaScore.setPrecision(1.0);
+				fBetaScore.setPrecision(Double.NaN);
 			}
 		}	
 		return fBetaScore;
@@ -296,22 +296,13 @@ public class EvaluationScoreCalculator {
 	private Fscore calcSimpleGoAnnotationScore(Set<GOterm> groundTruth, Set<GOterm> prediction) {
 		Fscore f = new Fscore();
 		int truePositive = 0;
-		if (groundTruth.size() > 0 && prediction.size() > 0) {
-			for (Iterator<GOterm> groundTruthIter = groundTruth.iterator(); groundTruthIter.hasNext();) {
-				if (prediction.contains(groundTruthIter.next())) {
-					truePositive++;
-				}
-			}
-			f.setRecall((double) truePositive / groundTruth.size());
-			f.setPrecision((double) truePositive / prediction.size());
-		} else {
-			if (groundTruth.size() == 0) {
-				f.setRecall(1.0);
-			}
-			if (prediction.size() == 0) {
-				f.setPrecision(1.0);
+		for (Iterator<GOterm> groundTruthIter = groundTruth.iterator(); groundTruthIter.hasNext();) {
+			if (prediction.contains(groundTruthIter.next())) {
+				truePositive++;
 			}
 		}
+		f.setRecall((double) truePositive / groundTruth.size());
+		f.setPrecision((double) truePositive / prediction.size());
 		return f;
 	}
 
@@ -335,22 +326,13 @@ public class EvaluationScoreCalculator {
 		int truePositive = 0;
 		Double recall = 0.0;
 		Double precision = 0.0;
-		if (groundTruthAncestry.size() > 0 && predictionAncestry.size() > 0) {
-			for (Iterator<GOterm> groundTruthIter = groundTruthAncestry.iterator(); groundTruthIter.hasNext();) {
-				if (predictionAncestry.contains(groundTruthIter.next())) {
-					truePositive++;
-				}
-			}
-			recall = (double) truePositive / groundTruthAncestry.size();
-			precision = (double) truePositive / predictionAncestry.size();
-		} else {
-			if (groundTruthAncestry.size() == 0) {
-				recall = 1.0;
-			}
-			if (predictionAncestry.size() == 0) {
-				precision = 1.0;
+		for (Iterator<GOterm> groundTruthIter = groundTruthAncestry.iterator(); groundTruthIter.hasNext();) {
+			if (predictionAncestry.contains(groundTruthIter.next())) {
+				truePositive++;
 			}
 		}
+		recall = (double) truePositive / groundTruthAncestry.size();
+		precision = (double) truePositive / predictionAncestry.size();
 		f.setPrecision(precision);
 		f.setRecall(recall);
 		return f;
@@ -397,7 +379,7 @@ public class EvaluationScoreCalculator {
 			if (infoContentGroundTruth > 0.0) {
 				recall = commonInfoContentPrediction / infoContentGroundTruth;
 			} else {
-				recall = 1.0;
+				recall = Double.NaN;
 			}
 			// Precision
 			Double infoContentPrediction = 0.0;
@@ -448,14 +430,14 @@ public class EvaluationScoreCalculator {
 			if (infoContentPrediction > 0.0) {
 				precision = commonInfoContentGroundTruth / infoContentPrediction;
 			} else {
-				precision = 1.0;
+				precision = Double.NaN;
 			}
 		} else {
 			if (groundTruth.size() == 0) {
-				recall = 1.0;
+				recall = Double.NaN;
 			}
 			if (prediction.size() == 0) {
-				precision = 1.0;
+				precision = Double.NaN;
 			}
 		}
 		if (f.getScore() > 1.0) { // Something went very wrong - Should never be happening
@@ -486,7 +468,7 @@ public class EvaluationScoreCalculator {
 	 * score.
 	 */
 	public void findBlastResultWithHighestPossibleDescriptionScore() {
-		setHighestPossibleDescriptionScore(new Fscore());
+		setHighestPossibleDescriptionScore(fBetaScore(new HashSet<String>(), getGroundTruthDescription().getTokens())); // In case the ground truth is empty
 		for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 			for (BlastResult cmpt : resultsFromBlastDatabase) {
 				// Generate the set of evaluation-tokens for each description, 
@@ -494,7 +476,7 @@ public class EvaluationScoreCalculator {
 				cmpt.tokenizeForEvaluation();
 				cmpt.setEvaluationScore(fBetaScore(cmpt.getEvaluationTokens(), getGroundTruthDescription().getTokens()));
 				// Find best performing BlastResult-Description:
-				if (cmpt.getEvaluationScore().getScore() > getHighestPossibleDescriptionScore().getScore()) {
+				if (cmpt.getEvaluationScore().getScore() > getHighestPossibleDescriptionScore().getScore() || getHighestPossibleDescriptionScore().getScore().isNaN()) {
 					setHighestPossibleDescriptionScore(cmpt.getEvaluationScore());
 					setBlastResultWithHighestPossibleDescriptionScore(cmpt);
 				}
@@ -515,7 +497,7 @@ public class EvaluationScoreCalculator {
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
 						Fscore score = calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
-						if (score.getScore() > this.getHighestPossibleSimpleGoAnnotationScore().getScore())
+						if (score.getScore() > this.getHighestPossibleSimpleGoAnnotationScore().getScore() || this.getHighestPossibleSimpleGoAnnotationScore().getScore().isNaN())
 								this.setHighestPossibleSimpleGoAnnotationScore(score);
 						if (getHighestPossibleSimpleGoAnnotationScore().getScore().equals(1.0))
 							break;
@@ -529,7 +511,7 @@ public class EvaluationScoreCalculator {
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
 						Fscore score = calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
-						if (score.getScore() > this.getHighestPossibleAncestryGoAnnotationScore().getScore())
+						if (score.getScore() > this.getHighestPossibleAncestryGoAnnotationScore().getScore() || this.getHighestPossibleAncestryGoAnnotationScore().getScore().isNaN())
 								this.setHighestPossibleAncestryGoAnnotationScore(score);
 						if (getHighestPossibleAncestryGoAnnotationScore().getScore().equals(1.0))
 							break;
@@ -543,7 +525,7 @@ public class EvaluationScoreCalculator {
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
 						Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
-						if (score.getScore() > this.getHighestPossibleSemSimGoAnnotationScore().getScore())
+						if (score.getScore() > this.getHighestPossibleSemSimGoAnnotationScore().getScore() || this.getHighestPossibleSemSimGoAnnotationScore().getScore().isNaN())
 								this.setHighestPossibleSemSimGoAnnotationScore(score);
 						if (getHighestPossibleSemSimGoAnnotationScore().getScore().equals(1.0))
 							break;
