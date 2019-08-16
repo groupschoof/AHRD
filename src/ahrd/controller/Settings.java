@@ -124,6 +124,7 @@ public class Settings implements Cloneable {
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
 	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
 	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
+	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summay"; 
 	
 	/**
 	 * Fields:
@@ -344,6 +345,10 @@ public class Settings implements Cloneable {
 	 * Triggers the calculation and output of the highest possible recall of descriptions and gene ontology terms.
 	 */
 	private boolean findHighestPossibleRecall = false;
+	/**
+	 * Triggers the output of averages and coverages of all scores at the end of the evalution output
+	 */
+	private boolean writeEvaluationSummary = false;
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -538,6 +543,7 @@ public class Settings implements Cloneable {
 		this.setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
 		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
 		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
+		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
 	}
 
 	/**
@@ -1316,5 +1322,13 @@ public class Settings implements Cloneable {
 
 	public void setFindHighestPossibleRecall(boolean findHighestPossibleRecall) {
 		this.findHighestPossibleRecall = findHighestPossibleRecall;
+	}
+
+	public boolean doWriteEvaluationSummary() {
+		return writeEvaluationSummary;
+	}
+
+	public void setWriteEvaluationSummary(boolean writeEvaluationSummary) {
+		this.writeEvaluationSummary = writeEvaluationSummary;
 	}
 }
