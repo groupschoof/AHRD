@@ -124,7 +124,7 @@ public class Settings implements Cloneable {
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
 	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
 	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
-	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summay"; 
+	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary"; 
 	
 	/**
 	 * Fields:
