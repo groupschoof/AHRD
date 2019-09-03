@@ -26,6 +26,7 @@ public abstract class OutputWriter {
         final DecimalFormatSymbols dcs = FRMT.getDecimalFormatSymbols();
         dcs.setDecimalSeparator('.');
         dcs.setGroupingSeparator(',');
+        dcs.setNaN("NaN");
         FRMT.setDecimalFormatSymbols(dcs);
 	}
 	
