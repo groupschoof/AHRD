@@ -42,8 +42,8 @@ public class SimulatedAnnealingTrainerTest {
 
 	@Test
 	public void testAvgEvaluationScore() {
-		assertTrue("SimulatedAnnealingTrainer should initialize Settings to Training-Mode.",
-				getSettings().isInTrainingMode());
+		assertTrue("SimulatedAnnealingTrainer should initialize Settings to Evaluation-Mode.",
+				getSettings().isInEvaluationMode());
 		Protein p1 = new Protein("protein_one", 200);
 		p1.getEvaluationScoreCalculator().setEvalutionScore(new Fscore(1.0, 0.0, 0.6));
 		p1.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(1.0);

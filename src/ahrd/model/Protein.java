@@ -42,8 +42,7 @@ public class Protein {
 		// If current Settings require evaluation of AHRD's performance or are
 		// set to train AHRD's parameters, a EvaluationScoreCalculator is
 		// needed:
-		if (getSettings().getWriteBestBlastHitsToOutput()
-				|| getSettings().isInTrainingMode())
+		if (getSettings().isInEvaluationMode())
 			setEvaluationScoreCalculator(new EvaluationScoreCalculator(this));
 	}
 
@@ -59,8 +58,7 @@ public class Protein {
 		// If current Settings require evaluation of AHRD's performance or are
 		// set to train AHRD's parameters, a EvaluationScoreCalculator is
 		// needed:
-		if (getSettings().getWriteBestBlastHitsToOutput()
-				|| getSettings().isInTrainingMode())
+		if (getSettings().isInEvaluationMode())
 			setEvaluationScoreCalculator(new EvaluationScoreCalculator(this));
 	}
 

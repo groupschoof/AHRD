@@ -458,16 +458,14 @@ public class BlastResult implements Comparable<BlastResult> {
 	}
 
 	/**
-	 * Evaluation Tokens are <i>not</i> filtered with the TOKEN-BLACKLIST, as we
-	 * want to evaluate <i>all</i> tokens, that are printed out, too. This set
-	 * of evaluation-tokens is set if and only if, AHRD is run in Evaluator-Mode
-	 * and this BlastResult is the best scoring of the Blast-Search-Result, it
-	 * is obtained from. You can evaluate AHRD based <i>only</i> on tokens that
-	 * passed the Blacklist and Filtering with the correct input parameter. See
-	 * <code>Settings.evaluateValidTokens</code> for details.
-	 * 
-	 * @Note: This method uses the static respective static method from
-	 *        Model-Class GroundTruthDescription.
+	 * Evaluation Tokens are filtered with the TOKEN-BLACKLIST if 
+	 * <code>Settings.evaluateOnlyValidTokens</code> is set to <i>true</i>
+	 * (the default).
+	 * If <i>all</i> tokens (that are printed out too) are to be evaluated
+	 * <code>Settings.evaluateValidTokens</code> can be set to <i>false</i>
+	 * This unchanged set of evaluation-tokens is only set if AHRD is run
+	 * in Evaluator-Mode and this BlastResult is the best scoring of the 
+	 * Blast-Search-Result, it is obtained from.
 	 */
 	public void tokenizeForEvaluation() {
 		if (getSettings().getEvaluateOnlyValidTokens())

@@ -123,6 +123,9 @@ public class Settings implements Cloneable {
 	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
 	public static final String DESCRIPTION_GROUP_NAME = "description";
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
+	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
+	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
+	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary"; 
 	
 	/**
 	 * Fields:
@@ -155,7 +158,7 @@ public class Settings implements Cloneable {
 	 */
 	private Parameters parameters = new Parameters();
 	private Boolean writeTokenSetToOutput;
-	private Boolean writeBestBlastHitsToOutput;
+	private Boolean writeBestBlastHitsToOutput = false;
 	/**
 	 * Forces AHRD to write out all internal scores (Sum(Token-Scores),
 	 * Description- and Lexical-Scores, etc.
@@ -329,6 +332,18 @@ public class Settings implements Cloneable {
 	 * Is applied to all blast databases that don't have a token blacklist specified.
 	 */
 	private Set<String> defaultTokenBlacklist = new HashSet<String>();
+	/**
+	 * Triggers the calculation and output of the highest possible precision of descriptions and gene ontology terms.
+	 */
+	private boolean findHighestPossiblePrecision = false;
+	/**
+	 * Triggers the calculation and output of the highest possible recall of descriptions and gene ontology terms.
+	 */
+	private boolean findHighestPossibleRecall = false;
+	/**
+	 * Triggers the output of averages and coverages of all scores at the end of the evalution output
+	 */
+	private boolean writeEvaluationSummary = false;
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -346,6 +361,8 @@ public class Settings implements Cloneable {
 		} else {
 			this.setProteinsFastaRegex(DEFAULT_PROTEINS_FASTA_REGEX);
 		}
+		// If started to evaluate parameters or train the algorithm, ground truth descriptions are stored in this file:
+		setPathToGroundTruthFasta((String) input.get(GROUND_TRUTH_FASTA_KEY));
 		this.setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
 		this.setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
 		this.setPathToOutput((String) input.get(OUTPUT_KEY));
@@ -361,7 +378,10 @@ public class Settings implements Cloneable {
 			this.setGoTermScoreInformationContentWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_INFORMATION_CONTENT_WEIGHT)));
 		}
 		this.setWriteTokenSetToOutput(Boolean.parseBoolean((String) input.get(WRITE_TOKEN_SET_TO_OUTPUT)));
-		this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
+		// Writing best blast hits to output is only supported in evaluation mode. So otherwise the default 'false' will be kept.
+		if (isInEvaluationMode()) {
+			this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
+		}
 		this.setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
 		this.setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
 		if (input.get(BLAST_BLACKLIST_KEY) != null) {
@@ -390,9 +410,7 @@ public class Settings implements Cloneable {
 			this.getParameters().setDescriptionScoreBitScoreWeight(blastDatabaseName,
 					this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
 		}
-		// If started to train the algorithm ground truth descriptions are stored in this file:
-		setPathToGroundTruthFasta((String) input.get(GROUND_TRUTH_FASTA_KEY));
-		// If started in training-mode the F-Measure's Beta-Parameter can be set
+		// If started in evaluation-mode the F-Measure's Beta-Parameter can be set
 		// to some other value than 1.0
 		if (input.get(F_MEASURE_BETA_PARAM_KEY) != null)
 			this.fMeasureBetaParameter = Double.parseDouble((String) input.get(F_MEASURE_BETA_PARAM_KEY));
@@ -459,7 +477,9 @@ public class Settings implements Cloneable {
 			this.setSeqSimSearchTableBitScoreCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
 		}
-		this.setEvaluateOnlyValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_ONLY_VALID_TOKENS_KEY)));
+		if (input.get(EVALUATE_ONLY_VALID_TOKENS_KEY) != null) {
+			this.setEvaluateOnlyValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_ONLY_VALID_TOKENS_KEY)));
+		}
 		if (input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY) != null) {
 			this.setPathToGroundTruthDescriptionBlacklist(input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY).toString());
 			this.setGroundTruthDescriptionBlacklist(new HashSet<String>(fromFile(getPathToGroundTruthDescriptionBlacklist())));
@@ -468,9 +488,17 @@ public class Settings implements Cloneable {
 			this.setPathToGroundTruthDescriptionFilter(input.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY).toString());
 			this.setGroundTruthDescriptionFilter(fromFile(getPathToGroundTruthDescriptionFilter()));
 		}
+		// If the ground_truth_token_blacklist parameter is set the provided file will be used as blacklist for the ground truth tokens.
+		// Otherwise the evaluate_only_valid_tokens parameter is checked. If set to 'true' (its default) the defaultTokenBlacklist is used to filter the ground truth tokens.
+		// If evaluate_only_valid_tokens is set to 'false' the ground truth token black list remains empty,
+		// which will result in ALL ground truth tokens being used in the evaluation (so no filtering takes place).
 		if (input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY) != null) {
 			this.setPathToGroundTruthTokenBlacklist(input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY).toString());
 			this.setGroundTruthTokenBlacklist(new HashSet<String>(fromFile(getPathToGroundTruthTokenBlacklist())));
+		} else {
+			if (this.getEvaluateOnlyValidTokens()) {
+				this.setGroundTruthTokenBlacklist(this.getDefaultTokenBlacklist());
+			}
 		}
 		if (input.get(GROUND_TRUTH_FASTA_REGEX_KEY) != null) {
 			this.setGroundTruthFastaRegex(Pattern.compile((String) input.get(GROUND_TRUTH_FASTA_REGEX_KEY)));
@@ -511,6 +539,9 @@ public class Settings implements Cloneable {
 		if (input.get(INFORMATIVE_TOKEN_THRESHOLD) != null) {
 			this.setInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD)));
 		}
+		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
+		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
+		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
 	}
 
 	/**
@@ -835,7 +866,7 @@ public class Settings implements Cloneable {
 		this.pathToGroundTruthFasta = pathToGroundTruthFasta;
 	}
 
-	public boolean isInTrainingMode() {
+	public boolean isInEvaluationMode() {
 		return (getPathToGroundTruthFasta() != null && getPathToGroundTruthFasta() != "");
 	}
 
@@ -1281,5 +1312,29 @@ public class Settings implements Cloneable {
 
 	public void setSeqSimSearchTableQueryColRegex(Pattern seqSimSearchTableQueryColRegex) {
 		this.seqSimSearchTableQueryColRegex = seqSimSearchTableQueryColRegex;
+	}
+
+	public boolean doFindHighestPossiblePrecision() {
+		return findHighestPossiblePrecision;
+	}
+
+	public void setFindHighestPossiblePrecision(boolean findHighestPossiblePrecision) {
+		this.findHighestPossiblePrecision = findHighestPossiblePrecision;
+	}
+
+	public boolean doFindHighestPossibleRecall() {
+		return findHighestPossibleRecall;
+	}
+
+	public void setFindHighestPossibleRecall(boolean findHighestPossibleRecall) {
+		this.findHighestPossibleRecall = findHighestPossibleRecall;
+	}
+
+	public boolean doWriteEvaluationSummary() {
+		return writeEvaluationSummary;
+	}
+
+	public void setWriteEvaluationSummary(boolean writeEvaluationSummary) {
+		this.writeEvaluationSummary = writeEvaluationSummary;
 	}
 }

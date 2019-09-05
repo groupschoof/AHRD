@@ -76,6 +76,8 @@ public abstract class Trainer extends Evaluator {
 		Double avgPrecision = 0.0;
 		// average Recall (TPR):
 		Double avgRecall = 0.0;
+		// Number of proteins covert by prediction
+		Integer numberOfProts = 0;
 		// Evaluate GO annotations.
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			for (Protein p : getProteins().values()) {
@@ -83,19 +85,27 @@ public abstract class Trainer extends Evaluator {
 				if (e != null) {
 					//Depending on the settings the go annotation f-score with the highest level of complexity is used
 					if (getSettings().doCalculateSemSimGoF1Scores()) {
-						avgEvlScr += e.getSemSimGoAnnotationScore().getScore();
-						avgPrecision += e.getSemSimGoAnnotationScore().getPrecision();
-						avgRecall += e.getSemSimGoAnnotationScore().getRecall();
+						if (!e.getSemSimGoAnnotationScore().getScore().isNaN()) {
+							avgEvlScr += e.getSemSimGoAnnotationScore().getScore();
+							avgPrecision += e.getSemSimGoAnnotationScore().getPrecision();
+							avgRecall += e.getSemSimGoAnnotationScore().getRecall();
+							numberOfProts++;							
+						}
 					} else {
 						if (getSettings().doCalculateAncestryGoF1Scores()) {
-							avgEvlScr += e.getAncestryGoAnnotationScore().getScore();
-							avgPrecision += e.getAncestryGoAnnotationScore().getPrecision();
-							avgRecall += e.getAncestryGoAnnotationScore().getRecall();
+							if (!e.getAncestryGoAnnotationScore().getScore().isNaN()) {
+								avgEvlScr += e.getAncestryGoAnnotationScore().getScore();
+								avgPrecision += e.getAncestryGoAnnotationScore().getPrecision();
+								avgRecall += e.getAncestryGoAnnotationScore().getRecall();
+								numberOfProts++;
+							}
 						} else {
-							// getSettings().doCalculateSimpleGoF1Scores() Needs to be checked?
-							avgEvlScr += e.getSimpleGoAnnotationScore().getScore();
-							avgPrecision += e.getSimpleGoAnnotationScore().getPrecision();
-							avgRecall += e.getSimpleGoAnnotationScore().getRecall();
+							if (!e.getSimpleGoAnnotationScore().getScore().isNaN()) {
+								avgEvlScr += e.getSimpleGoAnnotationScore().getScore();
+								avgPrecision += e.getSimpleGoAnnotationScore().getPrecision();
+								avgRecall += e.getSimpleGoAnnotationScore().getRecall();
+								numberOfProts++;
+							}
 						}
 					}
 				}
@@ -103,17 +113,15 @@ public abstract class Trainer extends Evaluator {
 		} else { // Otherwise use HRD based scores
 			for (Protein p : getProteins().values()) {
 				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
-				if (e != null) {
-					if (e.getEvalutionScore() != null) {
+				if (e != null && e.getEvalutionScore() != null && !e.getEvalutionScore().getScore().isNaN()) {
 						avgEvlScr += e.getEvalutionScore().getScore();
 						avgPrecision += e.getEvalutionScore().getPrecision();
 						avgRecall += e.getEvalutionScore().getRecall();
-					}
+						numberOfProts++;
 				}
 			}
 		}
 		// average each number:
-		Double numberOfProts = new Double(getProteins().size());
 		if (avgEvlScr > 0.0)
 			avgEvlScr = avgEvlScr / numberOfProts;
 		if (avgPrecision > 0.0)
@@ -127,33 +135,45 @@ public abstract class Trainer extends Evaluator {
 	}
 
 	/**
-	 * This calculates the average maximum evaluation score AHRD could possibly
-	 * achieve.
+	 * This calculates the average maximum evaluation score AHRD could possibly achieve.
 	 */
 	public void calcAvgMaxEvaluationScore() {
 		double avgMaxEvlScr = 0.0; 		// init average maximum evaluation-score
+		Integer numberOfProts = 0;
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) { 		// Evaluate GO annotations.
 			for (Protein p : getProteins().values()) {
 				EvaluationScoreCalculator e = p.getEvaluationScoreCalculator();
 				e.findHighestPossibleGoScore();
 				//Depending on the settings the go annotation f-score with the highest level of complexity is used
 				if (getSettings().doCalculateSemSimGoF1Scores()) {
-					avgMaxEvlScr += e.getHighestPossibleSemSimGoAnnotationScore().getScore();
+					if (!e.getHighestPossibleSemSimGoAnnotationScore().getScore().isNaN()) {
+						avgMaxEvlScr += e.getHighestPossibleSemSimGoAnnotationScore().getScore();
+						numberOfProts++;
+					}
 				} else {
 					if (getSettings().doCalculateAncestryGoF1Scores()) {
-						avgMaxEvlScr += e.getHighestPossibleAncestryGoAnnotationScore().getScore();
+						if (!e.getHighestPossibleAncestryGoAnnotationScore().getScore().isNaN()) {
+							avgMaxEvlScr += e.getHighestPossibleAncestryGoAnnotationScore().getScore();
+							numberOfProts++;
+						}
 					} else {
-						avgMaxEvlScr += e.getHighestPossibleSimpleGoAnnotationScore().getScore();
+						if (!e.getHighestPossibleSimpleGoAnnotationScore().getScore().isNaN()) {
+							avgMaxEvlScr += e.getHighestPossibleSimpleGoAnnotationScore().getScore();
+							numberOfProts++;
+						}
 					}
 				}
 			}
 		} else { // Otherwise use HRD based scores
 			for (Protein prot : getProteins().values()) {
 				prot.getEvaluationScoreCalculator().findBlastResultWithHighestPossibleDescriptionScore();
-				avgMaxEvlScr += prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getScore();
+				if (!prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getScore().isNaN()) {
+					avgMaxEvlScr += prot.getEvaluationScoreCalculator().getHighestPossibleDescriptionScore().getScore();
+					numberOfProts++;
+				}
 			}
 		}
-		setAvgMaxEvaluationScore(avgMaxEvlScr / getProteins().size());		// calculate average
+		setAvgMaxEvaluationScore(avgMaxEvlScr / numberOfProts);		// calculate average
 	}
 
 	/**

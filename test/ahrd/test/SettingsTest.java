@@ -159,4 +159,12 @@ public class SettingsTest {
 				"Path through Parameter-Space should be remembered, but flag is set to FALSE.",
 				getSettings().rememberSimulatedAnnealingPath());
 	}
+	
+	@Test
+	public void testEvaluateOnlyValidTokens() {
+		assertTrue(
+				"The flag evaluateOnlyValidTokens should be set to TRUE by default, but it is set to FALSE.",
+				getSettings().getEvaluateOnlyValidTokens());
+	}
+	
 }

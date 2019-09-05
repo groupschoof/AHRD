@@ -203,7 +203,10 @@ See @./test/resources/evaluator_example_hrd.yml@ for more details.
 
 Parameters specific to the Evaluator function are:
 # @ground_truth_fasta: path_to_your_ground_truth.fasta@  _Required_ parameter pointing to the fasta formatted file containing the ground truth proteins _including_ the ground truth Human Readable Descriptions. (See @./test/resources/ground_truth.fasta@ for details.)
+# @evaluate_only_valid_tokens: true@ Description tokens are filtered by the appropriate blacklist before evaluation. Set to @false@ if all tokens are to be included in the calculation of the descriptions evaluation score.
 # @find_highest_possible_evaluation_score: false@ Set to @true@ if you want to see how the best fitting candidate description among the sequence similarity search hits performs. This gives you the theoretical best possible performance that can be achieved with the provided sequence similarity search results. In addition to the F-score itself the accession and description of the best performing candidate protein is written to the output as well. 
+# @find_highest_possible_precision: false@ If set to @true@ the highest precision of all candidate descriptions is included in the ouput for each query protein.
+# @find_highest_possible_recall: false@ If set to @true@ the highest recall of all candidate descriptions is included in the ouput for each query protein.
 # @write_scores_to_output: false@ Set to @true@ if you want to see all internal intermediate scores: Token-Scores, Lexical-Scores, and Description-Scores. Use with extreme caution, because this option is meant for developers _only_.
 # @write_best_blast_hits_to_output: false@ Set to @true@ if you want to see the respective best sequence similarity search Hits and their performances.
 # @f_measure_beta_parameter: 1.0@ This parameter is also used by AHRD-Trainer. See section "2.7":#27-parameter-optimization for details.
