@@ -57,7 +57,7 @@ public class Settings implements Cloneable {
 	public static final String GENE_ONTOLOGY_REFERENCE_KEY = "gene_ontology_reference";
 	public static final String OUTPUT_KEY = "output";
 	public static final String SIMULATED_ANNEALING_PATH_LOG_KEY = "path_log";
-	public static final String WRITE_SCORES_TO_OUTPUT = "write_scores_to_output";
+	public static final String WRITE_DESCIPTION_SUBSCORES_TO_OUTPUT = "write_description_subscores_to_output";
 	public static final String WRITE_BEST_BLAST_HITS_TO_OUTPUT = "write_best_blast_hits_to_output";
 	public static final String WRITE_TOKEN_SET_TO_OUTPUT = "write_token_set_to_output";
 	public static final String HRD_SCORES_OUTPUT_PATH = "hrd_scores_output";
@@ -162,7 +162,7 @@ public class Settings implements Cloneable {
 	 * Forces AHRD to write out all internal scores (Sum(Token-Scores),
 	 * Description- and Lexical-Scores, etc.
 	 */
-	private Boolean writeScoresToOutput;
+	private Boolean writeDescriptionSubScoresToOutputToOutput;
 	/**
 	 * F-Measure's Beta-Parameter as set in the input.yml or default 1.0
 	 */
@@ -384,7 +384,7 @@ public class Settings implements Cloneable {
 		if (isInEvaluationMode()) {
 			this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
 		}
-		this.setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
+		this.setWriteDesciptionSubScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_DESCIPTION_SUBSCORES_TO_OUTPUT)));
 		this.setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
 		if (input.get(BLAST_BLACKLIST_KEY) != null) {
 			this.setDefaultBlastResultsBlacklist(new HashSet<String>(fromFile((String) input.get(BLAST_BLACKLIST_KEY))));
@@ -832,12 +832,12 @@ public class Settings implements Cloneable {
 		this.writeBestBlastHitsToOutput = writeBestBlastHitsToOutput;
 	}
 
-	public Boolean getWriteScoresToOutput() {
-		return writeScoresToOutput;
+	public Boolean getWriteDescriptionSubScoresToOutput() {
+		return writeDescriptionSubScoresToOutputToOutput;
 	}
 
-	public void setWriteScoresToOutput(Boolean writeScoresToOutput) {
-		this.writeScoresToOutput = writeScoresToOutput;
+	public void setWriteDesciptionSubScoresToOutput(Boolean writeScoresToOutput) {
+		this.writeDescriptionSubScoresToOutputToOutput = writeScoresToOutput;
 	}
 
 	public Map<String, Map<String, String>> getBlastDbSettings() {

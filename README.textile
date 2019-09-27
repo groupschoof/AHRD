@@ -208,7 +208,7 @@ Parameters specific to the Evaluator function are:
 # @find_highest_possible_evaluation_score: false@ Set to @true@ if you want to see how the best fitting candidate description among the sequence similarity search hits performs. This gives you the theoretical best possible performance that can be achieved with the provided sequence similarity search results. In addition to the F-score itself the accession and description of the best performing candidate protein is written to the output as well. 
 # @find_highest_possible_precision: false@ If set to @true@ the highest precision of all candidate descriptions is included in the ouput for each query protein.
 # @find_highest_possible_recall: false@ If set to @true@ the highest recall of all candidate descriptions is included in the ouput for each query protein.
-# @write_scores_to_output: false@ Set to @true@ if you want to see all internal intermediate scores: Token-Scores, Lexical-Scores, and Description-Scores. Use with extreme caution, because this option is meant for developers _only_.
+# @write_description_subscores_to_output: false@ Set to @true@ if you want to see all internal intermediate scores: Sum(Token-Scores), TokenHighScore, Correction-Factor, Lexical-Score, RelativeBlastScore and DescriptionScore.
 # @write_best_blast_hits_to_output: false@ Set to @true@ if you want to see the respective best sequence similarity search Hits and their performances.
 # @f_measure_beta_parameter: 1.0@ This parameter is also used by AHRD-Trainer. See section "2.7":#27-parameter-optimization for details.
 # @write_fscore_details_to_output: false@ Set to @true@ to add Precision (ie. positive predictive value) and Recall (ie. true positive rate) to the output of all F-Scores.

@@ -4,7 +4,7 @@ ground_truth_go_annotations: ./test/resources/ground_truth_go_annotations.goa
 output: ./evaluator_output.tsv
 find_highest_possible_evaluation_score: true
 find_highest_possible_go_score: true
-write_scores_to_output: false
+write_description_subscores_to_output: false
 semsim_GO_f1_scores: true
 write_best_blast_hits_to_output: true
 f_measure_beta_parameter: 1.0

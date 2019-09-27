@@ -175,6 +175,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			coveragesLine += separator + (double)covEvalScoreMinBestCompScore/getProteins().size() + separator + (double)covEvaluationScorePrecision/getProteins().size() + separator + (double)covEvaluationScoreRecall/getProteins().size();
 		}
 		
+		if (getSettings().getWriteDescriptionSubScoresToOutput()) {
+			columnNamesLine += separator + "Sum(Token-Scores)" + separator + "TokenHighScore" + separator + "Correction-Factor" + separator + "Lexical-Score" + separator + "RelativeBlastScore" + separator + "DescriptionScore";
+			for (Protein prot : getProteins()) {
+				BlastResult highestScoringBlastResult = prot.getDescriptionScoreCalculator().getHighestScoringBlastResult();
+				// Found a high scoring description?
+				if (highestScoringBlastResult == null) {
+					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN");
+				} else {
+					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(prot.getTokenScoreCalculator().sumOfAllTokenScores(highestScoringBlastResult))); 
+					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(prot.getTokenScoreCalculator().getTokenHighScore()));
+					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(prot.getLexicalScoreCalculator().correctionFactor(highestScoringBlastResult)));
+					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(prot.getLexicalScoreCalculator().lexicalScore(highestScoringBlastResult)));
+					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(prot.getDescriptionScoreCalculator().relativeBlastScore(highestScoringBlastResult)));
+					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(highestScoringBlastResult.getDescriptionScore()));
+				}
+			}
+			averagesLine += separator + separator + separator + separator + separator + separator;
+			coveragesLine += separator + separator + separator + separator + separator + separator;
+		}
+		
 		// Best blast hits
 		if (getSettings().getWriteBestBlastHitsToOutput()) {
 			for (String blastDb : getSettings().getBlastDatabases()) {

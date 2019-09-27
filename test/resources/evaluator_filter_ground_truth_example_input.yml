@@ -5,7 +5,7 @@ ground_truth_description_filter: ./test/resources/filter_descline_sprot.txt
 ground_truth_token_blacklist: ./test/resources/blacklist_token.txt
 output: ./evaluator_output.tsv
 find_highest_possible_evaluation_score: true
-write_scores_to_output: false
+write_description_subscores_to_output: false
 write_best_blast_hits_to_output: true
 f_measure_beta_parameter: 1.0
 token_score_bit_score_weight: 0.468

@@ -29,7 +29,7 @@ token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
 write_token_set_to_output: false
 write_best_blast_hits_to_output: true
-write_scores_to_output: false
+write_description_subscores_to_output: false
 output: ./ahrd_output.csv
 ground_truth_fasta: ./test/resources/ground_truth.fasta
 remember_simulated_annealing_path: true
