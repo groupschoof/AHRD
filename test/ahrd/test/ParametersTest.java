@@ -40,10 +40,10 @@ public class ParametersTest {
 		for (int i = 0; i < 500; i++) {
 			inds.add(p.parameterToMutateRandomIndex());
 		}
-		assertEquals(9, inds.size());
-		// Parameter-Indices: 0..2 + 2 * 3 (#Blast-Databases) = 9
-		// Indices 0 to 8 should all be present:
-		for (int r = 0; r < 9; r++) {
+		assertEquals(10, inds.size());
+		// Parameter-Indices: 0..3 + 2 * 3 (#Blast-Databases) = 10
+		// Indices 0 to 9 should all be present:
+		for (int r = 0; r < 10; r++) {
 			assertTrue(
 					"Parameter-Index "
 							+ r
@@ -213,7 +213,7 @@ public class ParametersTest {
 						|| blastParamDiff);
 		// Extreme Score-Increase should result in mutation of the same
 		// parameter:
-		for (int paramInd = 0; paramInd < 9; paramInd++) {
+		for (int paramInd = 0; paramInd < 10; paramInd++) {
 			n.setLastMutatedParameter(paramInd);
 			Parameters n2 = n.neighbour(1.0);
 			assertEquals(
@@ -234,11 +234,15 @@ public class ParametersTest {
 						"TokenScoreOverlapScoreWeight should have been mutated.",
 						!n.getTokenScoreOverlapScoreWeight().equals(
 								n2.getTokenScoreOverlapScoreWeight()));
-			else if (paramInd > 2) {
+			else if (paramInd == 3)
+				assertTrue(
+						"DescriptionScoreThreshold should have been mutated.",
+						!n.getDescriptionScoreThreshold().equals(
+								n2.getDescriptionScoreThreshold()));
+			else if (paramInd > 3) {
 				String blastDbName = getSettings().getSortedBlastDatabases()
-						.get((new Double(Math.floor((paramInd - 3) / 2.0)))
-								.intValue());
-				boolean mutatedBlastDbWeight = ! (paramInd % 2 == 0);
+						.get((int) Math.floor((double) (paramInd - 4) / 2));
+				boolean mutatedBlastDbWeight = paramInd % 2 == 0;
 				if (mutatedBlastDbWeight)
 					assertTrue(
 							"BlastDatabaseWeight of db " + blastDbName
@@ -260,7 +264,7 @@ public class ParametersTest {
 	@Test
 	public void testClone() {
 		Parameters p = getSettings().getParameters();
-		p.setAvgEvaluationScore(0.8);
+		p.setAvgTrainingScore(0.8);
 		Parameters c = p.clone();
 		// test
 		assertTrue("A clone should not be it's 'parent'.", p != c);
@@ -286,21 +290,21 @@ public class ParametersTest {
 							.getDescriptionScoreBitScoreWeight(blastDb)) != System.identityHashCode(c
 							.getDescriptionScoreBitScoreWeight(blastDb)));
 		}
-		// Test passing on the average evaluation score:
-		assertEquals(p.getAvgEvaluationScore(), c.getAvgEvaluationScore(), 0.0);
+		// Test passing on the average training score:
+		assertEquals(p.getAvgTrainingScore(), c.getAvgTrainingScore(), 0.0);
 		// Assure they are different Objects. As the operator != does not reveal
 		// this, we set the clone to a different value than its parent:
-		c.setAvgEvaluationScore(0.7);
+		c.setAvgTrainingScore(0.7);
 		assertTrue(
 				"Cloning should result in the average evaluation scores being different Objects.",
-				p.getAvgEvaluationScore() != c.getAvgEvaluationScore());
+				p.getAvgTrainingScore() != c.getAvgTrainingScore());
 	}
 
 	@Test
 	public void testEqualityAndHashCode() {
 		Parameters p = getSettings().getParameters();
 		// Also test evaluation-scores:
-		p.setAvgEvaluationScore(100.00);
+		p.setAvgTrainingScore(100.00);
 		p.setAvgPrecision(0.5);
 		p.setAvgRecall(0.5);
 		Parameters c = p.clone();
@@ -311,8 +315,8 @@ public class ParametersTest {
 				"Equal Parameters should not be added to a mathematical Set twice.",
 				!h.add(c));
 		// Changing scores should still fulfill equality:
-		c.setAvgEvaluationScore(123.45);
-		assertTrue(!p.getAvgEvaluationScore().equals(c.getAvgEvaluationScore()));
+		c.setAvgTrainingScore(123.45);
+		assertTrue(!p.getAvgTrainingScore().equals(c.getAvgTrainingScore()));
 		assertTrue("Changing scores should still fulfill equality.",
 				p.equals(c));
 		// Change clone and check, if it is now unequal to parent:

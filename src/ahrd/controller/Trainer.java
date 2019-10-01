@@ -65,11 +65,11 @@ public abstract class Trainer extends Evaluator {
 	}
 
 	/**
-	 * Calculates the average of AHRD's EvaluationScore (objective-function).
+	 * Calculates the average of AHRD's Training-Score (objective-function).
 	 * If GO term scores have been computed the average is based upon them.
 	 * Otherwise the conventional HRD based scores are used.
 	 */
-	public void calcAveragesOfEvalScorePrecisionAndRecall() {
+	public void calcAveragesOfTrainingScorePrecisionAndRecall() {
 		// average evaluation-score
 		Double avgEvlScr = 0.0;
 		// average Precision (PPV):
@@ -128,8 +128,10 @@ public abstract class Trainer extends Evaluator {
 			avgPrecision = avgPrecision / numberOfProts;
 		if (avgRecall > 0.0)
 			avgRecall = avgRecall / numberOfProts;
+		// what's the coverage?
+		double coverage = (double) numberOfProts/getProteins().size();
 		// done:
-		getSettings().setAvgEvaluationScore(avgEvlScr);
+		getSettings().setAvgTrainingScore(avgEvlScr * coverage);
 		getSettings().setAvgPrecision(avgPrecision);
 		getSettings().setAvgRecall(avgRecall);
 	}
@@ -185,7 +187,7 @@ public abstract class Trainer extends Evaluator {
 	 */
 	protected void writeProteins(int iteration) throws IOException{
 		BufferedWriter outBufWrtr = new BufferedWriter(new FileWriter(iteration + ".tsv"));
-		outBufWrtr.write("#Generation\tAverage Evaluation-Score(F-Score)\tOrigin\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight");
+		outBufWrtr.write("#Generation\tAverage Training-Score(F-Score)\tOrigin\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight");
 		List<String> sortedBlastDatabases = new ArrayList<String>(getSettings().getBlastDatabases());
 		Collections.sort(sortedBlastDatabases);
 		for (String blastDb : sortedBlastDatabases) {
@@ -194,7 +196,7 @@ public abstract class Trainer extends Evaluator {
 		}
 		outBufWrtr.write("\n");
 		outBufWrtr.write("#" + iteration + "\t" 
-		+ getSettings().getAvgEvaluationScore() + "\t"
+		+ getSettings().getAvgTrainingScore() + "\t"
 		+ getSettings().getParameters().getOrigin() + "\t" 
 		+ getSettings().getTokenScoreBitScoreWeight() + "\t"
 		+ getSettings().getTokenScoreDatabaseScoreWeight() + "\t"

@@ -116,7 +116,7 @@ public class GeneticTrainer extends Trainer {
 			// Determine the fitness of each individual (parameter set) in the
 			// population
 			for (Parameters individual : population) {
-				if (individual.getAvgEvaluationScore() == null) {
+				if (individual.getAvgTrainingScore() == null) {
 					getSettings().setParameters(individual);
 					reinitializeBlastResults();
 					// Iterate over all Proteins and assign the best scoring Human
@@ -128,7 +128,7 @@ public class GeneticTrainer extends Trainer {
 					// Evaluate AHRD's performance for each Protein:
 					calculateEvaluationScores();
 					// Estimate average performance of current Parameters:
-					calcAveragesOfEvalScorePrecisionAndRecall();
+					calcAveragesOfTrainingScorePrecisionAndRecall();
 //					if(getSettings().getParameters().getOrigin().equals("seed")) {
 //						writeProteins(generation);
 //					}
@@ -174,10 +174,10 @@ public class GeneticTrainer extends Trainer {
 			// Remember the best parameter set and the generation it was found
 			// in
 			if (getBestParameters() != null) {
-				diffAvgEvalScoreToLastGeneration = fitnessRanking.last().getAvgEvaluationScore() - getBestParameters().getAvgEvaluationScore();
+				diffAvgEvalScoreToLastGeneration = fitnessRanking.last().getAvgTrainingScore() - getBestParameters().getAvgTrainingScore();
 			}
 			if (getBestParameters() == null
-					|| fitnessRanking.last().getAvgEvaluationScore() > getBestParameters().getAvgEvaluationScore()) {
+					|| fitnessRanking.last().getAvgTrainingScore() > getBestParameters().getAvgTrainingScore()) {
 				setBestParameters(fitnessRanking.last().clone());
 				setGenerationBestParametersWereFoundIn(generation);
 			}

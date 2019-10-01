@@ -877,12 +877,12 @@ public class Settings implements Cloneable {
 	}
 
 
-	public Double getAvgEvaluationScore() {
-		return getParameters().getAvgEvaluationScore();
+	public Double getAvgTrainingScore() {
+		return getParameters().getAvgTrainingScore();
 	}
 
-	public void setAvgEvaluationScore(Double avgEvaluationScore) {
-		this.getParameters().setAvgEvaluationScore(avgEvaluationScore);
+	public void setAvgTrainingScore(Double avgEvaluationScore) {
+		this.getParameters().setAvgTrainingScore(avgEvaluationScore);
 	}
 	
 	public Double getAvgPrecision() {
