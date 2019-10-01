@@ -6,6 +6,7 @@ import static ahrd.controller.Utils.randomMultipleOfOne;
 import static ahrd.controller.Utils.randomMultipleOfTen;
 import static ahrd.controller.Utils.randomSaveSubtract;
 import static ahrd.controller.Utils.roundToNDecimalPlaces;
+import static ahrd.controller.Utils.randomDoubleBetween;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +58,11 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 * generation.  
 	 */
 	private String origin;
+	/**
+	 * Limits the target selection to proteins above a certain description score
+	 * Values should be in the range of 1 to 20
+	 */
+	private Double descriptionScoreThreshold = 0.0d;
 	
 	/**
 	 * 
@@ -77,6 +83,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 					randomMultipleOfOne().toString());
 			out.setBlastDbWeight(blastDbName, randomMultipleOfTen().toString());
 		}
+		out.setDescriptionScoreThreshold(randomDoubleBetween(0, 20));
 		// Set origin for genetic training output
 		out.setOrigin("random");
 		return out;
@@ -111,7 +118,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	public int parameterToMutateRandomIndex() {
 		int randParamInd = 0;
 		// How many Parameters can be mutated?
-		int noOfParams = 3 + 2 * getBlastDatabases().size();
+		int noOfParams = 4 + 2 * getBlastDatabases().size();
 		// Randomly choose a parameter to change:
 		Random rand = Utils.random;
 		randParamInd = rand.nextInt(noOfParams);
@@ -156,7 +163,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 			randParamToMutate = parameterToMutateRandomIndex();
 		}
 		// Once a parameter is chosen by its index, mutate it:
-		if (randParamToMutate < 3) {
+		if (randParamToMutate < 4) {
 			// Mutate one of the four parameters independent of the number of
 			// Blast-Databases:
 			if (randParamToMutate == 0)
@@ -165,9 +172,12 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				ngb.mutateTokenScoreDatabaseScoreWeight();
 			else if (randParamToMutate == 2)
 				ngb.mutateTokenScoreOverlapScoreWeight();
+			else if (randParamToMutate == 3) {
+				ngb.mutateDescriptionScoreThreshold();
+			}
 		} else {
 			// Mutate a Parameter associated with a Blast-Database:
-			int indOfBlastDbToMutate = randParamToMutate - 3;
+			int indOfBlastDbToMutate = randParamToMutate - 4;
 			int blastDbIndex = (new Double(
 					Math.floor(indOfBlastDbToMutate / 2.0))).intValue();
 			String blastDbToMutate = getSettings().getSortedBlastDatabases()
@@ -187,6 +197,16 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		// Set origin for genetic training output
 		ngb.setOrigin("mutation");
 		return ngb;
+	}
+
+	private void mutateDescriptionScoreThreshold() {
+		Double descriptionScoreThreshold = getDescriptionScoreThreshold();
+		Double mutateBy = 10.0 * mutatePercentageBy();
+		if (randomSaveSubtract(descriptionScoreThreshold, mutateBy))
+			descriptionScoreThreshold -= mutateBy;
+		else
+			descriptionScoreThreshold += mutateBy;
+		setDescriptionScoreThreshold(descriptionScoreThreshold);
 	}
 
 	public String randomBlastDatabaseName() {
@@ -346,6 +366,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 			if(rand.nextBoolean())
 				offspring.setBlastDbWeight(blastDbName, partner.getBlastDbWeight(blastDbName).toString());
 		}
+		if(rand.nextBoolean())
+			offspring.setDescriptionScoreThreshold(partner.getDescriptionScoreThreshold());
 		offspring.normalizeTokenScoreWeights();
 		offspring.setAvgEvaluationScore(null);
 		offspring.setAvgPrecision(null);
@@ -396,12 +418,10 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 			}
 		}
 		return areBlastParamsEqual
-				&& ((Parameters) eql).getTokenScoreBitScoreWeight().equals(
-						this.getTokenScoreBitScoreWeight())
-				&& ((Parameters) eql).getTokenScoreDatabaseScoreWeight()
-						.equals(this.getTokenScoreDatabaseScoreWeight())
-				&& ((Parameters) eql).getTokenScoreOverlapScoreWeight().equals(
-						this.getTokenScoreOverlapScoreWeight());
+				&& ((Parameters) eql).getTokenScoreBitScoreWeight().equals(this.getTokenScoreBitScoreWeight())
+				&& ((Parameters) eql).getTokenScoreDatabaseScoreWeight().equals(this.getTokenScoreDatabaseScoreWeight())
+				&& ((Parameters) eql).getTokenScoreOverlapScoreWeight().equals(this.getTokenScoreOverlapScoreWeight())
+				&& ((Parameters) eql).getDescriptionScoreThreshold().equals(this.getDescriptionScoreThreshold());
 	}
 
 	@Override
@@ -414,7 +434,8 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		}
 		hashSrc += getTokenScoreBitScoreWeight()
 				+ getTokenScoreDatabaseScoreWeight()
-				+ getTokenScoreOverlapScoreWeight();
+				+ getTokenScoreOverlapScoreWeight()
+				+ getDescriptionScoreThreshold();
 		return hashSrc.hashCode();
 	}
 
@@ -550,6 +571,10 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				return -1;
 			if (this.getTokenScoreOverlapScoreWeight() > other.getTokenScoreOverlapScoreWeight())
 				return 1;
+			if (this.getDescriptionScoreThreshold() < other.getDescriptionScoreThreshold())
+				return -1;
+			if (this.getDescriptionScoreThreshold() > other.getDescriptionScoreThreshold())
+				return 1;
 			for (String blastDbName : getSettings().getSortedBlastDatabases()) {
 				if (this.getDescriptionScoreBitScoreWeight(blastDbName) < other.getDescriptionScoreBitScoreWeight(blastDbName))
 					return -1;
@@ -570,5 +595,13 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 
 	public void setOrigin(String origin) {
 		this.origin = origin;
+	}
+
+	public Double getDescriptionScoreThreshold() {
+		return descriptionScoreThreshold;
+	}
+
+	public void setDescriptionScoreThreshold(Double descriptionScoreThreshold) {
+		this.descriptionScoreThreshold = descriptionScoreThreshold;
 	}
 }

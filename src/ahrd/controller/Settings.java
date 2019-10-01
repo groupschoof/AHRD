@@ -124,7 +124,8 @@ public class Settings implements Cloneable {
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
 	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
 	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
-	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary"; 
+	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary";
+	public static final String DESCRIPTION_SCORE_THRESHOLD = "description_score_threshold";
 	
 	/**
 	 * Fields:
@@ -544,6 +545,9 @@ public class Settings implements Cloneable {
 		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
 		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
 		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
+		if (input.get(DESCRIPTION_SCORE_THRESHOLD) != null) {
+			this.setDescriptionScoreThreshold(Double.parseDouble((String) input.get(DESCRIPTION_SCORE_THRESHOLD)));
+		}
 	}
 
 	/**
@@ -1330,5 +1334,13 @@ public class Settings implements Cloneable {
 
 	public void setWriteEvaluationSummary(boolean writeEvaluationSummary) {
 		this.writeEvaluationSummary = writeEvaluationSummary;
+	}
+
+	public double getDescriptionScoreThreshold() {
+		return this.getParameters().getDescriptionScoreThreshold();
+	}
+
+	public void setDescriptionScoreThreshold(double descriptionScoreThreshold) {
+		this.getParameters().setDescriptionScoreThreshold(descriptionScoreThreshold);
 	}
 }

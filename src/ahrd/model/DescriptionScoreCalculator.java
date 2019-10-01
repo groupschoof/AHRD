@@ -82,9 +82,9 @@ public class DescriptionScoreCalculator {
 		for (String blastDb : getProtein().getBlastResults().keySet()) {
 			for (BlastResult iterBlastResult : getProtein().getBlastResults().get(blastDb)) {
 				getProtein().getDescriptionScoreCalculator().calcDescriptionScore(iterBlastResult);
-				// Only take Description-Lines into account
-				// that have at least a single non-blacklisted Token:
-				if (iterBlastResult.getTokens().size() > 0) {
+				// Only take Description-Lines into account that have at least a single non-blacklisted Token
+				// and a description score above the threshold.
+				if (iterBlastResult.getTokens().size() > 0 && iterBlastResult.getDescriptionScore() > getSettings().getDescriptionScoreThreshold()) {
 					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
 					if (databaseGoAnnotations != null && !databaseGoAnnotations.isEmpty()
 							&& databaseGoAnnotations.containsKey(iterBlastResult.getShortAccession())

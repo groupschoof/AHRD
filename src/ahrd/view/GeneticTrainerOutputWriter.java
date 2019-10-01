@@ -24,6 +24,7 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 			hdr += "\t" + blastDb + "-Weight";
 			hdr += "\t" + blastDb + "-Description-Score-Bit-Score-Weight";
 		}
+		hdr += "\tDescription-Score-Threshold";
 		hdr += "\n";
 		return hdr;
 	}
@@ -49,6 +50,7 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 			col += "\t"
 					+ FRMT.format(p.getDescriptionScoreBitScoreWeight(blastDb));
 		}
+		col += "\t" + FRMT.format(p.getDescriptionScoreThreshold());
 		col += "\n";
 		return col;
 	}
@@ -65,6 +67,7 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 			col += "\t" + s.getBlastDbWeight(blastDb);
 			col += "\t" + s.getDescriptionScoreBitScoreWeight(blastDb);
 		}
+		col += "\t" + s.getDescriptionScoreThreshold();
 		col += "\n";
 		return col;
 	}
