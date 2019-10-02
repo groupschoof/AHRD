@@ -41,7 +41,7 @@ public class SimulatedAnnealingTrainerTest {
 	}
 
 	@Test
-	public void testAvgEvaluationScore() {
+	public void testAvgTrainingScore() {
 		assertTrue("SimulatedAnnealingTrainer should initialize Settings to Evaluation-Mode.",
 				getSettings().isInEvaluationMode());
 		Protein p1 = new Protein("protein_one", 200);
@@ -59,8 +59,8 @@ public class SimulatedAnnealingTrainerTest {
 		this.trainer.getProteins().put(p3.getAccession(), p3);
 		// test
 		trainer.calcAveragesOfTrainingScorePrecisionAndRecall();
-		// (1.0 + 0.8 + 0.3) / 3 = 0.7
-		assertEquals(0.7, getSettings().getAvgTrainingScore(), 0.000000000001);
+		// [(1.0 + 0.8 + 0.3) / 3 = 0.7] actually 0.7446808510638299 because of the incorporation of the coverage (=1)
+		assertEquals(0.7446808510638299, getSettings().getAvgTrainingScore(), 0.000000000001);
 		// (0.6 + 0.7 + 0.5) / 3 = 0.6
 		assertEquals(0.6, getSettings().getAvgRecall(),
 				0.000000000001);
@@ -69,7 +69,7 @@ public class SimulatedAnnealingTrainerTest {
 			p.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.0);
 		}
 		trainer.calcAveragesOfTrainingScorePrecisionAndRecall();
-		assertEquals(getSettings().getAvgTrainingScore(), 0.7, 0.00000000001);
+		assertEquals(getSettings().getAvgTrainingScore(), 0.7446808510638299, 0.00000000001);
 	}
 
 	@Test

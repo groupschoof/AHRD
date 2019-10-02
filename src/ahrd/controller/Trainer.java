@@ -131,7 +131,13 @@ public abstract class Trainer extends Evaluator {
 		// what's the coverage?
 		double coverage = (double) numberOfProts/getProteins().size();
 		// done:
-		getSettings().setAvgTrainingScore(avgEvlScr * coverage);
+		double b = 0.5d;
+		double bSqr = b*b;
+		if (Double.isNaN((1 + bSqr) * (avgEvlScr * coverage) / (bSqr * avgEvlScr + coverage))) {
+			getSettings().setAvgTrainingScore(0.0d);
+		} else {
+			getSettings().setAvgTrainingScore((1 + bSqr) * (avgEvlScr * coverage) / (bSqr * avgEvlScr + coverage));
+		}
 		getSettings().setAvgPrecision(avgPrecision);
 		getSettings().setAvgRecall(avgRecall);
 	}
