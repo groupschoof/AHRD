@@ -20,9 +20,12 @@ import java.util.Set;
  * wrapped in a distinct class from Settings in order to enable random
  * generation and scoring of these parameters.
  * 
- * @author Kathrin Klee, Asis Hallab
+ * @author Kathrin Klee, Asis Hallab, Florian Boecker
  */
 public class Parameters implements Cloneable, Comparable<Parameters> {
+	
+	private static final int numberOfDataBaseIndependantParameters = 4;
+	private static final int numberOfParametersPerDataBase = 2;
 
 	private Double tokenScoreBitScoreWeight;
 	private Double tokenScoreDatabaseScoreWeight;
@@ -118,7 +121,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	public int parameterToMutateRandomIndex() {
 		int randParamInd = 0;
 		// How many Parameters can be mutated?
-		int noOfParams = 4 + 2 * getBlastDatabases().size();
+		int noOfParams = numberOfDataBaseIndependantParameters + numberOfParametersPerDataBase * getBlastDatabases().size();
 		// Randomly choose a parameter to change:
 		Random rand = Utils.random;
 		randParamInd = rand.nextInt(noOfParams);
@@ -133,37 +136,35 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 * <li>Token-Score-Bit-Score-Weight</li>
 	 * <li>Token-Score-Database-Score-Weight</li>
 	 * <li>Token-Score-Overlap-Score-Weight</li>
-	 * <li>Blast-Database-Weight</li>
-	 * <li>Description-Score-Bit-Score-Weight (different for each
-	 * Blast-Database)</li>
-	 * <li>Description-Score-Relative-Description-Frequency-Weight</li>
+	 * <li>Blast-Database-Weight (different for each Blast-Database)</li>
+	 * <li>Description-Score-Bit-Score-Weight (different for each Blast-Database)</li>
 	 * </ul>
 	 * 
 	 * @NOTE: The three <em>Token-Score-Weights</em> <strong>must</strong> sum
 	 *        up to 1.
 	 * 
 	 * @param Double
-	 *            diffEvalScoreToLastEvaluatedParams - To increase probability
+	 *            diffTrainingScoreToLastEvaluatedParams - To increase probability
 	 *            to perform 'hill climbing' during optimization, a good
 	 *            increase in training score increases likelihood to mutate
 	 *            the last mutated parameter again.
 	 * @return clone of this instance with one of the above mentioned parameters
 	 *         <em>slightly</em> changed.
 	 */
-	public Parameters neighbour(Double diffEvalScoreToLastEvaluatedParams) {
+	public Parameters neighbour(Double diffTrainingScoreToLastEvaluatedParams) {
 		Parameters ngb = this.clone();
 		// Randomly decide to mutate the same parameter again, if last mutation
 		// resulted in an increase of score:
 		Integer randParamToMutate = getLastMutatedParameter();
-		if (!(diffEvalScoreToLastEvaluatedParams != null
-				&& diffEvalScoreToLastEvaluatedParams > 0.0
-				&& randParamToMutate != null && Utils.random.nextDouble() <= pMutateSameParameter(diffEvalScoreToLastEvaluatedParams))) {
+		if (!(diffTrainingScoreToLastEvaluatedParams != null
+				&& diffTrainingScoreToLastEvaluatedParams > 0.0
+				&& randParamToMutate != null && Utils.random.nextDouble() <= pMutateSameParameter(diffTrainingScoreToLastEvaluatedParams))) {
 			// Do not mutate the same parameter again, but randomly choose one
 			// to change:
 			randParamToMutate = parameterToMutateRandomIndex();
 		}
 		// Once a parameter is chosen by its index, mutate it:
-		if (randParamToMutate < 4) {
+		if (randParamToMutate < numberOfDataBaseIndependantParameters) {
 			// Mutate one of the four parameters independent of the number of
 			// Blast-Databases:
 			if (randParamToMutate == 0)
@@ -177,16 +178,17 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 			}
 		} else {
 			// Mutate a Parameter associated with a Blast-Database:
-			int indOfBlastDbToMutate = randParamToMutate - 4;
-			int blastDbIndex = (new Double(
-					Math.floor(indOfBlastDbToMutate / 2.0))).intValue();
-			String blastDbToMutate = getSettings().getSortedBlastDatabases()
-					.get(blastDbIndex);
-			boolean mutateWeight = (indOfBlastDbToMutate % 2 == 0);
-			if (mutateWeight)
+			int indexOfBlastDbParameterToMutate = randParamToMutate - numberOfDataBaseIndependantParameters;
+			int blastDbIndex = (int) Math.floor((double) indexOfBlastDbParameterToMutate / numberOfParametersPerDataBase);
+			String blastDbToMutate = getSettings().getSortedBlastDatabases().get(blastDbIndex);
+			switch (indexOfBlastDbParameterToMutate % numberOfParametersPerDataBase) {
+			case 0:
 				ngb.mutateBlastDatabaseWeight(blastDbToMutate);
-			else
+				break;
+			case 1:
 				ngb.mutateDescriptionScoreBitScoreWeight(blastDbToMutate);
+				break;
+			}
 		}
 		// Remember what made the neighbor different from its parent:
 		ngb.setLastMutatedParameter(randParamToMutate);
@@ -603,5 +605,13 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 
 	public void setDescriptionScoreThreshold(Double descriptionScoreThreshold) {
 		this.descriptionScoreThreshold = descriptionScoreThreshold;
+	}
+
+	public static int getNumberOfDataBaseIndependantParameters() {
+		return numberOfDataBaseIndependantParameters;
+	}
+
+	public static int getNumberOfParametersPerDataBase() {
+		return numberOfParametersPerDataBase;
 	}
 }
