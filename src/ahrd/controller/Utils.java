@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Provides globally used utility-methods. E.g. for reading files or creating
@@ -78,6 +79,10 @@ public class Utils {
 	public static Long randomMultipleOfTen() {
 		Random rand = Utils.random;
 		return new Long((rand.nextInt(10) + 1) * 10);
+	}
+	
+	public static double randomDoubleBetween(double min, double max) {
+		return ThreadLocalRandom.current().nextDouble(min, max);
 	}
 
 	public static boolean randomTrueOrFalse() {

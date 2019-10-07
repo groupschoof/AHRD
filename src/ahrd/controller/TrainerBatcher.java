@@ -176,10 +176,10 @@ public class TrainerBatcher extends Batcher {
 
 		// Append Description-related scores?
 		String appendDescScores = (String) getInput().get(
-				Settings.WRITE_SCORES_TO_OUTPUT);
+				Settings.WRITE_DESCIPTION_SUBSCORES_TO_OUTPUT);
 
 		if (appendDescScores != null && new Boolean(appendDescScores)) {
-			batchYml.put(Settings.WRITE_SCORES_TO_OUTPUT, true);
+			batchYml.put(Settings.WRITE_DESCIPTION_SUBSCORES_TO_OUTPUT, true);
 		}
 
 		// Pass on simulated annealing parameters, if any are given:

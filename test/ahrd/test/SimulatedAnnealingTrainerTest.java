@@ -41,7 +41,7 @@ public class SimulatedAnnealingTrainerTest {
 	}
 
 	@Test
-	public void testAvgEvaluationScore() {
+	public void testAvgTrainingScore() {
 		assertTrue("SimulatedAnnealingTrainer should initialize Settings to Evaluation-Mode.",
 				getSettings().isInEvaluationMode());
 		Protein p1 = new Protein("protein_one", 200);
@@ -58,9 +58,9 @@ public class SimulatedAnnealingTrainerTest {
 		this.trainer.getProteins().put(p2.getAccession(), p2);
 		this.trainer.getProteins().put(p3.getAccession(), p3);
 		// test
-		trainer.calcAveragesOfEvalScorePrecisionAndRecall();
-		// (1.0 + 0.8 + 0.3) / 3 = 0.7
-		assertEquals(0.7, getSettings().getAvgEvaluationScore(), 0.000000000001);
+		trainer.calcAveragesOfTrainingScorePrecisionAndRecall();
+		// [(1.0 + 0.8 + 0.3) / 3 = 0.7] actually 0.7446808510638299 because of the incorporation of the coverage (=1)
+		assertEquals(0.7446808510638299, getSettings().getAvgTrainingScore(), 0.000000000001);
 		// (0.6 + 0.7 + 0.5) / 3 = 0.6
 		assertEquals(0.6, getSettings().getAvgRecall(),
 				0.000000000001);
@@ -68,8 +68,8 @@ public class SimulatedAnnealingTrainerTest {
 		for (Protein p : trainer.getProteins().values()) {
 			p.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.0);
 		}
-		trainer.calcAveragesOfEvalScorePrecisionAndRecall();
-		assertEquals(getSettings().getAvgEvaluationScore(), 0.7, 0.00000000001);
+		trainer.calcAveragesOfTrainingScorePrecisionAndRecall();
+		assertEquals(getSettings().getAvgTrainingScore(), 0.7446808510638299, 0.00000000001);
 	}
 
 	@Test
@@ -86,7 +86,7 @@ public class SimulatedAnnealingTrainerTest {
 		assertNotNull(clone);
 		// Scores should be equal:
 		assertNotNull("Avg EvaluationScore should be remembered.",
-				clone.getAvgEvaluationScore());
+				clone.getAvgTrainingScore());
 		assertNotNull("Avg Precision (PPV) should be remembered.",
 				clone.getAvgPrecision());
 		assertNotNull("Avg Recall (TPR) should be remembered.",
@@ -95,7 +95,7 @@ public class SimulatedAnnealingTrainerTest {
 
 	@Test
 	public void testAcceptanceProbability() {
-		getSettings().setAvgEvaluationScore(0.5);
+		getSettings().setAvgTrainingScore(0.5);
 		getSettings().setOptimizationAcceptanceProbabilityScalingFactor(
 				new Double(200000000));
 		getSettings().setTemperature(1000);
@@ -103,11 +103,11 @@ public class SimulatedAnnealingTrainerTest {
 		assertEquals(1.0, trainer.acceptanceProbability(), 0.0);
 		// test current Settings better than accepted:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		getSettings().setAvgEvaluationScore(1.0);
+		getSettings().setAvgTrainingScore(1.0);
 		assertEquals(1.0, trainer.acceptanceProbability(), 0.0);
 		// test current Settings worse than accepted ones:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		getSettings().setAvgEvaluationScore(0.9999741);
+		getSettings().setAvgTrainingScore(0.9999741);
 		// 0.9999741 - 1.0 = -2.59 * 10^-5
 		assertEquals(-0.0000259,
 				trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.00000001);
@@ -120,7 +120,7 @@ public class SimulatedAnnealingTrainerTest {
 
 	@Test
 	public void testDiffEvalScoreToCurrentlyAcceptedParams() {
-		getSettings().setAvgEvaluationScore(0.5);
+		getSettings().setAvgTrainingScore(0.5);
 		// test first iteration, when accepted Settings are null:
 		assertEquals(0.0, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
 		// test current Settings equal well performing than accepted ones:
@@ -128,12 +128,12 @@ public class SimulatedAnnealingTrainerTest {
 		assertEquals(0.0, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
 		// test current Settings better than accepted:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		getSettings().setAvgEvaluationScore(1.0);
+		getSettings().setAvgTrainingScore(1.0);
 		assertEquals(0.5, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
 		// test current Settings worse than accepted ones:
 		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		trainer.getAcceptedParameters().setAvgEvaluationScore(0.5);
-		getSettings().setAvgEvaluationScore(0.25);
+		trainer.getAcceptedParameters().setAvgTrainingScore(0.5);
+		getSettings().setAvgTrainingScore(0.25);
 		// 0.25 - 0.5 = -0.25
 		assertEquals(-0.25, trainer.diffEvalScoreToCurrentlyAcceptedParams(),
 				0.0);
@@ -151,7 +151,7 @@ public class SimulatedAnnealingTrainerTest {
 
 	@Test
 	public void testAcceptOrRejectParameters() {
-		getSettings().setAvgEvaluationScore(0.5);
+		getSettings().setAvgTrainingScore(0.5);
 		int a = this.trainer.acceptOrRejectParameters();
 		assertEquals(getSettings().getParameters(),
 				this.trainer.getAcceptedParameters());
@@ -159,7 +159,7 @@ public class SimulatedAnnealingTrainerTest {
 				"The currently evaluated Settings were the first and thus must have been accepted with probability 1.0. Returned int should thus be 3.",
 				3, a);
 		this.trainer.initNeighbouringSettings();
-		getSettings().setAvgEvaluationScore(0.75);
+		getSettings().setAvgTrainingScore(0.75);
 		assertTrue(
 				"Before calling trainer.acceptOrRejectParameters() accepted Parameters should NOT equal currently evaluated set of Parameters.",
 				!getSettings().getParameters().equals(
@@ -178,9 +178,9 @@ public class SimulatedAnnealingTrainerTest {
 				new Double(1500000));
 		Set<Integer> as = new HashSet<Integer>();
 		for (int i = 0; i < 50; i++) {
-			this.trainer.getAcceptedParameters().setAvgEvaluationScore(0.75);
+			this.trainer.getAcceptedParameters().setAvgTrainingScore(0.75);
 			this.trainer.initNeighbouringSettings();
-			getSettings().setAvgEvaluationScore(0.74538);
+			getSettings().setAvgTrainingScore(0.74538);
 			assertTrue(
 					"Before calling trainer.acceptOrRejectParameters() accepted Parameters should NOT equal currently evaluated set of Parameters.",
 					!getSettings().getParameters().equals(

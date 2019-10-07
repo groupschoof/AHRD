@@ -2,7 +2,7 @@ proteins_fasta: ./test/resources/proteins.fasta
 ground_truth_fasta: ./test/resources/ground_truth.fasta
 output: ./evaluator_output.tsv
 find_highest_possible_evaluation_score: true
-write_scores_to_output: false
+write_description_subscores_to_output: false
 write_best_blast_hits_to_output: true
 f_measure_beta_parameter: 1.0
 blacklist: ./test/resources/blacklist_descline.txt

@@ -353,7 +353,7 @@ public class AHRD {
 					double lexicalScore = correctionFactor * sumGoTermScores / goTermHighScore;
 					double relativeBlastScore = getSettings().getDescriptionScoreBitScoreWeight(blastDbName) * blastResult.getBitScore() / maxBitScore;
 					double goAnnotationScore = lexicalScore + relativeBlastScore;
-					if (goAnnotationScore > goAnnotationTopScore) {
+					if (goAnnotationScore > goAnnotationTopScore && goAnnotationScore > getSettings().getDescriptionScoreThreshold()) {
 						goAnnotationTopScore = goAnnotationScore;
 						highestScoringBlastResult = blastResult;
 					}

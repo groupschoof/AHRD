@@ -42,7 +42,7 @@ public class TrainerOutputWriter {
 		String hdr = "Temperature\t";
 		if (isFinalOutput)
 			hdr += "Average Maximum-Evaluation-Score\t";
-		hdr += "Average Evaluation-Score(F-Score)";
+		hdr += "Average Training-Score";
 		if (!isFinalOutput)
 			hdr += "\tDiff-to-curr-Accepted\tAccepted";
 		hdr += "\tAverage Precision\tAverage Recall\tToken-Score-Bit-Score-Weight\tToken-Score-Database-Score-Weight\tToken-Score-Overlap-Score-Weight\tInformative-Token-Threshold";
@@ -89,7 +89,7 @@ public class TrainerOutputWriter {
 	public String settingsRow(Settings s,
 			double diffAvgEvalScoreToCurrAccepted, int accepted) {
 		String col = s.getTemperature().toString() + "\t"
-				+ s.getAvgEvaluationScore() + "\t"
+				+ s.getAvgTrainingScore() + "\t"
 				+ diffAvgEvalScoreToCurrAccepted + "\t" + accepted + "\t"
 				+ FRMT.format(s.getAvgPrecision()) + "\t"
 				+ FRMT.format(s.getAvgRecall()) + "\t"
@@ -109,7 +109,7 @@ public class TrainerOutputWriter {
 	public String finalSettingsRow(Settings s, Integer sFoundAtTemp,
 			Double avgMaxEvalScore) {
 		String col = sFoundAtTemp + "\t" + avgMaxEvalScore + "\t"
-				+ s.getAvgEvaluationScore() + "\t"
+				+ s.getAvgTrainingScore() + "\t"
 				+ FRMT.format(s.getAvgPrecision()) + "\t"
 				+ FRMT.format(s.getAvgRecall()) + "\t"
 				+ FRMT.format(s.getTokenScoreBitScoreWeight()) + "\t"

@@ -109,7 +109,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 				// Evaluate AHRD's performance for each Protein:
 				calculateEvaluationScores();
 				// Estimate average performance of current Parameters:
-				calcAveragesOfEvalScorePrecisionAndRecall();
+				calcAveragesOfTrainingScorePrecisionAndRecall();
 			}
 			// Breaking a little bit with the pure simulated annealing
 			// algorithm, we remember the best performing Parameters:
@@ -119,7 +119,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 			if (getSettings().rememberSimulatedAnnealingPath())
 				getTestedParameters()
 						.add(getSettings().getParameters().clone());
-			// Remember difference in avg. evaluation-scores, *before* accepting
+			// Remember difference in avg. training-scores, *before* accepting
 			// or rejecting current Parameters:
 			Double diffScores = diffEvalScoreToCurrentlyAcceptedParams();
 			// Initialize the next iteration.
@@ -137,14 +137,14 @@ public class SimulatedAnnealingTrainer extends Trainer {
 	}
 
 	/**
-	 * Each iteration the average evaluation-score is compared with the latest
+	 * Each iteration the average training-score is compared with the latest
 	 * far high-score. If the current Settings Score is better, it will become
 	 * the high-score.
 	 */
 	public void findBestSettings() {
 		if (getBestParameters() == null
-				|| getSettings().getAvgEvaluationScore() > getBestParameters()
-						.getAvgEvaluationScore()) {
+				|| getSettings().getAvgTrainingScore() > getBestParameters()
+						.getAvgTrainingScore()) {
 			setBestParameters(getSettings().getParameters().clone());
 			setBestParametersFoundAtTemperature(getSettings().getTemperature());
 		}
@@ -163,8 +163,8 @@ public class SimulatedAnnealingTrainer extends Trainer {
 
 	public Double diffEvalScoreToCurrentlyAcceptedParams() {
 		return (getAcceptedParameters() != null) ? getSettings()
-				.getAvgEvaluationScore()
-				- getAcceptedParameters().getAvgEvaluationScore() : 0.0;
+				.getAvgTrainingScore()
+				- getAcceptedParameters().getAvgTrainingScore() : 0.0;
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 		// current Temperature:
 		if (getAcceptedParameters() != null
 				&& diffEvalScoreToCurrentlyAcceptedParams() < 0.0) {
-			// In this case the difference in avg. evaluation scores of current
+			// In this case the difference in avg. training scores of current
 			// to accepted parameters is always NEGATIVE.
 			// Hence the following formula can be written as:
 			// p := exp((delta.scores*sf)/T.curr), where delta.score is a
@@ -228,8 +228,8 @@ public class SimulatedAnnealingTrainer extends Trainer {
 		double acceptCurrSettingsProb = acceptanceProbability();
 		if (acceptCurrSettingsProb == 1.0) {
 			if (getAcceptedParameters() == null
-					|| getAcceptedParameters().getAvgEvaluationScore() < getSettings()
-							.getAvgEvaluationScore()) {
+					|| getAcceptedParameters().getAvgTrainingScore() < getSettings()
+							.getAvgTrainingScore()) {
 				accepted = 3; // Accepted better performing parameters
 			} else {
 				accepted = 2; // Accepted equally well performing parameters

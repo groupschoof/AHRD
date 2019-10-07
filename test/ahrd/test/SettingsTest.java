@@ -102,7 +102,7 @@ public class SettingsTest {
 	@Test
 	public void testClone() {
 		Settings s = getSettings();
-		s.setAvgEvaluationScore(0.8);
+		s.setAvgTrainingScore(0.8);
 		Settings c = s.clone();
 		// test
 		assertTrue("A clone should not be it's 'parent'.", s != c);
@@ -129,13 +129,13 @@ public class SettingsTest {
 							.getDescriptionScoreBitScoreWeight(blastDb)));
 		}
 		// Test passing on the average evaluation score:
-		assertEquals(s.getAvgEvaluationScore(), c.getAvgEvaluationScore(), 0.0);
+		assertEquals(s.getAvgTrainingScore(), c.getAvgTrainingScore(), 0.0);
 		// Assure they are different Objects. As the operator != does not reveal
 		// this, we set the clone to a different value than its parent:
-		c.setAvgEvaluationScore(0.7);
+		c.setAvgTrainingScore(0.7);
 		assertTrue(
 				"Cloning should result in the average evaluation scores being different Objects.",
-				s.getAvgEvaluationScore() != c.getAvgEvaluationScore());
+				s.getAvgTrainingScore() != c.getAvgTrainingScore());
 	}
 
 	@Test

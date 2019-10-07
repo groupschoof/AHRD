@@ -57,7 +57,7 @@ public class Settings implements Cloneable {
 	public static final String GENE_ONTOLOGY_REFERENCE_KEY = "gene_ontology_reference";
 	public static final String OUTPUT_KEY = "output";
 	public static final String SIMULATED_ANNEALING_PATH_LOG_KEY = "path_log";
-	public static final String WRITE_SCORES_TO_OUTPUT = "write_scores_to_output";
+	public static final String WRITE_DESCIPTION_SUBSCORES_TO_OUTPUT = "write_description_subscores_to_output";
 	public static final String WRITE_BEST_BLAST_HITS_TO_OUTPUT = "write_best_blast_hits_to_output";
 	public static final String WRITE_TOKEN_SET_TO_OUTPUT = "write_token_set_to_output";
 	public static final String HRD_SCORES_OUTPUT_PATH = "hrd_scores_output";
@@ -125,7 +125,8 @@ public class Settings implements Cloneable {
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
 	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
 	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
-	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary"; 
+	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary";
+	public static final String DESCRIPTION_SCORE_THRESHOLD = "description_score_threshold";
 	
 	/**
 	 * Fields:
@@ -163,7 +164,7 @@ public class Settings implements Cloneable {
 	 * Forces AHRD to write out all internal scores (Sum(Token-Scores),
 	 * Description- and Lexical-Scores, etc.
 	 */
-	private Boolean writeScoresToOutput;
+	private Boolean writeDescriptionSubScoresToOutputToOutput;
 	/**
 	 * F-Measure's Beta-Parameter as set in the input.yml or default 1.0
 	 */
@@ -382,7 +383,7 @@ public class Settings implements Cloneable {
 		if (isInEvaluationMode()) {
 			this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
 		}
-		this.setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
+		this.setWriteDesciptionSubScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_DESCIPTION_SUBSCORES_TO_OUTPUT)));
 		this.setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
 		if (input.get(BLAST_BLACKLIST_KEY) != null) {
 			this.setDefaultBlastResultsBlacklist(new HashSet<String>(fromFile((String) input.get(BLAST_BLACKLIST_KEY))));
@@ -542,6 +543,9 @@ public class Settings implements Cloneable {
 		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
 		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
 		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
+		if (input.get(DESCRIPTION_SCORE_THRESHOLD) != null) {
+			this.setDescriptionScoreThreshold(Double.parseDouble((String) input.get(DESCRIPTION_SCORE_THRESHOLD)));
+		}
 	}
 
 	/**
@@ -846,12 +850,12 @@ public class Settings implements Cloneable {
 		this.writeBestBlastHitsToOutput = writeBestBlastHitsToOutput;
 	}
 
-	public Boolean getWriteScoresToOutput() {
-		return writeScoresToOutput;
+	public Boolean getWriteDescriptionSubScoresToOutput() {
+		return writeDescriptionSubScoresToOutputToOutput;
 	}
 
-	public void setWriteScoresToOutput(Boolean writeScoresToOutput) {
-		this.writeScoresToOutput = writeScoresToOutput;
+	public void setWriteDesciptionSubScoresToOutput(Boolean writeScoresToOutput) {
+		this.writeDescriptionSubScoresToOutputToOutput = writeScoresToOutput;
 	}
 
 	public Map<String, Map<String, String>> getBlastDbSettings() {
@@ -887,12 +891,12 @@ public class Settings implements Cloneable {
 	}
 
 
-	public Double getAvgEvaluationScore() {
-		return getParameters().getAvgEvaluationScore();
+	public Double getAvgTrainingScore() {
+		return getParameters().getAvgTrainingScore();
 	}
 
-	public void setAvgEvaluationScore(Double avgEvaluationScore) {
-		this.getParameters().setAvgEvaluationScore(avgEvaluationScore);
+	public void setAvgTrainingScore(Double avgEvaluationScore) {
+		this.getParameters().setAvgTrainingScore(avgEvaluationScore);
 	}
 	
 	public Double getAvgPrecision() {
@@ -1336,5 +1340,13 @@ public class Settings implements Cloneable {
 
 	public void setWriteEvaluationSummary(boolean writeEvaluationSummary) {
 		this.writeEvaluationSummary = writeEvaluationSummary;
+	}
+
+	public double getDescriptionScoreThreshold() {
+		return this.getParameters().getDescriptionScoreThreshold();
+	}
+
+	public void setDescriptionScoreThreshold(double descriptionScoreThreshold) {
+		this.getParameters().setDescriptionScoreThreshold(descriptionScoreThreshold);
 	}
 }
