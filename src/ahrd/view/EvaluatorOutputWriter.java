@@ -16,6 +16,7 @@ import ahrd.controller.AHRD;
 import ahrd.model.BlastResult;
 import ahrd.model.CompetitorAnnotation;
 import ahrd.model.Protein;
+import ahrd.model.TokenScoreCalculator;
 
 public class EvaluatorOutputWriter extends TsvOutputWriter {
 
@@ -176,13 +177,15 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		}
 		
 		if (getSettings().getWriteDescriptionSubScoresToOutput()) {
-			columnNamesLine += separator + "Sum(Token-Scores)" + separator + "TokenHighScore" + separator + "Correction-Factor" + separator + "Lexical-Score" + separator + "RelativeBlastScore" + separator + "DescriptionScore";
+			columnNamesLine += separator + "OverlapScore" + separator + "Sum(Token-Scores)" + separator + "TokenHighScore" + separator + "Correction-Factor" + separator + "Lexical-Score" + separator + "RelativeBlastScore" + separator + "DescriptionScore";
 			for (Protein prot : getProteins()) {
 				BlastResult highestScoringBlastResult = prot.getDescriptionScoreCalculator().getHighestScoringBlastResult();
 				// Found a high scoring description?
 				if (highestScoringBlastResult == null) {
-					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN");
+					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN" + separator + "NaN");
 				} else {
+					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(TokenScoreCalculator.overlapScore(
+							highestScoringBlastResult.getQueryStart(), highestScoringBlastResult.getQueryEnd(), prot.getSequenceLength(), highestScoringBlastResult.getSubjectStart(), highestScoringBlastResult.getSubjectEnd(), highestScoringBlastResult.getSubjectLength())));
 					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(prot.getTokenScoreCalculator().sumOfAllTokenScores(highestScoringBlastResult))); 
 					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(prot.getTokenScoreCalculator().getTokenHighScore()));
 					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(prot.getLexicalScoreCalculator().correctionFactor(highestScoringBlastResult)));
@@ -191,8 +194,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(highestScoringBlastResult.getDescriptionScore()));
 				}
 			}
-			averagesLine += separator + separator + separator + separator + separator + separator;
-			coveragesLine += separator + separator + separator + separator + separator + separator;
+			averagesLine += separator + separator + separator + separator + separator + separator + separator;
+			coveragesLine += separator + separator + separator + separator + separator + separator + separator;
 		}
 		
 		// Best blast hits
