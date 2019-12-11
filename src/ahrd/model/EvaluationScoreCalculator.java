@@ -164,6 +164,7 @@ public class EvaluationScoreCalculator {
 		} else {
 			if (groundTruthTkns==null || groundTruthTkns.isEmpty()) {
 				fBetaScore.setRecall(Double.NaN);
+				fBetaScore.setPrecision(Double.NaN);
 			}
 			if (assignedTkns==null || assignedTkns.isEmpty()) {
 				fBetaScore.setPrecision(Double.NaN);
@@ -302,7 +303,11 @@ public class EvaluationScoreCalculator {
 			}
 		}
 		f.setRecall((double) truePositive / groundTruth.size());
-		f.setPrecision((double) truePositive / prediction.size());
+		if (groundTruth.size() > 0) {
+			f.setPrecision((double) truePositive / prediction.size());
+		} else {
+			f.setPrecision(Double.NaN);
+		}
 		return f;
 	}
 
@@ -332,7 +337,11 @@ public class EvaluationScoreCalculator {
 			}
 		}
 		recall = (double) truePositive / groundTruthAncestry.size();
-		precision = (double) truePositive / predictionAncestry.size();
+		if (groundTruthAncestry.size() > 0) {
+			precision = (double) truePositive / predictionAncestry.size();
+		} else {
+			precision = Double.NaN;
+		}
 		f.setPrecision(precision);
 		f.setRecall(recall);
 		return f;
@@ -435,6 +444,7 @@ public class EvaluationScoreCalculator {
 		} else {
 			if (groundTruth.size() == 0) {
 				recall = Double.NaN;
+				precision = Double.NaN;
 			}
 			if (prediction.size() == 0) {
 				precision = Double.NaN;
