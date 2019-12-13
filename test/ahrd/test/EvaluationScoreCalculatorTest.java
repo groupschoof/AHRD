@@ -343,36 +343,36 @@ public class EvaluationScoreCalculatorTest {
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore().isNaN());
 		// Prediction is empty
 		// |ref| > 0 && |pred| == 0 -> f1 == NaN
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore().isNaN());
 		// Ground truth is empty
 		// |ref| == 0 && |pred| > 0 -> f1 == NaN
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>());
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>());
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore().isNaN());
 		// Prediction is equal to the ground truth
 		// ref == pred -> f1 == 1
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpMetabolicProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpMetabolicProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == 1.0);
 		// Prediction and ground truth have no overlap
 		// |ref| > 0 && |pred| > 0 && ref != pred -> f1 == 0
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == 0.0);
 		// Prediction and ground truth overlap on one term while differing on an other
 		// |ref| == 2 && |pred| == 2 && |ref^pred| == 1 -> f1 == 2*0.5*0.5/(0.5+0.5) == 0.5
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == 0.5);
 		// One term of the prediction is the ground truth, an other is not.
 		// |ref| == 1 && |pred| == 2 && |ref^pred| == 1 -> f1 == 2*1*0.5/(1+0.5) == 0.667
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpCellularProcess, bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSimpleGoAnnotationScore().getScore() == (double)2/3);
@@ -399,28 +399,28 @@ public class EvaluationScoreCalculatorTest {
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore().isNaN());
 		// Prediction is empty
 		// |ref| > 0 && |pred| == 0 -> f1 == NaN
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore().isNaN());
 		// Ground truth is empty
 		// |ref| == 0 && |pred| > 0 -> f1 == NaN
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>());
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>());
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore().isNaN());
 		// Prediction is equal to the ground truth
 		// ref == pred -> f1 == 1
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpMetabolicProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpMetabolicProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess, bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore() == 1.0);
 		// |ref| == 1 && |pred| == 1 && ref != pred && |ancestry(ref)| == |ancestry(pred)| == 2 && |ancestry(ref)^ancestry(pred)| == 1 -> f1 == 2*0.5*0.5/(0.5+0.5) == 0.5
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore() == 0.5);
 		// ref == ancestry(ref) && pred == ancestry(pred) && |ref| == 2 && |pred| == 2 && ref != pred && |ancestry(ref)| == |ancestry(pred)| == 2 && |ancestry(ref)^ancestry(pred)| == 1 -> f1 == 2*0.5*0.5/(0.5+0.5) == 0.5
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpRoot, bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot, bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getAncestryGoAnnotationScore().getScore() == 0.5);
@@ -452,42 +452,42 @@ public class EvaluationScoreCalculatorTest {
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore().isNaN());
 		// Prediction is empty
 		// |ref| > 0 && |pred| == 0 -> f1 == NaN
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore().isNaN());
 		// Ground truth is empty
 		// |ref| == 0 && |pred| > 0 -> f1 == NaN
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>());
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>());
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore().isNaN());
 		// Prediction is equal to the ground truth
 		// ref == pred -> f1 == 1
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess, bpMetabolicProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess, bpMetabolicProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpCellularProcess, bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 1.0);
 		// The predictions only common ancestor with the ground truth is a root term which has an information content of 0.
 		// |ref| == 1 && |pred| == 1 && ref != pred && commonAncestor(ref, pred) == rootTerm -> f1 == 0
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpCellularProcess)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore() == 0.0);
 		// Predicted root term which has an information content of 0.
 		// ref == root && pred != root -> f1 == NaN
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpMetabolicProcess)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore().isNaN());
 		// Prediction and ground truth are the same root term which has an information content of 0.
 		// ref == pred == root -> f1 == NaN
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore().isNaN());
 		// Prediction and ground truth are different root terms which both have an information content of 0.
 		// ref == root && pred == root && ref != pred -> f1 == NaN
-		p.getEvaluationScoreCalculator().setGroundTruthGoAnnoatations(new HashSet<GOterm>(Arrays.asList(mfRoot)));
+		p.getEvaluationScoreCalculator().setGroundTruthGoAnnotations(new HashSet<GOterm>(Arrays.asList(mfRoot)));
 		p.setGoResultsTerms(new HashSet<GOterm>(Arrays.asList(bpRoot)));
 		p.getEvaluationScoreCalculator().assignEvaluationScores();
 		assertTrue(p.getEvaluationScoreCalculator().getSemSimGoAnnotationScore().getScore().isNaN());

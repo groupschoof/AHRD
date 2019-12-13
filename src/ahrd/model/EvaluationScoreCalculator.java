@@ -34,7 +34,7 @@ public class EvaluationScoreCalculator {
 	private Double evalScoreMinBestCompScore;
 	private Fscore highestPossibleDescriptionScore;
 	private BlastResult blastResultWithHighestPossibleDescriptionScore;
-	private Set<GOterm> groundTruthGoAnnoatations = new HashSet<GOterm>();
+	private Set<GOterm> groundTruthGoAnnotations = new HashSet<GOterm>();
 	private Fscore simpleGoAnnotationScore;
 	private Fscore ancestryGoAnnotationScore;
 	private Fscore semSimGoAnnotationScore;
@@ -68,7 +68,7 @@ public class EvaluationScoreCalculator {
 		// Necessary if the ground truth description is empty or has no valid tokens left after the token blacklist is applied.
 		// Also necessary if the ground truth go annotation is empty.
 		// In both cases no annotation should result in an evaluation score of 1.
-		// To ensure so an empty CompetitorAnnoation is created for each competitor.
+		// To ensure so an empty CompetitorAnnotation is created for each competitor.
 		// In the vast majority of cases these CompetitorAnnotations will be replaced by proper annotations read from file.
 		if (getSettings().hasCompetitors()) {
 			for (String competitor : getSettings().getCompetitorSettings().keySet()) {
@@ -227,11 +227,11 @@ public class EvaluationScoreCalculator {
 							// GOterm annotations scores
 							if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 								if (getSettings().doCalculateSimpleGoF1Scores())
-									annot.setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, annot.getGoAnnotations()));
+									annot.setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.groundTruthGoAnnotations, annot.getGoAnnotations()));
 								if (getSettings().doCalculateAncestryGoF1Scores())
-									annot.setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, annot.getGoAnnotations()));
+									annot.setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, annot.getGoAnnotations()));
 								if (getSettings().doCalculateSemSimGoF1Scores())
-									annot.setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, annot.getGoAnnotations()));
+									annot.setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, annot.getGoAnnotations()));
 							}
 						}
 					}
@@ -256,13 +256,13 @@ public class EvaluationScoreCalculator {
 						if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 							if (getSettings().doCalculateSimpleGoF1Scores())
 								cmpt.setSimpleGoAnnotationScore(
-										calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, cmpt.getGoAnnotations()));
+										calcSimpleGoAnnotationScore(this.groundTruthGoAnnotations, cmpt.getGoAnnotations()));
 							if (getSettings().doCalculateAncestryGoF1Scores())
 								cmpt.setAncestryGoAnnotationScore(
-										calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, cmpt.getGoAnnotations()));
+										calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, cmpt.getGoAnnotations()));
 							if (getSettings().doCalculateSemSimGoF1Scores())
 								cmpt.setSemSimGoAnnotationScore(
-										calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, cmpt.getGoAnnotations()));
+										calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, cmpt.getGoAnnotations()));
 						}
 					}
 				}
@@ -275,16 +275,16 @@ public class EvaluationScoreCalculator {
 			// Calculation of an F1-score based on ground truth and prediction GO
 			// annotations alone
 			if (getSettings().doCalculateSimpleGoF1Scores())
-				setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, this.protein.getGoResultsTerms()));
+				setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.groundTruthGoAnnotations, this.protein.getGoResultsTerms()));
 			// Calculation of an F1-score based on ground truth and prediction GO
 			// annotations extended to their complete ancestry
 			if (getSettings().doCalculateAncestryGoF1Scores())
-				setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, this.protein.getGoResultsTerms()));
+				setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, this.protein.getGoResultsTerms()));
 			// Calculation of an F1-score based on the semantic similarity
 			// (based on term information content) of ground truth and prediction
 			// GO annotations.
 			if (getSettings().doCalculateSemSimGoF1Scores())
-				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, this.protein.getGoResultsTerms()));
+				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, this.protein.getGoResultsTerms()));
 		}
 	}
 
@@ -503,10 +503,10 @@ public class EvaluationScoreCalculator {
 	public void findHighestPossibleGoScore() {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
-				this.setHighestPossibleSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>())); // In case ground truth go annotation is empty
+				this.setHighestPossibleSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.groundTruthGoAnnotations, new HashSet<GOterm>())); // In case ground truth go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						Fscore score = calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						Fscore score = calcSimpleGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
 						if (score.getScore() > this.getHighestPossibleSimpleGoAnnotationScore().getScore() || this.getHighestPossibleSimpleGoAnnotationScore().getScore().isNaN())
 								this.setHighestPossibleSimpleGoAnnotationScore(score);
 						if (getHighestPossibleSimpleGoAnnotationScore().getScore().equals(1.0))
@@ -517,10 +517,10 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			if (getSettings().doCalculateAncestryGoF1Scores()) {
-				this.setHighestPossibleAncestryGoAnnotationScore(this.calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>())); // In case ground truth go annotation is empty
+				this.setHighestPossibleAncestryGoAnnotationScore(this.calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, new HashSet<GOterm>())); // In case ground truth go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						Fscore score = calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						Fscore score = calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
 						if (score.getScore() > this.getHighestPossibleAncestryGoAnnotationScore().getScore() || this.getHighestPossibleAncestryGoAnnotationScore().getScore().isNaN())
 								this.setHighestPossibleAncestryGoAnnotationScore(score);
 						if (getHighestPossibleAncestryGoAnnotationScore().getScore().equals(1.0))
@@ -531,10 +531,10 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			if (getSettings().doCalculateSemSimGoF1Scores()) {
-				this.setHighestPossibleSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>())); // In case ground truth go annotation is empty
+				this.setHighestPossibleSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, new HashSet<GOterm>())); // In case ground truth go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
 						if (score.getScore() > this.getHighestPossibleSemSimGoAnnotationScore().getScore() || this.getHighestPossibleSemSimGoAnnotationScore().getScore().isNaN())
 								this.setHighestPossibleSemSimGoAnnotationScore(score);
 						if (getHighestPossibleSemSimGoAnnotationScore().getScore().equals(1.0))
@@ -571,13 +571,13 @@ public class EvaluationScoreCalculator {
 		// find the blast result with the go annotations that results in the highest possible precision
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
-				if(this.groundTruthGoAnnoatations.isEmpty()) {
+				if(this.groundTruthGoAnnotations.isEmpty()) {
 					this.setHighestPossibleSimpleGoAnnotationPrecision(Double.NaN);
 				} else {
 					this.setHighestPossibleSimpleGoAnnotationPrecision(0.0);
 					for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 						for (BlastResult br : resultsFromBlastDatabase) {
-							Fscore score = calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+							Fscore score = calcSimpleGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
 							if (score.getPrecision() > this.getHighestPossibleSimpleGoAnnotationPrecision())
 									this.setHighestPossibleSimpleGoAnnotationPrecision(score.getPrecision());
 							if (getHighestPossibleSimpleGoAnnotationPrecision().equals(1.0))
@@ -589,13 +589,13 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			if (getSettings().doCalculateAncestryGoF1Scores()) {
-				if(this.groundTruthGoAnnoatations.isEmpty()) {
+				if(this.groundTruthGoAnnotations.isEmpty()) {
 					this.setHighestPossibleAncestryGoAnnotationPrecision(Double.NaN);
 				} else {
 					this.setHighestPossibleAncestryGoAnnotationPrecision(0.0);
 					for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 						for (BlastResult br : resultsFromBlastDatabase) {
-							Fscore score = calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+							Fscore score = calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
 							if (score.getPrecision() > this.getHighestPossibleAncestryGoAnnotationPrecision())
 									this.setHighestPossibleAncestryGoAnnotationPrecision(score.getPrecision());
 							if (getHighestPossibleAncestryGoAnnotationPrecision().equals(1.0))
@@ -607,13 +607,13 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			if (getSettings().doCalculateSemSimGoF1Scores()) {
-				if (this.groundTruthGoAnnoatations.isEmpty()) {
+				if (this.groundTruthGoAnnotations.isEmpty()) {
 					this.setHighestPossibleSemSimGoAnnotationPrecision(Double.NaN);
 				} else {
 					this.setHighestPossibleSemSimGoAnnotationPrecision(0.0);
 					for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 						for (BlastResult br : resultsFromBlastDatabase) {
-							Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+							Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
 							if (score.getPrecision() > this.getHighestPossibleSemSimGoAnnotationPrecision())
 									this.setHighestPossibleSemSimGoAnnotationPrecision(score.getPrecision());
 							if (getHighestPossibleSemSimGoAnnotationPrecision().equals(1.0))
@@ -647,10 +647,10 @@ public class EvaluationScoreCalculator {
 		// find the blast result with the go annotations that results in the highest possible recall
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
-				this.setHighestPossibleSimpleGoAnnotationRecall(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getRecall()); // NaN in case ground truth go annotation is empty, initialize with 0 otherwise
+				this.setHighestPossibleSimpleGoAnnotationRecall(calcSimpleGoAnnotationScore(this.groundTruthGoAnnotations, new HashSet<GOterm>()).getRecall()); // NaN in case ground truth go annotation is empty, initialize with 0 otherwise
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						Fscore score = calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						Fscore score = calcSimpleGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
 						if (score.getRecall() > this.getHighestPossibleSimpleGoAnnotationRecall())
 								this.setHighestPossibleSimpleGoAnnotationRecall(score.getRecall());
 						if (getHighestPossibleSimpleGoAnnotationRecall().equals(1.0))
@@ -661,10 +661,10 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			if (getSettings().doCalculateAncestryGoF1Scores()) {
-				this.setHighestPossibleAncestryGoAnnotationRecall(calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getRecall()); // NaN in case ground truth go annotation is empty, initialize with 0 otherwise
+				this.setHighestPossibleAncestryGoAnnotationRecall(calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, new HashSet<GOterm>()).getRecall()); // NaN in case ground truth go annotation is empty, initialize with 0 otherwise
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						Fscore score = calcAncestryGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						Fscore score = calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
 						if (score.getRecall() > this.getHighestPossibleAncestryGoAnnotationRecall())
 								this.setHighestPossibleAncestryGoAnnotationRecall(score.getRecall());
 						if (getHighestPossibleAncestryGoAnnotationRecall().equals(1.0))
@@ -675,10 +675,10 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			if (getSettings().doCalculateSemSimGoF1Scores()) {
-				this.setHighestPossibleSemSimGoAnnotationRecall(calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getRecall()); // NaN in case ground truth go annotation is empty, initialize with 0 otherwise  
+				this.setHighestPossibleSemSimGoAnnotationRecall(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, new HashSet<GOterm>()).getRecall()); // NaN in case ground truth go annotation is empty, initialize with 0 otherwise  
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnoatations, br.getGoAnnotations());
+						Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
 						if (score.getRecall() > this.getHighestPossibleSemSimGoAnnotationRecall())
 								this.setHighestPossibleSemSimGoAnnotationRecall(score.getRecall());
 						if (getHighestPossibleSemSimGoAnnotationRecall().equals(1.0))
@@ -739,12 +739,12 @@ public class EvaluationScoreCalculator {
 		this.highestPossibleDescriptionScore = highestPossibleEvaluationScore;
 	}
 
-	public Set<GOterm> getGroundTruthGoAnnoatations() {
-		return groundTruthGoAnnoatations;
+	public Set<GOterm> getGroundTruthGoAnnotations() {
+		return groundTruthGoAnnotations;
 	}
 
-	public void setGroundTruthGoAnnoatations(Set<GOterm> groundTruthGoAnnoatations) {
-		this.groundTruthGoAnnoatations = groundTruthGoAnnoatations;
+	public void setGroundTruthGoAnnotations(Set<GOterm> groundTruthGoAnnotations) {
+		this.groundTruthGoAnnotations = groundTruthGoAnnotations;
 	}
 
 	public Fscore getSimpleGoAnnotationScore() {

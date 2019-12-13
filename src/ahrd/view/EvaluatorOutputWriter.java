@@ -819,7 +819,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
 			columnNamesLine += separator + "Ground-Truth-GO-Annotations";
 			for (Protein prot : getProteins()) {
-				proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + combineGoTermsToString(prot.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations()));
+				proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + combineGoTermsToString(prot.getEvaluationScoreCalculator().getGroundTruthGoAnnotations()));
 			}
 			averagesLine += separator;
 			coveragesLine += separator;

@@ -60,7 +60,7 @@ public class Evaluator extends AHRD {
 				if (term == null) {
 					throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 				}
-				p.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations().add(term);
+				p.getEvaluationScoreCalculator().getGroundTruthGoAnnotations().add(term);
 			}
 			// Add GOterm objects to predicted annotations
 			goAnnotsStringToObject();
