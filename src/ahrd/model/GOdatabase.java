@@ -312,6 +312,44 @@ public class GOdatabase {
 			i.printStackTrace();
 		}
 		System.out.println("Done building new GO database based on OWL file!");
+		Double maxFiniteInfoContent = 0.0;
+		GOterm maxFiniteInfoContentTerm = null;
+		Double minInfoContent = Double.MAX_VALUE;
+		GOterm minInfoContentTerm = null;
+		for (GOterm term : accGoDb.values()) {
+			if (Double.isFinite(term.getInformationContent()) && term.getInformationContent() > maxFiniteInfoContent) {
+				maxFiniteInfoContent = term.getInformationContent();
+				maxFiniteInfoContentTerm = term;
+			}
+			if (term.getInformationContent() > 0 && term.getInformationContent() < minInfoContent) {
+				minInfoContent = term.getInformationContent();
+				minInfoContentTerm = term;
+			}
+		}
+		System.out.println("MinInfoContent:" + minInfoContentTerm.getAccession() + " " + minInfoContentTerm.getOntology() + " " + minInfoContentTerm.getAnnotationCount() + " " + minInfoContent);
+		System.out.println("MaxInfoContent:" + maxFiniteInfoContentTerm.getAccession() + " " + maxFiniteInfoContentTerm.getOntology() + " " + maxFiniteInfoContentTerm.getAnnotationCount() + " " + maxFiniteInfoContent);
+		int singletsCCOcount = 0;
+		int singletsMFOcount = 0;
+		int singletsBPOcount = 0;
+		for (GOterm term : accGoDb.values()) {
+			if (term.getAnnotationCount() == 1) {
+				switch(term.getOntology()) {
+				case "biological_process":
+					singletsBPOcount++;
+					break;
+				case "cellular_component":
+					singletsCCOcount++;
+					break;
+				case "molecular_function":
+					singletsMFOcount++;
+					break;
+					}
+			}
+		}
+		System.out.println("Single annotation terms counts:");
+		System.out.println("BPO: " + singletsBPOcount);
+		System.out.println("CCO: " + singletsCCOcount);
+		System.out.println("MFO: " + singletsMFOcount);
 		return accGoDb;
 	}
 
