@@ -21,7 +21,7 @@ blast_dbs:
     file: ./test/resources/tair_blast8_tabular.txt
     database: ./test/resources/tair_blast_db.fasta
     filter: ./test/resources/filter_descline_tair.txt
-	fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
+    fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
     short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"
 token_score_bit_score_weight: 0.333
 token_score_database_score_weight: 0.333
