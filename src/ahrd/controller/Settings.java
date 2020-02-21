@@ -124,7 +124,8 @@ public class Settings implements Cloneable {
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
 	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
 	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
-	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary"; 
+	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary";
+	public static final String EVALUATE_SUBONTOLOGIES_SEPARATELY = "evaluate_subontologies_separately"; 
 	
 	/**
 	 * Fields:
@@ -349,6 +350,10 @@ public class Settings implements Cloneable {
 	 * Triggers the output of averages and coverages of all scores at the end of the evalution output
 	 */
 	private boolean writeEvaluationSummary = false;
+	/**
+	 * Triggers the calculation and output of GO Fscores separately for the three GO subontologies (in Evaluation mode)
+	 */
+	private boolean evaluateSubontologiesSepatatey = false;
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -544,6 +549,7 @@ public class Settings implements Cloneable {
 		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
 		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
 		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
+		this.setEvaluateSubontologiesSepatatey(Boolean.parseBoolean((String) input.get(EVALUATE_SUBONTOLOGIES_SEPARATELY)));
 	}
 
 	/**
@@ -1330,5 +1336,13 @@ public class Settings implements Cloneable {
 
 	public void setWriteEvaluationSummary(boolean writeEvaluationSummary) {
 		this.writeEvaluationSummary = writeEvaluationSummary;
+	}
+
+	public boolean doEvaluateSubontologiesSepatatey() {
+		return evaluateSubontologiesSepatatey;
+	}
+
+	public void setEvaluateSubontologiesSepatatey(boolean evaluateSubontologiesSepatatey) {
+		this.evaluateSubontologiesSepatatey = evaluateSubontologiesSepatatey;
 	}
 }

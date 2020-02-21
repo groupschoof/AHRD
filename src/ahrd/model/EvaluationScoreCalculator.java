@@ -231,7 +231,7 @@ public class EvaluationScoreCalculator {
 								if (getSettings().doCalculateAncestryGoF1Scores())
 									annot.setAncestryGoAnnotationScore(calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, annot.getGoAnnotations()));
 								if (getSettings().doCalculateSemSimGoF1Scores())
-									annot.setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, annot.getGoAnnotations()));
+									annot.setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, annot.getGoAnnotations(), getSettings().doEvaluateSubontologiesSepatatey()));
 							}
 						}
 					}
@@ -262,7 +262,7 @@ public class EvaluationScoreCalculator {
 										calcAncestryGoAnnotationScore(this.groundTruthGoAnnotations, cmpt.getGoAnnotations()));
 							if (getSettings().doCalculateSemSimGoF1Scores())
 								cmpt.setSemSimGoAnnotationScore(
-										calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, cmpt.getGoAnnotations()));
+										calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, cmpt.getGoAnnotations(), getSettings().doEvaluateSubontologiesSepatatey()));
 						}
 					}
 				}
@@ -284,7 +284,7 @@ public class EvaluationScoreCalculator {
 			// (based on term information content) of ground truth and prediction
 			// GO annotations.
 			if (getSettings().doCalculateSemSimGoF1Scores())
-				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, this.protein.getGoResultsTerms()));
+				setSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, this.protein.getGoResultsTerms(), getSettings().doEvaluateSubontologiesSepatatey()));
 		}
 	}
 
@@ -470,6 +470,61 @@ public class EvaluationScoreCalculator {
 		}
 		return maxCommonInfoContent;
 	}
+	
+	private Fscore calcSemSimGoAnnotationScore(Set<GOterm> groundTruth, Set<GOterm> prediction, boolean perSubOntology) {
+		Fscore basicFscore = calcSemSimGoAnnotationScore(groundTruth, prediction);
+		if (!perSubOntology) {
+			return basicFscore;
+		} else {
+			GoFscore subOntologyFscore = new GoFscore();
+			subOntologyFscore.setPrecision(basicFscore.getPrecision());
+			subOntologyFscore.setRecall(basicFscore.getRecall());
+			// BPO
+			Set<GOterm> bpoGroundTruth = new HashSet<>();
+			for (GOterm term : groundTruth) {
+				if (term.getOntology().equals("biological_process")) {
+					bpoGroundTruth.add(term);
+				}
+			}
+			Set<GOterm> bpoPrediction = new HashSet<>();
+			for (GOterm term : prediction) {
+				if (term.getOntology().equals("biological_process")) {
+					bpoPrediction.add(term);
+				}
+			}
+			subOntologyFscore.setBpoFscore(calcSemSimGoAnnotationScore(bpoGroundTruth, bpoPrediction));
+			// MFO
+			Set<GOterm> mfoGroundTruth = new HashSet<>();
+			for (GOterm term : groundTruth) {
+				if (term.getOntology().equals("molecular_function")) {
+					mfoGroundTruth.add(term);
+				}
+			}
+			Set<GOterm> mfoPrediction = new HashSet<>();
+			for (GOterm term : prediction) {
+				if (term.getOntology().equals("molecular_function")) {
+					mfoPrediction.add(term);
+				}
+			}
+			subOntologyFscore.setMfoFscore(calcSemSimGoAnnotationScore(mfoGroundTruth, mfoPrediction));
+			// CCO
+			Set<GOterm> ccoGroundTruth = new HashSet<>();
+			for (GOterm term : groundTruth) {
+				if (term.getOntology().equals("cellular_component")) {
+					ccoGroundTruth.add(term);
+				}
+			}
+			Set<GOterm> ccoPrediction = new HashSet<>();
+			for (GOterm term : prediction) {
+				if (term.getOntology().equals("cellular_component")) {
+					ccoPrediction.add(term);
+				}
+			}
+			subOntologyFscore.setCcoFscore(calcSemSimGoAnnotationScore(ccoGroundTruth, ccoPrediction));
+			
+			return subOntologyFscore;
+		}
+	}
 
 	/**
 	 * In order to get more accurate information of how well AHRD performs, we
@@ -531,10 +586,10 @@ public class EvaluationScoreCalculator {
 				}
 			}
 			if (getSettings().doCalculateSemSimGoF1Scores()) {
-				this.setHighestPossibleSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, new HashSet<GOterm>())); // In case ground truth go annotation is empty
+				this.setHighestPossibleSemSimGoAnnotationScore(calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, new HashSet<GOterm>(), getSettings().doEvaluateSubontologiesSepatatey())); // In case ground truth go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
 					for (BlastResult br : resultsFromBlastDatabase) {
-						Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations());
+						Fscore score = calcSemSimGoAnnotationScore(this.groundTruthGoAnnotations, br.getGoAnnotations(), getSettings().doEvaluateSubontologiesSepatatey());
 						if (score.getScore() > this.getHighestPossibleSemSimGoAnnotationScore().getScore() || this.getHighestPossibleSemSimGoAnnotationScore().getScore().isNaN())
 								this.setHighestPossibleSemSimGoAnnotationScore(score);
 						if (getHighestPossibleSemSimGoAnnotationScore().getScore().equals(1.0))

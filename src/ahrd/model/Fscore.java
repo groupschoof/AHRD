@@ -32,7 +32,7 @@ public class Fscore {
 	// Arithmetically the fscore for a precision of 0 and a recall of 0 is undefined and should be stored as NaN (1 * 0 * 0 / (1 * 0 + 0) = 0/0 = NaN).
 	// When no predictions are made the precision is NaN. When no ground Truth exists the recall is NaN. Both cases result in an NaN-fscore as well.
 	// To differentiate these cases from a genuine prediction that has no overlap with a proper ground truth (p=0 and r=0) the fscore is set to 0 instead of NaN. 
-	private void calcScore() {
+	protected void calcScore() {
 		if (this.precision == 0.0 && this.recall == 0.0) {
 			this.score = 0.0;
 		} else {
