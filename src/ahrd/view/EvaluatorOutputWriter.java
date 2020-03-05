@@ -212,221 +212,278 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator;
 					coveragesLine += separator;
-					if (getSettings().isInEvaluationMode()) {
-						// Best blast hits description evaluation
-						columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-Description-Length" + separator + "Best-BlastHit-against-" + blastDb + "-Description-Evaluation-Score";
-						int sumBestBlastDescriptionLength = 0;
-						int covBestBlastDescriptionLength = 0;
-						Double sumBestBlastDescriptionScore = 0.0;
-						int covBestBlastDescriptionScore = 0;
+					// Best blast hits description evaluation
+					columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-Description-Length" + separator + "Best-BlastHit-against-" + blastDb + "-Description-Evaluation-Score";
+					int sumBestBlastDescriptionLength = 0;
+					int covBestBlastDescriptionLength = 0;
+					Double sumBestBlastDescriptionScore = 0.0;
+					int covBestBlastDescriptionScore = 0;
+					for (Protein prot : getProteins()) {
+						if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+							BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+							int bestBlastDescriptionLength = bestBr.getEvaluationTokens().size();
+							if (bestBlastDescriptionLength > 0) {
+								proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + bestBlastDescriptionLength);
+								sumBestBlastDescriptionLength += bestBlastDescriptionLength;
+								covBestBlastDescriptionLength++;
+							} else {
+								proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + "NaN");
+							}
+							Double bestBlastDescriptionScore = bestBr.getEvaluationScore().getScore();
+							proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastDescriptionScore));
+							if (!bestBlastDescriptionScore.isNaN()) {
+								sumBestBlastDescriptionScore += bestBlastDescriptionScore;
+								covBestBlastDescriptionScore++;
+							}
+						} else {
+							proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + separator);
+						}
+					}
+					averagesLine += separator + FRMT.format((double)sumBestBlastDescriptionLength/covBestBlastDescriptionLength) + separator + FRMT.format(sumBestBlastDescriptionScore/covBestBlastDescriptionScore);
+					coveragesLine += separator + FRMT.format((double)covBestBlastDescriptionLength/getProteins().size()) + separator + FRMT.format((double)covBestBlastDescriptionScore/getProteins().size());
+					if (getSettings().doWriteFscoreDetailsToOutput()) {
+						columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Precision\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Recall";
+						double sumBestBlastDescriptionScorePrecision = 0.0;
+						int covBestBlastDescriptionScorePrecision = 0;
+						double sumBestBlastDescriptionScoreRecall = 0.0;
+						int covBestBlastDescriptionScoreRecall = 0;
 						for (Protein prot : getProteins()) {
 							if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 								BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-								int bestBlastDescriptionLength = bestBr.getEvaluationTokens().size();
-								if (bestBlastDescriptionLength > 0) {
-									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + bestBlastDescriptionLength);
-									sumBestBlastDescriptionLength += bestBlastDescriptionLength;
-									covBestBlastDescriptionLength++;
-								} else {
-									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + "NaN");
+								Double bestBlastDescriptionScorePrecision = bestBr.getEvaluationScore().getPrecision();
+								proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastDescriptionScorePrecision));
+								if (!bestBlastDescriptionScorePrecision.isNaN()) {
+									sumBestBlastDescriptionScorePrecision += bestBlastDescriptionScorePrecision;
+									covBestBlastDescriptionScorePrecision++;
 								}
-								Double bestBlastDescriptionScore = bestBr.getEvaluationScore().getScore();
-								proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastDescriptionScore));
-								if (!bestBlastDescriptionScore.isNaN()) {
-									sumBestBlastDescriptionScore += bestBlastDescriptionScore;
-									covBestBlastDescriptionScore++;
+								Double bestBlastDescriptionScoreRecall = bestBr.getEvaluationScore().getRecall();
+								proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastDescriptionScoreRecall));
+								if (!bestBlastDescriptionScoreRecall.isNaN()) {
+									sumBestBlastDescriptionScoreRecall += bestBlastDescriptionScoreRecall;
+									covBestBlastDescriptionScoreRecall++;
 								}
 							} else {
 								proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + separator);
 							}
 						}
-						averagesLine += separator + FRMT.format((double)sumBestBlastDescriptionLength/covBestBlastDescriptionLength) + separator + FRMT.format(sumBestBlastDescriptionScore/covBestBlastDescriptionScore);
-						coveragesLine += separator + FRMT.format((double)covBestBlastDescriptionLength/getProteins().size()) + separator + FRMT.format((double)covBestBlastDescriptionScore/getProteins().size());
-						if (getSettings().doWriteFscoreDetailsToOutput()) {
-							columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Precision\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Recall";
-							double sumBestBlastDescriptionScorePrecision = 0.0;
-							int covBestBlastDescriptionScorePrecision = 0;
-							double sumBestBlastDescriptionScoreRecall = 0.0;
-							int covBestBlastDescriptionScoreRecall = 0;
-							for (Protein prot : getProteins()) {
-								if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-									BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-									Double bestBlastDescriptionScorePrecision = bestBr.getEvaluationScore().getPrecision();
-									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastDescriptionScorePrecision));
-									if (!bestBlastDescriptionScorePrecision.isNaN()) {
-										sumBestBlastDescriptionScorePrecision += bestBlastDescriptionScorePrecision;
-										covBestBlastDescriptionScorePrecision++;
-									}
-									Double bestBlastDescriptionScoreRecall = bestBr.getEvaluationScore().getRecall();
-									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastDescriptionScoreRecall));
-									if (!bestBlastDescriptionScoreRecall.isNaN()) {
-										sumBestBlastDescriptionScoreRecall += bestBlastDescriptionScoreRecall;
-										covBestBlastDescriptionScoreRecall++;
-									}
-								} else {
-									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + separator);
-								}
+						averagesLine += separator + FRMT.format(sumBestBlastDescriptionScorePrecision/covBestBlastDescriptionScorePrecision) + separator + FRMT.format(sumBestBlastDescriptionScoreRecall/covBestBlastDescriptionScoreRecall);
+						coveragesLine += separator + FRMT.format((double)covBestBlastDescriptionScorePrecision/getProteins().size()) + separator + FRMT.format((double)covBestBlastDescriptionScoreRecall/getProteins().size()); 
+					}
+					// Best blast hits go terms
+					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+						columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations";
+						for (Protein prot : getProteins()) {
+							if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+								BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+								proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + combineGoTermsToString(bestBr.getGoAnnotations()));
+							} else {
+								proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 							}
-							averagesLine += separator + FRMT.format(sumBestBlastDescriptionScorePrecision/covBestBlastDescriptionScorePrecision) + separator + FRMT.format(sumBestBlastDescriptionScoreRecall/covBestBlastDescriptionScoreRecall);
-							coveragesLine += separator + FRMT.format((double)covBestBlastDescriptionScorePrecision/getProteins().size()) + separator + FRMT.format((double)covBestBlastDescriptionScoreRecall/getProteins().size()); 
 						}
-						// Best blast hits go terms
-						if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
-							columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations";
+						averagesLine += separator;
+						coveragesLine += separator;
+						// Best blast hits go term evaluation
+						if (getSettings().doCalculateSimpleGoF1Scores()) {
+							columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score";
+							double sumBestBlastGoAnnotationsSimpleScore = 0.0;
+							int covBestBlastGoAnnotationsSimpleScore = 0;
 							for (Protein prot : getProteins()) {
 								if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 									BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + combineGoTermsToString(bestBr.getGoAnnotations()));
+									Double bestBlastGoAnnotationSimpleScore = bestBr.getSimpleGoAnnotationScore().getScore();
+									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSimpleScore));
+									if (!bestBlastGoAnnotationSimpleScore.isNaN()) {
+										sumBestBlastGoAnnotationsSimpleScore += bestBlastGoAnnotationSimpleScore;
+										covBestBlastGoAnnotationsSimpleScore++;
+									}
 								} else {
 									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 								}
 							}
-							averagesLine += separator;
-							coveragesLine += separator;
-							// Best blast hits go term evaluation
-							if (getSettings().doCalculateSimpleGoF1Scores()) {
-								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score";
-								double sumBestBlastGoAnnotationsSimpleScore = 0.0;
-								int covBestBlastGoAnnotationsSimpleScore = 0;
+							averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSimpleScore/covBestBlastGoAnnotationsSimpleScore);
+							coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSimpleScore/getProteins().size());
+							if (getSettings().doWriteFscoreDetailsToOutput()) {
+								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Precision";
+								double sumBestBlastGoAnnotationsSimpleScorePrecision = 0.0;
+								int covBestBlastGoAnnotationsSimpleScorePrecision = 0;
 								for (Protein prot : getProteins()) {
 									if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-										Double bestBlastGoAnnotationSimpleScore = bestBr.getSimpleGoAnnotationScore().getScore();
-										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSimpleScore));
-										if (!bestBlastGoAnnotationSimpleScore.isNaN()) {
-											sumBestBlastGoAnnotationsSimpleScore += bestBlastGoAnnotationSimpleScore;
-											covBestBlastGoAnnotationsSimpleScore++;
+										Double bestBlastGoAnnotationSimpleScorePrecision = bestBr.getSimpleGoAnnotationScore().getPrecision();
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSimpleScorePrecision));
+										if (!bestBlastGoAnnotationSimpleScorePrecision.isNaN()) {
+											sumBestBlastGoAnnotationsSimpleScorePrecision += bestBlastGoAnnotationSimpleScorePrecision;
+											covBestBlastGoAnnotationsSimpleScorePrecision++;
 										}
 									} else {
 										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 									}
 								}
-								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSimpleScore/covBestBlastGoAnnotationsSimpleScore);
-								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSimpleScore/getProteins().size());
-								if (getSettings().doWriteFscoreDetailsToOutput()) {
-									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Precision";
-									double sumBestBlastGoAnnotationsSimpleScorePrecision = 0.0;
-									int covBestBlastGoAnnotationsSimpleScorePrecision = 0;
-									for (Protein prot : getProteins()) {
-										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-											Double bestBlastGoAnnotationSimpleScorePrecision = bestBr.getSimpleGoAnnotationScore().getPrecision();
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSimpleScorePrecision));
-											if (!bestBlastGoAnnotationSimpleScorePrecision.isNaN()) {
-												sumBestBlastGoAnnotationsSimpleScorePrecision += bestBlastGoAnnotationSimpleScorePrecision;
-												covBestBlastGoAnnotationsSimpleScorePrecision++;
-											}
-										} else {
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
-										}
-									}
-									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSimpleScorePrecision/covBestBlastGoAnnotationsSimpleScorePrecision);
-									coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSimpleScorePrecision/getProteins().size());
-									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Recall";
-									double sumBestBlastGoAnnotationsSimpleScoreRecall = 0.0;
-									int covBestBlastGoAnnotationsSimpleScoreRecall = 0;
-									for (Protein prot : getProteins()) {
-										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-											Double bestBlastGoAnnotationSimpleScoreRecall = bestBr.getSimpleGoAnnotationScore().getRecall();
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSimpleScoreRecall));
-											if (!bestBlastGoAnnotationSimpleScoreRecall.isNaN()) {
-												sumBestBlastGoAnnotationsSimpleScoreRecall += bestBlastGoAnnotationSimpleScoreRecall;
-												covBestBlastGoAnnotationsSimpleScoreRecall++;
-											}
-										} else {
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
-										}
-									}
-									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSimpleScoreRecall/covBestBlastGoAnnotationsSimpleScoreRecall);
-									coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSimpleScoreRecall/getProteins().size());
-								}
-							}
-							if (getSettings().doCalculateAncestryGoF1Scores()) {
-								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score";
-								double sumBestBlastGoAnnotationsAncestryScore = 0.0;
-								int covBestBlastGoAnnotationsAncestryScore = 0;
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSimpleScorePrecision/covBestBlastGoAnnotationsSimpleScorePrecision);
+								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSimpleScorePrecision/getProteins().size());
+								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Recall";
+								double sumBestBlastGoAnnotationsSimpleScoreRecall = 0.0;
+								int covBestBlastGoAnnotationsSimpleScoreRecall = 0;
 								for (Protein prot : getProteins()) {
 									if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-										Double bestBlastGoAnnotationAncestryScore = bestBr.getAncestryGoAnnotationScore().getScore();
-										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationAncestryScore));
-										if (!bestBlastGoAnnotationAncestryScore.isNaN()) {
-											sumBestBlastGoAnnotationsAncestryScore += bestBlastGoAnnotationAncestryScore;
-											covBestBlastGoAnnotationsAncestryScore++;
+										Double bestBlastGoAnnotationSimpleScoreRecall = bestBr.getSimpleGoAnnotationScore().getRecall();
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSimpleScoreRecall));
+										if (!bestBlastGoAnnotationSimpleScoreRecall.isNaN()) {
+											sumBestBlastGoAnnotationsSimpleScoreRecall += bestBlastGoAnnotationSimpleScoreRecall;
+											covBestBlastGoAnnotationsSimpleScoreRecall++;
 										}
 									} else {
 										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 									}
 								}
-								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsAncestryScore/covBestBlastGoAnnotationsAncestryScore);
-								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsAncestryScore/getProteins().size());
-								if (getSettings().doWriteFscoreDetailsToOutput()) {
-									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Precision";
-									double sumBestBlastGoAnnotationsAncestryScorePrecision = 0.0;
-									int covBestBlastGoAnnotationsAncestryScorePrecision = 0;
-									for (Protein prot : getProteins()) {
-										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-											Double bestBlastGoAnnotationAncestryScorePrecision = bestBr.getAncestryGoAnnotationScore().getPrecision();
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationAncestryScorePrecision));
-											if (!bestBlastGoAnnotationAncestryScorePrecision.isNaN()) {
-												sumBestBlastGoAnnotationsAncestryScorePrecision += bestBlastGoAnnotationAncestryScorePrecision;
-												covBestBlastGoAnnotationsAncestryScorePrecision++;
-											}
-										} else {
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
-										}
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSimpleScoreRecall/covBestBlastGoAnnotationsSimpleScoreRecall);
+								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSimpleScoreRecall/getProteins().size());
+							}
+						}
+						if (getSettings().doCalculateAncestryGoF1Scores()) {
+							columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score";
+							double sumBestBlastGoAnnotationsAncestryScore = 0.0;
+							int covBestBlastGoAnnotationsAncestryScore = 0;
+							for (Protein prot : getProteins()) {
+								if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+									BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+									Double bestBlastGoAnnotationAncestryScore = bestBr.getAncestryGoAnnotationScore().getScore();
+									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationAncestryScore));
+									if (!bestBlastGoAnnotationAncestryScore.isNaN()) {
+										sumBestBlastGoAnnotationsAncestryScore += bestBlastGoAnnotationAncestryScore;
+										covBestBlastGoAnnotationsAncestryScore++;
 									}
-									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsAncestryScorePrecision/covBestBlastGoAnnotationsAncestryScorePrecision);
-									coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsAncestryScorePrecision/getProteins().size());
-									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Recall";
-									double sumBestBlastGoAnnotationsAncestryScoreRecall = 0.0;
-									int covBestBlastGoAnnotationsAncestryScoreRecall = 0;
-									for (Protein prot : getProteins()) {
-										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-											Double bestBlastGoAnnotationAncestryScoreRecall = bestBr.getAncestryGoAnnotationScore().getRecall();
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationAncestryScoreRecall));
-											if (!bestBlastGoAnnotationAncestryScoreRecall.isNaN()) {
-												sumBestBlastGoAnnotationsAncestryScoreRecall += bestBlastGoAnnotationAncestryScoreRecall;
-												covBestBlastGoAnnotationsAncestryScoreRecall++;
-											}
-										} else {
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
-										}
-									}
-									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsAncestryScoreRecall/covBestBlastGoAnnotationsAncestryScoreRecall);
-									coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsAncestryScoreRecall/getProteins().size());
+								} else {
+									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 								}
 							}
-							if (getSettings().doCalculateSemSimGoF1Scores()) {
-								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score";
-								double sumBestBlastGoAnnotationsSemSimScore = 0.0;
-								int covBestBlastGoAnnotationsSemSimScore = 0;
+							averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsAncestryScore/covBestBlastGoAnnotationsAncestryScore);
+							coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsAncestryScore/getProteins().size());
+							if (getSettings().doWriteFscoreDetailsToOutput()) {
+								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Precision";
+								double sumBestBlastGoAnnotationsAncestryScorePrecision = 0.0;
+								int covBestBlastGoAnnotationsAncestryScorePrecision = 0;
 								for (Protein prot : getProteins()) {
 									if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-										Double bestBlastGoAnnotationSemSimScore = bestBr.getSemSimGoAnnotationScore().getScore();
+										Double bestBlastGoAnnotationAncestryScorePrecision = bestBr.getAncestryGoAnnotationScore().getPrecision();
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationAncestryScorePrecision));
+										if (!bestBlastGoAnnotationAncestryScorePrecision.isNaN()) {
+											sumBestBlastGoAnnotationsAncestryScorePrecision += bestBlastGoAnnotationAncestryScorePrecision;
+											covBestBlastGoAnnotationsAncestryScorePrecision++;
+										}
+									} else {
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
+									}
+								}
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsAncestryScorePrecision/covBestBlastGoAnnotationsAncestryScorePrecision);
+								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsAncestryScorePrecision/getProteins().size());
+								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Recall";
+								double sumBestBlastGoAnnotationsAncestryScoreRecall = 0.0;
+								int covBestBlastGoAnnotationsAncestryScoreRecall = 0;
+								for (Protein prot : getProteins()) {
+									if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+										Double bestBlastGoAnnotationAncestryScoreRecall = bestBr.getAncestryGoAnnotationScore().getRecall();
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationAncestryScoreRecall));
+										if (!bestBlastGoAnnotationAncestryScoreRecall.isNaN()) {
+											sumBestBlastGoAnnotationsAncestryScoreRecall += bestBlastGoAnnotationAncestryScoreRecall;
+											covBestBlastGoAnnotationsAncestryScoreRecall++;
+										}
+									} else {
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
+									}
+								}
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsAncestryScoreRecall/covBestBlastGoAnnotationsAncestryScoreRecall);
+								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsAncestryScoreRecall/getProteins().size());
+							}
+						}
+						if (getSettings().doCalculateSemSimGoF1Scores()) {
+							columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score";
+							double sumBestBlastGoAnnotationsSemSimScore = 0.0;
+							int covBestBlastGoAnnotationsSemSimScore = 0;
+							for (Protein prot : getProteins()) {
+								if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+									BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+									Double bestBlastGoAnnotationSemSimScore = bestBr.getSemSimGoAnnotationScore().getScore();
+									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScore));
+									if (!bestBlastGoAnnotationSemSimScore.isNaN()) {
+										sumBestBlastGoAnnotationsSemSimScore += bestBlastGoAnnotationSemSimScore;
+										covBestBlastGoAnnotationsSemSimScore++;
+									}
+								} else {
+									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
+								}
+							}
+							averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScore/covBestBlastGoAnnotationsSemSimScore);
+							coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScore/getProteins().size());
+							if (getSettings().doWriteFscoreDetailsToOutput()) {
+								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Precision";
+								double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
+								int covBestBlastGoAnnotationsSemSimScorePrecision = 0;
+								for (Protein prot : getProteins()) {
+									if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+										Double bestBlastGoAnnotationSemSimScorePrecision = bestBr.getSemSimGoAnnotationScore().getPrecision();
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScorePrecision));
+										if (!bestBlastGoAnnotationSemSimScorePrecision.isNaN()) {
+											sumBestBlastGoAnnotationsSemSimScorePrecision += bestBlastGoAnnotationSemSimScorePrecision;
+											covBestBlastGoAnnotationsSemSimScorePrecision++;
+										}
+									} else {
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
+									}
+								}
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision/covBestBlastGoAnnotationsSemSimScorePrecision);
+								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScorePrecision/getProteins().size());
+								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Recall";
+								double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
+								int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
+								for (Protein prot : getProteins()) {
+									if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+										Double bestBlastGoAnnotationSemSimScoreRecall = bestBr.getSemSimGoAnnotationScore().getRecall();
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScoreRecall));
+										if (!bestBlastGoAnnotationSemSimScoreRecall.isNaN()) {
+											sumBestBlastGoAnnotationsSemSimScoreRecall += bestBlastGoAnnotationSemSimScoreRecall;
+											covBestBlastGoAnnotationsSemSimScoreRecall++;
+										}
+									} else {
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
+									}
+								}
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall/covBestBlastGoAnnotationsSemSimScoreRecall);
+								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScoreRecall/getProteins().size());
+							}
+							if (getSettings().doEvaluateSubontologiesSepatatey()) {
+								//BPO
+								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-BPO-SemSim-F-Score";
+								double sumBestBlastGoAnnotationsBpoSemSimScore = 0.0;
+								int covBestBlastGoAnnotationsBpoSemSimScore = 0;
+								for (Protein prot : getProteins()) {
+									if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+										Double bestBlastGoAnnotationSemSimScore = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getBpoFscore().getScore();
 										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScore));
 										if (!bestBlastGoAnnotationSemSimScore.isNaN()) {
-											sumBestBlastGoAnnotationsSemSimScore += bestBlastGoAnnotationSemSimScore;
-											covBestBlastGoAnnotationsSemSimScore++;
+											sumBestBlastGoAnnotationsBpoSemSimScore += bestBlastGoAnnotationSemSimScore;
+											covBestBlastGoAnnotationsBpoSemSimScore++;
 										}
 									} else {
 										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 									}
 								}
-								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScore/covBestBlastGoAnnotationsSemSimScore);
-								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScore/getProteins().size());
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsBpoSemSimScore/covBestBlastGoAnnotationsBpoSemSimScore);
+								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsBpoSemSimScore/getProteins().size());
 								if (getSettings().doWriteFscoreDetailsToOutput()) {
-									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Precision";
+									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-BPO-SemSim-F-Score-Precision";
 									double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
 									int covBestBlastGoAnnotationsSemSimScorePrecision = 0;
 									for (Protein prot : getProteins()) {
 										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-											Double bestBlastGoAnnotationSemSimScorePrecision = bestBr.getSemSimGoAnnotationScore().getPrecision();
+											Double bestBlastGoAnnotationSemSimScorePrecision = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getBpoFscore().getPrecision();
 											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScorePrecision));
 											if (!bestBlastGoAnnotationSemSimScorePrecision.isNaN()) {
 												sumBestBlastGoAnnotationsSemSimScorePrecision += bestBlastGoAnnotationSemSimScorePrecision;
@@ -438,13 +495,13 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 									}
 									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision/covBestBlastGoAnnotationsSemSimScorePrecision);
 									coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScorePrecision/getProteins().size());
-									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Recall";
+									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-BPO-SemSim-F-Score-Recall";
 									double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
 									int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
 									for (Protein prot : getProteins()) {
 										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-											Double bestBlastGoAnnotationSemSimScoreRecall = bestBr.getSemSimGoAnnotationScore().getRecall();
+											Double bestBlastGoAnnotationSemSimScoreRecall = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getBpoFscore().getRecall();
 											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScoreRecall));
 											if (!bestBlastGoAnnotationSemSimScoreRecall.isNaN()) {
 												sumBestBlastGoAnnotationsSemSimScoreRecall += bestBlastGoAnnotationSemSimScoreRecall;
@@ -457,180 +514,120 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall/covBestBlastGoAnnotationsSemSimScoreRecall);
 									coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScoreRecall/getProteins().size());
 								}
-								if (getSettings().doEvaluateSubontologiesSepatatey()) {
-									//BPO
-									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-BPO-SemSim-F-Score";
-									double sumBestBlastGoAnnotationsBpoSemSimScore = 0.0;
-									int covBestBlastGoAnnotationsBpoSemSimScore = 0;
+								// MFO
+								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-MFO-SemSim-F-Score";
+								double sumBestBlastGoAnnotationsMfoSemSimScore = 0.0;
+								int covBestBlastGoAnnotationsMfoSemSimScore = 0;
+								for (Protein prot : getProteins()) {
+									if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+										Double bestBlastGoAnnotationSemSimScore = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getMfoFscore().getScore();
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScore));
+										if (!bestBlastGoAnnotationSemSimScore.isNaN()) {
+											sumBestBlastGoAnnotationsMfoSemSimScore += bestBlastGoAnnotationSemSimScore;
+											covBestBlastGoAnnotationsMfoSemSimScore++;
+										}
+									} else {
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
+									}
+								}
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsMfoSemSimScore / covBestBlastGoAnnotationsMfoSemSimScore);
+								coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsMfoSemSimScore / getProteins().size());
+								if (getSettings().doWriteFscoreDetailsToOutput()) {
+									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-MFO-SemSim-F-Score-Precision";
+									double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
+									int covBestBlastGoAnnotationsSemSimScorePrecision = 0;
 									for (Protein prot : getProteins()) {
 										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-											Double bestBlastGoAnnotationSemSimScore = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getBpoFscore().getScore();
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScore));
-											if (!bestBlastGoAnnotationSemSimScore.isNaN()) {
-												sumBestBlastGoAnnotationsBpoSemSimScore += bestBlastGoAnnotationSemSimScore;
-												covBestBlastGoAnnotationsBpoSemSimScore++;
+											Double bestBlastGoAnnotationSemSimScorePrecision = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getMfoFscore().getPrecision();
+											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScorePrecision));
+											if (!bestBlastGoAnnotationSemSimScorePrecision.isNaN()) {
+												sumBestBlastGoAnnotationsSemSimScorePrecision += bestBlastGoAnnotationSemSimScorePrecision;
+												covBestBlastGoAnnotationsSemSimScorePrecision++;
 											}
 										} else {
 											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 										}
 									}
-									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsBpoSemSimScore/covBestBlastGoAnnotationsBpoSemSimScore);
-									coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsBpoSemSimScore/getProteins().size());
-									if (getSettings().doWriteFscoreDetailsToOutput()) {
-										columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-BPO-SemSim-F-Score-Precision";
-										double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
-										int covBestBlastGoAnnotationsSemSimScorePrecision = 0;
-										for (Protein prot : getProteins()) {
-											if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-												BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-												Double bestBlastGoAnnotationSemSimScorePrecision = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getBpoFscore().getPrecision();
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScorePrecision));
-												if (!bestBlastGoAnnotationSemSimScorePrecision.isNaN()) {
-													sumBestBlastGoAnnotationsSemSimScorePrecision += bestBlastGoAnnotationSemSimScorePrecision;
-													covBestBlastGoAnnotationsSemSimScorePrecision++;
-												}
-											} else {
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
-											}
-										}
-										averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision/covBestBlastGoAnnotationsSemSimScorePrecision);
-										coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScorePrecision/getProteins().size());
-										columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-BPO-SemSim-F-Score-Recall";
-										double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
-										int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
-										for (Protein prot : getProteins()) {
-											if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-												BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-												Double bestBlastGoAnnotationSemSimScoreRecall = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getBpoFscore().getRecall();
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScoreRecall));
-												if (!bestBlastGoAnnotationSemSimScoreRecall.isNaN()) {
-													sumBestBlastGoAnnotationsSemSimScoreRecall += bestBlastGoAnnotationSemSimScoreRecall;
-													covBestBlastGoAnnotationsSemSimScoreRecall++;
-												}
-											} else {
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
-											}
-										}
-										averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall/covBestBlastGoAnnotationsSemSimScoreRecall);
-										coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScoreRecall/getProteins().size());
-									}
-									// MFO
-									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-MFO-SemSim-F-Score";
-									double sumBestBlastGoAnnotationsMfoSemSimScore = 0.0;
-									int covBestBlastGoAnnotationsMfoSemSimScore = 0;
+									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision / covBestBlastGoAnnotationsSemSimScorePrecision);
+									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScorePrecision / getProteins().size());
+									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-MFO-SemSim-F-Score-Recall";
+									double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
+									int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
 									for (Protein prot : getProteins()) {
 										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-											Double bestBlastGoAnnotationSemSimScore = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getMfoFscore().getScore();
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScore));
-											if (!bestBlastGoAnnotationSemSimScore.isNaN()) {
-												sumBestBlastGoAnnotationsMfoSemSimScore += bestBlastGoAnnotationSemSimScore;
-												covBestBlastGoAnnotationsMfoSemSimScore++;
+											Double bestBlastGoAnnotationSemSimScoreRecall = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getMfoFscore().getRecall();
+											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScoreRecall));
+											if (!bestBlastGoAnnotationSemSimScoreRecall.isNaN()) {
+												sumBestBlastGoAnnotationsSemSimScoreRecall += bestBlastGoAnnotationSemSimScoreRecall;
+												covBestBlastGoAnnotationsSemSimScoreRecall++;
 											}
 										} else {
 											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 										}
 									}
-									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsMfoSemSimScore / covBestBlastGoAnnotationsMfoSemSimScore);
-									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsMfoSemSimScore / getProteins().size());
-									if (getSettings().doWriteFscoreDetailsToOutput()) {
-										columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-MFO-SemSim-F-Score-Precision";
-										double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
-										int covBestBlastGoAnnotationsSemSimScorePrecision = 0;
-										for (Protein prot : getProteins()) {
-											if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-												BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-												Double bestBlastGoAnnotationSemSimScorePrecision = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getMfoFscore().getPrecision();
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScorePrecision));
-												if (!bestBlastGoAnnotationSemSimScorePrecision.isNaN()) {
-													sumBestBlastGoAnnotationsSemSimScorePrecision += bestBlastGoAnnotationSemSimScorePrecision;
-													covBestBlastGoAnnotationsSemSimScorePrecision++;
-												}
-											} else {
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
-											}
-										}
-										averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision / covBestBlastGoAnnotationsSemSimScorePrecision);
-										coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScorePrecision / getProteins().size());
-										columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-MFO-SemSim-F-Score-Recall";
-										double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
-										int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
-										for (Protein prot : getProteins()) {
-											if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-												BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-												Double bestBlastGoAnnotationSemSimScoreRecall = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getMfoFscore().getRecall();
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScoreRecall));
-												if (!bestBlastGoAnnotationSemSimScoreRecall.isNaN()) {
-													sumBestBlastGoAnnotationsSemSimScoreRecall += bestBlastGoAnnotationSemSimScoreRecall;
-													covBestBlastGoAnnotationsSemSimScoreRecall++;
-												}
-											} else {
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
-											}
-										}
-										averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall / covBestBlastGoAnnotationsSemSimScoreRecall);
-										coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScoreRecall / getProteins().size());
-									}
+									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall / covBestBlastGoAnnotationsSemSimScoreRecall);
+									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScoreRecall / getProteins().size());
+								}
 
-									// CCO
-									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-CCO-SemSim-F-Score";
-									double sumBestBlastGoAnnotationsCcoSemSimScore = 0.0;
-									int covBestBlastGoAnnotationsCcoSemSimScore = 0;
+								// CCO
+								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-CCO-SemSim-F-Score";
+								double sumBestBlastGoAnnotationsCcoSemSimScore = 0.0;
+								int covBestBlastGoAnnotationsCcoSemSimScore = 0;
+								for (Protein prot : getProteins()) {
+									if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+										Double bestBlastGoAnnotationSemSimScore = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getCcoFscore().getScore();
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScore));
+										if (!bestBlastGoAnnotationSemSimScore.isNaN()) {
+											sumBestBlastGoAnnotationsCcoSemSimScore += bestBlastGoAnnotationSemSimScore;
+											covBestBlastGoAnnotationsCcoSemSimScore++;
+										}
+									} else {
+										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
+									}
+								}
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsCcoSemSimScore / covBestBlastGoAnnotationsCcoSemSimScore);
+								coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsCcoSemSimScore / getProteins().size());
+								if (getSettings().doWriteFscoreDetailsToOutput()) {
+									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-CCO-SemSim-F-Score-Precision";
+									double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
+									int covBestBlastGoAnnotationsSemSimScorePrecision = 0;
 									for (Protein prot : getProteins()) {
 										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
 											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-											Double bestBlastGoAnnotationSemSimScore = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getCcoFscore().getScore();
-											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScore));
-											if (!bestBlastGoAnnotationSemSimScore.isNaN()) {
-												sumBestBlastGoAnnotationsCcoSemSimScore += bestBlastGoAnnotationSemSimScore;
-												covBestBlastGoAnnotationsCcoSemSimScore++;
+											Double bestBlastGoAnnotationSemSimScorePrecision = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getCcoFscore().getPrecision();
+											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScorePrecision));
+											if (!bestBlastGoAnnotationSemSimScorePrecision.isNaN()) {
+												sumBestBlastGoAnnotationsSemSimScorePrecision += bestBlastGoAnnotationSemSimScorePrecision;
+												covBestBlastGoAnnotationsSemSimScorePrecision++;
 											}
 										} else {
 											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 										}
 									}
-									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsCcoSemSimScore / covBestBlastGoAnnotationsCcoSemSimScore);
-									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsCcoSemSimScore / getProteins().size());
-									if (getSettings().doWriteFscoreDetailsToOutput()) {
-										columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-CCO-SemSim-F-Score-Precision";
-										double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
-										int covBestBlastGoAnnotationsSemSimScorePrecision = 0;
-										for (Protein prot : getProteins()) {
-											if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-												BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-												Double bestBlastGoAnnotationSemSimScorePrecision = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getCcoFscore().getPrecision();
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScorePrecision));
-												if (!bestBlastGoAnnotationSemSimScorePrecision.isNaN()) {
-													sumBestBlastGoAnnotationsSemSimScorePrecision += bestBlastGoAnnotationSemSimScorePrecision;
-													covBestBlastGoAnnotationsSemSimScorePrecision++;
-												}
-											} else {
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
+									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision / covBestBlastGoAnnotationsSemSimScorePrecision);
+									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScorePrecision / getProteins().size());
+									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-CCO-SemSim-F-Score-Recall";
+									double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
+									int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
+									for (Protein prot : getProteins()) {
+										if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
+											BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+											Double bestBlastGoAnnotationSemSimScoreRecall = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getCcoFscore().getRecall();
+											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScoreRecall));
+											if (!bestBlastGoAnnotationSemSimScoreRecall.isNaN()) {
+												sumBestBlastGoAnnotationsSemSimScoreRecall += bestBlastGoAnnotationSemSimScoreRecall;
+												covBestBlastGoAnnotationsSemSimScoreRecall++;
 											}
+										} else {
+											proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 										}
-										averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision / covBestBlastGoAnnotationsSemSimScorePrecision);
-										coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScorePrecision / getProteins().size());
-										columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-CCO-SemSim-F-Score-Recall";
-										double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
-										int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
-										for (Protein prot : getProteins()) {
-											if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
-												BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
-												Double bestBlastGoAnnotationSemSimScoreRecall = ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getCcoFscore().getRecall();
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + FRMT.format(bestBlastGoAnnotationSemSimScoreRecall));
-												if (!bestBlastGoAnnotationSemSimScoreRecall.isNaN()) {
-													sumBestBlastGoAnnotationsSemSimScoreRecall += bestBlastGoAnnotationSemSimScoreRecall;
-													covBestBlastGoAnnotationsSemSimScoreRecall++;
-												}
-											} else {
-												proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
-											}
-										}
-										averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall / covBestBlastGoAnnotationsSemSimScoreRecall);
-										coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScoreRecall / getProteins().size());
 									}
-
+									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall / covBestBlastGoAnnotationsSemSimScoreRecall);
+									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScoreRecall / getProteins().size());
 								}
 							}
 						}
