@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import sun.tools.tree.ThisExpression;
+
 public class EvaluationScoreCalculator {
 
 	private Protein protein;
@@ -355,6 +357,9 @@ public class EvaluationScoreCalculator {
 	 */
 	private Fscore calcSemSimGoAnnotationScore(Set<GOterm> groundTruth, Set<GOterm> prediction) {
 		Fscore f = new Fscore();
+		if (getSettings().doWriteCumulativeSemSimGoScores()) {
+			f = new InfoContentFscore();
+		}
 		Double recall = 0.0;
 		Double precision = 0.0;
 		/**
@@ -387,6 +392,11 @@ public class EvaluationScoreCalculator {
 			}
 			if (infoContentGroundTruth > 0.0) {
 				recall = commonInfoContentPrediction / infoContentGroundTruth;
+				if (getSettings().doWriteCumulativeSemSimGoScores()) {
+					InfoContentFscore icf = (InfoContentFscore)f;
+					icf.setCommonInfoContentPrediction(commonInfoContentPrediction);
+					icf.setInfoContentGroundTruth(infoContentGroundTruth);
+				}
 			} else {
 				recall = Double.NaN;
 			}
@@ -438,6 +448,11 @@ public class EvaluationScoreCalculator {
 			}
 			if (infoContentPrediction > 0.0) {
 				precision = commonInfoContentGroundTruth / infoContentPrediction;
+				if (getSettings().doWriteCumulativeSemSimGoScores()) {
+					InfoContentFscore icf = (InfoContentFscore)f;
+					icf.setCommonInfoContentGroundTruth(commonInfoContentGroundTruth);
+					icf.setInfoContentPrediction(infoContentPrediction);
+				}
 			} else {
 				precision = Double.NaN;
 			}
@@ -477,8 +492,7 @@ public class EvaluationScoreCalculator {
 			return basicFscore;
 		} else {
 			GoFscore subOntologyFscore = new GoFscore();
-			subOntologyFscore.setPrecision(basicFscore.getPrecision());
-			subOntologyFscore.setRecall(basicFscore.getRecall());
+			subOntologyFscore.setAllFscore(basicFscore);
 			// BPO
 			Set<GOterm> bpoGroundTruth = new HashSet<>();
 			for (GOterm term : groundTruth) {

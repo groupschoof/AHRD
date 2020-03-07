@@ -15,7 +15,9 @@ import java.util.Map;
 import ahrd.controller.AHRD;
 import ahrd.model.BlastResult;
 import ahrd.model.CompetitorAnnotation;
+import ahrd.model.Fscore;
 import ahrd.model.GoFscore;
+import ahrd.model.InfoContentFscore;
 import ahrd.model.Protein;
 
 public class EvaluatorOutputWriter extends TsvOutputWriter {
@@ -25,6 +27,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 	private Map<Protein, String> proteinOutputLines = new HashMap<Protein, String>();
 	private String averagesLine = "";
 	private String coveragesLine = "";
+	private String cumulativeLine = "";
 	private final String separator = "\t";
 
 	public EvaluatorOutputWriter(Collection<Protein> proteins) {
@@ -54,7 +57,11 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		if (getSettings().doWriteEvaluationSummary()) {
 			bw.write("\n");
 			bw.write(averagesLine + "\n");
-			bw.write(coveragesLine);
+			bw.write(coveragesLine + "\n");
+		}
+		// Cumulative Scores
+		if (getSettings().doWriteCumulativeSemSimGoScores()) {
+			bw.write(cumulativeLine + "\n");
 		}
 		// Cleanup
 		bw.close();
@@ -79,6 +86,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		}
 		averagesLine += "Average" + separator + separator + separator;
 		coveragesLine += "Coverage" + separator + separator + separator;
+		cumulativeLine += "Cumulative" + separator + separator + separator;
 
 		// AHRD's GO terms:
 		if (getSettings().hasGeneOntologyAnnotations()) {
@@ -88,6 +96,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			averagesLine += separator;
 			coveragesLine += separator;
+			cumulativeLine += separator;
 		}
 		
 		// AHRD's description evaluation
@@ -136,7 +145,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		}
 		averagesLine += separator + FRMT.format((double)sumDescriptionLength/covDescriptLength) + separator + separator + FRMT.format((double)sumGroundTruthDescriptionLength/covGroundTruthDescriptionLength) + separator + FRMT.format(sumEvaluationScore/covEvaluationScore);
 		coveragesLine += separator + FRMT.format((double)covDescriptLength/getProteins().size()) + separator + separator + FRMT.format((double)covGroundTruthDescriptionLength/getProteins().size()) + separator + FRMT.format((double)covEvaluationScore/getProteins().size());
-		
+		cumulativeLine += separator + separator + separator + separator;
 		// AHRD's description evaluation details
 		if (getSettings().doWriteFscoreDetailsToOutput()) {
 			columnNamesLine += separator +  "Diff-to-bestCompetitor" + separator + "Precision" + separator + "Recall";
@@ -174,6 +183,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			averagesLine += separator + sumEvalScoreMinBestCompScore/covEvalScoreMinBestCompScore + separator + sumEvaluationScorePrecision/covEvaluationScorePrecision + separator + sumEvaluationScoreRecall/covEvaluationScoreRecall;
 			coveragesLine += separator + (double)covEvalScoreMinBestCompScore/getProteins().size() + separator + (double)covEvaluationScorePrecision/getProteins().size() + separator + (double)covEvaluationScoreRecall/getProteins().size();
+			cumulativeLine += separator + separator + separator;
 		}
 		
 		if (getSettings().getWriteDescriptionSubScoresToOutput()) {
@@ -194,6 +204,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			averagesLine += separator + separator + separator + separator + separator + separator;
 			coveragesLine += separator + separator + separator + separator + separator + separator;
+			cumulativeLine += separator + separator + separator + separator + separator + separator;
 		}
 		
 		// Best blast hits
@@ -212,6 +223,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator;
 					coveragesLine += separator;
+					cumulativeLine += separator;
 					// Best blast hits description evaluation
 					columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-Description-Length" + separator + "Best-BlastHit-against-" + blastDb + "-Description-Evaluation-Score";
 					int sumBestBlastDescriptionLength = 0;
@@ -241,6 +253,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format((double)sumBestBlastDescriptionLength/covBestBlastDescriptionLength) + separator + FRMT.format(sumBestBlastDescriptionScore/covBestBlastDescriptionScore);
 					coveragesLine += separator + FRMT.format((double)covBestBlastDescriptionLength/getProteins().size()) + separator + FRMT.format((double)covBestBlastDescriptionScore/getProteins().size());
+					cumulativeLine += separator + separator;
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Precision\tBest-BlastHit-against-" + blastDb + "-Description-Evaluation-Score-Recall";
 						double sumBestBlastDescriptionScorePrecision = 0.0;
@@ -268,6 +281,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumBestBlastDescriptionScorePrecision/covBestBlastDescriptionScorePrecision) + separator + FRMT.format(sumBestBlastDescriptionScoreRecall/covBestBlastDescriptionScoreRecall);
 						coveragesLine += separator + FRMT.format((double)covBestBlastDescriptionScorePrecision/getProteins().size()) + separator + FRMT.format((double)covBestBlastDescriptionScoreRecall/getProteins().size()); 
+						cumulativeLine += separator + separator;
 					}
 					// Best blast hits go terms
 					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
@@ -282,6 +296,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator;
 						coveragesLine += separator;
+						cumulativeLine += separator;
 						// Best blast hits go term evaluation
 						if (getSettings().doCalculateSimpleGoF1Scores()) {
 							columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score";
@@ -302,6 +317,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSimpleScore/covBestBlastGoAnnotationsSimpleScore);
 							coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSimpleScore/getProteins().size());
+							cumulativeLine += separator;
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
 								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Precision";
 								double sumBestBlastGoAnnotationsSimpleScorePrecision = 0.0;
@@ -322,6 +338,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSimpleScorePrecision/covBestBlastGoAnnotationsSimpleScorePrecision);
 								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSimpleScorePrecision/getProteins().size());
 								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Simple-F-Score-Recall";
+								cumulativeLine += separator;
 								double sumBestBlastGoAnnotationsSimpleScoreRecall = 0.0;
 								int covBestBlastGoAnnotationsSimpleScoreRecall = 0;
 								for (Protein prot : getProteins()) {
@@ -339,6 +356,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSimpleScoreRecall/covBestBlastGoAnnotationsSimpleScoreRecall);
 								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSimpleScoreRecall/getProteins().size());
+								cumulativeLine += separator;
 							}
 						}
 						if (getSettings().doCalculateAncestryGoF1Scores()) {
@@ -360,6 +378,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsAncestryScore/covBestBlastGoAnnotationsAncestryScore);
 							coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsAncestryScore/getProteins().size());
+							cumulativeLine += separator;
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
 								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Precision";
 								double sumBestBlastGoAnnotationsAncestryScorePrecision = 0.0;
@@ -379,6 +398,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsAncestryScorePrecision/covBestBlastGoAnnotationsAncestryScorePrecision);
 								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsAncestryScorePrecision/getProteins().size());
+								cumulativeLine += separator;
 								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-Ancestry-F-Score-Recall";
 								double sumBestBlastGoAnnotationsAncestryScoreRecall = 0.0;
 								int covBestBlastGoAnnotationsAncestryScoreRecall = 0;
@@ -397,6 +417,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsAncestryScoreRecall/covBestBlastGoAnnotationsAncestryScoreRecall);
 								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsAncestryScoreRecall/getProteins().size());
+								cumulativeLine += separator;
 							}
 						}
 						if (getSettings().doCalculateSemSimGoF1Scores()) {
@@ -416,8 +437,33 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 									proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 								}
 							}
-							averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScore/covBestBlastGoAnnotationsSemSimScore);
-							coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScore/getProteins().size());
+							averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScore / covBestBlastGoAnnotationsSemSimScore);
+							coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScore / getProteins().size());
+							double cumulativeCommonInfoContentPrediction = 0.0;
+							double cumulativeInfoContentGroundTruth = 0.0;
+							double cumulativeCommonInfoContentGroundTruth = 0.0;
+							double cumulativeInfoContentPrediction = 0.0;
+							Fscore cumulativeFscore = new Fscore();
+							if (getSettings().doWriteCumulativeSemSimGoScores()) {
+								for (Protein prot : getProteins()) {
+									BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+									if (bestBr != null) {
+										InfoContentFscore infoContentFscore = null;
+										if (getSettings().doEvaluateSubontologiesSepatatey()) {
+											infoContentFscore = ((InfoContentFscore) ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getAllFscore());
+										} else {
+											infoContentFscore = ((InfoContentFscore) bestBr.getSemSimGoAnnotationScore());
+										}
+										cumulativeCommonInfoContentPrediction += infoContentFscore.getCommonInfoContentPrediction();
+										cumulativeInfoContentGroundTruth += infoContentFscore.getInfoContentGroundTruth();
+										cumulativeCommonInfoContentGroundTruth += infoContentFscore.getCommonInfoContentGroundTruth();
+										cumulativeInfoContentPrediction += infoContentFscore.getInfoContentPrediction();
+									}
+								}
+								cumulativeFscore.setRecall(cumulativeCommonInfoContentPrediction / cumulativeInfoContentGroundTruth);
+								cumulativeFscore.setPrecision(cumulativeCommonInfoContentGroundTruth / cumulativeInfoContentPrediction);
+							}
+							cumulativeLine += separator + FRMT.format(cumulativeFscore.getScore());
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
 								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Precision";
 								double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
@@ -437,6 +483,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision/covBestBlastGoAnnotationsSemSimScorePrecision);
 								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScorePrecision/getProteins().size());
+								cumulativeLine += separator + FRMT.format(cumulativeFscore.getPrecision());
 								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-SemSim-F-Score-Recall";
 								double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
 								int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
@@ -455,6 +502,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall/covBestBlastGoAnnotationsSemSimScoreRecall);
 								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScoreRecall/getProteins().size());
+								cumulativeLine += separator + FRMT.format(cumulativeFscore.getRecall());
 							}
 							if (getSettings().doEvaluateSubontologiesSepatatey()) {
 								//BPO
@@ -474,8 +522,28 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 										proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator);
 									}
 								}
-								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsBpoSemSimScore/covBestBlastGoAnnotationsBpoSemSimScore);
-								coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsBpoSemSimScore/getProteins().size());
+								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsBpoSemSimScore / covBestBlastGoAnnotationsBpoSemSimScore);
+								coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsBpoSemSimScore / getProteins().size());
+								double cumulativeCommonInfoContentPredictionBPO = 0.0;
+								double cumulativeInfoContentGroundTruthBPO = 0.0;
+								double cumulativeCommonInfoContentGroundTruthBPO = 0.0;
+								double cumulativeInfoContentPredictionBPO = 0.0;
+								Fscore cumulativeFscoreBPO = new Fscore();
+								if (getSettings().doWriteCumulativeSemSimGoScores()) {
+									for (Protein prot : getProteins()) {
+										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+										if (bestBr != null) {
+											InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getBpoFscore());
+											cumulativeCommonInfoContentPredictionBPO += infoContentFscore.getCommonInfoContentPrediction();
+											cumulativeInfoContentGroundTruthBPO += infoContentFscore.getInfoContentGroundTruth();
+											cumulativeCommonInfoContentGroundTruthBPO += infoContentFscore.getCommonInfoContentGroundTruth();
+											cumulativeInfoContentPredictionBPO += infoContentFscore.getInfoContentPrediction();
+										}
+									}
+									cumulativeFscoreBPO.setRecall(cumulativeCommonInfoContentPredictionBPO / cumulativeInfoContentGroundTruthBPO);
+									cumulativeFscoreBPO.setPrecision(cumulativeCommonInfoContentGroundTruthBPO / cumulativeInfoContentPredictionBPO);
+								}
+								cumulativeLine += separator + FRMT.format(cumulativeFscoreBPO.getScore());
 								if (getSettings().doWriteFscoreDetailsToOutput()) {
 									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-BPO-SemSim-F-Score-Precision";
 									double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
@@ -495,6 +563,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 									}
 									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision/covBestBlastGoAnnotationsSemSimScorePrecision);
 									coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScorePrecision/getProteins().size());
+									cumulativeLine += separator + FRMT.format(cumulativeFscoreBPO.getPrecision());
 									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-BPO-SemSim-F-Score-Recall";
 									double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
 									int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
@@ -513,6 +582,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 									}
 									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall/covBestBlastGoAnnotationsSemSimScoreRecall);
 									coveragesLine += separator + FRMT.format((double)covBestBlastGoAnnotationsSemSimScoreRecall/getProteins().size());
+									cumulativeLine += separator + FRMT.format(cumulativeFscoreBPO.getRecall());
 								}
 								// MFO
 								columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-MFO-SemSim-F-Score";
@@ -533,6 +603,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsMfoSemSimScore / covBestBlastGoAnnotationsMfoSemSimScore);
 								coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsMfoSemSimScore / getProteins().size());
+								double cumulativeCommonInfoContentPredictionMFO = 0.0;
+								double cumulativeInfoContentGroundTruthMFO = 0.0;
+								double cumulativeCommonInfoContentGroundTruthMFO = 0.0;
+								double cumulativeInfoContentPredictionMFO = 0.0;
+								Fscore cumulativeFscoreMFO = new Fscore();
+								if (getSettings().doWriteCumulativeSemSimGoScores()) {
+									for (Protein prot : getProteins()) {
+										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+										if (bestBr != null) {
+											InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getMfoFscore());
+											cumulativeCommonInfoContentPredictionMFO += infoContentFscore.getCommonInfoContentPrediction();
+											cumulativeInfoContentGroundTruthMFO += infoContentFscore.getInfoContentGroundTruth();
+											cumulativeCommonInfoContentGroundTruthMFO += infoContentFscore.getCommonInfoContentGroundTruth();
+											cumulativeInfoContentPredictionMFO += infoContentFscore.getInfoContentPrediction();
+										}
+									}
+									cumulativeFscoreMFO.setRecall(cumulativeCommonInfoContentPredictionMFO / cumulativeInfoContentGroundTruthMFO);
+									cumulativeFscoreMFO.setPrecision(cumulativeCommonInfoContentGroundTruthMFO / cumulativeInfoContentPredictionMFO);
+								}
+								cumulativeLine += separator + FRMT.format(cumulativeFscoreMFO.getScore());
 								if (getSettings().doWriteFscoreDetailsToOutput()) {
 									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-MFO-SemSim-F-Score-Precision";
 									double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
@@ -552,6 +642,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 									}
 									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision / covBestBlastGoAnnotationsSemSimScorePrecision);
 									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScorePrecision / getProteins().size());
+									cumulativeLine += separator + FRMT.format(cumulativeFscoreMFO.getPrecision());
 									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-MFO-SemSim-F-Score-Recall";
 									double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
 									int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
@@ -570,6 +661,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 									}
 									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall / covBestBlastGoAnnotationsSemSimScoreRecall);
 									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScoreRecall / getProteins().size());
+									cumulativeLine += separator + FRMT.format(cumulativeFscoreMFO.getRecall());
 								}
 
 								// CCO
@@ -591,6 +683,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsCcoSemSimScore / covBestBlastGoAnnotationsCcoSemSimScore);
 								coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsCcoSemSimScore / getProteins().size());
+								double cumulativeCommonInfoContentPredictionCCO = 0.0;
+								double cumulativeInfoContentGroundTruthCCO = 0.0;
+								double cumulativeCommonInfoContentGroundTruthCCO = 0.0;
+								double cumulativeInfoContentPredictionCCO = 0.0;
+								Fscore cumulativeFscoreCCO = new Fscore();
+								if (getSettings().doWriteCumulativeSemSimGoScores()) {
+									for (Protein prot : getProteins()) {
+										BlastResult bestBr = prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb);
+										if (bestBr != null) {
+											InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) bestBr.getSemSimGoAnnotationScore()).getCcoFscore());
+											cumulativeCommonInfoContentPredictionCCO += infoContentFscore.getCommonInfoContentPrediction();
+											cumulativeInfoContentGroundTruthCCO += infoContentFscore.getInfoContentGroundTruth();
+											cumulativeCommonInfoContentGroundTruthCCO += infoContentFscore.getCommonInfoContentGroundTruth();
+											cumulativeInfoContentPredictionCCO += infoContentFscore.getInfoContentPrediction();
+										}
+									}
+									cumulativeFscoreCCO.setRecall(cumulativeCommonInfoContentPredictionCCO / cumulativeInfoContentGroundTruthCCO);
+									cumulativeFscoreCCO.setPrecision(cumulativeCommonInfoContentGroundTruthCCO / cumulativeInfoContentPredictionCCO);
+								}
+								cumulativeLine += separator + FRMT.format(cumulativeFscoreCCO.getScore());
 								if (getSettings().doWriteFscoreDetailsToOutput()) {
 									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-CCO-SemSim-F-Score-Precision";
 									double sumBestBlastGoAnnotationsSemSimScorePrecision = 0.0;
@@ -610,6 +722,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 									}
 									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScorePrecision / covBestBlastGoAnnotationsSemSimScorePrecision);
 									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScorePrecision / getProteins().size());
+									cumulativeLine += separator + FRMT.format(cumulativeFscoreCCO.getPrecision());
 									columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations-CCO-SemSim-F-Score-Recall";
 									double sumBestBlastGoAnnotationsSemSimScoreRecall = 0.0;
 									int covBestBlastGoAnnotationsSemSimScoreRecall = 0;
@@ -628,6 +741,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 									}
 									averagesLine += separator + FRMT.format(sumBestBlastGoAnnotationsSemSimScoreRecall / covBestBlastGoAnnotationsSemSimScoreRecall);
 									coveragesLine += separator + FRMT.format((double) covBestBlastGoAnnotationsSemSimScoreRecall / getProteins().size());
+									cumulativeLine += separator + FRMT.format(cumulativeFscoreCCO.getRecall());
 								}
 							}
 						}
@@ -672,6 +786,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				}
 				averagesLine += separator + separator + FRMT.format((double)sumCompetitorDescriptionLength/covCompetitorDescriptionLength) + separator + FRMT.format(sumCompetitorDescriptionScore/covCompetitorDescriptionScore);
 				coveragesLine += separator + separator + FRMT.format((double)covCompetitorDescriptionLength/getProteins().size()) + separator + FRMT.format((double)covCompetitorDescriptionScore/getProteins().size());
+				cumulativeLine += separator + separator + separator;
 				// Competitor description evaluation details
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
 					columnNamesLine += separator + competitor + "-Description-Evaluation-Score-Precision";
@@ -706,6 +821,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumCompetitorDescriptionScorePrecision/covCompetitorDescriptionScorePrecision) + separator + FRMT.format(sumCompetitorDescriptionScoreRecall/covCompetitorDescriptionScoreRecall);
 					coveragesLine += separator + FRMT.format((double)covCompetitorDescriptionScorePrecision/getProteins().size()) + separator + FRMT.format((double)covCompetitorDescriptionScoreRecall/getProteins().size());
+					cumulativeLine += separator + separator;
 				}
 				// Competitor GO terms
 				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
@@ -725,6 +841,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator;
 					coveragesLine += separator;
+					cumulativeLine += separator;
 					// Competitor GO term evaluation
 					if (getSettings().doCalculateSimpleGoF1Scores()){
 						columnNamesLine += separator + competitor + "-GO-Annotations-Simple-F-Score";
@@ -750,6 +867,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumCompetitorSimpleGoScore/covCompetitorSimpleGoScore);
 						coveragesLine += separator + FRMT.format((double)covCompetitorSimpleGoScore/getProteins().size());
+						cumulativeLine += separator;
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
 							columnNamesLine += separator + competitor + "-GO-Annotations-Simple-F-Score-Precision";
 							columnNamesLine += separator + competitor + "-GO-Annotations-Simple-F-Score-Recall";
@@ -783,6 +901,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumCompetitorSimpleGoScorePrecision/covCompetitorSimpleGoScorePrecision) + separator + FRMT.format(sumCompetitorSimpleGoScoreRecall/covCompetitorSimpleGoScoreRecall);
 							coveragesLine += separator + FRMT.format((double)covCompetitorSimpleGoScorePrecision/getProteins().size()) + separator + FRMT.format((double)covCompetitorSimpleGoScoreRecall/getProteins().size());
+							cumulativeLine += separator + separator;
 						}
 					}
 					if (getSettings().doCalculateAncestryGoF1Scores()){
@@ -809,6 +928,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumCompetitorAncestryGoScore/covCompetitorAncestryGoScore);
 						coveragesLine += separator + FRMT.format((double)covCompetitorAncestryGoScore/getProteins().size());
+						cumulativeLine += separator;
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
 							columnNamesLine += separator + competitor + "-GO-Annotations-Ancestry-F-Score-Precision";
 							columnNamesLine += separator + competitor + "-GO-Annotations-Ancestry-F-Score-Recall";
@@ -842,6 +962,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumCompetitorAncestryGoScorePrecision/covCompetitorAncestryGoScorePrecision) + separator + FRMT.format(sumCompetitorAncestryGoScoreRecall/covCompetitorAncestryGoScoreRecall);
 							coveragesLine += separator + FRMT.format((double)covCompetitorAncestryGoScorePrecision/getProteins().size()) + separator + FRMT.format((double)covCompetitorAncestryGoScoreRecall/getProteins().size());
+							cumulativeLine += separator + separator;
 						}
 					}
 					if (getSettings().doCalculateSemSimGoF1Scores()){
@@ -868,6 +989,34 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumCompetitorSemSimGoScore/covCompetitorSemSimGoScore);
 						coveragesLine += separator + FRMT.format((double)covCompetitorSemSimGoScore/getProteins().size());
+						double cumulativeCommonInfoContentPrediction = 0.0;
+						double cumulativeInfoContentGroundTruth = 0.0;
+						double cumulativeCommonInfoContentGroundTruth = 0.0;
+						double cumulativeInfoContentPrediction = 0.0;
+						Fscore cumulativeFscore = new Fscore();
+						if (getSettings().doWriteCumulativeSemSimGoScores()) {
+							for (Protein prot : getProteins()) {
+								Map<String, CompetitorAnnotation> compAnnots = prot.getEvaluationScoreCalculator().getCompetitorAnnotations();
+								if (compAnnots != null) {
+									CompetitorAnnotation annot = compAnnots.get(competitor);
+									if (annot != null) {
+										InfoContentFscore infoContentFscore = null;
+										if (getSettings().doEvaluateSubontologiesSepatatey()) {
+											infoContentFscore = ((InfoContentFscore) ((GoFscore) annot.getSemSimGoAnnotationScore()).getAllFscore());
+										} else {
+											infoContentFscore = ((InfoContentFscore) annot.getSemSimGoAnnotationScore());
+										}
+										cumulativeCommonInfoContentPrediction += infoContentFscore.getCommonInfoContentPrediction();
+										cumulativeInfoContentGroundTruth += infoContentFscore.getInfoContentGroundTruth();
+										cumulativeCommonInfoContentGroundTruth += infoContentFscore.getCommonInfoContentGroundTruth();
+										cumulativeInfoContentPrediction += infoContentFscore.getInfoContentPrediction();
+									}
+								}
+							}
+							cumulativeFscore.setRecall(cumulativeCommonInfoContentPrediction / cumulativeInfoContentGroundTruth);
+							cumulativeFscore.setPrecision(cumulativeCommonInfoContentGroundTruth / cumulativeInfoContentPrediction);
+						}
+						cumulativeLine += separator + FRMT.format(cumulativeFscore.getScore());
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
 							columnNamesLine += separator + competitor + "-GO-Annotations-SemSim-F-Score-Precision";
 							columnNamesLine += separator + competitor + "-GO-Annotations-SemSim-F-Score-Recall";
@@ -901,6 +1050,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumCompetitorSemSimGoScorePrecision/covCompetitorSemSimGoScorePrecision) + separator + FRMT.format(sumCompetitorSemSimGoScoreRecall/covCompetitorSemSimGoScoreRecall);
 							coveragesLine += separator + FRMT.format((double)covCompetitorSemSimGoScorePrecision/getProteins().size()) + separator + FRMT.format((double)covCompetitorSemSimGoScoreRecall/getProteins().size());
+							cumulativeLine += separator + FRMT.format(cumulativeFscore.getPrecision()) + separator + FRMT.format(cumulativeFscore.getRecall());
 						}
 						if (getSettings().doEvaluateSubontologiesSepatatey()) {
 							// BPO
@@ -927,6 +1077,29 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumCompetitorBpoSemSimGoScore / covCompetitorBpoSemSimGoScore);
 							coveragesLine += separator + FRMT.format((double) covCompetitorBpoSemSimGoScore / getProteins().size());
+							double cumulativeCommonInfoContentPredictionBPO = 0.0;
+							double cumulativeInfoContentGroundTruthBPO = 0.0;
+							double cumulativeCommonInfoContentGroundTruthBPO = 0.0;
+							double cumulativeInfoContentPredictionBPO = 0.0;
+							Fscore cumulativeFscoreBPO = new Fscore();
+							if (getSettings().doWriteCumulativeSemSimGoScores()) {
+								for (Protein prot : getProteins()) {
+									Map<String, CompetitorAnnotation> compAnnots = prot.getEvaluationScoreCalculator().getCompetitorAnnotations();
+									if (compAnnots != null) {
+										CompetitorAnnotation annot = compAnnots.get(competitor);
+										if (annot != null) {
+											InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) annot.getSemSimGoAnnotationScore()).getBpoFscore());
+											cumulativeCommonInfoContentPredictionBPO += infoContentFscore.getCommonInfoContentPrediction();
+											cumulativeInfoContentGroundTruthBPO += infoContentFscore.getInfoContentGroundTruth();
+											cumulativeCommonInfoContentGroundTruthBPO += infoContentFscore.getCommonInfoContentGroundTruth();
+											cumulativeInfoContentPredictionBPO += infoContentFscore.getInfoContentPrediction();
+										}
+									}
+								}
+								cumulativeFscoreBPO.setRecall(cumulativeCommonInfoContentPredictionBPO / cumulativeInfoContentGroundTruthBPO);
+								cumulativeFscoreBPO.setPrecision(cumulativeCommonInfoContentGroundTruthBPO / cumulativeInfoContentPredictionBPO);
+							}
+							cumulativeLine += separator + FRMT.format(cumulativeFscoreBPO.getScore());
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
 								columnNamesLine += separator + competitor + "-GO-Annotations-BPO-SemSim-F-Score-Precision";
 								columnNamesLine += separator + competitor + "-GO-Annotations-BPO-SemSim-F-Score-Recall";
@@ -960,6 +1133,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumCompetitorSemSimGoScorePrecision / covCompetitorSemSimGoScorePrecision) + separator + FRMT.format(sumCompetitorSemSimGoScoreRecall / covCompetitorSemSimGoScoreRecall);
 								coveragesLine += separator + FRMT.format((double) covCompetitorSemSimGoScorePrecision / getProteins().size()) + separator + FRMT.format((double) covCompetitorSemSimGoScoreRecall / getProteins().size());
+								cumulativeLine += separator + FRMT.format(cumulativeFscoreBPO.getPrecision()) + separator + FRMT.format(cumulativeFscoreBPO.getRecall());
 							}
 							// MFO
 							columnNamesLine += separator + competitor + "-GO-Annotations-MFO-SemSim-F-Score";
@@ -985,6 +1159,29 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumCompetitorMfoSemSimGoScore / covCompetitorMfoSemSimGoScore);
 							coveragesLine += separator + FRMT.format((double) covCompetitorMfoSemSimGoScore / getProteins().size());
+							double cumulativeCommonInfoContentPredictionMFO = 0.0;
+							double cumulativeInfoContentGroundTruthMFO = 0.0;
+							double cumulativeCommonInfoContentGroundTruthMFO = 0.0;
+							double cumulativeInfoContentPredictionMFO = 0.0;
+							Fscore cumulativeFscoreMFO = new Fscore();
+							if (getSettings().doWriteCumulativeSemSimGoScores()) {
+								for (Protein prot : getProteins()) {
+									Map<String, CompetitorAnnotation> compAnnots = prot.getEvaluationScoreCalculator().getCompetitorAnnotations();
+									if (compAnnots != null) {
+										CompetitorAnnotation annot = compAnnots.get(competitor);
+										if (annot != null) {
+											InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) annot.getSemSimGoAnnotationScore()).getMfoFscore());
+											cumulativeCommonInfoContentPredictionMFO += infoContentFscore.getCommonInfoContentPrediction();
+											cumulativeInfoContentGroundTruthMFO += infoContentFscore.getInfoContentGroundTruth();
+											cumulativeCommonInfoContentGroundTruthMFO += infoContentFscore.getCommonInfoContentGroundTruth();
+											cumulativeInfoContentPredictionMFO += infoContentFscore.getInfoContentPrediction();
+										}
+									}
+								}
+								cumulativeFscoreMFO.setRecall(cumulativeCommonInfoContentPredictionMFO / cumulativeInfoContentGroundTruthMFO);
+								cumulativeFscoreMFO.setPrecision(cumulativeCommonInfoContentGroundTruthMFO / cumulativeInfoContentPredictionMFO);
+							}
+							cumulativeLine += separator + FRMT.format(cumulativeFscoreMFO.getScore());
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
 								columnNamesLine += separator + competitor + "-GO-Annotations-MFO-SemSim-F-Score-Precision";
 								columnNamesLine += separator + competitor + "-GO-Annotations-MFO-SemSim-F-Score-Recall";
@@ -1018,6 +1215,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumCompetitorSemSimGoScorePrecision / covCompetitorSemSimGoScorePrecision) + separator + FRMT.format(sumCompetitorSemSimGoScoreRecall / covCompetitorSemSimGoScoreRecall);
 								coveragesLine += separator + FRMT.format((double) covCompetitorSemSimGoScorePrecision / getProteins().size()) + separator + FRMT.format((double) covCompetitorSemSimGoScoreRecall / getProteins().size());
+								cumulativeLine += separator + FRMT.format(cumulativeFscoreMFO.getPrecision()) + separator + FRMT.format(cumulativeFscoreMFO.getRecall());
 							}
 							// CCO
 							columnNamesLine += separator + competitor + "-GO-Annotations-CCO-SemSim-F-Score";
@@ -1043,6 +1241,29 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumCompetitorCcoSemSimGoScore / covCompetitorCcoSemSimGoScore);
 							coveragesLine += separator + FRMT.format((double) covCompetitorCcoSemSimGoScore / getProteins().size());
+							double cumulativeCommonInfoContentPredictionCCO = 0.0;
+							double cumulativeInfoContentGroundTruthCCO = 0.0;
+							double cumulativeCommonInfoContentGroundTruthCCO = 0.0;
+							double cumulativeInfoContentPredictionCCO = 0.0;
+							Fscore cumulativeFscoreCCO = new Fscore();
+							if (getSettings().doWriteCumulativeSemSimGoScores()) {
+								for (Protein prot : getProteins()) {
+									Map<String, CompetitorAnnotation> compAnnots = prot.getEvaluationScoreCalculator().getCompetitorAnnotations();
+									if (compAnnots != null) {
+										CompetitorAnnotation annot = compAnnots.get(competitor);
+										if (annot != null) {
+											InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) annot.getSemSimGoAnnotationScore()).getCcoFscore());
+											cumulativeCommonInfoContentPredictionCCO += infoContentFscore.getCommonInfoContentPrediction();
+											cumulativeInfoContentGroundTruthCCO += infoContentFscore.getInfoContentGroundTruth();
+											cumulativeCommonInfoContentGroundTruthCCO += infoContentFscore.getCommonInfoContentGroundTruth();
+											cumulativeInfoContentPredictionCCO += infoContentFscore.getInfoContentPrediction();
+										}
+									}
+								}
+								cumulativeFscoreCCO.setRecall(cumulativeCommonInfoContentPredictionCCO / cumulativeInfoContentGroundTruthCCO);
+								cumulativeFscoreCCO.setPrecision(cumulativeCommonInfoContentGroundTruthCCO / cumulativeInfoContentPredictionCCO);
+							}
+							cumulativeLine += separator + FRMT.format(cumulativeFscoreCCO.getScore());
 							if (getSettings().doWriteFscoreDetailsToOutput()) {
 								columnNamesLine += separator + competitor + "-GO-Annotations-CCO-SemSim-F-Score-Precision";
 								columnNamesLine += separator + competitor + "-GO-Annotations-CCO-SemSim-F-Score-Recall";
@@ -1076,6 +1297,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 								}
 								averagesLine += separator + FRMT.format(sumCompetitorSemSimGoScorePrecision / covCompetitorSemSimGoScorePrecision) + separator + FRMT.format(sumCompetitorSemSimGoScoreRecall / covCompetitorSemSimGoScoreRecall);
 								coveragesLine += separator + FRMT.format((double) covCompetitorSemSimGoScorePrecision / getProteins().size()) + separator + FRMT.format((double) covCompetitorSemSimGoScoreRecall / getProteins().size());
+								cumulativeLine += separator + FRMT.format(cumulativeFscoreCCO.getPrecision()) + separator + FRMT.format(cumulativeFscoreCCO.getRecall());
 							}
 						}
 					}
@@ -1103,6 +1325,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			averagesLine += separator + separator + FRMT.format(sumHighestPossibleDescriptionScore/covHighestPossibleDescriptionScore);
 			coveragesLine += separator + separator + FRMT.format((double)covHighestPossibleDescriptionScore/getProteins().size());
+			cumulativeLine += separator + separator;
 			if (getSettings().doWriteFscoreDetailsToOutput()) {
 				columnNamesLine += separator + "Highest-Possible-Description-Score-Precision" + separator + "Highest-Possible-Description-Score-Recall";
 				double sumHighestPossibleDescriptionScorePrecision = 0.0;
@@ -1129,7 +1352,8 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 				}
 				averagesLine += separator + FRMT.format(sumHighestPossibleDescriptionScorePrecision/covHighestPossibleDescriptionScorePrecision) + separator + FRMT.format(sumHighestPossibleDescriptionScoreRecall/covHighestPossibleDescriptionScoreRecall);
-				coveragesLine += separator + FRMT.format((double)covHighestPossibleDescriptionScorePrecision/getProteins().size()) + separator + FRMT.format((double)covHighestPossibleDescriptionScoreRecall/getProteins().size()); 
+				coveragesLine += separator + FRMT.format((double) covHighestPossibleDescriptionScorePrecision / getProteins().size()) + separator + FRMT.format((double) covHighestPossibleDescriptionScoreRecall / getProteins().size());
+				cumulativeLine += separator + separator;
 			}
 		}
 		// Highest possible description precision
@@ -1147,6 +1371,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			averagesLine += separator + FRMT.format(sumHighestPossibleDescriptionPrecision/covHighestPossibleDescriptionPrecision);
 			coveragesLine += separator + FRMT.format((double)covHighestPossibleDescriptionPrecision/getProteins().size());
+			cumulativeLine += separator;
 		}
 		// Highest possible description recall
 		if (getSettings().doFindHighestPossibleRecall()) {
@@ -1163,6 +1388,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			averagesLine += separator + FRMT.format(sumHighestPossibleDescriptionRecall/covHighestPossibleDescriptionRecall);
 			coveragesLine += separator + FRMT.format((double)covHighestPossibleDescriptionRecall/getProteins().size());
+			cumulativeLine += separator;
 		}
 		// AHRD's GO term evaluation
 		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
@@ -1172,6 +1398,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			}
 			averagesLine += separator;
 			coveragesLine += separator;
+			cumulativeLine += separator;
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
 				columnNamesLine += separator + "AHRD-GO-Annotations-Simple-F-Score";
 				double sumSimpleGoAnnotationScore = 0.0;
@@ -1186,6 +1413,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				}
 				averagesLine += separator + FRMT.format(sumSimpleGoAnnotationScore/covSimpleGoAnnotationScore);
 				coveragesLine += separator + FRMT.format((double)covSimpleGoAnnotationScore/getProteins().size());
+				cumulativeLine += separator;
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
 					columnNamesLine += separator + "AHRD-GO-Annotations-Simple-F-Score-Precision" + separator + "AHRD-GO-Annotations-Simple-F-Score-Recall";
 					double sumSimpleGoAnnotationScorePrecision = 0.0;
@@ -1208,6 +1436,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumSimpleGoAnnotationScorePrecision/covSimpleGoAnnotationScorePrecision) + separator + FRMT.format(sumSimpleGoAnnotationScoreRecall/covSimpleGoAnnotationScoreRecall);
 					coveragesLine += separator + FRMT.format((double)covSimpleGoAnnotationScorePrecision/getProteins().size()) + separator + FRMT.format((double)covSimpleGoAnnotationScoreRecall/getProteins().size());
+					cumulativeLine += separator + separator;
 				}
 			}
 			if (getSettings().doCalculateAncestryGoF1Scores()) {
@@ -1224,6 +1453,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				}
 				averagesLine += separator + FRMT.format(sumAncestryGoAnnotationScore/covAncestryGoAnnotationScore);
 				coveragesLine += separator + FRMT.format((double)covAncestryGoAnnotationScore/getProteins().size());
+				cumulativeLine += separator;
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
 					columnNamesLine += separator + "AHRD-GO-Annotations-Ancestry-F-Score-Precision" + separator + "AHRD-GO-Annotations-Ancestry-F-Score-Recall";
 					double sumAncestryGoAnnotationScorePrecision = 0.0;
@@ -1246,6 +1476,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumAncestryGoAnnotationScorePrecision/covAncestryGoAnnotationScorePrecision) + separator + FRMT.format(sumAncestryGoAnnotationScoreRecall/covAncestryGoAnnotationScoreRecall);
 					coveragesLine += separator + FRMT.format((double)covAncestryGoAnnotationScorePrecision/getProteins().size()) + separator + FRMT.format((double)covAncestryGoAnnotationScoreRecall/getProteins().size());
+					cumulativeLine += separator + separator;
 				}
 			}
 			if (getSettings().doCalculateSemSimGoF1Scores()) {
@@ -1262,6 +1493,31 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 				}
 				averagesLine += separator + FRMT.format(sumSemSimGoAnnotationScore/covSemSimGoAnnotationScore);
 				coveragesLine += separator + FRMT.format((double)covSemSimGoAnnotationScore/getProteins().size());
+				double cumulativeCommonInfoContentPrediction = 0.0;
+				double cumulativeInfoContentGroundTruth = 0.0;
+				double cumulativeCommonInfoContentGroundTruth = 0.0;
+				double cumulativeInfoContentPrediction = 0.0;
+				Fscore cumulativeFscore = new Fscore();
+				if (getSettings().doWriteCumulativeSemSimGoScores()) {
+					for (Protein prot : getProteins()) {
+						Fscore semSimGoAnnotationScore = prot.getEvaluationScoreCalculator().getSemSimGoAnnotationScore();
+						if (semSimGoAnnotationScore != null) {
+							InfoContentFscore infoContentFscore = null;
+							if (getSettings().doEvaluateSubontologiesSepatatey()) {
+								infoContentFscore = ((InfoContentFscore) ((GoFscore) semSimGoAnnotationScore).getAllFscore());
+							} else {
+								infoContentFscore = ((InfoContentFscore) semSimGoAnnotationScore);
+							}
+							cumulativeCommonInfoContentPrediction += infoContentFscore.getCommonInfoContentPrediction();
+							cumulativeInfoContentGroundTruth += infoContentFscore.getInfoContentGroundTruth();
+							cumulativeCommonInfoContentGroundTruth += infoContentFscore.getCommonInfoContentGroundTruth();
+							cumulativeInfoContentPrediction += infoContentFscore.getInfoContentPrediction();
+						}
+					}
+					cumulativeFscore.setRecall(cumulativeCommonInfoContentPrediction / cumulativeInfoContentGroundTruth);
+					cumulativeFscore.setPrecision(cumulativeCommonInfoContentGroundTruth / cumulativeInfoContentPrediction);
+				}
+				cumulativeLine += separator + FRMT.format(cumulativeFscore.getScore());
 				if (getSettings().doWriteFscoreDetailsToOutput()) {
 					columnNamesLine += separator + "AHRD-GO-Annotations-SemSim-F-Score-Precision" + separator + "AHRD-GO-Annotations-SemSim-F-Score-Recall";
 					double sumSemSimGoAnnotationScorePrecision = 0.0;
@@ -1284,6 +1540,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumSemSimGoAnnotationScorePrecision/covSemSimGoAnnotationScorePrecision) + separator + FRMT.format(sumSemSimGoAnnotationScoreRecall/covSemSimGoAnnotationScoreRecall);
 					coveragesLine += separator + FRMT.format((double)covSemSimGoAnnotationScorePrecision/getProteins().size()) + separator + FRMT.format((double)covSemSimGoAnnotationScoreRecall/getProteins().size());
+					cumulativeLine += separator + FRMT.format(cumulativeFscore.getPrecision()) + separator + FRMT.format(cumulativeFscore.getRecall());
 				}
 				if (getSettings().doEvaluateSubontologiesSepatatey()) {
 					// BPO
@@ -1300,6 +1557,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumSemSimGoBpoAnnotationScore/covSemSimGoBpoAnnotationScore);
 					coveragesLine += separator + FRMT.format((double)covSemSimGoBpoAnnotationScore/getProteins().size());
+					double cumulativeCommonInfoContentPredictionBPO = 0.0;
+					double cumulativeInfoContentGroundTruthBPO = 0.0;
+					double cumulativeCommonInfoContentGroundTruthBPO = 0.0;
+					double cumulativeInfoContentPredictionBPO = 0.0;
+					Fscore cumulativeFscoreBPO = new Fscore();
+					if (getSettings().doWriteCumulativeSemSimGoScores()) {
+						for (Protein prot : getProteins()) {
+							Fscore semSimGoAnnotationScore = prot.getEvaluationScoreCalculator().getSemSimGoAnnotationScore();
+							if (semSimGoAnnotationScore != null) {
+								InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) semSimGoAnnotationScore).getBpoFscore());
+								cumulativeCommonInfoContentPredictionBPO += infoContentFscore.getCommonInfoContentPrediction();
+								cumulativeInfoContentGroundTruthBPO += infoContentFscore.getInfoContentGroundTruth();
+								cumulativeCommonInfoContentGroundTruthBPO += infoContentFscore.getCommonInfoContentGroundTruth();
+								cumulativeInfoContentPredictionBPO += infoContentFscore.getInfoContentPrediction();
+							}
+						}
+						cumulativeFscoreBPO.setRecall(cumulativeCommonInfoContentPredictionBPO / cumulativeInfoContentGroundTruthBPO);
+						cumulativeFscoreBPO.setPrecision(cumulativeCommonInfoContentGroundTruthBPO / cumulativeInfoContentPredictionBPO);
+					}
+					cumulativeLine += separator + FRMT.format(cumulativeFscoreBPO.getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						columnNamesLine += separator + "AHRD-GO-Annotations-BPO-SemSim-F-Score-Precision" + separator + "AHRD-GO-Annotations-BPO-SemSim-F-Score-Recall";
 						double sumSemSimGoAnnotationScorePrecision = 0.0;
@@ -1322,6 +1599,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumSemSimGoAnnotationScorePrecision/covSemSimGoAnnotationScorePrecision) + separator + FRMT.format(sumSemSimGoAnnotationScoreRecall/covSemSimGoAnnotationScoreRecall);
 						coveragesLine += separator + FRMT.format((double)covSemSimGoAnnotationScorePrecision/getProteins().size()) + separator + FRMT.format((double)covSemSimGoAnnotationScoreRecall/getProteins().size());
+						cumulativeLine += separator + FRMT.format(cumulativeFscoreBPO.getPrecision()) + separator + FRMT.format(cumulativeFscoreBPO.getRecall());
 					}
 					//MFO
 					columnNamesLine += separator + "AHRD-GO-Annotations-MFO-SemSim-F-Score";
@@ -1337,6 +1615,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumSemSimGoMfoAnnotationScore/covSemSimGoMfoAnnotationScore);
 					coveragesLine += separator + FRMT.format((double)covSemSimGoMfoAnnotationScore/getProteins().size());
+					double cumulativeCommonInfoContentPredictionMFO = 0.0;
+					double cumulativeInfoContentGroundTruthMFO = 0.0;
+					double cumulativeCommonInfoContentGroundTruthMFO = 0.0;
+					double cumulativeInfoContentPredictionMFO = 0.0;
+					Fscore cumulativeFscoreMFO = new Fscore();
+					if (getSettings().doWriteCumulativeSemSimGoScores()) {
+						for (Protein prot : getProteins()) {
+							Fscore semSimGoAnnotationScore = prot.getEvaluationScoreCalculator().getSemSimGoAnnotationScore();
+							if (semSimGoAnnotationScore != null) {
+								InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) semSimGoAnnotationScore).getMfoFscore());
+								cumulativeCommonInfoContentPredictionMFO += infoContentFscore.getCommonInfoContentPrediction();
+								cumulativeInfoContentGroundTruthMFO += infoContentFscore.getInfoContentGroundTruth();
+								cumulativeCommonInfoContentGroundTruthMFO += infoContentFscore.getCommonInfoContentGroundTruth();
+								cumulativeInfoContentPredictionMFO += infoContentFscore.getInfoContentPrediction();
+							}
+						}
+						cumulativeFscoreMFO.setRecall(cumulativeCommonInfoContentPredictionMFO / cumulativeInfoContentGroundTruthMFO);
+						cumulativeFscoreMFO.setPrecision(cumulativeCommonInfoContentGroundTruthMFO / cumulativeInfoContentPredictionMFO);
+					}
+					cumulativeLine += separator + FRMT.format(cumulativeFscoreMFO.getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						columnNamesLine += separator + "AHRD-GO-Annotations-MFO-SemSim-F-Score-Precision" + separator + "AHRD-GO-Annotations-MFO-SemSim-F-Score-Recall";
 						double sumSemSimGoAnnotationScorePrecision = 0.0;
@@ -1359,6 +1657,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumSemSimGoAnnotationScorePrecision/covSemSimGoAnnotationScorePrecision) + separator + FRMT.format(sumSemSimGoAnnotationScoreRecall/covSemSimGoAnnotationScoreRecall);
 						coveragesLine += separator + FRMT.format((double)covSemSimGoAnnotationScorePrecision/getProteins().size()) + separator + FRMT.format((double)covSemSimGoAnnotationScoreRecall/getProteins().size());
+						cumulativeLine += separator + FRMT.format(cumulativeFscoreMFO.getPrecision()) + separator + FRMT.format(cumulativeFscoreMFO.getRecall());
 					}
 					//CCO
 					columnNamesLine += separator + "AHRD-GO-Annotations-CCO-SemSim-F-Score";
@@ -1374,6 +1673,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumSemSimGoCcoAnnotationScore/covSemSimGoCcoAnnotationScore);
 					coveragesLine += separator + FRMT.format((double)covSemSimGoCcoAnnotationScore/getProteins().size());
+					double cumulativeCommonInfoContentPredictionCCO = 0.0;
+					double cumulativeInfoContentGroundTruthCCO = 0.0;
+					double cumulativeCommonInfoContentGroundTruthCCO = 0.0;
+					double cumulativeInfoContentPredictionCCO = 0.0;
+					Fscore cumulativeFscoreCCO = new Fscore();
+					if (getSettings().doWriteCumulativeSemSimGoScores()) {
+						for (Protein prot : getProteins()) {
+							Fscore semSimGoAnnotationScore = prot.getEvaluationScoreCalculator().getSemSimGoAnnotationScore();
+							if (semSimGoAnnotationScore != null) {
+								InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) semSimGoAnnotationScore).getCcoFscore());
+								cumulativeCommonInfoContentPredictionCCO += infoContentFscore.getCommonInfoContentPrediction();
+								cumulativeInfoContentGroundTruthCCO += infoContentFscore.getInfoContentGroundTruth();
+								cumulativeCommonInfoContentGroundTruthCCO += infoContentFscore.getCommonInfoContentGroundTruth();
+								cumulativeInfoContentPredictionCCO += infoContentFscore.getInfoContentPrediction();
+							}
+						}
+						cumulativeFscoreCCO.setRecall(cumulativeCommonInfoContentPredictionCCO / cumulativeInfoContentGroundTruthCCO);
+						cumulativeFscoreCCO.setPrecision(cumulativeCommonInfoContentGroundTruthCCO / cumulativeInfoContentPredictionCCO);
+					}
+					cumulativeLine += separator + FRMT.format(cumulativeFscoreCCO.getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						columnNamesLine += separator + "AHRD-GO-Annotations-CCO-SemSim-F-Score-Precision" + separator + "AHRD-GO-Annotations-CCO-SemSim-F-Score-Recall";
 						double sumSemSimGoAnnotationScorePrecision = 0.0;
@@ -1396,6 +1715,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumSemSimGoAnnotationScorePrecision/covSemSimGoAnnotationScorePrecision) + separator + FRMT.format(sumSemSimGoAnnotationScoreRecall/covSemSimGoAnnotationScoreRecall);
 						coveragesLine += separator + FRMT.format((double)covSemSimGoAnnotationScorePrecision/getProteins().size()) + separator + FRMT.format((double)covSemSimGoAnnotationScoreRecall/getProteins().size());
+						cumulativeLine += separator + FRMT.format(cumulativeFscoreCCO.getPrecision()) + separator + FRMT.format(cumulativeFscoreCCO.getRecall());
 					}
 				}
 			}
@@ -1415,6 +1735,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumHighestPossibleSimpleGoAnnotationScore/covHighestPossibleSimpleGoAnnotationScore);
 					coveragesLine += separator + FRMT.format((double)covHighestPossibleSimpleGoAnnotationScore/getProteins().size());
+					cumulativeLine += separator;
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						columnNamesLine += separator + "Highest-Possible-BlastResult-GO-Annotations-Simple-F-Score-Precision" + separator + "Highest-Possible-BlastResult-GO-Annotations-Simple-F-Score-Recall";
 						double sumHighestPossibleSimpleGoAnnotationScorePrecision = 0.0;
@@ -1437,6 +1758,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumHighestPossibleSimpleGoAnnotationScorePrecision/covHighestPossibleSimpleGoAnnotationScorePrecision) + separator + FRMT.format(sumHighestPossibleSimpleGoAnnotationScoreRecall/covHighestPossibleSimpleGoAnnotationScoreRecall);
 						coveragesLine += separator + FRMT.format((double)covHighestPossibleSimpleGoAnnotationScorePrecision/getProteins().size()) + separator + FRMT.format((double)covHighestPossibleSimpleGoAnnotationScoreRecall/getProteins().size());
+						cumulativeLine += separator + separator;
 					}
 				}
 				if (getSettings().doCalculateAncestryGoF1Scores()) {
@@ -1453,6 +1775,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumHighestPossibleAncestryGoAnnotationScore/covHighestPossibleAncestryGoAnnotationScore);
 					coveragesLine += separator + FRMT.format((double)covHighestPossibleAncestryGoAnnotationScore/getProteins().size());
+					cumulativeLine += separator;
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						columnNamesLine += separator + "Highest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score-Precision" + separator + "Highest-Possible-BlastResult-GO-Annotations-Ancestry-F-Score-Recall";
 						double sumHighestPossibleAncestryGoAnnotationScorePrecision = 0.0;
@@ -1475,6 +1798,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumHighestPossibleAncestryGoAnnotationScorePrecision/covHighestPossibleAncestryGoAnnotationScorePrecision) + separator + FRMT.format(sumHighestPossibleAncestryGoAnnotationScoreRecall/covHighestPossibleAncestryGoAnnotationScoreRecall);
 						coveragesLine += separator + FRMT.format((double)covHighestPossibleAncestryGoAnnotationScorePrecision/getProteins().size()) + separator + FRMT.format((double)covHighestPossibleAncestryGoAnnotationScoreRecall/getProteins().size());
+						cumulativeLine += separator + separator;
 					}
 				}
 				if (getSettings().doCalculateSemSimGoF1Scores()) {
@@ -1491,6 +1815,31 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationScore/covHighestPossibleSemSimGoAnnotationScore);
 					coveragesLine += separator + FRMT.format((double)covHighestPossibleSemSimGoAnnotationScore/getProteins().size());
+					double cumulativeCommonInfoContentPrediction = 0.0;
+					double cumulativeInfoContentGroundTruth = 0.0;
+					double cumulativeCommonInfoContentGroundTruth = 0.0;
+					double cumulativeInfoContentPrediction = 0.0;
+					Fscore cumulativeFscore = new Fscore();
+					if (getSettings().doWriteCumulativeSemSimGoScores()) {
+						for (Protein prot : getProteins()) {
+							Fscore semSimGoAnnotationScore = prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore();
+							if (semSimGoAnnotationScore != null) {
+								InfoContentFscore infoContentFscore = null;
+								if (getSettings().doEvaluateSubontologiesSepatatey()) {
+									infoContentFscore = ((InfoContentFscore) ((GoFscore) semSimGoAnnotationScore).getAllFscore());
+								} else {
+									infoContentFscore = ((InfoContentFscore) semSimGoAnnotationScore);
+								}
+								cumulativeCommonInfoContentPrediction += infoContentFscore.getCommonInfoContentPrediction();
+								cumulativeInfoContentGroundTruth += infoContentFscore.getInfoContentGroundTruth();
+								cumulativeCommonInfoContentGroundTruth += infoContentFscore.getCommonInfoContentGroundTruth();
+								cumulativeInfoContentPrediction += infoContentFscore.getInfoContentPrediction();
+							}
+						}
+						cumulativeFscore.setRecall(cumulativeCommonInfoContentPrediction / cumulativeInfoContentGroundTruth);
+						cumulativeFscore.setPrecision(cumulativeCommonInfoContentGroundTruth / cumulativeInfoContentPrediction);
+					}
+					cumulativeLine += separator + FRMT.format(cumulativeFscore.getScore());
 					if (getSettings().doWriteFscoreDetailsToOutput()) {
 						columnNamesLine += separator + "Highest-Possible-BlastResult-GO-Annotations-SemSim-F-Score-Precision" + separator + "Highest-Possible-BlastResult-GO-Annotations-SemSim-F-Score-Recall";
 						double sumHighestPossibleSemSimGoAnnotationScorePrecision = 0.0;
@@ -1513,6 +1862,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationScorePrecision/covHighestPossibleSemSimGoAnnotationScorePrecision) + separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationScoreRecall/covHighestPossibleSemSimGoAnnotationScoreRecall);
 						coveragesLine += separator + FRMT.format((double)covHighestPossibleSemSimGoAnnotationScorePrecision/getProteins().size()) + separator + FRMT.format((double)covHighestPossibleSemSimGoAnnotationScoreRecall/getProteins().size());
+						cumulativeLine += separator + FRMT.format(cumulativeFscore.getPrecision()) + separator + FRMT.format(cumulativeFscore.getRecall());
 					}
 					if (getSettings().doEvaluateSubontologiesSepatatey()) {
 						// BPO
@@ -1529,6 +1879,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumHighestPossibleBpoSemSimGoAnnotationScore / covHighestPossibleBpoSemSimGoAnnotationScore);
 						coveragesLine += separator + FRMT.format((double) covHighestPossibleBpoSemSimGoAnnotationScore / getProteins().size());
+						double cumulativeCommonInfoContentPredictionBPO = 0.0;
+						double cumulativeInfoContentGroundTruthBPO = 0.0;
+						double cumulativeCommonInfoContentGroundTruthBPO = 0.0;
+						double cumulativeInfoContentPredictionBPO = 0.0;
+						Fscore cumulativeFscoreBPO = new Fscore();
+						if (getSettings().doWriteCumulativeSemSimGoScores()) {
+							for (Protein prot : getProteins()) {
+								Fscore semSimGoAnnotationScore = prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore();
+								if (semSimGoAnnotationScore != null) {
+									InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) semSimGoAnnotationScore).getBpoFscore());
+									cumulativeCommonInfoContentPredictionBPO += infoContentFscore.getCommonInfoContentPrediction();
+									cumulativeInfoContentGroundTruthBPO += infoContentFscore.getInfoContentGroundTruth();
+									cumulativeCommonInfoContentGroundTruthBPO += infoContentFscore.getCommonInfoContentGroundTruth();
+									cumulativeInfoContentPredictionBPO += infoContentFscore.getInfoContentPrediction();
+								}
+							}
+							cumulativeFscoreBPO.setRecall(cumulativeCommonInfoContentPredictionBPO / cumulativeInfoContentGroundTruthBPO);
+							cumulativeFscoreBPO.setPrecision(cumulativeCommonInfoContentGroundTruthBPO / cumulativeInfoContentPredictionBPO);
+						}
+						cumulativeLine += separator + FRMT.format(cumulativeFscoreBPO.getScore());
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
 							columnNamesLine += separator + "Highest-Possible-BlastResult-GO-Annotations-BPO-SemSim-F-Score-Precision" + separator + "Highest-Possible-BlastResult-GO-Annotations-BPO-SemSim-F-Score-Recall";
 							double sumHighestPossibleSemSimGoAnnotationScorePrecision = 0.0;
@@ -1551,6 +1921,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationScorePrecision / covHighestPossibleSemSimGoAnnotationScorePrecision) + separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationScoreRecall / covHighestPossibleSemSimGoAnnotationScoreRecall);
 							coveragesLine += separator + FRMT.format((double) covHighestPossibleSemSimGoAnnotationScorePrecision / getProteins().size()) + separator + FRMT.format((double) covHighestPossibleSemSimGoAnnotationScoreRecall / getProteins().size());
+							cumulativeLine += separator + FRMT.format(cumulativeFscoreBPO.getPrecision()) + separator + FRMT.format(cumulativeFscoreBPO.getRecall());
 						}
 						// MFO
 						columnNamesLine += separator + "Highest-Possible-BlastResult-GO-Annotations-MFO-SemSim-F-Score";
@@ -1566,6 +1937,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumHighestPossibleMfoSemSimGoAnnotationScore / covHighestPossibleMfoSemSimGoAnnotationScore);
 						coveragesLine += separator + FRMT.format((double) covHighestPossibleMfoSemSimGoAnnotationScore / getProteins().size());
+						double cumulativeCommonInfoContentPredictionMFO = 0.0;
+						double cumulativeInfoContentGroundTruthMFO = 0.0;
+						double cumulativeCommonInfoContentGroundTruthMFO = 0.0;
+						double cumulativeInfoContentPredictionMFO = 0.0;
+						Fscore cumulativeFscoreMFO = new Fscore();
+						if (getSettings().doWriteCumulativeSemSimGoScores()) {
+							for (Protein prot : getProteins()) {
+								Fscore semSimGoAnnotationScore = prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore();
+								if (semSimGoAnnotationScore != null) {
+									InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) semSimGoAnnotationScore).getMfoFscore());
+									cumulativeCommonInfoContentPredictionMFO += infoContentFscore.getCommonInfoContentPrediction();
+									cumulativeInfoContentGroundTruthMFO += infoContentFscore.getInfoContentGroundTruth();
+									cumulativeCommonInfoContentGroundTruthMFO += infoContentFscore.getCommonInfoContentGroundTruth();
+									cumulativeInfoContentPredictionMFO += infoContentFscore.getInfoContentPrediction();
+								}
+							}
+							cumulativeFscoreMFO.setRecall(cumulativeCommonInfoContentPredictionMFO / cumulativeInfoContentGroundTruthMFO);
+							cumulativeFscoreMFO.setPrecision(cumulativeCommonInfoContentGroundTruthMFO / cumulativeInfoContentPredictionMFO);
+						}
+						cumulativeLine += separator + FRMT.format(cumulativeFscoreMFO.getScore());
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
 							columnNamesLine += separator + "Highest-Possible-BlastResult-GO-Annotations-MFO-SemSim-F-Score-Precision" + separator + "Highest-Possible-BlastResult-GO-Annotations-MFO-SemSim-F-Score-Recall";
 							double sumHighestPossibleSemSimGoAnnotationScorePrecision = 0.0;
@@ -1588,6 +1979,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationScorePrecision / covHighestPossibleSemSimGoAnnotationScorePrecision) + separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationScoreRecall / covHighestPossibleSemSimGoAnnotationScoreRecall);
 							coveragesLine += separator + FRMT.format((double) covHighestPossibleSemSimGoAnnotationScorePrecision / getProteins().size()) + separator + FRMT.format((double) covHighestPossibleSemSimGoAnnotationScoreRecall / getProteins().size());
+							cumulativeLine += separator + FRMT.format(cumulativeFscoreMFO.getPrecision()) + separator + FRMT.format(cumulativeFscoreMFO.getRecall());
 						}
 						// CCO
 						columnNamesLine += separator + "Highest-Possible-BlastResult-GO-Annotations-CCO-SemSim-F-Score";
@@ -1603,6 +1995,26 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 						}
 						averagesLine += separator + FRMT.format(sumHighestPossibleCcoSemSimGoAnnotationScore / covHighestPossibleCcoSemSimGoAnnotationScore);
 						coveragesLine += separator + FRMT.format((double) covHighestPossibleCcoSemSimGoAnnotationScore / getProteins().size());
+						double cumulativeCommonInfoContentPredictionCCO = 0.0;
+						double cumulativeInfoContentGroundTruthCCO = 0.0;
+						double cumulativeCommonInfoContentGroundTruthCCO = 0.0;
+						double cumulativeInfoContentPredictionCCO = 0.0;
+						Fscore cumulativeFscoreCCO = new Fscore();
+						if (getSettings().doWriteCumulativeSemSimGoScores()) {
+							for (Protein prot : getProteins()) {
+								Fscore semSimGoAnnotationScore = prot.getEvaluationScoreCalculator().getHighestPossibleSemSimGoAnnotationScore();
+								if (semSimGoAnnotationScore != null) {
+									InfoContentFscore infoContentFscore = ((InfoContentFscore) ((GoFscore) semSimGoAnnotationScore).getCcoFscore());
+									cumulativeCommonInfoContentPredictionCCO += infoContentFscore.getCommonInfoContentPrediction();
+									cumulativeInfoContentGroundTruthCCO += infoContentFscore.getInfoContentGroundTruth();
+									cumulativeCommonInfoContentGroundTruthCCO += infoContentFscore.getCommonInfoContentGroundTruth();
+									cumulativeInfoContentPredictionCCO += infoContentFscore.getInfoContentPrediction();
+								}
+							}
+							cumulativeFscoreCCO.setRecall(cumulativeCommonInfoContentPredictionCCO / cumulativeInfoContentGroundTruthCCO);
+							cumulativeFscoreCCO.setPrecision(cumulativeCommonInfoContentGroundTruthCCO / cumulativeInfoContentPredictionCCO);
+						}
+						cumulativeLine += separator + FRMT.format(cumulativeFscoreCCO.getScore());
 						if (getSettings().doWriteFscoreDetailsToOutput()) {
 							columnNamesLine += separator + "Highest-Possible-BlastResult-GO-Annotations-CCO-SemSim-F-Score-Precision" + separator + "Highest-Possible-BlastResult-GO-Annotations-CCO-SemSim-F-Score-Recall";
 							double sumHighestPossibleSemSimGoAnnotationScorePrecision = 0.0;
@@ -1625,6 +2037,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							}
 							averagesLine += separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationScorePrecision / covHighestPossibleSemSimGoAnnotationScorePrecision) + separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationScoreRecall / covHighestPossibleSemSimGoAnnotationScoreRecall);
 							coveragesLine += separator + FRMT.format((double) covHighestPossibleSemSimGoAnnotationScorePrecision / getProteins().size()) + separator + FRMT.format((double) covHighestPossibleSemSimGoAnnotationScoreRecall / getProteins().size());
+							cumulativeLine += separator + FRMT.format(cumulativeFscoreCCO.getPrecision()) + separator + FRMT.format(cumulativeFscoreCCO.getRecall());
 						}
 					}
 				}
@@ -1646,6 +2059,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumHighestPossibleSimpleGoAnnotationPrecision/covHighestPossibleSimpleGoAnnotationPrecision);
 					coveragesLine += separator + FRMT.format((double)covHighestPossibleSimpleGoAnnotationPrecision/getProteins().size());
+					cumulativeLine += separator;
 				}
 				if (getSettings().doCalculateAncestryGoF1Scores()) {
 					columnNamesLine += separator + "Highest-Possible-Ancestry-GO-Annotations-Precision";
@@ -1661,6 +2075,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumHighestPossibleAncestryGoAnnotationPrecision/covHighestPossibleAncestryGoAnnotationPrecision);
 					coveragesLine += separator + FRMT.format((double)covHighestPossibleAncestryGoAnnotationPrecision/getProteins().size());
+					cumulativeLine += separator;
 				}
 				if (getSettings().doCalculateSemSimGoF1Scores()) {
 					columnNamesLine += separator + "Highest-Possible-SemSim-GO-Annotations-Precision";
@@ -1676,6 +2091,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationPrecision/covHighestPossibleSemSimGoAnnotationPrecision);
 					coveragesLine += separator + FRMT.format((double)covHighestPossibleSemSimGoAnnotationPrecision/getProteins().size());
+					cumulativeLine += separator;
 				}
 			}
 			// Highest possible Go annotation recall
@@ -1694,6 +2110,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumHighestPossibleSimpleGoAnnotationRecall/covHighestPossibleSimpleGoAnnotationRecall);
 					coveragesLine += separator + FRMT.format((double)covHighestPossibleSimpleGoAnnotationRecall/getProteins().size());
+					cumulativeLine += separator;
 				}
 				if (getSettings().doCalculateAncestryGoF1Scores()) {
 					columnNamesLine += separator + "Highest-Possible-Ancestry-GO-Annotations-Recall";
@@ -1709,6 +2126,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumHighestPossibleAncestryGoAnnotationRecall/covHighestPossibleAncestryGoAnnotationRecall);
 					coveragesLine += separator + FRMT.format((double)covHighestPossibleAncestryGoAnnotationRecall/getProteins().size());
+					cumulativeLine += separator;
 				}
 				if (getSettings().doCalculateSemSimGoF1Scores()) {
 					columnNamesLine += separator + "Highest-Possible-SemSim-GO-Annotations-Recall";
@@ -1724,6 +2142,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					}
 					averagesLine += separator + FRMT.format(sumHighestPossibleSemSimGoAnnotationRecall/covHighestPossibleSemSimGoAnnotationRecall);
 					coveragesLine += separator + FRMT.format((double)covHighestPossibleSemSimGoAnnotationRecall/getProteins().size());
+					cumulativeLine += separator;
 				}
 			}
 		}

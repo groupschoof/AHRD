@@ -125,7 +125,8 @@ public class Settings implements Cloneable {
 	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
 	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
 	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary";
-	public static final String EVALUATE_SUBONTOLOGIES_SEPARATELY = "evaluate_subontologies_separately"; 
+	public static final String EVALUATE_SUBONTOLOGIES_SEPARATELY = "evaluate_subontologies_separately";
+	public static final String WRITE_CUMMULATIVE_SEMSIMGO_SCORES_KEY = "write_cummulative_semsimgo_scores";
 	
 	/**
 	 * Fields:
@@ -354,6 +355,10 @@ public class Settings implements Cloneable {
 	 * Triggers the calculation and output of GO Fscores separately for the three GO subontologies (in Evaluation mode)
 	 */
 	private boolean evaluateSubontologiesSepatatey = false;
+	/**
+	 * Triggers the calculation and output of cumulative SemSim GO scores
+	 */
+	private boolean writeCumulativeSemSimGoScores = false;
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -550,6 +555,7 @@ public class Settings implements Cloneable {
 		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
 		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
 		this.setEvaluateSubontologiesSepatatey(Boolean.parseBoolean((String) input.get(EVALUATE_SUBONTOLOGIES_SEPARATELY)));
+		this.setWriteCumulativeSemSimGoScores(Boolean.parseBoolean((String) input.get(WRITE_CUMMULATIVE_SEMSIMGO_SCORES_KEY)));
 	}
 
 	/**
@@ -1344,5 +1350,13 @@ public class Settings implements Cloneable {
 
 	public void setEvaluateSubontologiesSepatatey(boolean evaluateSubontologiesSepatatey) {
 		this.evaluateSubontologiesSepatatey = evaluateSubontologiesSepatatey;
+	}
+
+	public boolean doWriteCumulativeSemSimGoScores() {
+		return writeCumulativeSemSimGoScores;
+	}
+
+	public void setWriteCumulativeSemSimGoScores(boolean writeCumulativeSemSimGoScores) {
+		this.writeCumulativeSemSimGoScores = writeCumulativeSemSimGoScores;
 	}
 }
