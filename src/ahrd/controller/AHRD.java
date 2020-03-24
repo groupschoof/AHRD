@@ -295,6 +295,7 @@ public class AHRD {
 					for (GOterm ancestor : term.getAncestry()) {
 						if (goSlim.contains(ancestor) && ancestor.getInformationContent() > maxInfoContent) {
 							highestInfoContentGoSlimTerm = ancestor;
+							maxInfoContent = ancestor.getInformationContent();
 						}
 					}
 					if (highestInfoContentGoSlimTerm != null) {
