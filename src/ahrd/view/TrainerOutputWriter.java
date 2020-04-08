@@ -97,7 +97,6 @@ public class TrainerOutputWriter {
 				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreOverlapScoreWeight()) + "\t"
 				+ FRMT.format(s.getGoTermScoreInformationContentWeight()) + "\t"
-				+ FRMT.format(s.getInformativeTokenThreshold()) + "\t"
 				+ FRMT.format(s.getGoTermScoreEvidenceCodeScoreWeight());
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + FRMT.format(s.getBlastDbWeight(blastDb));
@@ -118,7 +117,6 @@ public class TrainerOutputWriter {
 				+ FRMT.format(s.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(s.getTokenScoreOverlapScoreWeight()) + "\t"
 				+ FRMT.format(s.getGoTermScoreInformationContentWeight()) + "\t"
-				+ FRMT.format(s.getInformativeTokenThreshold()) + "\t"
 				+ FRMT.format(s.getGoTermScoreEvidenceCodeScoreWeight());
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + FRMT.format(s.getBlastDbWeight(blastDb));

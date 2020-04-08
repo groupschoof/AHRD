@@ -45,7 +45,6 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 				+ FRMT.format(p.getTokenScoreDatabaseScoreWeight()) + "\t"
 				+ FRMT.format(p.getTokenScoreOverlapScoreWeight()) + "\t"
 				+ FRMT.format(p.getGoTermScoreInformationContentWeight()) + "\t"
-				+ FRMT.format(p.getInformativeTokenThreshold()) + "\t"
 				+ FRMT.format(p.getGoTermScoreEvidenceCodeScoreWeight());
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + FRMT.format(p.getBlastDbWeight(blastDb));
@@ -65,7 +64,6 @@ public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 				+ s.getTokenScoreDatabaseScoreWeight() + "\t"
 				+ s.getTokenScoreOverlapScoreWeight() + "\t"
 				+ s.getGoTermScoreInformationContentWeight() + "\t"
-				+ s.getInformativeTokenThreshold() + "\t"
 				+ s.getGoTermScoreEvidenceCodeScoreWeight();
 		for (String blastDb : this.sortedBlastDatabases) {
 			col += "\t" + s.getBlastDbWeight(blastDb);

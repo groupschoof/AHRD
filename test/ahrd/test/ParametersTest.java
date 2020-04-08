@@ -228,7 +228,6 @@ public class ParametersTest {
 				(!n.getTokenScoreBitScoreWeight().equals(s.getTokenScoreBitScoreWeight())
 						|| !n.getTokenScoreDatabaseScoreWeight().equals(s.getTokenScoreDatabaseScoreWeight()) 
 						|| !n.getTokenScoreOverlapScoreWeight().equals(s.getTokenScoreOverlapScoreWeight()) 
-						|| !n.getInformativeTokenThreshold().equals(s.getInformativeTokenThreshold())
 						|| !n.getGoTermScoreInformationContentWeight().equals(s.getGoTermScoreInformationContentWeight())
 						|| !n.getGoTermScoreEvidenceCodeScoreWeight().equals(s.getGoTermScoreEvidenceCodeScoreWeight()))
 						|| blastParamDiff);
@@ -246,14 +245,13 @@ public class ParametersTest {
 				case 1: assertTrue("TokenScoreDatabaseScoreWeight should have been mutated.",!n.getTokenScoreDatabaseScoreWeight().equals(n2.getTokenScoreDatabaseScoreWeight())); break; 
 				case 2: assertTrue("TokenScoreOverlapScoreWeight should have been mutated.",!n.getTokenScoreOverlapScoreWeight().equals(n2.getTokenScoreOverlapScoreWeight())); break; 
 				case 3: assertTrue("GoTermScoreInformationContentWeight should have been mutated.",!n.getGoTermScoreInformationContentWeight().equals(n2.getGoTermScoreInformationContentWeight())); break; 
-				case 4: assertTrue("InformativeTokenThreshold should have been mutated.",!n.getInformativeTokenThreshold().equals(n2.getInformativeTokenThreshold())); break;
-				case 5: assertTrue("GoTermScoreEvidenceCodeScoreWeight should have been mutated.",!n.getGoTermScoreEvidenceCodeScoreWeight().equals(n2.getGoTermScoreEvidenceCodeScoreWeight())); break;
+				case 4: assertTrue("GoTermScoreEvidenceCodeScoreWeight should have been mutated.",!n.getGoTermScoreEvidenceCodeScoreWeight().equals(n2.getGoTermScoreEvidenceCodeScoreWeight())); break;
 				}
 			} else {
 				String blastDbName = getSettings().getSortedBlastDatabases()
 						.get((new Double(Math.floor((paramInd - Parameters.NUMBER_OF_NON_DB_PARAMETERS) / 2.0)))
 								.intValue());
-				boolean mutatedBlastDbWeight = ! (paramInd % 2 == 1);
+				boolean mutatedBlastDbWeight = ! ((paramInd - Parameters.NUMBER_OF_NON_DB_PARAMETERS) % 2 == 1);
 				if (mutatedBlastDbWeight)
 					assertTrue(
 							"BlastDatabaseWeight of db " + blastDbName
