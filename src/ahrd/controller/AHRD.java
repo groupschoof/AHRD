@@ -249,11 +249,7 @@ public class AHRD {
 	/**
 	 * Assign Gene Ontology terms to each Protein
 	 */
-	public void assignGeneOntologyTerms() throws MissingInterproResultException, IOException, SQLException {
-		// Load a Map of all GO terms
-		if (goDB == null) {
-			goDB = new GOdatabase().getMap();
-		}
+	public void assignGeneOntologyTerms() throws MissingInterproResultException {
 		for (Protein protein : this.getProteins().values()) {
 			// calculate total and cumulative go term scores 
 			Map<String, Double> cumulativeGoTermBitScores = new HashMap<String, Double>();
@@ -337,13 +333,11 @@ public class AHRD {
 					if (reference != null) {
 						for (ReferenceGoAnnotation annotation : reference) {
 							String termAcc = annotation.getGoTerm();
-							GOterm term = goDB.get(termAcc);
-							double infoContentScore = 1 - (getSettings().getGoTermScoreInformationContentWeight() * term.getAnnotationFrequency());
 							double evidenceCodeScore = 1 - (getSettings().getGoTermScoreEvidenceCodeScoreWeight() * (1 - (cumulativeGoTermEvidenceCodeWeights.get(termAcc) / termAnnotationCounts.get(termAcc)))); 
 							double goTermAbundancyScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
 														+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
 														+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;
-							double goTermScore = goTermAbundancyScore * infoContentScore * evidenceCodeScore;
+							double goTermScore = goTermAbundancyScore * evidenceCodeScore;
 							goTermScores.put(termAcc, goTermScore);
 							if (goTermScore > goTermHighScore) {
 								goTermHighScore = goTermScore;

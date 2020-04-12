@@ -208,30 +208,6 @@ public class ParametersTest {
 	}
 	
 	@Test
-	public void testMutateGoTermScoreInformationContentWeight() {
-		Parameters p = getSettings().getParameters();
-		Double dbsw = new Double(p.getTokenScoreDatabaseScoreWeight());
-		Double osw = new Double(p.getTokenScoreOverlapScoreWeight());
-		Double bsw = new Double(p.getTokenScoreBitScoreWeight());
-		Double goTermScoreInformationContentWeight = new Double(p.getGoTermScoreInformationContentWeight());
-		// test:
-		p.mutateGoTermScoreInformationContentWeight();
-		assertEquals(
-				1.0,
-				p.getTokenScoreBitScoreWeight()
-						+ p.getTokenScoreDatabaseScoreWeight()
-						+ p.getTokenScoreOverlapScoreWeight(), 0.001);
-		assertTrue(
-				"The three Token-Score-Weights should not have changed.",
-				dbsw.equals(p.getTokenScoreDatabaseScoreWeight())
-						&& osw.equals(p.getTokenScoreOverlapScoreWeight())
-						&& bsw.equals(p.getTokenScoreBitScoreWeight()));
-		assertTrue(
-				"The goTermScoreInformationContentWeight should have changed.",
-				!goTermScoreInformationContentWeight.equals(p.getGoTermScoreInformationContentWeight()));
-	}
-
-	@Test
 	public void testNeighbour() {
 		// test
 		Parameters n = getSettings().getParameters().neighbour(0.0);
@@ -253,7 +229,6 @@ public class ParametersTest {
 						|| !n.getTokenScoreDatabaseScoreWeight().equals(s.getTokenScoreDatabaseScoreWeight()) 
 						|| !n.getTokenScoreOverlapScoreWeight().equals(s.getTokenScoreOverlapScoreWeight()) 
 						|| !n.getInformativeTokenThreshold().equals(s.getInformativeTokenThreshold())
-						|| !n.getGoTermScoreInformationContentWeight().equals(s.getGoTermScoreInformationContentWeight())
 						|| !n.getGoTermScoreEvidenceCodeScoreWeight().equals(s.getGoTermScoreEvidenceCodeScoreWeight()))
 						|| blastParamDiff);
 		// Extreme Score-Increase should result in mutation of the same
@@ -268,16 +243,15 @@ public class ParametersTest {
 				switch (paramInd) {
 				case 0: assertTrue("TokenScoreBitScoreWeight should have been mutated.",!n.getTokenScoreBitScoreWeight().equals(n2.getTokenScoreBitScoreWeight())); break;
 				case 1: assertTrue("TokenScoreDatabaseScoreWeight should have been mutated.",!n.getTokenScoreDatabaseScoreWeight().equals(n2.getTokenScoreDatabaseScoreWeight())); break; 
-				case 2: assertTrue("TokenScoreOverlapScoreWeight should have been mutated.",!n.getTokenScoreOverlapScoreWeight().equals(n2.getTokenScoreOverlapScoreWeight())); break; 
-				case 3: assertTrue("GoTermScoreInformationContentWeight should have been mutated.",!n.getGoTermScoreInformationContentWeight().equals(n2.getGoTermScoreInformationContentWeight())); break; 
-				case 4: assertTrue("InformativeTokenThreshold should have been mutated.",!n.getInformativeTokenThreshold().equals(n2.getInformativeTokenThreshold())); break;
-				case 5: assertTrue("GoTermScoreEvidenceCodeScoreWeight should have been mutated.",!n.getGoTermScoreEvidenceCodeScoreWeight().equals(n2.getGoTermScoreEvidenceCodeScoreWeight())); break;
+				case 2: assertTrue("TokenScoreOverlapScoreWeight should have been mutated.",!n.getTokenScoreOverlapScoreWeight().equals(n2.getTokenScoreOverlapScoreWeight())); break;  
+				case 3: assertTrue("InformativeTokenThreshold should have been mutated.",!n.getInformativeTokenThreshold().equals(n2.getInformativeTokenThreshold())); break;
+				case 4: assertTrue("GoTermScoreEvidenceCodeScoreWeight should have been mutated.",!n.getGoTermScoreEvidenceCodeScoreWeight().equals(n2.getGoTermScoreEvidenceCodeScoreWeight())); break;
 				}
 			} else {
 				String blastDbName = getSettings().getSortedBlastDatabases()
 						.get((new Double(Math.floor((paramInd - Parameters.NUMBER_OF_NON_DB_PARAMETERS) / 2.0)))
 								.intValue());
-				boolean mutatedBlastDbWeight = ! (paramInd % 2 == 1);
+				boolean mutatedBlastDbWeight = ! ((paramInd - Parameters.NUMBER_OF_NON_DB_PARAMETERS) % 2 == 1);
 				if (mutatedBlastDbWeight)
 					assertTrue(
 							"BlastDatabaseWeight of db " + blastDbName
