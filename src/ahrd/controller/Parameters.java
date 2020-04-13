@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class Parameters implements Cloneable, Comparable<Parameters> {
 	
-	public static final int NUMBER_OF_NON_DB_PARAMETERS = 5;
+	public static final int NUMBER_OF_NON_DB_PARAMETERS = 4;
 
 	private Double tokenScoreBitScoreWeight;
 	private Double tokenScoreDatabaseScoreWeight;
@@ -59,11 +59,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	 */
 	private String origin;
 	/**
-	 * Fraction of the TokenHighScore a Tokens TokenScore needs to be considered as informative. 
-	 * Should be between 0 and 1.
-	 */
-	private Double informativeTokenThreshold = 0.5;
-	/**
 	 * Weight of the reference go annotation evidence code weights on the calculation of the goTermScore
 	 */
 	private Double goTermScoreEvidenceCodeScoreWeight = 0.5;
@@ -82,8 +77,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		out.setGoTermScoreEvidenceCodeScoreWeight(rand.nextDouble());
 		// normalize the randomly chosen weights:
 		out.normalizeTokenScoreWeights();
-		// draw random informative token threshold between 0 an 1
-		out.setInformativeTokenThreshold(rand.nextDouble());
 		// Init BlastDbs' Parameters:
 		for (String blastDbName : sortedDistinctBlastDatabaseNames) {
 			out.setDescriptionScoreBitScoreWeight(blastDbName,
@@ -174,8 +167,7 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				case 0: ngb.mutateTokenScoreBitScoreWeight(); break;
 				case 1: ngb.mutateTokenScoreDatabaseScoreWeight(); break;
 				case 2: ngb.mutateTokenScoreOverlapScoreWeight(); break;
-				case 3: ngb.mutateInformativeTokenThreshold(); break;
-				case 4: ngb.mutateGoTermScoreEvidenceCodeScoreWeight(); break; 
+				case 3: ngb.mutateGoTermScoreEvidenceCodeScoreWeight(); break; 
 			}
 		} else {
 			// Mutate a Parameter associated with a Blast-Database:
@@ -301,13 +293,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	}
 
 	/**
-	 * Diminishes or increases Informative-Token-Threshold
-	 */
-	public void mutateInformativeTokenThreshold() {
-		setInformativeTokenThreshold(mutateZeroToOne(getInformativeTokenThreshold()));
-	}
-
-	/**
 	 * Diminishes or increases Go-Term-Score-Information-Content-Weight
 	 */
 	public void mutateGoTermScoreEvidenceCodeScoreWeight() {
@@ -378,8 +363,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		if(rand.nextBoolean())
 			offspring.setTokenScoreOverlapScoreWeight(partner.getTokenScoreOverlapScoreWeight());
 		if(rand.nextBoolean())
-			offspring.setInformativeTokenThreshold(partner.getInformativeTokenThreshold());
-		if(rand.nextBoolean())
 			offspring.setGoTermScoreEvidenceCodeScoreWeight(partner.getGoTermScoreEvidenceCodeScoreWeight());
 		for (String blastDbName : getSettings().getSortedBlastDatabases()) {
 			if(rand.nextBoolean())
@@ -442,7 +425,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				&& ((Parameters) eql).getTokenScoreDatabaseScoreWeight()
 						.equals(this.getTokenScoreDatabaseScoreWeight())
 				&& ((Parameters) eql).getTokenScoreOverlapScoreWeight().equals(this.getTokenScoreOverlapScoreWeight())
-				&& ((Parameters) eql).getInformativeTokenThreshold().equals(this.getInformativeTokenThreshold())
 				&& ((Parameters) eql).getGoTermScoreEvidenceCodeScoreWeight().equals(this.getGoTermScoreEvidenceCodeScoreWeight());
 	}
 
@@ -457,7 +439,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 		hashSrc += getTokenScoreBitScoreWeight()
 				+ getTokenScoreDatabaseScoreWeight()
 				+ getTokenScoreOverlapScoreWeight()
-				+ getInformativeTokenThreshold()
 				+ getGoTermScoreEvidenceCodeScoreWeight();
 		return hashSrc.hashCode();
 	}
@@ -594,10 +575,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 				return -1;
 			if (this.getTokenScoreOverlapScoreWeight() > other.getTokenScoreOverlapScoreWeight())
 				return 1;
-			if (this.getInformativeTokenThreshold() < other.getInformativeTokenThreshold())
-				return -1;
-			if (this.getInformativeTokenThreshold() > other.getInformativeTokenThreshold())
-				return 1;
 			if (this.getGoTermScoreEvidenceCodeScoreWeight() < other.getGoTermScoreEvidenceCodeScoreWeight())
 				return -1;
 			if (this.getGoTermScoreEvidenceCodeScoreWeight() > other.getGoTermScoreEvidenceCodeScoreWeight())
@@ -622,14 +599,6 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 
 	public void setOrigin(String origin) {
 		this.origin = origin;
-	}
-
-	public Double getInformativeTokenThreshold() {
-		return informativeTokenThreshold;
-	}
-
-	public void setInformativeTokenThreshold(double informativeTokenThreshold) {
-		this.informativeTokenThreshold = informativeTokenThreshold;
 	}
 
 	public Double getGoTermScoreEvidenceCodeScoreWeight() {

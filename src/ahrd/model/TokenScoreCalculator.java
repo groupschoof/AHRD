@@ -132,7 +132,7 @@ public class TokenScoreCalculator {
 	public void filterTokenScores() {
 		for (String token : getTokenScores().keySet()) {
 			if (!isInformativeToken(token)) {
-				getTokenScores().put(token, new Double(getTokenScores().get(token) - getTokenHighScore() * getSettings().getInformativeTokenThreshold()));
+				getTokenScores().put(token, new Double(getTokenScores().get(token) - getTokenHighScore() * 0.5));
 			}
 		}
 	}
@@ -144,7 +144,7 @@ public class TokenScoreCalculator {
 	 *        initialized!
 	 */
 	public boolean isInformativeToken(String token) {
-		return getTokenScores().get(token) > getTokenHighScore() * getSettings().getInformativeTokenThreshold();
+		return getTokenScores().get(token) > getTokenHighScore() * 0.5;
 	}
 
 	/**

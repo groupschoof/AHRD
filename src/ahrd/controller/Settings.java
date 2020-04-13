@@ -118,7 +118,6 @@ public class Settings implements Cloneable {
 	public static final String COMPETITOR_GOA_FILE_KEY = "go_annotations";
 	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score";
 	public static final String WRITE_FSCORE_DETAILS_TO_OUTPUT = "write_fscore_details_to_output";
-	public static final String INFORMATIVE_TOKEN_THRESHOLD = "informative_token_threshold";
 	public static final String REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY = "reference_go_annotation_evidence_code_weights";
 	public static final String ACCESSION_GROUP_NAME = "accession";
 	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
@@ -511,9 +510,6 @@ public class Settings implements Cloneable {
 		}
 		this.setFindHighestPossibleGoScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY)));
 		this.setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
-		if (input.get(INFORMATIVE_TOKEN_THRESHOLD) != null) {
-			this.setInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD)));
-		}
 		/**
 		 * Initialize default reference go annotation evidence code weights
 		 * (see: http://www.geneontology.org/page/guide-go-evidence-codes)
@@ -830,14 +826,6 @@ public class Settings implements Cloneable {
 
 	public void setGoTermScoreEvidenceCodeScoreWeight(Double goTermScoreEvidenceCodeScoreWeight) {
 		this.getParameters().setGoTermScoreEvidenceCodeScoreWeight(goTermScoreEvidenceCodeScoreWeight);
-	}
-	
-	public double getInformativeTokenThreshold() {
-		return getParameters().getInformativeTokenThreshold();
-	}
-
-	public void setInformativeTokenThreshold(double informativeTokenThreshold) {
-		this.getParameters().setInformativeTokenThreshold(informativeTokenThreshold);
 	}
 
 	public Boolean getWriteTokenSetToOutput() {

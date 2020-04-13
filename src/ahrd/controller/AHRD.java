@@ -348,8 +348,8 @@ public class AHRD {
 			}
 			// Filter GO Term-Scores
 			for (String goTerm : goTermScores.keySet()) {
-				if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getInformativeTokenThreshold()) {
-					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getInformativeTokenThreshold()));
+				if (goTermScores.get(goTerm) < goTermHighScore * 0.5) {
+					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * 0.5));
 				}
 			}
 			// Find highest scoring GO annotation
@@ -366,7 +366,7 @@ public class AHRD {
 							Double goTermScore = goTermScores.get(annotation.getGoTerm());
 							sumGoTermScores += goTermScore * getSettings().getEvidenceCodeWeight(annotation.getEvidenceCode());
 							goTermCount++;
-							if (goTermScore > goTermHighScore * getSettings().getInformativeTokenThreshold()) {
+							if (goTermScore > goTermHighScore * 0.5) {
 								informativeGoTermCount++;
 							}
 						}
