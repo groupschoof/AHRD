@@ -1,8 +1,9 @@
 package ahrd.controller;
 
+import static ahrd.controller.DatabaseSetup.setupOrUseExistingDatabase;
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Settings.setSettings;
-import static ahrd.model.ReferenceGoAnnotations.parseReferenceGoAnnotations;
+import static ahrd.model.AhrdDb.closeDb;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,7 +20,6 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
-import ahrd.model.GOterm;
 import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import ahrd.view.FastaOutputWriter;
@@ -29,15 +29,12 @@ import nu.xom.ParsingException;
 
 public class AHRD {
 
-	public static final String VERSION = "3.11";
+	public static final String VERSION = "3.4";
 
 	private Map<String, Protein> proteins;
 	private Map<String, Double> descriptionScoreBitScoreWeights = new HashMap<String, Double>();
-	private Map<String, Set<String>> referenceGoAnnotations;
-	private Set<String> uniqueBlastResultShortAccessions;
 	private long timestamp;
 	private long memorystamp;
-	private Map<String, GOterm> goDB;
 
 	protected long takeTime() {
 		// Measure time:
@@ -55,14 +52,12 @@ public class AHRD {
 	}
 
 	public static void main(String[] args) {
-		System.out.println("Usage:\njava -Xmx2g -jar ahrd.jar input.yml\n");
+		System.out.println("Usage:\njava -Xmx30g -jar ahrd.jar input.yml\n");
 
 		try {
 			AHRD ahrd = new AHRD(args[0]);
 			// Load and parse all inputs
 			ahrd.setup(true);
-			// After the setup the unique short accessions are no longer needed:
-			ahrd.setUniqueBlastResultShortAccessions(null);
 
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
@@ -77,11 +72,13 @@ public class AHRD {
 			// Log
 			System.out.println("Wrote output in " + ahrd.takeTime() + "sec, currently occupying "
 					+ ahrd.takeMemoryUsage() + " MB");
-			
+
 			System.out.println("\n\nDONE");
 		} catch (Exception e) {
 			System.err.println("We are sorry, an un-expected ERROR occurred:");
 			e.printStackTrace(System.err);
+		} finally {
+			closeDb();
 		}
 	}
 
@@ -107,24 +104,20 @@ public class AHRD {
 	public AHRD(String pathToYmlInput) throws IOException {
 		super();
 		setSettings(new Settings(pathToYmlInput));
-		// The following fields are only used if AHRD is requested to generate
-		// Gene Ontology term annotations:
-		if (getSettings().hasGeneOntologyAnnotations()) {
-			this.setUniqueBlastResultShortAccessions(new HashSet<String>());
-			this.setReferenceGoAnnotations(new HashMap<String, Set<String>>());
-		}
 	}
 
 	public void initializeProteins() throws IOException, MissingAccessionException {
 		setProteins(Protein.initializeProteins(getSettings().getProteinsFasta()));
 	}
 
-	public void parseBlastResults() throws IOException, MissingProteinException, SAXException {
+	public void parseBlastResults()
+			throws IOException, MissingProteinException, SAXException, MissingAccessionException {
 		for (String blastDatabase : getSettings().getBlastDatabases()) {
-			BlastResult.readBlastResults(getProteins(), blastDatabase, getUniqueBlastResultShortAccessions());
+			BlastResult.readBlastResults(getProteins(), blastDatabase);
 		}
 	}
 
+	@Deprecated
 	public void parseInterproResult() throws IOException {
 		if (getSettings().hasInterproAnnotations()) {
 			Set<String> missingProteinAccessions = new HashSet<String>();
@@ -142,18 +135,6 @@ public class AHRD {
 		}
 	}
 
-	/**
-	 * Method finds GO term annotations for Proteins in the searched Blast
-	 * databases and stores them in a Map.
-	 * 
-	 * @throws IOException
-	 */
-	public void setUpReferenceGoAnnotations() throws IOException {
-		if (getSettings().hasGeneOntologyAnnotations()) {
-			setReferenceGoAnnotations(parseReferenceGoAnnotations(getUniqueBlastResultShortAccessions()));
-		}
-	}
-
 	public void filterBestScoringBlastResults(Protein prot) {
 		for (String blastDatabaseName : prot.getBlastResults().keySet()) {
 			prot.getBlastResults().put(blastDatabaseName,
@@ -163,7 +144,7 @@ public class AHRD {
 
 	/**
 	 * Method initializes the AHRD-run: 1. Loads Proteins 2. Parses BlastResults
-	 * 3. Parses InterproResults 4. Parses Gene-Ontology-Results
+	 * 3. Parses InterproResults. Step 3 is deprecated!
 	 * 
 	 * @throws IOException
 	 * @throws MissingAccessionException
@@ -173,6 +154,8 @@ public class AHRD {
 	 */
 	public void setup(boolean writeLogMsgs)
 			throws IOException, MissingAccessionException, MissingProteinException, SAXException, ParsingException {
+		setupOrUseExistingDatabase(writeLogMsgs);
+
 		if (writeLogMsgs)
 			System.out.println("Started AHRD...\n");
 
@@ -189,15 +172,7 @@ public class AHRD {
 			System.out.println("...parsed blast results in " + takeTime() + "sec, currently occupying "
 					+ takeMemoryUsage() + " MB");
 
-		// Reference GO Annotations (for Proteins in the searched Blast
-		// Databases)
-		setUpReferenceGoAnnotations();
-		if (writeLogMsgs) {
-			System.out.println("...parsed reference Gene Ontology Annotations (GOA) in " + takeTime()
-					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
-		}
-
-		// one single InterproResult-File
+		// one single InterproResult-File (DEPRECATED)
 		if (getSettings().hasValidInterproDatabaseAndResultFile()) {
 			InterproResult.initialiseInterproDb();
 			parseInterproResult();
@@ -229,19 +204,11 @@ public class AHRD {
 			// currentScore - (Token-High-Score / 2)
 			prot.getTokenScoreCalculator().filterTokenScores();
 			// Find the highest scoring Blast-Result:
-			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult(this.getReferenceGoAnnotations());
-			// If AHRD is requested to annotate Gene Ontology Terms, do so:
-			if (getSettings().hasGeneOntologyAnnotations()
-					&& prot.getDescriptionScoreCalculator().getHighestScoringBlastResult() != null
-					&& getReferenceGoAnnotations().containsKey(
-							prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession())) {
-				prot.setGoResults(getReferenceGoAnnotations()
-						.get(prot.getDescriptionScoreCalculator().getHighestScoringBlastResult().getShortAccession()));
-			}
+			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult();
 			// filter for each protein's most-informative
-			// interpro-results
+			// interpro-results (DEPRECATED)
 			InterproResult.filterForMostInforming(prot);
-		}		
+		}
 	}
 
 	public Map<String, Protein> getProteins() {
@@ -259,29 +226,4 @@ public class AHRD {
 	public void setDescriptionScoreBitScoreWeights(Map<String, Double> descriptionScoreBitScoreWeights) {
 		this.descriptionScoreBitScoreWeights = descriptionScoreBitScoreWeights;
 	}
-
-	public Map<String, Set<String>> getReferenceGoAnnotations() {
-		return referenceGoAnnotations;
-	}
-
-	public void setReferenceGoAnnotations(Map<String, Set<String>> referenceGoAnnotations) {
-		this.referenceGoAnnotations = referenceGoAnnotations;
-	}
-
-	public Set<String> getUniqueBlastResultShortAccessions() {
-		return uniqueBlastResultShortAccessions;
-	}
-
-	public void setUniqueBlastResultShortAccessions(Set<String> uniqueBlastResultShortAccessions) {
-		this.uniqueBlastResultShortAccessions = uniqueBlastResultShortAccessions;
-	}
-
-	public Map<String, GOterm> getGoDB() {
-		return goDB;
-	}
-
-	public void setGoDB(Map<String, GOterm> goDB) {
-		this.goDB = goDB;
-	}
-
 }

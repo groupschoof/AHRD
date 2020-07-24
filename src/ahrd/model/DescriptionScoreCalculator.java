@@ -1,6 +1,7 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.model.AhrdDb.getReferenceProteinDAO;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,16 +68,10 @@ public class DescriptionScoreCalculator {
 	/**
 	 * Assigns each BlastResult's Description-Line its AHRD-Score and then finds
 	 * the highest scoring one.
-	 * 
-	 * @param referenceGoAnnotations
-	 *            Map of BlastResults' shortAccesions as keys and their Sets of
-	 *            annotated GO Terms as values. If NOT null and any of the query
-	 *            proteins' hits of GO Term annotations, AHRD will use the
-	 *            highest scoring BlastResult with GO Terms to annotate the
-	 *            query.
 	 */
-	public void findHighestScoringBlastResult(Map<String, Set<String>> referenceGoAnnotations) {
+	public void findHighestScoringBlastResult() {
 		BlastResult bestScoringBr = null;
+		ReferenceProtein rp;
 		Set<Double> scoreRankingWithGoAnnos = new HashSet<Double>();
 		Map<Double, BlastResult> scoreRanking = new HashMap<Double, BlastResult>();
 		for (String blastDb : getProtein().getBlastResults().keySet()) {
@@ -86,9 +81,8 @@ public class DescriptionScoreCalculator {
 				// that have at least a single non-blacklisted Token:
 				if (iterBlastResult.getTokens().size() > 0) {
 					scoreRanking.put(iterBlastResult.getDescriptionScore(), iterBlastResult);
-					if (referenceGoAnnotations != null && !referenceGoAnnotations.isEmpty()
-							&& referenceGoAnnotations.containsKey(iterBlastResult.getShortAccession())
-							&& getSettings().getPreferReferenceWithGoAnnos())
+					rp = getReferenceProteinDAO().byAccession.get(iterBlastResult.getAccession());
+					if (rp != null && !rp.getGoTerms().isEmpty() && getSettings().getPreferReferenceWithGoAnnos())
 						scoreRankingWithGoAnnos.add(iterBlastResult.getDescriptionScore());
 				}
 			}
@@ -100,6 +94,12 @@ public class DescriptionScoreCalculator {
 			bestScoringBr = scoreRanking.get(getDescriptionHighScore());
 		}
 		setHighestScoringBlastResult(bestScoringBr);
+		// If AHRD is able to annotate Gene Ontology (GO) Terms, do so:
+		if (bestScoringBr != null) {
+			rp = getReferenceProteinDAO().byAccession.get(bestScoringBr.getAccession());
+			if (rp != null && !rp.getGoTerms().isEmpty())
+				getProtein().setGoResults(rp.getGoTerms());
+		}
 	}
 
 	public void calcDescriptionScore(BlastResult blastResult) {

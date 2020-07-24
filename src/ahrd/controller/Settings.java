@@ -98,7 +98,21 @@ public class Settings implements Cloneable {
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
-	public static final String DEFAULT_LINE_SEP = "(\r|\n)+"; 
+	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
+	public static final String AHRD_DATABASE_KEY = "ahrd_db";
+	public static final String AHRD_DB_CACHE_PERCENT_KEY = "ahrd_db_cache_percent";
+
+	/*
+	 * CONSTANTS:
+	 */
+	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
+	public static final String FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME = "accession";
+	public static final String FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME = "description";
+	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
+	public static final String GO_TERM_GROUP_NAME = "goTerm";
+	/*
+	 * END CONSTANTS
+	 */
 
 	/**
 	 * Fields:
@@ -228,6 +242,16 @@ public class Settings implements Cloneable {
 	 * pass the Blacklisting. Otherwise all Tokens are submitted to evaluation.
 	 */
 	private Boolean evaluateValidTokens = true;
+
+	/**
+	 * This is the path to the directory in which the AHRD data is stored.
+	 */
+	private String ahrd_db = "AHRD_DB";
+	/**
+	 * The percent of the max memory available in the current JVM to be used for
+	 * caching AHRD's database.
+	 */
+	private int ahrdDbCachePercent = 90;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -373,14 +397,20 @@ public class Settings implements Cloneable {
 			this.setPathToReferencesTokenBlacklist(input.get(REFERENCES_TOKEN_BLACKLIST_KEY).toString());
 			this.setReferencesTokenBlacklist(fromFile(getPathToReferencesTokenBlacklist()));
 		}
+		if (input.get(AHRD_DATABASE_KEY) != null) {
+			this.setAhrd_db(input.get(AHRD_DATABASE_KEY).toString());
+		}
+		if (input.get(AHRD_DB_CACHE_PERCENT_KEY) != null) {
+			this.setAhrdDbCachePercent(new Integer(input.get(AHRD_DB_CACHE_PERCENT_KEY).toString()));
+		}
 	}
 
 	/**
 	 * Returns a clone of this instance. <strong>Only</strong> all primitive
 	 * fields and the Blast-Database-Parameters are actually cloned. All other
-	 * fields still refer to <strong>the same objects</strong>.
-	 * <em>So be very careful using this method.</em> It has been written in
-	 * this manner to fulfill requirements and minimize memory-usage.
+	 * fields still refer to <strong>the same objects</strong>. <em>So be very
+	 * careful using this method.</em> It has been written in this manner to
+	 * fulfill requirements and minimize memory-usage.
 	 */
 	public Settings clone() {
 		Settings clone;
@@ -925,5 +955,23 @@ public class Settings implements Cloneable {
 
 	public void setReferencesTokenBlacklist(List<String> referencesTokenBlacklist) {
 		this.referencesTokenBlacklist = referencesTokenBlacklist;
+	}
+
+	public String getAhrd_db() {
+		return ahrd_db;
+	}
+
+	public void setAhrd_db(String ahrd_db) {
+		this.ahrd_db = ahrd_db;
+	}
+
+	public int getAhrdDbCachePercent() {
+		return ahrdDbCachePercent;
+	}
+
+	public void setAhrdDbCachePercent(int ahrdDbCachePercent) {
+		if (ahrdDbCachePercent > 90)
+			ahrdDbCachePercent = 90;
+		this.ahrdDbCachePercent = ahrdDbCachePercent;
 	}
 }
