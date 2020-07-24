@@ -345,17 +345,44 @@ public class BlastResult implements Comparable<BlastResult> {
 								+ Settings.FASTA_HEADER_REGEX_KEY
 								+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
 								+ blastDbName + "'.");
-					} else if (blastResults.containsKey(m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
-						// Found the next Blast HIT:
-						acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim();
-						hrd = m.group(FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME).trim();
-						// Following lines, until the next header, contain
-						// information to be collected:
-						hit = true;
 					} else {
-						// Found a Protein in the FASTA database, that is of no
-						// relevance within this context:
-						hit = false;
+						acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME); 
+						if (acc == null) {
+							System.err.println("ERROR:Unable to parse accession from header line\n" + str + "\n" +
+								"using regex pattern:" + getSettings().getFastaHeaderRegex(blastDbName).toString() );
+							continue;
+						}
+						else if (acc.trim() == "") {
+							System.err.println("ERROR:Parsed empty accession from header line\n" + str + "\n" +
+								"using regex pattern:" + getSettings().getFastaHeaderRegex(blastDbName).toString() );
+							continue;
+						}
+						hrd = m.group(FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME);
+						if (hrd == null)
+						{
+							if (getSettings().debugRegex()) {
+								System.err.println("Parsed accession: " + acc );
+							}
+							System.err.println("ERROR:Unable to parse description from header line\n" + str + "\n" +
+								"using regex pattern:" + getSettings().getFastaHeaderRegex(blastDbName).toString());
+							continue;
+						}
+						acc = acc.trim();
+						hrd = hrd.trim();
+						if (getSettings().debugRegex()) {
+							System.err.println("Parsed accession: " + acc );
+							System.err.println("Parsed description: " + hrd );
+						}
+						if (blastResults.containsKey(acc)) {
+							// Found the next Blast HIT:
+							// Following lines, until the next header, contain
+							// information to be collected:
+							hit = true;
+						} else {
+							// Found a Protein in the FASTA database, that is of no
+							// relevance within this context:
+							hit = false;
+						}
 					}
 				} else if (hit) {
 					// Process non header-line, if and only if, we are reading
