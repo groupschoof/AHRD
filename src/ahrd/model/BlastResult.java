@@ -350,18 +350,18 @@ public class BlastResult implements Comparable<BlastResult> {
 						// the sequence position is used to quickly seek the appropriate byte in the fasta file
 						// fasta files can be huge, but int goes only up to 2.15*10^9 so only about 2Gb -> must use long instead
 						Long sequencePosition = Long.parseLong(fastaIndexFields[2]);
-						// find the start of the header line by reading backwards byte by byte until a '>' is encountered
-						Long headerPosition = sequencePosition;
-						byte[] b = new byte[1];
+						// find the start of the header line by reading backwards two bytes by byte until '\n>' is encountered
+						Long headerPosition = sequencePosition-1;
+						byte[] b = new byte[2];
 						String s = new String(b);
-						while (!s.equals(">")) {
+						while (!s.equals("\n>")) {
 							headerPosition--;
+							if (headerPosition == 0) break;
 							blastDbFastaSeekableStream.seek(headerPosition);
 							blastDbFastaSeekableStream.read(b);
 							s = new String(b);
 						}
-						// found the last '>'
-						headerPosition--;
+						// found the last '\n>' before the sequence start position
 						// read header line
 						blastDbFastaSeekableStream.seek(headerPosition);
 						b = new byte[(int) ((sequencePosition-1)-headerPosition)];
