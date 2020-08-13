@@ -98,8 +98,10 @@ public class Settings implements Cloneable {
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
-	public static final String DEFAULT_LINE_SEP = "(\r|\n)+"; 
-
+	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
+	public static final String FAI_CONTIG_REGEX_KEY = "fai_contig_regex";
+	public static final Pattern DEFAULT_FAI_CONTIG_REGEX = Pattern
+			.compile("^(?<accession>\\S+)$");
 	/**
 	 * Fields:
 	 */
@@ -482,6 +484,12 @@ public class Settings implements Cloneable {
 		return (getBlastDbSettings(blastDatabaseName).containsKey(FASTA_HEADER_REGEX_KEY))
 				? Pattern.compile(getBlastDbSettings(blastDatabaseName).get(FASTA_HEADER_REGEX_KEY).toString())
 				: DEFAULT_FASTA_HEADER_REGEX;
+	}
+	
+	public Pattern getFaiContigRegex(String blastDatabaseName) {
+		return (getBlastDbSettings(blastDatabaseName).containsKey(FAI_CONTIG_REGEX_KEY))
+				? Pattern.compile(getBlastDbSettings(blastDatabaseName).get(FAI_CONTIG_REGEX_KEY).toString())
+				: DEFAULT_FAI_CONTIG_REGEX;
 	}
 
 	public Pattern getShortAccessionRegex(String blastDatabaseName) {

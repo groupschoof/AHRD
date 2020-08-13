@@ -3,10 +3,13 @@ package ahrd.model;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -310,65 +313,149 @@ public class BlastResult implements Comparable<BlastResult> {
 	 */
 	public static void parseBlastDatabase(Map<String, Protein> proteinDb, String blastDbName,
 			Map<String, List<BlastResult>> blastResults) throws IOException {
-		// Parse line by line FASTA Blast search DB. Extract Subject Lengths and
-		// Subject HRDs.
-		BufferedReader fastaIn = null;
-		try {
-			fastaIn = new BufferedReader(new FileReader(getSettings().getPathToBlastDatabase(blastDbName)));
-			String str, hrd = new String();
-			String acc = "";
-			Integer hitAALength = new Integer(0);
-			boolean hit = false;
-			while ((str = fastaIn.readLine()) != null) {
-				if (str.startsWith(">")) {
-					// Finished reading in the original Fasta-Entry of a
-					// Blast-Hit? If so, process it:
-					if (hit) {
-						fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
-						// Clean up to enable processing the next Hit
-						hitAALength = new Integer(0);
-						// Note, that the boolean 'hit' will be set in the
-						// following If-Else-Block.
-
+		// take timestamp for benchmarking
+		long timestamp = (new Date()).getTime();
+		long measuredSeconds;
+		// get patterns to match index contig names and fasta headers
+		Pattern faiContigPattern = getSettings().getFaiContigRegex(blastDbName);
+		Pattern fastaHeaderPattern = getSettings().getFastaHeaderRegex(blastDbName);
+		// check if an .fai index file is available for the fasta file
+		String faiFileName = getSettings().getPathToBlastDatabase(blastDbName) + ".fai";
+		File faiFile = new File(faiFileName); 
+		if (faiFile.exists()) {
+			BufferedReader fastaIndexBufferedReader = null;
+			RandomAccessFile blastDbFastaSeekableStream = null;
+			try {
+				fastaIndexBufferedReader = new BufferedReader(new FileReader(faiFileName));
+				blastDbFastaSeekableStream = new RandomAccessFile(new File(getSettings().getPathToBlastDatabase(blastDbName)), "r");
+				String line;
+				// go through the .fai file line by line
+				while ((line = fastaIndexBufferedReader.readLine()) != null) {
+					String[] fastaIndexFields = line.split("\\t");
+					Matcher faiContigMatcher = faiContigPattern.matcher(fastaIndexFields[0]);
+					if (!faiContigMatcher.matches()) {
+						System.err.println("WARNING: FAI contig name\n" + fastaIndexFields[0]
+						+ "\ndoes not match provided regular expression\n"
+						+ getSettings().getFaiContigRegex(blastDbName).toString()
+						+ "\n. The entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
+						+ "To fix this, please use - Blast database specific - parameter "
+						+ Settings.FAI_CONTIG_REGEX_KEY
+						+ " to provide a regular expression that matches ALL FAI contig names in Blast database '"
+						+ blastDbName + "'.");
+					} else if (blastResults.containsKey(faiContigMatcher.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
+						// found a blast hit in the index file
+						String acc = faiContigMatcher.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim();
+						// the sequence length can be taken from the index itself and dosn't have to be determined from the fasta
+						Integer length = Integer.parseInt(fastaIndexFields[1]);
+						// the sequence position is used to quickly seek the appropriate byte in the fasta file
+						// fasta files can be huge, but int goes only up to 2.15*10^9 so only about 2Gb -> must use long instead
+						Long sequencePosition = Long.parseLong(fastaIndexFields[2]);
+						// find the start of the header line by reading backwards byte by byte until a '>' is encountered
+						Long headerPosition = sequencePosition;
+						byte[] b = new byte[1];
+						String s = new String(b);
+						while (!s.equals(">")) {
+							headerPosition--;
+							blastDbFastaSeekableStream.seek(headerPosition);
+							blastDbFastaSeekableStream.read(b);
+							s = new String(b);
+						}
+						// found the last '>'
+						headerPosition--;
+						// read header line
+						blastDbFastaSeekableStream.seek(headerPosition);
+						b = new byte[(int) ((sequencePosition-1)-headerPosition)];
+						blastDbFastaSeekableStream.read(b);
+						String header = new String(b);
+						header = header.trim();
+						// extract the description from the header
+						Matcher fastaHeaderMatcher = fastaHeaderPattern.matcher(header);
+						if (!fastaHeaderMatcher.matches()) {
+							System.err.println("WARNING: FASTA header line\n" + header
+									+ "\ndoes not match provided regular expression\n"
+									+ fastaHeaderPattern.toString()
+									+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
+									+ "To fix this, please use - Blast database specific - parameter "
+									+ Settings.FASTA_HEADER_REGEX_KEY
+									+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
+									+ blastDbName + "'.");
+						} else {
+							String hrd = fastaHeaderMatcher.group(FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME).trim();
+							// store the additional info of the blast hit
+							fastaEntryValuesForBlastHit(blastResults, acc, length, hrd);
+						}
 					}
-
-					// Process the current Fasta-Header-Line:
-					Matcher m = getSettings().getFastaHeaderRegex(blastDbName).matcher(str);
-					if (!m.matches()) {
-						// Provided REGEX to parse FASTA header does not work in
-						// this case:
-						System.err.println("WARNING: FASTA header line\n" + str.trim()
-								+ "\ndoes not match provided regular expression\n"
-								+ getSettings().getFastaHeaderRegex(blastDbName).toString()
-								+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
-								+ "To fix this, please use - Blast database specific - parameter "
-								+ Settings.FASTA_HEADER_REGEX_KEY
-								+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
-								+ blastDbName + "'.");
-					} else if (blastResults.containsKey(m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
-						// Found the next Blast HIT:
-						acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim();
-						hrd = m.group(FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME).trim();
-						// Following lines, until the next header, contain
-						// information to be collected:
-						hit = true;
-					} else {
-						// Found a Protein in the FASTA database, that is of no
-						// relevance within this context:
-						hit = false;
-					}
-				} else if (hit) {
-					// Process non header-line, if and only if, we are reading
-					// the sequence of a Blast-Hit:
-					hitAALength += str.trim().length();
 				}
+				measuredSeconds = ((new Date()).getTime() - timestamp) / 1000;
+				System.out.println("Loading the FASTA index for " + blastDbName + " took " + measuredSeconds + "sec");
+				timestamp = (new Date()).getTime();
+			} finally {
+				fastaIndexBufferedReader.close();
+				blastDbFastaSeekableStream.close();
 			}
-			// Was the last read FASTA entry a Blast-Hit? If so, it needs
-			// processing:
-			if (hit)
-				fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
-		} finally {
-			fastaIn.close();
+		} else {
+			// Parse line by line FASTA Blast search DB. Extract Subject Lengths and
+			// Subject HRDs.
+			BufferedReader fastaIn = null;
+			try {
+				fastaIn = new BufferedReader(new FileReader(getSettings().getPathToBlastDatabase(blastDbName)));
+				String str, hrd = new String();
+				String acc = "";
+				Pattern p = getSettings().getFastaHeaderRegex(blastDbName);
+				Integer hitAALength = 0;
+				boolean hit = false;
+				while ((str = fastaIn.readLine()) != null) {
+					if (str.startsWith(">")) {
+						// Finished reading in the original Fasta-Entry of a
+						// Blast-Hit? If so, process it:
+						if (hit) {
+							fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
+							// Clean up to enable processing the next Hit
+							hitAALength = 0;
+							// Note, that the boolean 'hit' will be set in the
+							// following If-Else-Block.
+		
+						}
+						// Process the current Fasta-Header-Line:
+						Matcher m = p.matcher(str);
+						if (!m.matches()) {
+							// Provided REGEX to parse FASTA header does not work in
+							// this case:
+							System.err.println("WARNING: FASTA header line\n" + str.trim()
+									+ "\ndoes not match provided regular expression\n"
+									+ getSettings().getFastaHeaderRegex(blastDbName).toString()
+									+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
+									+ "To fix this, please use - Blast database specific - parameter "
+									+ Settings.FASTA_HEADER_REGEX_KEY
+									+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
+									+ blastDbName + "'.");
+						} else if (blastResults.containsKey(m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim())) {
+							// Found the next Blast HIT:
+							acc = m.group(FASTA_PROTEIN_HEADER_ACCESSION_GROUP_NAME).trim();
+							hrd = m.group(FASTA_PROTEIN_HEADER_DESCRIPTION_GROUP_NAME).trim();
+							// Following lines, until the next header, contain
+							// information to be collected:
+							hit = true;
+						} else {
+							// Found a Protein in the FASTA database, that is of no
+							// relevance within this context:
+							hit = false;
+						}
+					} else if (hit) {
+						// Process non header-line, if and only if, we are reading
+						// the sequence of a Blast-Hit:
+						hitAALength += str.trim().length();
+					}
+				}
+				// Was the last read FASTA entry a Blast-Hit? If so, it needs
+				// processing:
+				if (hit)
+					fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
+			} finally {
+				fastaIn.close();
+			}
+			measuredSeconds = ((new Date()).getTime() - timestamp) / 1000;
+			System.out.println("parseBlastDatabase() for " + blastDbName + " took " + measuredSeconds + "sec");
 		}
 	}
 
@@ -380,6 +467,7 @@ public class BlastResult implements Comparable<BlastResult> {
 		}
 		return blastResults;
 	}
+
 
 	/**
 	 * Sorts unique tokens and returns them concatenated. @NOTE: As this is
