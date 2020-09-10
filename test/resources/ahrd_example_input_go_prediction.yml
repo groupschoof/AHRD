@@ -1,32 +1,33 @@
 proteins_fasta: ./test/resources/proteins.fasta
-token_score_bit_score_weight: 0.468
-token_score_database_score_weight: 0.2098
-token_score_overlap_score_weight: 0.3221
-go_term_score_information_content_weight: 0.8
+token_score_bit_score_weight: 0.9394
+token_score_database_score_weight: 0.0306
+token_score_overlap_score_weight: 0.03
+go_term_score_information_content_weight: 0.3419417126650012
+informative_token_threshold: 0.026561811039958978
 blacklist: ./test/resources/blacklist_descline.txt
 token_blacklist: ./test/resources/blacklist_token.txt
 output: ./ahrd_output.csv
 blast_dbs:
   swissprot:
-    weight: 653
-    description_score_bit_score_weight: 2.717061
+    weight: 26
+    description_score_bit_score_weight: 10.0
     file: ./test/resources/swissprot_blast8_tabular.txt
     database: ./test/resources/swissprot_blast_db.fasta
     filter: ./test/resources/filter_descline_sprot.txt
   trembl:
-    weight: 904
-    description_score_bit_score_weight: 2.590211
+    weight: 129
+    description_score_bit_score_weight: 1.0949950811147244
     file: ./test/resources/trembl_blast8_tabular.txt
     database: ./test/resources/trembl_blast_db.fasta
     filter: ./test/resources/filter_descline_trembl.txt
     gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
-  tair:
-    weight: 854
-    description_score_bit_score_weight: 2.917405
-    file: ./test/resources/tair_blast8_tabular.txt
-    database: ./test/resources/tair_blast_db.fasta
-    fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
-    short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"
-    filter: ./test/resources/filter_descline_tair.txt
-    gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
-    gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"
+#  tair:
+#    weight: 854
+#    description_score_bit_score_weight: 2.917405
+#    file: ./test/resources/tair_blast8_tabular.txt
+#    database: ./test/resources/tair_blast_db.fasta
+#    fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
+#    short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"
+#    filter: ./test/resources/filter_descline_tair.txt
+#    gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
+#    gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"
