@@ -255,17 +255,27 @@ public class Parameters implements Cloneable, Comparable<Parameters> {
 	/**
 	 * Normalizes the three weights appearing in the Token-Score-Formula, so
 	 * they sum up to 1.0
+	 * 
+	 * High values (eg. 1.5) of the "mutator_mean" setting lead to TokenScoreWeight sums of 0.0.
+	 * This problem likely exists in all branches using the mutateZeroToOne method introduced in commit 532f9c1.
+	 * -> Needs to be avoided by resetting each of the three TokenScoreWeights to 1/3
 	 */
 	public void normalizeTokenScoreWeights() {
 		double s = getTokenScoreBitScoreWeight()
 				+ getTokenScoreDatabaseScoreWeight()
 				+ getTokenScoreOverlapScoreWeight();
-		setTokenScoreBitScoreWeight(roundToNDecimalPlaces(
-				getTokenScoreBitScoreWeight() / s, 4));
-		setTokenScoreDatabaseScoreWeight(roundToNDecimalPlaces(
-				getTokenScoreDatabaseScoreWeight() / s, 4));
-		setTokenScoreOverlapScoreWeight(roundToNDecimalPlaces(
-				getTokenScoreOverlapScoreWeight() / s, 4));
+		if (s <= 0.0) {
+			setTokenScoreBitScoreWeight(0.333);
+			setTokenScoreDatabaseScoreWeight(0.333);
+			setTokenScoreOverlapScoreWeight(0.333);
+		} else {
+			setTokenScoreBitScoreWeight(roundToNDecimalPlaces(
+					getTokenScoreBitScoreWeight() / s, 4));
+			setTokenScoreDatabaseScoreWeight(roundToNDecimalPlaces(
+					getTokenScoreDatabaseScoreWeight() / s, 4));
+			setTokenScoreOverlapScoreWeight(roundToNDecimalPlaces(
+					getTokenScoreOverlapScoreWeight() / s, 4));
+		}
 	}
 
 	/**
