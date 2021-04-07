@@ -39,7 +39,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 	 */
 	public static void main(String[] args) {
 		System.out
-				.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.SimulatedAnnealingTrainer input.yml\n");
+				.println("Usage:\njava -cp ahrd.jar ahrd.controller.SimulatedAnnealingTrainer input.yml\n");
 
 		try {
 			SimulatedAnnealingTrainer trainer = new SimulatedAnnealingTrainer(args[0]);

@@ -50,7 +50,7 @@ public class GeneticTrainer extends Trainer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("Usage:\njava -Xmx2g -cp ahrd.jar ahrd.controller.GeneticTrainer input.yml\n");
+		System.out.println("Usage:\njava -cp ahrd.jar ahrd.controller.GeneticTrainer input.yml\n");
 
 		try {
 			GeneticTrainer trainer = new GeneticTrainer(args[0]);

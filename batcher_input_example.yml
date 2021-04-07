@@ -1,5 +1,5 @@
 shell_script: ./test/resources/start_ahrd_batched.sh
-ahrd_call: "java -Xmx2048m -jar ./dist/ahrd.jar #batch#"
+ahrd_call: "java -jar ./dist/ahrd.jar #batch#"
 
 proteins_dir: ./test/resources/proteins
 batch_ymls_dir: ./test/resources/batch_ymls

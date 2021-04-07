@@ -1,5 +1,5 @@
 shell_script: ./test/resources/start_ahrd_batched.sh
-ahrd_call: "java -Xmx2048m -cp ./dist/ahrd.jar ahrd.controller.Trainer #batch#"
+ahrd_call: "java -cp ./dist/ahrd.jar ahrd.controller.Trainer #batch#"
 proteins_fasta: ./test/resources/proteins.fasta
 ground_truth_fasta: ./test/resources/ground_truth.fasta
 interpro_database: ./test/resources/interpro_31.xml

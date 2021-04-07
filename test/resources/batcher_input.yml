@@ -1,5 +1,5 @@
 shell_script: ./start_ahrd_batched.sh
-ahrd_call: "bsub -q priority -m dellall -o ./solyc_test_run/log/#batch_name#.log -e ./solyc_test_run/log/#batch_name#.err 'java -Xmx2048m -jar ./ahrd.jar #batch#'"
+ahrd_call: "bsub -q priority -m dellall -o ./solyc_test_run/log/#batch_name#.log -e ./solyc_test_run/log/#batch_name#.err 'java -jar ./ahrd.jar #batch#'"
 
 proteins_dir: /projects/irg/grp_pcb/projects/ITAG/pipe001/release2_3/release2_3/sequencebatches/
 batch_ymls_dir: ./solyc_test_run/batch_ymls/

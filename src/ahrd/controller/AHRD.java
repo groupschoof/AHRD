@@ -62,7 +62,7 @@ public class AHRD {
 	}
 
 	public static void main(String[] args) {
-		System.out.println("Usage:\njava -Xmx2g -jar ahrd.jar input.yml\n");
+		System.out.println("Usage:\njava -jar ahrd.jar input.yml\n");
 
 		try {
 			AHRD ahrd = new AHRD(args[0]);
