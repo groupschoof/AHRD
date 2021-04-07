@@ -2,9 +2,6 @@
 classes/**/*
 .settings
 
-# Ignore Batcher-Tests:
-start_ahrd_batched.sh
-
 # Executable jar should also be ignored
 dist/ahrd.jar
 
@@ -33,7 +30,7 @@ ahrd_extended_go_table.tsv
 ahrd_output.csv
 ahrd_extended_go_table.tsv
 ahrd_output.csv
-trainer_batch_ymls
+evaluator_output.tsv
 .externalToolBuilders/
 .project
 /classes/

@@ -16,7 +16,6 @@ h2. Table of contents
 ### "Optional input data":#222-optional-input-data
 ### "Required config files":#223-required-config-files
 #### "Test custom blacklists and filters":#2231-test-custom-blacklists-and-filters
-## "Batcher":#23-batcher
 ## "Output":#24-output
 ### "Tab-Delimited Table":#241-tab-delimited-table
 ### "Fasta-Format":#242-fasta-format
@@ -26,7 +25,6 @@ h2. Table of contents
 ## "Parameter Optimization":#27-parameter-optimization
 ### "Parameter Optimization via Genetic Algorithm":#271-parameter-optimization-via-genetic-algorithm
 ### "Parameter Optimization via Simulated Annealing":#272-parameter-optimization-via-simulated-annealing
-### "Optimization in parallel (Trainer-Batcher)":#273-optimization-in-parallel-trainer-batcher
 # "Algorithm":#3-algorithm
 ## "Pseudo-Code":#31-pseudo-code
 ## "Used Formulae and Parameters":#32-used-formulae-and-parameters
@@ -74,8 +72,6 @@ Basically AHRD needs a FASTA-File of amino acid sequences and different files co
 
 All parameters can be set manually, or the default ones can be used as given in the example input file @ahrd_example_input.yml@ (see sections "2.1":#21-ahrd-example-usages and "3.2":#32-used-formulae-and-parameters for more details).
 
-In order to parallelize the protein function annotation processes,  AHRD can be run on batches of recommended size between 1,000 to 2,000 proteins.  If you want to annotate very large protein sets or have low memory capacities use the included Batcher to split your input-data into Batches of appropriate size (see section "2.3":#23-batcher). _Note:_ As of Java 7 or higher AHRD is quite fast and batching might no longer be necessary.
-
 h3. 2.1 AHRD example usages
 
 There are _two_ template AHRD input files provided that you should use according to your use case. All example input files are stored in @./test/resources@ and are named @ahrd_example_input*.yml@. You can run AHRD on any of these use cases with <pre>java -jar ./dist/ahrd.jar your_use_case_file.yml</pre>
@@ -92,8 +88,6 @@ h4. 2.2.1 Required input data
 
 # Protein sequences in fasta format
 # Sequence Similarity Search (@blastp@ or @blat@) results in tabular format
-
-(If you run AHRD in batches the blast search results need to be batched in the same way as the fasta files.)
 
 Recommended Sequence Similarity Search:
 
@@ -130,24 +124,6 @@ Example Output for test string "activity", and regular expressions "(?i)interact
 [junit] (?i)activity -> </pre>
 
 The above example demonstrates how the first regular expression does not match anything in the test string "activity", but after matching it against the second regular expression nothing remains, because the matched substring has been filtered out. As you can see, this test applies all provided regular expression _in order of appearance_ and shows what _remains_ of the provided test string after filtering with the provided regular expressions.
-
-
-h3. 2.3 Batcher
-
-AHRD provides a function to generate several input.yml files from large datasets, consisting of _batches_ of query proteins. For each of these batches the user is expected to provide the batch's query proteins in FASTA format, and one Blast result file for each database searched. The AHRD batcher will then generate a unique input.yml file and entry in a batch shell script to execute AHRD on the respective batches in parallel for example on a compute cluster using a batch-system like LSF. We recommend this for very large datasets (more than a genome) or computers with low RAM.
-
-To generate the mentioned input.yml files and batcher shell script that can subsequently be used to start AHRD in parallel use the batcher function as follows:
-<pre>java -cp ./dist/ahrd.jar ahrd.controller.Batcher ./batcher_input_example.yml</pre>
-You will have to edit @./batcher_input_example.yml@ and provide the following arguments. Note, that in the mentioned directories each file will be interpreted as belonging to one unique Batch, if and only if they have identical file names. 
-
-# @shell_script:@ Path to the shell-script file which later contains all the statements to invoke AHRD on each supplied batch in parallel.
-# @ahrd_call: "java -jar ./dist/ahrd.jar #batch#"@ This line will be the basis of executing AHRD on each supplied batch. The line _must_ contain @#batch#@ wich will be replaced with the input.yml files. To use a batch system like LSF this line has to be modified to something like @bsub -q normal 'java -jar ./dist/ahrd.jar #batch#'@
-# @proteins_dir:@ The path to the directory the query protein batches are stored in.
-# @batch_ymls_dir:@ The path to the directory the AHRD-Batcher should store the generated input.yml files in.
-# @dir:@ Each database entry requires this argument, the path to the directory each batch's blast result file from searches in the corresponding Blast-database is located.
-# @output_dir:@ The directory each AHRD run should create a subdirectory with the output for the processed batch.
-
-_Batch-Name requirement:_ All above explained files belonging to the same Batch _must_ have the same name. This name must start with alpha-numeric characters and may finish with digits indicating the Batch's number. File extensions are allowed to be varying. 
 
 h3. 2.4 Output
 
@@ -268,24 +244,6 @@ _Note:_ See @./test/resources/simmulated_annealing_trainer_example_input.yml@ fo
 # @cool_down_by: 1@  Dimish temperature by this value after each simulated annealing iteration
 # @optimization_acceptance_probability_scaling_factor: 2500000000.0@  Used to scale the probability of accepting a currently evaluated parameter set. @P(Accept) := exp(-delta_scores*scaling_factor/current-temperature)@
 # @remember_simulated_annealing_path: false@  Set to @true@, if you want the optimization to remember already visited parameter sets and their performance. This increases memory usage but improves final results.  
-
-h4. 2.7.3 Optimization in parallel (Trainer-Batcher)
-
-Simulated Annealing is a time and resource consuming process. Because AHRD uses quite a number of parameters, the search space is accordingly large. Hence it is recommendable to start independend simulated annealing runs in parallel. Do this using 
-
-<pre>java -cp ./dist/ahrd.jar ahrd.controller.TrainerBatcher ./test/resources/trainer_batcher_example.yml</pre>
-
-The following parameters are specific to the Trainer-Batcher:
-
-# @shell_script: ./start_ahrd_batched.sh@ The path to the shell script you will use to start the simulated annealing jobs in parallel.
-# @ahrd_call: "java -cp ./dist/ahrd.jar ahrd.controller.Trainer #batch#"@ Defines a line in the resulting shell script, requires the presence of @#batch#@ which will be replaced with the respective generated Trainer inputs. This line can be used to submit the parallel optimizations into a job queue.
-# @no_start_positions_in_parameter_space: 1024@  Defines how many parallel optimization runs you want to start. 
-# @batch_ymls_dir: ./trainer_batch_ymls@  Path to the directory in which to store the generated Trainer input files. 
-# @output_dir: ./trainer_results@  Path to the directory in which to store each Trainer run's output(s). 
-
-_Note_, that the Trainer-Batcher works very much like the AHRD-Batcher (section "2.3":#23-batcher). Particularly you need to respect the _batch-name requirements_ explained there.
-
-The above Trainer-Batcher example input shows how to automatically generated a desired number of input files with different starting points in parameter space. These input files can then directly be used with the above documented AHRD Trainer (section "2.7":#27-parameter-optimization). 
 
 h2. 3 Algorithm
 
