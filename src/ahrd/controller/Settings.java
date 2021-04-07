@@ -64,7 +64,7 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_SCORE_BIT_SCORE_WEIGHT = "token_score_bit_score_weight";
 	public static final String TOKEN_SCORE_DATABASE_SCORE_WEIGHT = "token_score_database_score_weight";
 	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT = "token_score_overlap_score_weight";
-	public static final String GO_TERM_SCORE_INFORMATION_CONTENT_WEIGHT = "go_term_score_information_content_weight";
+	public static final String GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT = "go_term_score_evidence_code_score_weight";
 	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT = "description_score_bit_score_weight";
 	public static final String GROUND_TRUTH_FASTA_KEY = "ground_truth_fasta";
 	public static final String GROUND_TRUTH_DESCRIPTION_FILTER_KEY = "ground_truth_description_filter";
@@ -101,7 +101,7 @@ public class Settings implements Cloneable {
 	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
 	public static final String GENE_ONTOLOGY_REFERENCE_REGEX_KEY = "gene_ontology_reference_regex";
 	public static final Pattern DEFAULT_GENE_ONTOLOGY_REFERENCE_REGEX = Pattern
-			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
+			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})\\s+\\S+\\s+(?<evidenceCode>\\S+)");
 	public static final String EVALUATE_ONLY_VALID_TOKENS_KEY = "evaluate_only_valid_tokens";
 	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
 	public static final String GO_DB_PATH_KEY = "go_db_path";
@@ -119,6 +119,7 @@ public class Settings implements Cloneable {
 	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score";
 	public static final String WRITE_FSCORE_DETAILS_TO_OUTPUT = "write_fscore_details_to_output";
 	public static final String INFORMATIVE_TOKEN_THRESHOLD = "informative_token_threshold";
+	public static final String REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY = "reference_go_annotation_evidence_code_weights";
 	public static final String ACCESSION_GROUP_NAME = "accession";
 	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
 	public static final String DESCRIPTION_GROUP_NAME = "description";
@@ -344,6 +345,10 @@ public class Settings implements Cloneable {
 	 * Triggers the output of averages and coverages of all scores at the end of the evalution output
 	 */
 	private boolean writeEvaluationSummary = false;
+	/**
+	 * Weights of reference go annotation evidence codes for prediction of query protein go term annotations  
+	 */
+	private Map<String, Double> evidenceCodeWeights = new HashMap<String, Double>();
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -374,8 +379,8 @@ public class Settings implements Cloneable {
 		this.setTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
 		this.setTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
 		this.setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
-		if (input.get(GO_TERM_SCORE_INFORMATION_CONTENT_WEIGHT) != null) {
-			this.setGoTermScoreInformationContentWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_INFORMATION_CONTENT_WEIGHT)));
+		if (input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT) != null) {
+			this.setGoTermScoreEvidenceCodeScoreWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT)));
 		}
 		this.setWriteTokenSetToOutput(Boolean.parseBoolean((String) input.get(WRITE_TOKEN_SET_TO_OUTPUT)));
 		// Writing best blast hits to output is only supported in evaluation mode. So otherwise the default 'false' will be kept.
@@ -542,6 +547,44 @@ public class Settings implements Cloneable {
 		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
 		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
 		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
+		/**
+		 * Initialize default reference go annotation evidence code weights
+		 * (see: http://www.geneontology.org/page/guide-go-evidence-codes)
+		 */
+		//Experimental Evidence codes:
+		getEvidenceCodeWeights().put("EXP", 1.0); //Inferred from Experiment
+		getEvidenceCodeWeights().put("IDA", 1.0); //Inferred from Direct Assay
+		getEvidenceCodeWeights().put("IPI", 1.0); //Inferred from Physical Interaction
+		getEvidenceCodeWeights().put("IMP", 1.0); //Inferred from Mutant Phenotype
+		getEvidenceCodeWeights().put("IGI", 1.0); //Inferred from Genetic Interaction
+		getEvidenceCodeWeights().put("IEP", 1.0); //Inferred from Expression Pattern
+		//Computational Analysis evidence codes:
+		getEvidenceCodeWeights().put("ISS", 1.0); //Inferred from Sequence or structural Similarity
+		getEvidenceCodeWeights().put("ISO", 1.0); //Inferred from Sequence Orthology
+		getEvidenceCodeWeights().put("ISA", 1.0); //Inferred from Sequence Alignment
+		getEvidenceCodeWeights().put("ISM", 1.0); //Inferred from Sequence Model
+		getEvidenceCodeWeights().put("IGC", 1.0); //Inferred from Genomic Context
+		getEvidenceCodeWeights().put("IBA", 1.0); //Inferred from Biological aspect of Ancestor
+		getEvidenceCodeWeights().put("IBD", 1.0); //Inferred from Biological aspect of Descendant
+		getEvidenceCodeWeights().put("IKR", 1.0); //Inferred from Key Residues
+		getEvidenceCodeWeights().put("IRD", 1.0); //Inferred from Rapid Divergence
+		getEvidenceCodeWeights().put("RCA", 1.0); //Reviewed Computational Analysis
+		// Author Statement evidence codes:
+		getEvidenceCodeWeights().put("TAS", 1.0); //Traceable Author Statement
+		getEvidenceCodeWeights().put("NAS", 1.0); //Non-traceable Author Statement
+		// Curatorial Statement codes
+		getEvidenceCodeWeights().put("IC", 1.0); //Inferred By Curator
+		getEvidenceCodeWeights().put("ND", 1.0); //No Biological Data Available
+		// Automatically-Assigned evidence code
+		getEvidenceCodeWeights().put("IEA", 1.0); //Inferred from Electronic Annotation
+		/**
+		 * Override default evidence codes weights if specified in YML input
+		 */
+		if (input.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY) != null) {
+			for (Map.Entry<String, String> pair : ((Map<String, String>) input.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY)).entrySet()) {
+				getEvidenceCodeWeights().put(pair.getKey(), Double.parseDouble(pair.getValue()));
+			}
+		}
 	}
 
 	/**
@@ -814,12 +857,12 @@ public class Settings implements Cloneable {
 		this.getParameters().setTokenScoreOverlapScoreWeight(tokenScoreOverlapScoreWeight);
 	}
 	
-	public Double getGoTermScoreInformationContentWeight() {
-		return getParameters().getGoTermScoreInformationContentWeight();
+	public Double getGoTermScoreEvidenceCodeScoreWeight() {
+		return getParameters().getGoTermScoreEvidenceCodeScoreWeight();
 	}
 
-	public void setGoTermScoreInformationContentWeight(Double goTermScoreInformationContentWeight) {
-		this.getParameters().setGoTermScoreInformationContentWeight(goTermScoreInformationContentWeight);
+	public void setGoTermScoreEvidenceCodeScoreWeight(Double goTermScoreEvidenceCodeScoreWeight) {
+		this.getParameters().setGoTermScoreEvidenceCodeScoreWeight(goTermScoreEvidenceCodeScoreWeight);
 	}
 	
 	public double getInformativeTokenThreshold() {
@@ -1288,6 +1331,22 @@ public class Settings implements Cloneable {
 
 	public void setDefaultTokenBlacklist(Set<String> defaultTokenBlacklists) {
 		this.defaultTokenBlacklist = defaultTokenBlacklists;
+	}
+
+	public Map<String, Double> getEvidenceCodeWeights() {
+		return evidenceCodeWeights;
+	}
+
+	public void setEvidenceCodeWeights(Map<String, Double> evidenceCodeWeights) {
+		this.evidenceCodeWeights = evidenceCodeWeights;
+	}
+	
+	public Double getEvidenceCodeWeight(String code) {
+		if (getEvidenceCodeWeights().containsKey(code)) {
+			return getEvidenceCodeWeights().get(code);
+		} else {
+			return 1.0;
+		}
 	}
 
 	public Pattern getProteinsFastaRegex() {

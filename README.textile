@@ -44,7 +44,7 @@ h2. 1 Getting started
 
 h3. 1.1 Requirements
 
-AHRD is a Java-Program which requires @Java 1.7@ or higher and @ant@.
+AHRD is a Java-Program which requires @Java 1.8@ or higher and @ant@.
 
 
 h3. 1.2 Installation
@@ -350,7 +350,7 @@ _NOTE:_ All above column numbers start counting with zero, i.e. the first column
 
 h4. 3.3.2 Parameters controlling Gene Ontology term annotations
 
-AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @goa_uniprot_all.gaf.gz@ (last visit Feb 16th 2017)
+AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @goa_uniprot_all.gaf.gz@ (last visit Apr 7th 2021)
 
 To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter @gene_ontology_reference@. See example file @./test/resources/ahrd_input_seq_sim_table_go_prediction.yml@ for more details.
 
@@ -358,7 +358,7 @@ h5. 3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
 
 Unfortunately UniprotKB GOA files use short protein accessions like @W9QFR0@, while the UniprotKB FASTA databases use the long protein accessions with pipes like this @tr|W9QFR0|W9QFR0_9ROSA@. In order to enable AHRD to match the correct short and long accessions, and thus the database GO annotations it uses regular expressions to parse both the long accessions and the GOA files. By default AHRD is setup to handle Uniprot formats, but you can provide custom regular expressions for your own custom GOA files:
 
-# Set the regular expression to extract short protein accessions mapped to GO terms from the database GOA using @gene_ontology_reference_regex:@. For example for TAIR10 ("ATH_GO_GOSLIM.txt":https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/ATH_GO_GOSLIM.txt.gz, use @gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t"@ (The default is: @gene_ontology_reference_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})@)
+# Set the regular expression to extract short protein accessions mapped to GO terms from the database GOA using @gene_ontology_reference_regex:@. For example for TAIR10 ("ATH_GO_GOSLIM.txt":https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/ATH_GO_GOSLIM.txt.gz, use @gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t[^\\t]+\\t[^\\t]+\\t[^\\t]+\\t(?<evidenceCode>[^\\t]+)\\t"@ (The default is: @gene_ontology_reference_regex: ^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})\\s+\\S+\\s+(?<evidenceCode>\\S+)@)
 
 # Set the Blast database specific regular expression, used to extract the short accessions from long ones with @short_accession_regex:@ For example for TAIR10, use @short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"@. (The default is: @"^[^|]+\\|(?<shortAccession>[^|]+)"@)
 
