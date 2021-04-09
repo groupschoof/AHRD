@@ -223,177 +223,183 @@ public class AHRD {
 	/**
 	 * Assign a HumanReadableDescription to each Protein
 	 * 
-	 * @throws MissingInterproResultException
-	 * @throws IOException
-	 * @throws SQLException
 	 */
-	public void assignHumanReadableDescriptions() throws MissingInterproResultException, IOException, SQLException {
-		for (String protAcc : getProteins().keySet()) {
-			Protein prot = getProteins().get(protAcc);
-			// Find best scoring Blast-Hit's Description-Line (based on
-			// evalue):
-			filterBestScoringBlastResults(prot);
-			// Tokenize each BlastResult's Description-Line and
-			// assign the Tokens their Scores:
-			// tokenizeBlastResultDescriptionLines(prot);
-			prot.getTokenScoreCalculator().assignTokenScores();
-			// Tell informative from non-informative Tokens.
-			// Assign each non-informative a new Score :=
-			// currentScore - (Token-High-Score * Informative-Token-Threshold)
-			prot.getTokenScoreCalculator().filterTokenScores();
-			// Find the highest scoring Blast-Result:
-			prot.getDescriptionScoreCalculator().findHighestScoringBlastResult();
-			// filter for each protein's most-informative
-			// interpro-results
-			InterproResult.filterForMostInforming(prot);
+	public void assignHumanReadableDescriptions() {
+		if(!getSettings().doMultithreading()) {
+			for (Protein prot : getProteins().values()) {
+				assignHRD(prot);
+			}
+		} else {
+			getProteins().values().parallelStream().forEach(prot -> assignHRD(prot));
 		}
 	}
 	
+	private void assignHRD(Protein prot) {
+		// Find best scoring Blast-Hit's Description-Line (based on evalue):
+		filterBestScoringBlastResults(prot);
+		// Tokenize each BlastResult's Description-Line and assign the Tokens their Scores:
+		prot.getTokenScoreCalculator().assignTokenScores();
+		// Tell informative from non-informative Tokens.
+		// Assign each non-informative a new Score :=
+		// currentScore - (Token-High-Score * Informative-Token-Threshold)
+		prot.getTokenScoreCalculator().filterTokenScores();
+		// Find the highest scoring Blast-Result:
+		prot.getDescriptionScoreCalculator().findHighestScoringBlastResult();
+	}
+
 	/**
 	 * Assign Gene Ontology terms to each Protein
 	 */
-	public void assignGeneOntologyTerms() throws MissingInterproResultException, IOException, SQLException, OWLOntologyCreationException {
-		for (Protein protein : this.getProteins().values()) {
-			// calculate total and cumulative go term scores 
-			Map<String, Double> cumulativeGoTermBitScores = new HashMap<String, Double>();
-			Map<String, Double> cumulativeGoTermBlastDatabaseScores = new HashMap<String, Double>();
-			Map<String, Double> cumulativeGoTermOverlapScores = new HashMap<String, Double>();
-			double totalGoTermBitScore = 0;
-			double totalGoTermBlastDatabaseScore = 0;
-			double totalGoTermOverlapScore = 0;
-			double maxBitScore = 0;
-			for (String blastDbName : protein.getBlastResults().keySet()) {
-				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
-					totalGoTermBitScore += blastResult.getBitScore();
-					totalGoTermBlastDatabaseScore += getSettings().getBlastDbWeight(blastDbName);
-					// calculate overlap score
-					double overlapScore = TokenScoreCalculator.overlapScore(blastResult.getQueryStart(), blastResult.getQueryEnd(),
-							protein.getSequenceLength(), blastResult.getSubjectStart(), blastResult.getSubjectEnd(), blastResult.getSubjectLength());
-					totalGoTermOverlapScore += overlapScore; 
-					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
-					if (reference != null) {
-						for (ReferenceGoAnnotation annotation : reference) {
-							String goTerm = annotation.getGoTerm();
-							// calculate cumulative bit score
-							if (!cumulativeGoTermBitScores.containsKey(goTerm)) {
-								cumulativeGoTermBitScores.put(goTerm, new Double(blastResult.getBitScore()));
-							} else {
-								cumulativeGoTermBitScores.put(goTerm, new Double(blastResult.getBitScore() + cumulativeGoTermBitScores.get(goTerm)));
-							}
-							// calculate cumulative blast database score
-							if (!cumulativeGoTermBlastDatabaseScores.containsKey(goTerm)) {
-								cumulativeGoTermBlastDatabaseScores.put(goTerm, new Double(getSettings().getBlastDbWeight(blastDbName)));
-							} else {
-								cumulativeGoTermBlastDatabaseScores.put(goTerm, new Double(getSettings().getBlastDbWeight(blastDbName) + cumulativeGoTermBlastDatabaseScores.get(goTerm)));
-							}
-							// calculate cumulative overlap score
-							if (!cumulativeGoTermOverlapScores.containsKey(goTerm)) {
-								cumulativeGoTermOverlapScores.put(goTerm, overlapScore);
-							} else {
-								cumulativeGoTermOverlapScores.put(goTerm, overlapScore + cumulativeGoTermOverlapScores.get(goTerm));
-							}
+	public void assignGeneOntologyTerms() {
+		if(!getSettings().doMultithreading()) {
+			for (Protein prot : getProteins().values()) {
+				assignGO(prot);
+			}
+		} else {
+			getProteins().values().parallelStream().forEach(prot -> assignGO(prot));
+		}
+	}
+	
+	private void assignGO(Protein protein) {
+		// calculate total and cumulative go term scores 
+		Map<String, Double> cumulativeGoTermBitScores = new HashMap<String, Double>();
+		Map<String, Double> cumulativeGoTermBlastDatabaseScores = new HashMap<String, Double>();
+		Map<String, Double> cumulativeGoTermOverlapScores = new HashMap<String, Double>();
+		double totalGoTermBitScore = 0;
+		double totalGoTermBlastDatabaseScore = 0;
+		double totalGoTermOverlapScore = 0;
+		double maxBitScore = 0;
+		for (String blastDbName : protein.getBlastResults().keySet()) {
+			for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
+				totalGoTermBitScore += blastResult.getBitScore();
+				totalGoTermBlastDatabaseScore += getSettings().getBlastDbWeight(blastDbName);
+				// calculate overlap score
+				double overlapScore = TokenScoreCalculator.overlapScore(blastResult.getQueryStart(), blastResult.getQueryEnd(),
+						protein.getSequenceLength(), blastResult.getSubjectStart(), blastResult.getSubjectEnd(), blastResult.getSubjectLength());
+				totalGoTermOverlapScore += overlapScore; 
+				Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
+				if (reference != null) {
+					for (ReferenceGoAnnotation annotation : reference) {
+						String goTerm = annotation.getGoTerm();
+						// calculate cumulative bit score
+						if (!cumulativeGoTermBitScores.containsKey(goTerm)) {
+							cumulativeGoTermBitScores.put(goTerm, new Double(blastResult.getBitScore()));
+						} else {
+							cumulativeGoTermBitScores.put(goTerm, new Double(blastResult.getBitScore() + cumulativeGoTermBitScores.get(goTerm)));
+						}
+						// calculate cumulative blast database score
+						if (!cumulativeGoTermBlastDatabaseScores.containsKey(goTerm)) {
+							cumulativeGoTermBlastDatabaseScores.put(goTerm, new Double(getSettings().getBlastDbWeight(blastDbName)));
+						} else {
+							cumulativeGoTermBlastDatabaseScores.put(goTerm, new Double(getSettings().getBlastDbWeight(blastDbName) + cumulativeGoTermBlastDatabaseScores.get(goTerm)));
+						}
+						// calculate cumulative overlap score
+						if (!cumulativeGoTermOverlapScores.containsKey(goTerm)) {
+							cumulativeGoTermOverlapScores.put(goTerm, overlapScore);
+						} else {
+							cumulativeGoTermOverlapScores.put(goTerm, overlapScore + cumulativeGoTermOverlapScores.get(goTerm));
 						}
 					}
-					// calculate max bit score
-					if (blastResult.getBitScore() > maxBitScore) {
-						maxBitScore = new Double(blastResult.getBitScore());
-					}
+				}
+				// calculate max bit score
+				if (blastResult.getBitScore() > maxBitScore) {
+					maxBitScore = new Double(blastResult.getBitScore());
 				}
 			}
-			// Calculate GO term evidence code scores
-			Map<String, Double> cumulativeGoTermEvidenceCodeWeights = new HashMap<String, Double>();
-			Map<String, Integer> termAnnotationCounts = new HashMap<String, Integer>();
-			for (String blastDbName : protein.getBlastResults().keySet()) {
-				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
-					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
-					if (reference != null) {
-						for (ReferenceGoAnnotation annotation : reference) {
-							String goTerm = annotation.getGoTerm();
-							String code = annotation.getEvidenceCode();
-							// calculate cumulative evidence code score
-							if (!cumulativeGoTermEvidenceCodeWeights.containsKey(goTerm)) {
-								cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeight(code));
-							} else {
-								cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeight(code) + cumulativeGoTermEvidenceCodeWeights.get(goTerm));
-							}
-							// calculate number of term annotations 
-							if (!termAnnotationCounts.containsKey(goTerm)) {
-								termAnnotationCounts.put(goTerm, 1);
-							} else {
-								termAnnotationCounts.put(goTerm, termAnnotationCounts.get(goTerm) + 1);
-							}
+		}
+		// Calculate GO term evidence code scores
+		Map<String, Double> cumulativeGoTermEvidenceCodeWeights = new HashMap<String, Double>();
+		Map<String, Integer> termAnnotationCounts = new HashMap<String, Integer>();
+		for (String blastDbName : protein.getBlastResults().keySet()) {
+			for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
+				Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
+				if (reference != null) {
+					for (ReferenceGoAnnotation annotation : reference) {
+						String goTerm = annotation.getGoTerm();
+						String code = annotation.getEvidenceCode();
+						// calculate cumulative evidence code score
+						if (!cumulativeGoTermEvidenceCodeWeights.containsKey(goTerm)) {
+							cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeight(code));
+						} else {
+							cumulativeGoTermEvidenceCodeWeights.put(goTerm, getSettings().getEvidenceCodeWeight(code) + cumulativeGoTermEvidenceCodeWeights.get(goTerm));
+						}
+						// calculate number of term annotations 
+						if (!termAnnotationCounts.containsKey(goTerm)) {
+							termAnnotationCounts.put(goTerm, 1);
+						} else {
+							termAnnotationCounts.put(goTerm, termAnnotationCounts.get(goTerm) + 1);
+						}
 
+					}
+				}
+			}
+		}
+		// Calculate GO Term-Scores and GO term high score
+		Map<String, Double> goTermScores = new HashMap<String, Double>();
+		double goTermHighScore = 0.0;
+		for (String blastDbName : protein.getBlastResults().keySet()) {
+			for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
+				Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
+				if (reference != null) {
+					for (ReferenceGoAnnotation annotation : reference) {
+						String termAcc = annotation.getGoTerm();
+						double evidenceCodeScore = 1 - (getSettings().getGoTermScoreEvidenceCodeScoreWeight() * (1 - (cumulativeGoTermEvidenceCodeWeights.get(termAcc) / termAnnotationCounts.get(termAcc)))); 
+						double goTermAbundancyScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
+													+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
+													+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;
+						double goTermScore = goTermAbundancyScore * evidenceCodeScore;
+						goTermScores.put(termAcc, goTermScore);
+						if (goTermScore > goTermHighScore) {
+							goTermHighScore = goTermScore;
 						}
 					}
 				}
 			}
-			// Calculate GO Term-Scores and GO term high score
-			Map<String, Double> goTermScores = new HashMap<String, Double>();
-			double goTermHighScore = 0.0;
-			for (String blastDbName : protein.getBlastResults().keySet()) {
-				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
-					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
-					if (reference != null) {
-						for (ReferenceGoAnnotation annotation : reference) {
-							String termAcc = annotation.getGoTerm();
-							double evidenceCodeScore = 1 - (getSettings().getGoTermScoreEvidenceCodeScoreWeight() * (1 - (cumulativeGoTermEvidenceCodeWeights.get(termAcc) / termAnnotationCounts.get(termAcc)))); 
-							double goTermAbundancyScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
-														+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
-														+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;
-							double goTermScore = goTermAbundancyScore * evidenceCodeScore;
-							goTermScores.put(termAcc, goTermScore);
-							if (goTermScore > goTermHighScore) {
-								goTermHighScore = goTermScore;
-							}
+		}
+		// Filter GO Term-Scores
+		for (String goTerm : goTermScores.keySet()) {
+			if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getInformativeTokenThreshold()) {
+				goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getInformativeTokenThreshold()));
+			}
+		}
+		// Find highest scoring GO annotation
+		double goAnnotationTopScore = 0.0;
+		BlastResult highestScoringBlastResult = null;
+		for (String blastDbName : protein.getBlastResults().keySet()) {
+			for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
+				double sumGoTermScores = 0.0;
+				int informativeGoTermCount = 0;
+				int goTermCount = 0;
+				Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
+				if (reference != null) { 
+					for (ReferenceGoAnnotation annotation : reference) {
+						Double goTermScore = goTermScores.get(annotation.getGoTerm());
+						sumGoTermScores += goTermScore * getSettings().getEvidenceCodeWeight(annotation.getEvidenceCode());
+						goTermCount++;
+						if (goTermScore > goTermHighScore * getSettings().getInformativeTokenThreshold()) {
+							informativeGoTermCount++;
 						}
 					}
 				}
-			}
-			// Filter GO Term-Scores
-			for (String goTerm : goTermScores.keySet()) {
-				if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getInformativeTokenThreshold()) {
-					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getInformativeTokenThreshold()));
+				double correctionFactor = ((double) informativeGoTermCount) / ((double) goTermCount);
+				double lexicalScore = correctionFactor * sumGoTermScores / goTermHighScore;
+				double relativeBlastScore = getSettings().getDescriptionScoreBitScoreWeight(blastDbName) * blastResult.getBitScore() / maxBitScore;
+				double goAnnotationScore = lexicalScore + relativeBlastScore;
+				if (goAnnotationScore > goAnnotationTopScore) {
+					goAnnotationTopScore = goAnnotationScore;
+					highestScoringBlastResult = blastResult;
 				}
 			}
-			// Find highest scoring GO annotation
-			double goAnnotationTopScore = 0.0;
-			BlastResult highestScoringBlastResult = null;
-			for (String blastDbName : protein.getBlastResults().keySet()) {
-				for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
-					double sumGoTermScores = 0.0;
-					int informativeGoTermCount = 0;
-					int goTermCount = 0;
-					Set<ReferenceGoAnnotation> reference = this.getGoAnnotationReference().get(blastResult.getShortAccession());
-					if (reference != null) { 
-						for (ReferenceGoAnnotation annotation : reference) {
-							Double goTermScore = goTermScores.get(annotation.getGoTerm());
-							sumGoTermScores += goTermScore * getSettings().getEvidenceCodeWeight(annotation.getEvidenceCode());
-							goTermCount++;
-							if (goTermScore > goTermHighScore * getSettings().getInformativeTokenThreshold()) {
-								informativeGoTermCount++;
-							}
-						}
-					}
-					double correctionFactor = ((double) informativeGoTermCount) / ((double) goTermCount);
-					double lexicalScore = correctionFactor * sumGoTermScores / goTermHighScore;
-					double relativeBlastScore = getSettings().getDescriptionScoreBitScoreWeight(blastDbName) * blastResult.getBitScore() / maxBitScore;
-					double goAnnotationScore = lexicalScore + relativeBlastScore;
-					if (goAnnotationScore > goAnnotationTopScore) {
-						goAnnotationTopScore = goAnnotationScore;
-						highestScoringBlastResult = blastResult;
-					}
-				}
+		}
+		if (highestScoringBlastResult != null) {
+			Set<ReferenceGoAnnotation> reference = getGoAnnotationReference().get(highestScoringBlastResult.getShortAccession());
+			Set<String> results = new HashSet<String>();
+			for (ReferenceGoAnnotation annotation : reference) {
+				results.add(annotation.getGoTerm());
 			}
-			if (highestScoringBlastResult != null) {
-				Set<ReferenceGoAnnotation> reference = getGoAnnotationReference().get(highestScoringBlastResult.getShortAccession());
-				Set<String> results = new HashSet<String>();
-				for (ReferenceGoAnnotation annotation : reference) {
-					results.add(annotation.getGoTerm());
-				}
-				protein.setGoResults(results);
-			} else {
-				protein.setGoResults(new HashSet<String>());
-			}
+			protein.setGoResults(results);
+		} else {
+			protein.setGoResults(new HashSet<String>());
 		}
 	}
 

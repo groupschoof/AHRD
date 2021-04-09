@@ -191,11 +191,15 @@ public class Evaluator extends AHRD {
 	 * Settings.
 	 */
 	public void calculateEvaluationScores() {
-		for (Protein prot : getProteins().values()) {
-			prot.getEvaluationScoreCalculator().assignEvaluationScores();
+		if(!getSettings().doMultithreading()) {
+			for (Protein prot : getProteins().values()) {
+				prot.getEvaluationScoreCalculator().assignEvaluationScores();
+			}
+		} else {
+			getProteins().values().parallelStream().forEach(prot -> prot.getEvaluationScoreCalculator().assignEvaluationScores());
 		}
 	}
-
+	
 	/**
 	 * Calculates the evaluation-score as defined in function
 	 * calculateEvaluationScores() for each Protein's Blast-Results'

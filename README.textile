@@ -16,6 +16,7 @@ h2. Table of contents
 ### "Optional input data":#222-optional-input-data
 ### "Required config files":#223-required-config-files
 #### "Test custom blacklists and filters":#2231-test-custom-blacklists-and-filters
+## "Multithreading":#23-multithreading
 ## "Output":#24-output
 ### "Tab-Delimited Table":#241-tab-delimited-table
 ### "Fasta-Format":#242-fasta-format
@@ -103,7 +104,7 @@ If you want AHRD to predict your query protein's functions with Gene Ontology (G
 
 h4. 2.2.3 Required config files
 
-# Input yml with all pathes and parameters according to your needs (see ahrd_example_input.yml and section Parameters)
+# Input yml with all paths and parameters according to your needs (see ahrd_example_input.yml and section Parameters)
 # Blacklists and filters (they can either be used as provided or can be adapted to your needs and databases). Each of these files contains a list of valid Java regular expressions, one per line. For details on Java regular expressions please refer to http://docs.oracle.com/javase/tutorial/essential/regex/. In the YAML file, the blacklists can be put at the upper most level in order to apply for all blast search results, or can be provided for each blast search result individually. The description filter files have to be specified for each blast search result separately.
 ## *Description blacklist* (Argument @blacklist: ./test/resources/blacklist_descline.txt@) - Any Blast-Hit's description matching one of the regular expressions in this file will be ignored.
 ## *Description filter* for each single blast database (Argument @filter: ./test/resources/filter_descline_sprot.txt@) - Any part of a Blast-Hit description that matches any one of the regular expressions in this file will be deleted from the description.
@@ -124,6 +125,13 @@ Example Output for test string "activity", and regular expressions "(?i)interact
 [junit] (?i)activity -> </pre>
 
 The above example demonstrates how the first regular expression does not match anything in the test string "activity", but after matching it against the second regular expression nothing remains, because the matched substring has been filtered out. As you can see, this test applies all provided regular expression _in order of appearance_ and shows what _remains_ of the provided test string after filtering with the provided regular expressions.
+
+h3. 2.3 Multithreading
+
+The default behaviour of AHRD to only use one CPU core can be overridden with the argument @multithreading: true@.
+This can greatly reduce the runtime of AHRD's annotation ("2.1":#21-ahrd-example-usages), evaluation ("2.6":#2.6-computing-f-Scores-for-selected-parameter-sets) and optimization ("2.7":#27-parameter-optimization). However it can not speed up the input of large datasets.
+Another caveat is that AHRD will then use as many threads as you CPU has (logical) cores.
+So use this option with caution on computing resources shared with other users.
 
 h3. 2.4 Output
 
@@ -219,8 +227,10 @@ Basically the input file is almost identical to the AHRD evaluator run. The foll
 # @mutator_deviation: 0.15@  Mutate a randomly selected parameter by value gaussian normal distributed with this standard deviation
 
 Both approaches either optimize AHRD's parameters according to its description annotation performance _or_ its Gene Ontology term annotation performance.
-Optimization according to Gene Ontology based F-scores is automatically triggered if at least one valid @gene_ontology_reference:@ file is provided _and_ a valid @ground_truth_go_annotations:@ file is provided (section: "2.7":#261-computing-gene-ontology-annotation-f-Scores).
+Optimization according to Gene Ontology based F-scores is automatically triggered if at least one valid @gene_ontology_reference:@ file is provided _and_ a valid @ground_truth_go_annotations:@ file is provided (section: "2.6.1":#261-computing-gene-ontology-annotation-f-Scores).
 Then AHRD uses the highest complexity GO based F-score it is requested to calculate (in order of increasing complexity: @simple_GO_f1_scores:@, @ancestry_GO_f1_scores:@ and @semsim_GO_f1_scores:@).
+
+When using only a single CPU thread, parameter optimization can take a long time to finish. Consider using @multithreading: true@ to speed it up (see section "2.3":#23-multithreading).
  
 h4. 2.7.1 Parameter Optimization via Genetic Algorithm
 

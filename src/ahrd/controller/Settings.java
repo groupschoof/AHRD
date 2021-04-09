@@ -29,7 +29,7 @@ public class Settings implements Cloneable {
 	/**
 	 * Thread-Local Singleton of the current AHRD-Run's settings:
 	 */
-	private static final ThreadLocal<Settings> settings = new ThreadLocal<Settings>();
+	private static final ThreadLocal<Settings> settings = new InheritableThreadLocal<Settings>();
 
 	public static Settings getSettings() {
 		return settings.get();
@@ -127,6 +127,7 @@ public class Settings implements Cloneable {
 	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
 	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
 	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary"; 
+	public static final String MULTITHREADING = "multithreading";
 	
 	/**
 	 * Fields:
@@ -349,6 +350,10 @@ public class Settings implements Cloneable {
 	 * Weights of reference go annotation evidence codes for prediction of query protein go term annotations  
 	 */
 	private Map<String, Double> evidenceCodeWeights = new HashMap<String, Double>();
+	/**
+	 * Triggers AHRD to annotate and evaluate proteins using all available CPU cores
+	 */
+	private boolean multithreading = false;
 
 	/**
 	 * Initializes an Instance with content read from a YML-File:
@@ -547,6 +552,9 @@ public class Settings implements Cloneable {
 		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
 		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
 		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
+		if (input.get(MULTITHREADING) != null) {
+			this.setMultithreading(Boolean.parseBoolean((String) input.get(MULTITHREADING)));
+		}
 		/**
 		 * Initialize default reference go annotation evidence code weights
 		 * (see: http://www.geneontology.org/page/guide-go-evidence-codes)
@@ -1395,5 +1403,13 @@ public class Settings implements Cloneable {
 
 	public void setWriteEvaluationSummary(boolean writeEvaluationSummary) {
 		this.writeEvaluationSummary = writeEvaluationSummary;
+	}
+
+	public boolean doMultithreading() {
+		return multithreading;
+	}
+
+	public void setMultithreading(boolean multithreading) {
+		this.multithreading = multithreading;
 	}
 }
