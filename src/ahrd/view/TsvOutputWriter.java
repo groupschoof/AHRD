@@ -67,7 +67,7 @@ public class TsvOutputWriter extends OutputWriter {
 	 * @return String - Tab separated column names for the basic AHRD-output
 	 */
 	public String ahrdColumnNames() {
-		return "Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tInterpro-ID (Description)\tGene-Ontology-Term";
+		return "Protein-Accession\tBlast-Hit-Accession\tAHRD-Quality-Code\tHuman-Readable-Description\tGene-Ontology-Term";
 	}
 
 	/**

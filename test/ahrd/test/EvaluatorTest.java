@@ -14,7 +14,6 @@ import org.xml.sax.SAXException;
 
 import ahrd.controller.Evaluator;
 import ahrd.exception.MissingAccessionException;
-import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.GOterm;
 
@@ -77,7 +76,7 @@ public class EvaluatorTest {
 	}
 	
 	@Test
-	public void testSetupCompetitors() throws IOException, MissingAccessionException, MissingInterproResultException, SQLException, OWLOntologyCreationException {
+	public void testSetupCompetitors() throws IOException, MissingAccessionException, SQLException, OWLOntologyCreationException {
 		evaluator.initializeProteins();
 		evaluator.setupGroundTruthDescriptions();
 		evaluator.assignHumanReadableDescriptions();

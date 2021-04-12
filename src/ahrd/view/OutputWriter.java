@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 import ahrd.model.BlastResult;
-import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import ahrd.model.TokenScoreCalculator;
 
@@ -54,16 +53,6 @@ public abstract class OutputWriter {
 				descLine += "\t\tUnknown protein\t";
 			else
 				descLine += "Unknown protein";
-		}
-		// Interpro
-		List<InterproResult> sortedIprs = new ArrayList<InterproResult>(
-				protein.getInterproResults());
-		Collections.sort(sortedIprs);
-		for (Iterator<InterproResult> i = sortedIprs.iterator(); i.hasNext();) {
-			InterproResult ipr = i.next();
-			descLine += ipr.getId() + " (" + ipr.getName() + ")";
-			if (i.hasNext())
-				descLine += ", ";
 		}
 		descLine += separator;
 		// Gene-Ontology-Results:

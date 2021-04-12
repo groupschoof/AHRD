@@ -139,20 +139,6 @@ public class SettingsTest {
 	}
 
 	@Test
-	public void testHasInterproAnnotations() {
-		// Should have Interpro-Annotations with default test-Settings:
-		assertTrue(getSettings().hasInterproAnnotations());
-		String iprDbBackup = getSettings().getPathToInterproDatabase();
-		getSettings().setPathToInterproDatabase(null);
-		assertTrue(!getSettings().hasInterproAnnotations());
-		getSettings().setPathToInterproDatabase(iprDbBackup);
-		getSettings().setPathToInterproResults(null);
-		assertTrue(!getSettings().hasInterproAnnotations());
-		getSettings().setPathToInterproResults("/not/existing/path.raw");
-		assertTrue(!getSettings().hasInterproAnnotations());
-	}
-
-	@Test
 	public void testRememberSimulatedAnnealingPath() {
 		// Flag should be set in default Test-Settings:
 		assertTrue(

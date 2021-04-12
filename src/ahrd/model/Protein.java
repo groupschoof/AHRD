@@ -22,7 +22,6 @@ public class Protein {
 	private String sequence;
 	private Integer sequenceLength;
 	private Map<String, List<BlastResult>> blastResults;
-	private Set<InterproResult> interproResults = new HashSet<InterproResult>();
 	private Set<String> goResults = new HashSet<String>();
 	private Set<GOterm> goResultsTerms = new HashSet<GOterm>();
 	private Set<GOterm> goSlimTerms = new HashSet<GOterm>();
@@ -167,14 +166,6 @@ public class Protein {
 
 	public void setBlastResults(Map<String, List<BlastResult>> blastResults) {
 		this.blastResults = blastResults;
-	}
-
-	public Set<InterproResult> getInterproResults() {
-		return interproResults;
-	}
-
-	public void setInterproResults(Set<InterproResult> interproResults) {
-		this.interproResults = interproResults;
 	}
 
 	public Set<String> getGoResults() {

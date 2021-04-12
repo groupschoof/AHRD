@@ -21,7 +21,6 @@ import org.xml.sax.SAXException;
 import ahrd.controller.AHRD;
 import ahrd.controller.Utils;
 import ahrd.exception.MissingAccessionException;
-import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.Protein;
 import ahrd.model.ReferenceGoAnnotation;
@@ -88,7 +87,7 @@ public class GoAnnotationReferenceTest {
 	@Test
 	public void testAnnotatesGoTerms() throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
-			ParsingException, MissingInterproResultException, SQLException, OWLOntologyCreationException {
+			ParsingException, SQLException, OWLOntologyCreationException {
 		ahrd.setup(false);
 		ahrd.assignGeneOntologyTerms();
 		Protein p = ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056");

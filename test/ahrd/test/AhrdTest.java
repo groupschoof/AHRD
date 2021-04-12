@@ -14,7 +14,6 @@ import ahrd.controller.AHRD;
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
-import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import nu.xom.ParsingException;
 
@@ -73,15 +72,4 @@ public class AhrdTest {
 		assertTrue(p.getTokenScoreCalculator().getTotalTokenOverlapScore() > 0.0);
 	}
 
-	@Test
-	public void testParseInterproResults() throws IOException, ParsingException {
-		ahrd.setProteins(TestUtils.mockProteinDb());
-		// TODO: The Interpro-Database should be mocked:
-		InterproResult.initialiseInterproDb();
-		ahrd.parseInterproResult();
-		for (String iterProtAcc : ahrd.getProteins().keySet()) {
-			Protein protein = ahrd.getProteins().get(iterProtAcc);
-			assertTrue(protein.getInterproResults().size() > 0);
-		}
-	}
 }

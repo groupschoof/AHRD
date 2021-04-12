@@ -20,12 +20,10 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.xml.sax.SAXException;
 
 import ahrd.exception.MissingAccessionException;
-import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
 import ahrd.model.GOdatabase;
 import ahrd.model.GOterm;
-import ahrd.model.InterproResult;
 import ahrd.model.Protein;
 import ahrd.model.TokenScoreCalculator;
 import ahrd.model.ReferenceGoAnnotation;
@@ -139,23 +137,6 @@ public class AHRD {
 		}
 	}
 
-	public void parseInterproResult() throws IOException {
-		if (getSettings().hasInterproAnnotations()) {
-			Set<String> missingProteinAccessions = new HashSet<String>();
-			try {
-				InterproResult.parseInterproResult(proteins);
-			} catch (MissingProteinException mpe) {
-				missingProteinAccessions.add(mpe.getMessage());
-			}
-			if (missingProteinAccessions.size() > 0) {
-				System.err
-						.println("WARNING - The following Gene-Accessions were referenced in the Interpro-Result-File,"
-								+ " but could not be found in the Memory-Protein-Database:\n"
-								+ missingProteinAccessions);
-			}
-		}
-	}
-
 	/**
 	 * Method finds GO term annotations for Proteins in the searched Blast
 	 * databases and stores them in a Map.
@@ -177,7 +158,7 @@ public class AHRD {
 
 	/**
 	 * Method initializes the AHRD-run: 1. Loads Proteins 2. Parses BlastResults
-	 * 3. Parses InterproResults 4. Parses database Gene-Ontology-Annotations
+	 * 3. Parses database Gene-Ontology-Annotations
 	 * 
 	 * @throws IOException
 	 * @throws MissingAccessionException
@@ -210,14 +191,6 @@ public class AHRD {
 					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
 		}
 
-		// one single InterproResult-File
-		if (getSettings().hasValidInterproDatabaseAndResultFile()) {
-			InterproResult.initialiseInterproDb();
-			parseInterproResult();
-			if (writeLogMsgs)
-				System.out.println("...parsed interpro results in " + takeTime() + "sec, currently occupying "
-						+ takeMemoryUsage() + " MB");
-		}
 	}
 
 	/**

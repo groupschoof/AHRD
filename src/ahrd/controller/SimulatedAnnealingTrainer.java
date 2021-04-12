@@ -11,7 +11,6 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import ahrd.exception.MissingAccessionException;
-import ahrd.exception.MissingInterproResultException;
 import ahrd.view.TrainerOutputWriter;
 
 public class SimulatedAnnealingTrainer extends Trainer {
@@ -80,12 +79,11 @@ public class SimulatedAnnealingTrainer extends Trainer {
 	 * As of now performs hill-climbing to optimize parameters.
 	 * @throws SQLException 
 	 * @throws IOException 
-	 * @throws MissingInterproResultException 
 	 * @throws MissingAccessionException 
 	 * @throws OWLOntologyCreationException 
 	 * 
 	 */
-	public void train() throws MissingInterproResultException, IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
+	public void train() throws IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
 		while (getSettings().getTemperature() > 0) {
 			// If we run simulated annealing remembering tested Parameters and
 			// their scores,

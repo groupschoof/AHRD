@@ -52,8 +52,6 @@ public class Settings implements Cloneable {
 	public static final String BLAST_BLACKLIST_KEY = "blacklist";
 	public static final String BLAST_FILTER_KEY = "filter";
 	public static final String TOKEN_BLACKLIST_KEY = "token_blacklist";
-	public static final String INTERPRO_DATABASE_KEY = "interpro_database";
-	public static final String INTERPRO_RESULT_KEY = "interpro_result";
 	public static final String GENE_ONTOLOGY_REFERENCE_KEY = "gene_ontology_reference";
 	public static final String OUTPUT_KEY = "output";
 	public static final String SIMULATED_ANNEALING_PATH_LOG_KEY = "path_log";
@@ -142,8 +140,6 @@ public class Settings implements Cloneable {
 	private String pathToGroundTruthTokenBlacklist;
 	private Set<String> groundTruthTokenBlacklist = new HashSet<String>();
 	private Pattern groundTruthFastaRegex;
-	private String pathToInterproDatabase;
-	private String pathToInterproResults;
 	private String pathToOutput;
 	/**
 	 * File to write the AHRD-Scores of each BlastHit's Description into, if
@@ -373,8 +369,6 @@ public class Settings implements Cloneable {
 		}
 		// If started to evaluate parameters or train the algorithm, ground truth descriptions are stored in this file:
 		setPathToGroundTruthFasta((String) input.get(GROUND_TRUTH_FASTA_KEY));
-		this.setPathToInterproDatabase((String) input.get(INTERPRO_DATABASE_KEY));
-		this.setPathToInterproResults((String) input.get(INTERPRO_RESULT_KEY));
 		this.setPathToOutput((String) input.get(OUTPUT_KEY));
 		if (input.get(HRD_SCORES_OUTPUT_PATH) != null && !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
 			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH));
@@ -625,15 +619,6 @@ public class Settings implements Cloneable {
 		return clone;
 	}
 
-	public boolean hasValidInterproDatabaseAndResultFile() {
-		if (getPathToInterproDatabase() == null || getPathToInterproResults() == null)
-			return false;
-		// ELSE:
-		File iprDb = new File(getPathToInterproDatabase());
-		File iprRes = new File(getPathToInterproResults());
-		return (iprDb.canRead() && iprDb.length() > 0 && iprRes.canRead() && iprRes.length() > 0);
-	}
-
 	/**
 	 * Break with the classic simulated annealing approach and remember each
 	 * visited Parameter-Set and its score. This enables speeding up the
@@ -777,27 +762,6 @@ public class Settings implements Cloneable {
 
 	public void setPathToProteinsFasta(String pathToProteinsFasta) {
 		this.pathToProteinsFasta = pathToProteinsFasta;
-	}
-
-	public String getPathToInterproDatabase() {
-		return pathToInterproDatabase;
-	}
-
-	public void setPathToInterproDatabase(String pathToInterproDatabase) {
-		this.pathToInterproDatabase = pathToInterproDatabase;
-	}
-
-	public String getPathToInterproResults() {
-		return pathToInterproResults;
-	}
-
-	public boolean hasInterproAnnotations() {
-		return getPathToInterproDatabase() != null && (new File(getPathToInterproDatabase())).exists()
-				&& getPathToInterproResults() != null && (new File(getPathToInterproResults())).exists();
-	}
-
-	public void setPathToInterproResults(String pathToInterproResults) {
-		this.pathToInterproResults = pathToInterproResults;
 	}
 
 	public String getPathToGeneOntologyReference(String blastDatabaseName) {

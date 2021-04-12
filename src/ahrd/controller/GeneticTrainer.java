@@ -16,7 +16,6 @@ import java.util.TreeSet;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import ahrd.exception.MissingAccessionException;
-import ahrd.exception.MissingInterproResultException;
 import ahrd.view.GeneticTrainerOutputWriter;
 
 public class GeneticTrainer extends Trainer {
@@ -88,13 +87,12 @@ public class GeneticTrainer extends Trainer {
 	 * survivors, mutants of fit survivors and random parameter sets for the
 	 * rest in each succeeding generation.
 	 * @throws SQLException 
-	 * @throws IOException 
-	 * @throws MissingInterproResultException 
+	 * @throws IOException  
 	 * @throws MissingAccessionException 
 	 * @throws OWLOntologyCreationException 
 	 * 
 	 */
-	public void train() throws MissingInterproResultException, IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
+	public void train() throws IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
 		Set<Parameters> population = new HashSet<Parameters>();
 		// Set up first generation
 		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();

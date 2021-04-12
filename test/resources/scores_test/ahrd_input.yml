@@ -25,8 +25,6 @@ blast_dbs:
     token_blacklist: ./test/resources/blacklist_token.txt
     description_score_bit_score_weight: 0.4
 
-interpro_database: ./test/resources/interpro_31.xml
-interpro_result: ./test/resources/empty_file.txt
 gene_ontology_reference: ./test/resources/empty_file.txt
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3

@@ -22,8 +22,6 @@ blast_dbs:
     database: ./test/resources/trembl_blast_db.fasta
     filter: ./test/resources/filter_descline_trembl.txt
     description_score_bit_score_weight: 0.4
-interpro_database: ./test/resources/interpro_31.xml
-interpro_result: ./test/resources/interpro_result.raw
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2

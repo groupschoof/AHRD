@@ -21,7 +21,6 @@ import org.xml.sax.SAXException;
 import ahrd.controller.Parameters;
 import ahrd.controller.SimulatedAnnealingTrainer;
 import ahrd.exception.MissingAccessionException;
-import ahrd.exception.MissingInterproResultException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.Fscore;
 import ahrd.model.Protein;
@@ -73,7 +72,7 @@ public class SimulatedAnnealingTrainerTest {
 	}
 
 	@Test
-	public void testRememberSimulatedAnnealingPath() throws OWLOntologyCreationException, MissingInterproResultException, IOException, SQLException, MissingAccessionException {
+	public void testRememberSimulatedAnnealingPath() throws OWLOntologyCreationException, IOException, SQLException, MissingAccessionException {
 		// Just do two cycles:
 		getSettings().setTemperature(2);
 		Parameters p = getSettings().getParameters().clone();
