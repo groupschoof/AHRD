@@ -3,7 +3,6 @@ package ahrd.controller;
 import static ahrd.controller.Settings.getSettings;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -11,7 +10,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import ahrd.exception.MissingAccessionException;
-import ahrd.view.TrainerOutputWriter;
+import ahrd.view.SimulatedAnnealingTrainerOutputWriter;
 
 public class SimulatedAnnealingTrainer extends Trainer {
 
@@ -27,10 +26,8 @@ public class SimulatedAnnealingTrainer extends Trainer {
 	 */
 	public SimulatedAnnealingTrainer(String pathToInputYml) throws IOException {
 		super(pathToInputYml);
-		this.outWriter = new TrainerOutputWriter();
 		// Remember tested Parameter-Sets and their scores?
-		if (getSettings().rememberSimulatedAnnealingPath())
-			this.testedParameters = new HashSet<Parameters>();
+		if (getSettings().rememberSimulatedAnnealingPath())	this.testedParameters = new HashSet<>();
 	}
 	
 	/**
@@ -39,35 +36,42 @@ public class SimulatedAnnealingTrainer extends Trainer {
 	public static void main(String[] args) {
 		System.out
 				.println("Usage:\njava -cp ahrd.jar ahrd.controller.SimulatedAnnealingTrainer input.yml\n");
-
 		try {
+			// Try to heuristically find optimal parameters for the annotation with descriptions
 			SimulatedAnnealingTrainer trainer = new SimulatedAnnealingTrainer(args[0]);
-			trainer.setup(false); // false -> Don't log memory and time-usages
-			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
-				getSettings().setFindHighestPossibleGoScore(true);
+			if (getSettings().doEvaluateDescriptions()) {
+				trainer.setup(false); // false -> Don't log memory and time-usages
+				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
+				trainer.setupGroundTruthDescriptions();
+				trainer.outputWriter = new SimulatedAnnealingTrainerOutputWriter();
+				Parameters seed = getSettings().getDescriptionParameters().clone();
+				trainer.outputWriter.writeHeader(seed);
+				trainer.train(seed);
+				trainer.calcAvgMaxDescriptionScore();
+				trainer.outputWriter.writeFinalOutput(
+						trainer.getBestParametersFoundAtTemperature(),
+						trainer.getAvgMaxDescriptionScore(),
+						trainer.getBestParameters());
 			}
-			// After the setup the unique short accessions are no longer needed:
-			trainer.setUniqueBlastResultShortAccessions(null);
-			trainer.setupGroundTruthDescriptions();
-			trainer.setupGoAnnotationEvaluation();
-			// Try to find optimal parameters heuristically:
-			trainer.train();
-			// Calculate the average maximum evaluation score AHRD could have
-			// possible achieved:
-			trainer.calcAvgMaxEvaluationScore();
-
-			// Write final output
-			Settings bestSettings = getSettings().clone();
-			bestSettings.setParameters(trainer.getBestParameters());
-			trainer.outWriter.writeFinalOutput(bestSettings,
-					trainer.getAvgMaxEvaluationScore(),
-					trainer.getBestParametersFoundAtTemperature());
-			System.out
-					.println("Logged path through parameter- and score-space into:\n"
-							+ getSettings()
-									.getPathToSimulatedAnnealingPathLog());
-			System.out.println("Written output into:\n"
-					+ getSettings().getPathToOutput());
+			// Try to heuristically find optimal parameters for the annotation with GO terms
+			trainer = new SimulatedAnnealingTrainer(args[0]);
+			if (getSettings().doEvaluateGoTerms()) { 
+				trainer.setup(false); // false -> Don't log memory and time-usages
+				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
+				getSettings().setFindHighestPossibleGoScore(true);
+				trainer.setupGoAnnotationEvaluation();
+				trainer.outputWriter = new SimulatedAnnealingTrainerOutputWriter();
+				Parameters seed = getSettings().getGoParameters().clone();
+				trainer.outputWriter.writeHeader(seed);
+				trainer.train(seed);
+				trainer.calcAvgMaxGoScore();
+				trainer.outputWriter.writeFinalOutput(
+						trainer.getBestParametersFoundAtTemperature(),
+						trainer.getAvgMaxGoScore(),
+						trainer.getBestParameters());
+			}
+			System.out.println("Logged path through parameter- and score-space into:\n" + getSettings().getPathToTrainingPathLog());
+			System.out.println("Written output into:\n"	+ getSettings().getPathToOutput());
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
@@ -77,94 +81,75 @@ public class SimulatedAnnealingTrainer extends Trainer {
 
 	/**
 	 * As of now performs hill-climbing to optimize parameters.
-	 * @throws SQLException 
 	 * @throws IOException 
 	 * @throws MissingAccessionException 
 	 * @throws OWLOntologyCreationException 
 	 * 
 	 */
-	public void train() throws IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
+	public void train(Parameters currentParameters) throws IOException, OWLOntologyCreationException, MissingAccessionException {
 		while (getSettings().getTemperature() > 0) {
-			// If we run simulated annealing remembering tested Parameters and
-			// their scores,
-			// do not calculate current Parameter's performance, if already done
-			// in former cycle:
-			if (getSettings().rememberSimulatedAnnealingPath()
-					&& getTestedParameters().contains(
-							getSettings().getParameters())) {
-				getSettings().setParameters(
-						getAlreadyTestedParameters(getSettings()
-								.getParameters()));
+			// If we run simulated annealing remembering tested Parameters and their scores,
+			// do not calculate current Parameter's performance, if already done in former cycle.
+			// (The new Parameters object has only the parameters.
+			// The old one on the other hand also has the evaluation scores. 
+			if (getSettings().rememberSimulatedAnnealingPath() && getTestedParameters().contains(currentParameters)) {
+				currentParameters = getAlreadyTestedParameters(currentParameters);
 			} else {
-				reinitializeBlastResults();
-				// Iterate over all Proteins and assign the best scoring Human
-				// Readable Description
-				assignHumanReadableDescriptions();
-				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+				if (currentParameters instanceof DescriptionParameters) { // We are optimizing description annotation
+					getSettings().setDescriptionParameters((DescriptionParameters) currentParameters);
+					reinitializeBlastResults();
+					// Iterate over all Proteins and assign the best scoring Human Readable Description
+					assignHumanReadableDescriptions();
+					// Evaluate AHRD's performance for each Protein:
+					calculateEvaluationScores();
+					// Estimate average performance of current Parameters:
+					calcAveragesOfDescriptionScores();
+				} else { // We are optimizing GO annotation
+					getSettings().setGoParameters((GoParameters) currentParameters);
+					reinitializeBlastResults();
+					// Iterate over all Proteins and assign the best scoring GO terms
 					assignGeneOntologyTerms();
 					goAnnotsStringToObject();
+					// Evaluate AHRD's performance for each Protein:
+					calculateEvaluationScores();
+					// Estimate average performance of current Parameters:
+					calcAveragesOfGoScores();
 				}
-				// Evaluate AHRD's performance for each Protein:
-				calculateEvaluationScores();
-				// Estimate average performance of current Parameters:
-				calcAveragesOfEvalScorePrecisionAndRecall();
 			}
-			// Breaking a little bit with the pure simulated annealing
-			// algorithm, we remember the best performing Parameters:
-			findBestSettings();
-			// If started with this option, remember currently evaluated
-			// Parameters:
-			if (getSettings().rememberSimulatedAnnealingPath())
-				getTestedParameters()
-						.add(getSettings().getParameters().clone());
-			// Remember difference in avg. evaluation-scores, *before* accepting
-			// or rejecting current Parameters:
-			Double diffScores = diffEvalScoreToCurrentlyAcceptedParams();
+			
+			double diff;
+			// Breaking a little bit with the pure simulated annealing algorithm, we remember the best performing Parameters
+			if (getBestParameters() == null || currentParameters.getAvgEvaluationScore() > getBestParameters().getAvgEvaluationScore()) {
+				setBestParameters(currentParameters.clone());
+				setBestParametersFoundAtTemperature(getSettings().getTemperature());
+			}
+			// If started with this option, remember currently evaluated parameters:
+			if (getSettings().rememberSimulatedAnnealingPath()) {
+				getTestedParameters().add(currentParameters.clone());
+			}
+			// Remember difference in avg. evaluation-scores, *before* accepting or rejecting current Parameters:
+			diff = diffEvalScoreToCurrentlyAcceptedParams(currentParameters);
 			// Initialize the next iteration.
-			// Find locally optimal (according to objective function)
-			// Parameters:
-			int acceptedCurrParameters = acceptOrRejectParameters();
-			// Write output of current iteration:
-			this.outWriter.writeIterationOutput(getSettings(), diffScores,
-					acceptedCurrParameters);
-			// Try a slightly changes set of Parameters:
-			initNeighbouringSettings();
+			// Find locally optimal (according to objective function) parameters:
+			Integer acceptedCurrParameters = acceptOrRejectParameters(currentParameters);
+			// Write output of current iteration
+			this.outputWriter.writeIterationOutput(
+					getSettings().getTemperature(), currentParameters, diff, acceptedCurrParameters.toString());
+			// Try a slightly changed set of Parameters:
+			currentParameters = getAcceptedParameters().neighbour(diffEvalScoreToCurrentlyAcceptedParams(currentParameters));
 			// Cool down temperature:
 			coolDown();
 		}
 	}
 
-	/**
-	 * Each iteration the average evaluation-score is compared with the latest
-	 * far high-score. If the current Settings Score is better, it will become
-	 * the high-score.
-	 */
-	public void findBestSettings() {
-		if (getBestParameters() == null
-				|| getSettings().getAvgEvaluationScore() > getBestParameters()
-						.getAvgEvaluationScore()) {
-			setBestParameters(getSettings().getParameters().clone());
-			setBestParametersFoundAtTemperature(getSettings().getTemperature());
+	public Double diffEvalScoreToCurrentlyAcceptedParams(Parameters currentParameters) {
+		Double diffScores = 0.0;
+		if (getAcceptedParameters() != null) {
+			diffScores = currentParameters.getAvgEvaluationScore() - getAcceptedParameters().getAvgEvaluationScore();
 		}
+		return diffScores;
 	}
-
-	/**
-	 * Generates new Settings from the currently accepted ones by
-	 * <em>slightly</em> changing them to a <em>neighboring</em> according to
-	 * the euclidean distance in the parameter-space Instance.
-	 */
-	public void initNeighbouringSettings() {
-		getSettings().setParameters(
-				getAcceptedParameters().neighbour(
-						diffEvalScoreToCurrentlyAcceptedParams()));
-	}
-
-	public Double diffEvalScoreToCurrentlyAcceptedParams() {
-		return (getAcceptedParameters() != null) ? getSettings()
-				.getAvgEvaluationScore()
-				- getAcceptedParameters().getAvgEvaluationScore() : 0.0;
-	}
-
+	
 	/**
 	 * Calculates Acceptance-Probability according to the <strong>simulated
 	 * annealing</strong> algorithm. The distribution of P('Accept worse
@@ -173,24 +158,21 @@ public class SimulatedAnnealingTrainer extends Trainer {
 	 * 
 	 * @return Double - The calculated acceptance-probability
 	 */
-	public Double acceptanceProbability() {
+	public Double acceptanceProbability(Parameters curretParameters) {
 		// Scaling-Factor referenced for reading convenience. ;-)
-		Double sf = getSettings()
-				.getOptimizationAcceptanceProbabilityScalingFactor();
+		Double sf = getSettings().getOptimizationAcceptanceProbabilityScalingFactor();
 		// If current Settings perform better than the so far found best, accept
 		// them:
 		double p = 1.0;
 		// If not, generate Acceptance-Probability based on Score-Difference and
 		// current Temperature:
-		if (getAcceptedParameters() != null
-				&& diffEvalScoreToCurrentlyAcceptedParams() < 0.0) {
+		if (getAcceptedParameters() != null	&& diffEvalScoreToCurrentlyAcceptedParams(curretParameters) < 0.0) {
 			// In this case the difference in avg. evaluation scores of current
 			// to accepted parameters is always NEGATIVE.
 			// Hence the following formula can be written as:
 			// p := exp((delta.scores*sf)/T.curr), where delta.score is a
 			// negative real value.
-			p = Math.exp(diffEvalScoreToCurrentlyAcceptedParams() * sf
-					/ getSettings().getTemperature());
+			p = Math.exp(diffEvalScoreToCurrentlyAcceptedParams(curretParameters) * sf / getSettings().getTemperature());
 		}
 		return p;
 	}
@@ -220,24 +202,24 @@ public class SimulatedAnnealingTrainer extends Trainer {
 	 *         <li>2 Accepted equally well performing parameters</li>
 	 *         <li>3 Accepted better performing parameters</li>
 	 *         </ul>
+	 * @throws CloneNotSupportedException 
 	 */
-	public int acceptOrRejectParameters() {
+	public int acceptOrRejectParameters(Parameters curretParameters) {
 		int accepted = 0; // Rejected worse performing parameters
-		double acceptCurrSettingsProb = acceptanceProbability();
+		double acceptCurrSettingsProb = acceptanceProbability(curretParameters);
 		if (acceptCurrSettingsProb == 1.0) {
 			if (getAcceptedParameters() == null
-					|| getAcceptedParameters().getAvgEvaluationScore() < getSettings()
-							.getAvgEvaluationScore()) {
+					|| getAcceptedParameters().getAvgEvaluationScore() < curretParameters.getAvgEvaluationScore()) {
 				accepted = 3; // Accepted better performing parameters
 			} else {
 				accepted = 2; // Accepted equally well performing parameters
 			}
-			setAcceptedParameters(getSettings().getParameters().clone());
+			setAcceptedParameters(curretParameters.clone());
 		} else {
 			// Take random decision
 			Random r = Utils.random;
 			if (r.nextDouble() <= acceptCurrSettingsProb) {
-				setAcceptedParameters(getSettings().getParameters().clone());
+				setAcceptedParameters(curretParameters.clone());
 				accepted = 1; // Accepted worse performing parameters
 			}
 			// else discard the current Settings and continue with the so far
@@ -271,17 +253,16 @@ public class SimulatedAnnealingTrainer extends Trainer {
 		this.acceptedParameters = acceptedSettings;
 	}
 
-	public Set<Parameters> getTestedParameters() {
-		return testedParameters;
-	}
-
 	public Integer getBestParametersFoundAtTemperature() {
 		return bestParametersFoundAtTemperature;
 	}
 
-	public void setBestParametersFoundAtTemperature(
-			Integer bestParametersFoundAtTemperature) {
-		this.bestParametersFoundAtTemperature = bestParametersFoundAtTemperature;
+	public void setBestParametersFoundAtTemperature(int temperature) {
+		this.bestParametersFoundAtTemperature = temperature;
+	}
+	
+	public Set<Parameters> getTestedParameters() {
+		return testedParameters;
 	}
 
 }

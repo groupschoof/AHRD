@@ -291,7 +291,7 @@ public class BlastResult implements Comparable<BlastResult> {
 		// Finally, if AHRD is requested to annotate Gene Ontology Terms, we
 		// need to extract all unique short reference protein (BlastResult)
 		// accessions:
-		if (getSettings().hasGeneOntologyAnnotations()) {
+		if (getSettings().doAnnotateGoTerms()) {
 			uniqueShortAccessions.add(br.getShortAccession());
 		}
 	}

@@ -54,7 +54,7 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_BLACKLIST_KEY = "token_blacklist";
 	public static final String GENE_ONTOLOGY_REFERENCE_KEY = "gene_ontology_reference";
 	public static final String OUTPUT_KEY = "output";
-	public static final String SIMULATED_ANNEALING_PATH_LOG_KEY = "path_log";
+	public static final String TRAINING_PATH_LOG_KEY = "path_log";
 	public static final String WRITE_SCORES_TO_OUTPUT = "write_scores_to_output";
 	public static final String WRITE_BEST_BLAST_HITS_TO_OUTPUT = "write_best_blast_hits_to_output";
 	public static final String WRITE_TOKEN_SET_TO_OUTPUT = "write_token_set_to_output";
@@ -64,6 +64,7 @@ public class Settings implements Cloneable {
 	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT = "token_score_overlap_score_weight";
 	public static final String GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT = "go_term_score_evidence_code_score_weight";
 	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT = "description_score_bit_score_weight";
+	public static final String ANNOTATION_SCORE_BIT_SCORE_WEIGHT = "annotation_score_bit_score_weight";
 	public static final String GROUND_TRUTH_FASTA_KEY = "ground_truth_fasta";
 	public static final String GROUND_TRUTH_DESCRIPTION_FILTER_KEY = "ground_truth_description_filter";
 	public static final String GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY = "ground_truth_description_blacklist";
@@ -130,6 +131,13 @@ public class Settings implements Cloneable {
 	/**
 	 * Fields:
 	 */
+	private boolean annotateDescriptions = true;
+	private boolean evaluateDescriptions = false;
+	private boolean trainDescriptions = false;
+	private boolean annotateGoTerms = false;
+	private boolean evaluateGoTerms = false;
+	private boolean trainGoTerms = false;
+	
 	private String pathToProteinsFasta;
 	private Pattern proteinsFastaRegex;
 	private String pathToGroundTruthFasta;
@@ -149,12 +157,14 @@ public class Settings implements Cloneable {
 	/**
 	 * Trainer logs path through parameter- and score-space into this file:
 	 */
-	private String pathToSimulatedAnnealingPathLog;
+	private String pathToTrainingPathLog;
 	/**
 	 * Parameters representing weights and factors in the various formulas used
 	 * in AHRD. They are subject to optimization and can be set by the user.
 	 */
-	private Parameters parameters = new Parameters();
+	private DescriptionParameters descriptionParameters = new DescriptionParameters();
+	private GoParameters goParameters = new GoParameters();
+	
 	private Boolean writeTokenSetToOutput;
 	private Boolean writeBestBlastHitsToOutput = false;
 	/**
@@ -373,11 +383,14 @@ public class Settings implements Cloneable {
 		if (input.get(HRD_SCORES_OUTPUT_PATH) != null && !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
 			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH));
 		// Trainer logs path through parameter-space here:
-		if (input.get(SIMULATED_ANNEALING_PATH_LOG_KEY) != null)
-			setPathToSimulatedAnnealingPathLog((String) input.get(SIMULATED_ANNEALING_PATH_LOG_KEY));
-		this.setTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
-		this.setTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
-		this.setTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
+		if (input.get(TRAINING_PATH_LOG_KEY) != null)
+			setPathToTrainingPathLog((String) input.get(TRAINING_PATH_LOG_KEY));
+		this.setDescriptionTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
+		this.setDescriptionTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
+		this.setDescriptionTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
+		this.setGoTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
+		this.setGoTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
+		this.setGoTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
 		if (input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT) != null) {
 			this.setGoTermScoreEvidenceCodeScoreWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT)));
 		}
@@ -409,10 +422,24 @@ public class Settings implements Cloneable {
 				this.tokenBlacklists.put(blastDatabaseName, new HashSet<String>(fromFile(getPathToTokenBlacklist(blastDatabaseName))));
 			}
 			// Set Database-Weights and Description-Score-Bit-Score-Weight:
-			this.getParameters().setBlastDbWeight(blastDatabaseName,
+			this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName,
 					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
-			this.getParameters().setDescriptionScoreBitScoreWeight(blastDatabaseName,
-					this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
+			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT) != null) {
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT));
+			} else {
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
+			}
+			this.getGoParameters().setBlastDbWeight(blastDatabaseName,
+					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
+			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT) != null) {
+				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT));
+			} else {
+				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
+			}
 		}
 		// If started in evaluation-mode the F-Measure's Beta-Parameter can be set
 		// to some other value than 1.0
@@ -541,7 +568,7 @@ public class Settings implements Cloneable {
 		this.setFindHighestPossibleGoScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY)));
 		this.setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
 		if (input.get(INFORMATIVE_TOKEN_THRESHOLD) != null) {
-			this.setInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD)));
+			this.setGoInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD)));
 		}
 		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
 		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
@@ -615,7 +642,8 @@ public class Settings implements Cloneable {
 		}
 		clone.setBlastDbSettings(blastDbSettings);
 		// Clone the Parameters subject to optimization:
-		clone.setParameters(this.getParameters().clone());
+		clone.setDescriptionParameters(this.getDescriptionParameters().clone());
+		clone.setGoParameters(this.getGoParameters().clone());
 		return clone;
 	}
 
@@ -663,20 +691,36 @@ public class Settings implements Cloneable {
 		return this.sortedBlastDatabaseNames;
 	}
 
-	public Integer getBlastDbWeight(String blastDatabaseName) {
-		return getParameters().getBlastDbWeight(blastDatabaseName);
+	public Integer getDescriptionBlastDbWeight(String blastDatabaseName) {
+		return getDescriptionParameters().getBlastDbWeight(blastDatabaseName);
 	}
 
-	public void setBlastDbWeight(String blastDatabaseName, String bdbw) {
-		getParameters().setBlastDbWeight(blastDatabaseName, bdbw);
+	public void setDescriptionBlastDbWeight(String blastDatabaseName, String bdbw) {
+		getDescriptionParameters().setBlastDbWeight(blastDatabaseName, bdbw);
+	}
+	
+	public Integer getGoBlastDbWeight(String blastDatabaseName) {
+		return getGoParameters().getBlastDbWeight(blastDatabaseName);
+	}
+
+	public void setGoBlastDbWeight(String blastDatabaseName, String bdbw) {
+		getGoParameters().setBlastDbWeight(blastDatabaseName, bdbw);
 	}
 
 	public Double getDescriptionScoreBitScoreWeight(String blastDatabaseName) {
-		return getParameters().getDescriptionScoreBitScoreWeight(blastDatabaseName);
+		return getDescriptionParameters().getAnnotationScoreBitScoreWeight(blastDatabaseName);
 	}
 
 	public void setDescriptionScoreBitScoreWeight(String blastDatabaseName, String dsbsw) {
-		getParameters().setDescriptionScoreBitScoreWeight(blastDatabaseName, dsbsw);
+		getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, dsbsw);
+	}
+	
+	public Double getGoScoreBitScoreWeight(String blastDatabaseName) {
+		return getGoParameters().getAnnotationScoreBitScoreWeight(blastDatabaseName);
+	}
+
+	public void setGoScoreBitScoreWeight(String blastDatabaseName, String dsbsw) {
+		getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, dsbsw);
 	}
 
 	public String getPathToBlastResults(String blastDatabaseName) {
@@ -764,19 +808,12 @@ public class Settings implements Cloneable {
 		this.pathToProteinsFasta = pathToProteinsFasta;
 	}
 
+	public boolean hasGroundTruthFasta() throws IOException {
+		return getPathToGroundTruthFasta() != null && new File(getPathToGroundTruthFasta()).exists();
+	}
+	
 	public String getPathToGeneOntologyReference(String blastDatabaseName) {
 		return getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_KEY);
-	}
-
-	public boolean hasGeneOntologyAnnotations() {
-		boolean result = false;
-		for (String blastDatabaseName : getBlastDatabases()) {
-			if (getPathToGeneOntologyReference(blastDatabaseName) != null
-					&& new File(getPathToGeneOntologyReference(blastDatabaseName)).exists()) {
-				result = true;
-			}
-		}
-		return result;
 	}
 
 	public boolean hasGeneOntologyAnnotation(String blastDatabaseName) {
@@ -791,7 +828,7 @@ public class Settings implements Cloneable {
 		getBlastDbSettings(blastDatabaseName).put(GENE_ONTOLOGY_REFERENCE_KEY, path);
 	}
 
-	public void removeAllPathToGeneOntologyReferemces() {
+	public void removeAllPathToGeneOntologyReferences() {
 		for (String blastDatabaseName : getBlastDatabases()) {
 			getBlastDbSettings(blastDatabaseName).remove(GENE_ONTOLOGY_REFERENCE_KEY);
 		}
@@ -805,44 +842,68 @@ public class Settings implements Cloneable {
 		this.pathToOutput = pathToOutput;
 	}
 
-	public Double getTokenScoreBitScoreWeight() {
-		return getParameters().getTokenScoreBitScoreWeight();
+	public Double getDescriptionTokenScoreBitScoreWeight() {
+		return getDescriptionParameters().getTokenScoreBitScoreWeight();
 	}
 
-	public void setTokenScoreBitScoreWeight(Double tokenScoreBitScoreWeight) {
-		this.getParameters().setTokenScoreBitScoreWeight(tokenScoreBitScoreWeight);
+	public void setDescriptionTokenScoreBitScoreWeight(Double tokenScoreBitScoreWeight) {
+		this.getDescriptionParameters().setTokenScoreBitScoreWeight(tokenScoreBitScoreWeight);
+	}
+	
+	public Double getGoTokenScoreBitScoreWeight() {
+		return getGoParameters().getTokenScoreBitScoreWeight();
 	}
 
-	public Double getTokenScoreDatabaseScoreWeight() {
-		return getParameters().getTokenScoreDatabaseScoreWeight();
+	public void setGoTokenScoreBitScoreWeight(Double tokenScoreBitScoreWeight) {
+		this.getGoParameters().setTokenScoreBitScoreWeight(tokenScoreBitScoreWeight);
 	}
 
-	public void setTokenScoreDatabaseScoreWeight(Double tokenScoreDatabaseScoreWeight) {
-		this.getParameters().setTokenScoreDatabaseScoreWeight(tokenScoreDatabaseScoreWeight);
+	public Double getDescriptionTokenScoreDatabaseScoreWeight() {
+		return getDescriptionParameters().getTokenScoreDatabaseScoreWeight();
 	}
 
-	public Double getTokenScoreOverlapScoreWeight() {
-		return getParameters().getTokenScoreOverlapScoreWeight();
+	public void setDescriptionTokenScoreDatabaseScoreWeight(Double tokenScoreDatabaseScoreWeight) {
+		this.getDescriptionParameters().setTokenScoreDatabaseScoreWeight(tokenScoreDatabaseScoreWeight);
+	}
+	
+	public Double getGoTokenScoreDatabaseScoreWeight() {
+		return getGoParameters().getTokenScoreDatabaseScoreWeight();
 	}
 
-	public void setTokenScoreOverlapScoreWeight(Double tokenScoreOverlapScoreWeight) {
-		this.getParameters().setTokenScoreOverlapScoreWeight(tokenScoreOverlapScoreWeight);
+	public void setGoTokenScoreDatabaseScoreWeight(Double tokenScoreDatabaseScoreWeight) {
+		this.getGoParameters().setTokenScoreDatabaseScoreWeight(tokenScoreDatabaseScoreWeight);
+	}
+
+	public Double getDescriptionTokenScoreOverlapScoreWeight() {
+		return getDescriptionParameters().getTokenScoreOverlapScoreWeight();
+	}
+
+	public void setDescriptionTokenScoreOverlapScoreWeight(Double tokenScoreOverlapScoreWeight) {
+		this.getDescriptionParameters().setTokenScoreOverlapScoreWeight(tokenScoreOverlapScoreWeight);
+	}
+	
+	public Double getGoTokenScoreOverlapScoreWeight() {
+		return getGoParameters().getTokenScoreOverlapScoreWeight();
+	}
+
+	public void setGoTokenScoreOverlapScoreWeight(Double tokenScoreOverlapScoreWeight) {
+		this.getGoParameters().setTokenScoreOverlapScoreWeight(tokenScoreOverlapScoreWeight);
 	}
 	
 	public Double getGoTermScoreEvidenceCodeScoreWeight() {
-		return getParameters().getGoTermScoreEvidenceCodeScoreWeight();
+		return getGoParameters().getGoTermScoreEvidenceCodeScoreWeight();
 	}
 
 	public void setGoTermScoreEvidenceCodeScoreWeight(Double goTermScoreEvidenceCodeScoreWeight) {
-		this.getParameters().setGoTermScoreEvidenceCodeScoreWeight(goTermScoreEvidenceCodeScoreWeight);
+		this.getGoParameters().setGoTermScoreEvidenceCodeScoreWeight(goTermScoreEvidenceCodeScoreWeight);
 	}
 	
-	public double getInformativeTokenThreshold() {
-		return getParameters().getInformativeTokenThreshold();
+	public double getGoInformativeTokenThreshold() {
+		return getGoParameters().getInformativeTokenThreshold();
 	}
 
-	public void setInformativeTokenThreshold(double informativeTokenThreshold) {
-		this.getParameters().setInformativeTokenThreshold(informativeTokenThreshold);
+	public void setGoInformativeTokenThreshold(double informativeTokenThreshold) {
+		this.getGoParameters().setInformativeTokenThreshold(informativeTokenThreshold);
 	}
 
 	public Boolean getWriteTokenSetToOutput() {
@@ -902,28 +963,52 @@ public class Settings implements Cloneable {
 	}
 
 
-	public Double getAvgEvaluationScore() {
-		return getParameters().getAvgEvaluationScore();
+	public Double getAvgDescriptionEvaluationScore() {
+		return getDescriptionParameters().getAvgEvaluationScore();
 	}
 
-	public void setAvgEvaluationScore(Double avgEvaluationScore) {
-		this.getParameters().setAvgEvaluationScore(avgEvaluationScore);
+	public void setAvgDescriptionEvaluationScore(Double avgEvaluationScore) {
+		this.getDescriptionParameters().setAvgEvaluationScore(avgEvaluationScore);
 	}
 	
-	public Double getAvgPrecision() {
-		return getParameters().getAvgPrecision();
+	public Double getAvgGoEvaluationScore() {
+		return getGoParameters().getAvgEvaluationScore();
 	}
 
-	public void setAvgPrecision(Double avgPrecision) {
-		this.getParameters().setAvgPrecision(avgPrecision);
+	public void setAvgGoEvaluationScore(Double avgEvaluationScore) {
+		this.getGoParameters().setAvgEvaluationScore(avgEvaluationScore);
+	}
+	
+	public Double getAvgDescriptionPrecision() {
+		return getDescriptionParameters().getAvgPrecision();
 	}
 
-	public Double getAvgRecall() {
-		return getParameters().getAvgRecall();
+	public void setAvgDescriptionPrecision(Double avgPrecision) {
+		this.getDescriptionParameters().setAvgPrecision(avgPrecision);
+	}
+	
+	public Double getAvgGoPrecision() {
+		return getGoParameters().getAvgPrecision();
 	}
 
-	public void setAvgRecall(Double avgRecall) {
-		this.getParameters().setAvgRecall(avgRecall);
+	public void setAvgGoPrecision(Double avgPrecision) {
+		this.getGoParameters().setAvgPrecision(avgPrecision);
+	}
+
+	public Double getAvgDescriptionRecall() {
+		return getDescriptionParameters().getAvgRecall();
+	}
+
+	public void setAvgDescriptionRecall(Double avgRecall) {
+		this.getDescriptionParameters().setAvgRecall(avgRecall);
+	}
+	
+	public Double getAvgGoRecall() {
+		return getGoParameters().getAvgRecall();
+	}
+
+	public void setAvgGoRecall(Double avgRecall) {
+		this.getGoParameters().setAvgRecall(avgRecall);
 	}
 
 	public Integer getTemperature() {
@@ -938,12 +1023,20 @@ public class Settings implements Cloneable {
 		return coolDownBy;
 	}
 
-	public Parameters getParameters() {
-		return parameters;
+	public DescriptionParameters getDescriptionParameters() {
+		return descriptionParameters;
 	}
 
-	public void setParameters(Parameters parameters) {
-		this.parameters = parameters;
+	public void setDescriptionParameters(DescriptionParameters parameters) {
+		this.descriptionParameters = parameters;
+	}
+	
+	public GoParameters getGoParameters() {
+		return goParameters;
+	}
+
+	public void setGoParameters(GoParameters goParameters) {
+		this.goParameters = goParameters;
 	}
 
 	public boolean doOutputFasta() {
@@ -979,12 +1072,12 @@ public class Settings implements Cloneable {
 		this.optimizationAcceptanceProbabilityScalingFactor = optimizationAcceptanceProbabilityScalingFactor;
 	}
 
-	public String getPathToSimulatedAnnealingPathLog() {
-		return pathToSimulatedAnnealingPathLog;
+	public String getPathToTrainingPathLog() {
+		return pathToTrainingPathLog;
 	}
 
-	public void setPathToSimulatedAnnealingPathLog(String pathToSimulatedAnnealingPathLog) {
-		this.pathToSimulatedAnnealingPathLog = pathToSimulatedAnnealingPathLog;
+	public void setPathToTrainingPathLog(String path) {
+		this.pathToTrainingPathLog = path;
 	}
 
 	public Double getpMutateSameParameterScale() {
@@ -1376,4 +1469,53 @@ public class Settings implements Cloneable {
 	public void setMultithreading(boolean multithreading) {
 		this.multithreading = multithreading;
 	}
+
+	public boolean doAnnotateDescriptions() {
+		return annotateDescriptions;
+	}
+
+	public void setAnnotateDescriptions(boolean annotateDescriptions) {
+		this.annotateDescriptions = annotateDescriptions;
+	}
+
+	public boolean doEvaluateDescriptions() {
+		return evaluateDescriptions;
+	}
+
+	public void setEvaluateDescriptions(boolean evaluateDescriptions) {
+		this.evaluateDescriptions = evaluateDescriptions;
+	}
+
+	public boolean doTrainDescriptions() {
+		return trainDescriptions;
+	}
+
+	public void setTrainDescriptions(boolean trainDescriptions) {
+		this.trainDescriptions = trainDescriptions;
+	}
+
+	public boolean doAnnotateGoTerms() {
+		return annotateGoTerms;
+	}
+
+	public void setAnnotateGoTerms(boolean annotateGoTerms) {
+		this.annotateGoTerms = annotateGoTerms;
+	}
+
+	public boolean doEvaluateGoTerms() {
+		return evaluateGoTerms;
+	}
+
+	public void setEvaluateGoTerms(boolean evaluateGoTerms) {
+		this.evaluateGoTerms = evaluateGoTerms;
+	}
+
+	public boolean doTrainGoTerms() {
+		return trainGoTerms;
+	}
+
+	public void setTrainGoTerms(boolean trainGoTerms) {
+		this.trainGoTerms = trainGoTerms;
+	}
+
 }

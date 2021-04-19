@@ -80,7 +80,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 		coveragesLine += "Coverage" + separator + separator + separator;
 
 		// AHRD's GO terms:
-		if (getSettings().hasGeneOntologyAnnotations()) {
+		if (getSettings().doAnnotateGoTerms()) {
 			columnNamesLine += separator + "Gene-Ontology-Terms";
 			for (Protein prot : getProteins()) {
 				proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + combineGoTermStrings(prot.getGoResults()));
@@ -250,7 +250,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 							coveragesLine += separator + FRMT.format((double)covBestBlastDescriptionScorePrecision/getProteins().size()) + separator + FRMT.format((double)covBestBlastDescriptionScoreRecall/getProteins().size()); 
 						}
 						// Best blast hits go terms
-						if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+						if (getSettings().doAnnotateGoTerms() && getSettings().hasGroundTruthGoAnnotations()) {
 							columnNamesLine += separator + "Best-BlastHit-against-" + blastDb + "-GO-Annotations";
 							for (Protein prot : getProteins()) {
 								if (prot.getEvaluationScoreCalculator().getBestUnchangedBlastResults().get(blastDb) != null) {
@@ -515,7 +515,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 					coveragesLine += separator + FRMT.format((double)covCompetitorDescriptionScorePrecision/getProteins().size()) + separator + FRMT.format((double)covCompetitorDescriptionScoreRecall/getProteins().size());
 				}
 				// Competitor GO terms
-				if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+				if (getSettings().doAnnotateGoTerms() && getSettings().hasGroundTruthGoAnnotations()) {
 					columnNamesLine += separator + competitor + "-GO-Annotations";
 					for (Protein prot : getProteins()) {
 						Map<String, CompetitorAnnotation> compAnnots = prot.getEvaluationScoreCalculator().getCompetitorAnnotations();
@@ -796,7 +796,7 @@ public class EvaluatorOutputWriter extends TsvOutputWriter {
 			coveragesLine += separator + FRMT.format((double)covHighestPossibleDescriptionRecall/getProteins().size());
 		}
 		// AHRD's GO term evaluation
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+		if (getSettings().doAnnotateGoTerms() && getSettings().hasGroundTruthGoAnnotations()) {
 			columnNamesLine += separator + "Ground-Truth-GO-Annotations";
 			for (Protein prot : getProteins()) {
 				proteinOutputLines.replace(prot, proteinOutputLines.get(prot) + separator + combineGoTermsToString(prot.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations()));

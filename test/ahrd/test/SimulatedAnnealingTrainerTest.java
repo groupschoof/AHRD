@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,12 +17,14 @@ import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.xml.sax.SAXException;
 
+import ahrd.controller.DescriptionParameters;
 import ahrd.controller.Parameters;
 import ahrd.controller.SimulatedAnnealingTrainer;
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.Fscore;
 import ahrd.model.Protein;
+import ahrd.view.SimulatedAnnealingTrainerOutputWriter;
 
 public class SimulatedAnnealingTrainerTest {
 
@@ -52,31 +53,33 @@ public class SimulatedAnnealingTrainerTest {
 		Protein p3 = new Protein("protein_three", 220);
 		p3.getEvaluationScoreCalculator().setEvalutionScore(new Fscore(0.3, 0.0, 0.5));
 		p3.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.3);
-		this.trainer.setProteins(new HashMap<String, Protein>());
+		this.trainer.setProteins(new HashMap<>());
 		this.trainer.getProteins().put(p1.getAccession(), p1);
 		this.trainer.getProteins().put(p2.getAccession(), p2);
 		this.trainer.getProteins().put(p3.getAccession(), p3);
 		// test
-		trainer.calcAveragesOfEvalScorePrecisionAndRecall();
+		trainer.calcAveragesOfDescriptionScores();
 		// (1.0 + 0.8 + 0.3) / 3 = 0.7
-		assertEquals(0.7, getSettings().getAvgEvaluationScore(), 0.000000000001);
+		assertEquals(0.7, getSettings().getAvgDescriptionEvaluationScore(), 0.000000000001);
 		// (0.6 + 0.7 + 0.5) / 3 = 0.6
-		assertEquals(0.6, getSettings().getAvgRecall(),
+		assertEquals(0.6, getSettings().getAvgDescriptionRecall(),
 				0.000000000001);
 		// test robustness for zero scores:
 		for (Protein p : trainer.getProteins().values()) {
 			p.getEvaluationScoreCalculator().setEvalScoreMinBestCompScore(0.0);
 		}
-		trainer.calcAveragesOfEvalScorePrecisionAndRecall();
-		assertEquals(getSettings().getAvgEvaluationScore(), 0.7, 0.00000000001);
+		trainer.calcAveragesOfDescriptionScores();
+		assertEquals(getSettings().getAvgDescriptionEvaluationScore(), 0.7, 0.00000000001);
 	}
 
 	@Test
-	public void testRememberSimulatedAnnealingPath() throws OWLOntologyCreationException, IOException, SQLException, MissingAccessionException {
+	public void testRememberSimulatedAnnealingPath() throws OWLOntologyCreationException, IOException, MissingAccessionException {
 		// Just do two cycles:
 		getSettings().setTemperature(2);
-		Parameters p = getSettings().getParameters().clone();
-		this.trainer.train();
+		this.trainer.setOutputWriter(new SimulatedAnnealingTrainerOutputWriter());
+		Parameters p = getSettings().getDescriptionParameters().clone();
+		this.trainer.getOutputWriter().generateHeader(false, p);
+		this.trainer.train(p);
 		// test:
 		assertEquals(
 				"Training should have visited two distinct parameter-sets.", 2,
@@ -94,100 +97,107 @@ public class SimulatedAnnealingTrainerTest {
 
 	@Test
 	public void testAcceptanceProbability() {
-		getSettings().setAvgEvaluationScore(0.5);
-		getSettings().setOptimizationAcceptanceProbabilityScalingFactor(
-				new Double(200000000));
+		getSettings().setAvgDescriptionEvaluationScore(0.5);
+		getSettings().setOptimizationAcceptanceProbabilityScalingFactor(Double.valueOf(200000000));
 		getSettings().setTemperature(1000);
+		Parameters p = getSettings().getDescriptionParameters().clone();
 		// test first iteration, when accepted Settings are null:
-		assertEquals(1.0, trainer.acceptanceProbability(), 0.0);
+		assertEquals(1.0, trainer.acceptanceProbability(p), 0.0);
 		// test current Settings better than accepted:
-		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		getSettings().setAvgEvaluationScore(1.0);
-		assertEquals(1.0, trainer.acceptanceProbability(), 0.0);
+		trainer.setAcceptedParameters(p);
+		getSettings().setAvgDescriptionEvaluationScore(1.0);
+		p = getSettings().getDescriptionParameters().clone();
+		assertEquals(1.0, trainer.acceptanceProbability(p), 0.0);
 		// test current Settings worse than accepted ones:
-		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		getSettings().setAvgEvaluationScore(0.9999741);
+		trainer.setAcceptedParameters(p);
+		getSettings().setAvgDescriptionEvaluationScore(0.9999741);
+		p = getSettings().getDescriptionParameters().clone();
 		// 0.9999741 - 1.0 = -2.59 * 10^-5
 		assertEquals(-0.0000259,
-				trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.00000001);
+				trainer.diffEvalScoreToCurrentlyAcceptedParams(p), 0.00000001);
 		// exp((-0.0000259*200,000,000)/1000) = 0.005628006
-		assertEquals(0.005628006, trainer.acceptanceProbability(), 0.000000001);
+		assertEquals(0.005628006, trainer.acceptanceProbability(p), 0.000000001);
 		// exp((-0.0000259*200,000,000)/10000) = 0.5957108
 		getSettings().setTemperature(10000);
-		assertEquals(0.5957108, trainer.acceptanceProbability(), 0.000001);
+		p = getSettings().getDescriptionParameters().clone();
+		assertEquals(0.5957108, trainer.acceptanceProbability(p), 0.000001);
 	}
 
 	@Test
 	public void testDiffEvalScoreToCurrentlyAcceptedParams() {
-		getSettings().setAvgEvaluationScore(0.5);
+		getSettings().setAvgDescriptionEvaluationScore(0.5);
+		Parameters p = getSettings().getDescriptionParameters().clone();
 		// test first iteration, when accepted Settings are null:
-		assertEquals(0.0, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
+		assertEquals(0.0, trainer.diffEvalScoreToCurrentlyAcceptedParams(p), 0.0);
 		// test current Settings equal well performing than accepted ones:
-		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		assertEquals(0.0, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
+		trainer.setAcceptedParameters(p);
+		assertEquals(0.0, trainer.diffEvalScoreToCurrentlyAcceptedParams(p), 0.0);
 		// test current Settings better than accepted:
-		trainer.setAcceptedParameters(getSettings().getParameters().clone());
-		getSettings().setAvgEvaluationScore(1.0);
-		assertEquals(0.5, trainer.diffEvalScoreToCurrentlyAcceptedParams(), 0.0);
+		trainer.setAcceptedParameters(p);
+		getSettings().setAvgDescriptionEvaluationScore(1.0);
+		p = getSettings().getDescriptionParameters().clone();
+		assertEquals(0.5, trainer.diffEvalScoreToCurrentlyAcceptedParams(p), 0.0);
 		// test current Settings worse than accepted ones:
-		trainer.setAcceptedParameters(getSettings().getParameters().clone());
+		trainer.setAcceptedParameters(p);
 		trainer.getAcceptedParameters().setAvgEvaluationScore(0.5);
-		getSettings().setAvgEvaluationScore(0.25);
+		getSettings().setAvgDescriptionEvaluationScore(0.25);
+		p = getSettings().getDescriptionParameters().clone();
 		// 0.25 - 0.5 = -0.25
-		assertEquals(-0.25, trainer.diffEvalScoreToCurrentlyAcceptedParams(),
+		assertEquals(-0.25, trainer.diffEvalScoreToCurrentlyAcceptedParams(p),
 				0.0);
 	}
 
 	@Test
 	public void testCoolDown() {
-		Integer t = new Integer(getSettings().getTemperature());
+		int t = getSettings().getTemperature();
 		trainer.coolDown();
 		assertEquals("After cooling down the current temperature should be "
 				+ getSettings().getCoolDownBy() + " degrees less than " + t,
-				new Integer(t - getSettings().getCoolDownBy()), getSettings()
-						.getTemperature());
+				Integer.valueOf(t - getSettings().getCoolDownBy()), getSettings().getTemperature());
 	}
 
 	@Test
 	public void testAcceptOrRejectParameters() {
-		getSettings().setAvgEvaluationScore(0.5);
-		int a = this.trainer.acceptOrRejectParameters();
-		assertEquals(getSettings().getParameters(),
+		getSettings().setAvgDescriptionEvaluationScore(0.5);
+		Parameters p = getSettings().getDescriptionParameters().clone();
+		int a = this.trainer.acceptOrRejectParameters(p);
+		assertEquals(p,
 				this.trainer.getAcceptedParameters());
 		assertEquals(
 				"The currently evaluated Settings were the first and thus must have been accepted with probability 1.0. Returned int should thus be 3.",
 				3, a);
-		this.trainer.initNeighbouringSettings();
-		getSettings().setAvgEvaluationScore(0.75);
+		getSettings().setDescriptionParameters((DescriptionParameters) this.trainer.getAcceptedParameters().neighbour(this.trainer.diffEvalScoreToCurrentlyAcceptedParams(p)));
+		getSettings().setAvgDescriptionEvaluationScore(0.75);
 		assertTrue(
 				"Before calling trainer.acceptOrRejectParameters() accepted Parameters should NOT equal currently evaluated set of Parameters.",
-				!getSettings().getParameters().equals(
+				!getSettings().getDescriptionParameters().equals(
 						this.trainer.getAcceptedParameters()));
-		a = this.trainer.acceptOrRejectParameters();
+		p = getSettings().getDescriptionParameters().clone();
+		a = this.trainer.acceptOrRejectParameters(p);
 		assertEquals(
 				"The currently evaluated Settings were better than the currently accepted Settings and thus must have been accepted with probability 1.0. Returned int should thus be 3.",
 				3, a);
-		assertEquals(getSettings().getParameters(),
+		assertEquals(getSettings().getDescriptionParameters(),
 				this.trainer.getAcceptedParameters());
 		// Verify, that some worse performing settings get sometimes accepted or
 		// rejected, respectively!
 		// P('Accept worse performing Settings') is higher for high Temperatures
 		getSettings().setTemperature(10000);
-		getSettings().setOptimizationAcceptanceProbabilityScalingFactor(
-				new Double(1500000));
-		Set<Integer> as = new HashSet<Integer>();
+		getSettings().setOptimizationAcceptanceProbabilityScalingFactor(Double.valueOf(1500000));
+		p = getSettings().getDescriptionParameters().clone();
+		Set<Integer> as = new HashSet<>();
 		for (int i = 0; i < 50; i++) {
 			this.trainer.getAcceptedParameters().setAvgEvaluationScore(0.75);
-			this.trainer.initNeighbouringSettings();
-			getSettings().setAvgEvaluationScore(0.74538);
+			getSettings().setDescriptionParameters((DescriptionParameters) this.trainer.getAcceptedParameters().neighbour(this.trainer.diffEvalScoreToCurrentlyAcceptedParams(p)));
+			getSettings().setAvgDescriptionEvaluationScore(0.74538);
 			assertTrue(
 					"Before calling trainer.acceptOrRejectParameters() accepted Parameters should NOT equal currently evaluated set of Parameters.",
-					!getSettings().getParameters().equals(
-							this.trainer.getAcceptedParameters()));
+					!getSettings().getDescriptionParameters().equals(this.trainer.getAcceptedParameters()));
 			// Verify that we are dealing with the expected
 			// acceptance-probability: exp(-0.00462*1500000/10000) = 0.5000736
-			assertEquals(0.5, this.trainer.acceptanceProbability(), 0.0001);
-			as.add(this.trainer.acceptOrRejectParameters());
+			p = getSettings().getDescriptionParameters().clone();
+			assertEquals(0.5, this.trainer.acceptanceProbability(p), 0.0001);
+			as.add(this.trainer.acceptOrRejectParameters(p));
 		}
 		// Assert, that we did never except a worse parameter set with
 		// probability 1.0, which is only applied to better performing
@@ -197,7 +207,7 @@ public class SimulatedAnnealingTrainerTest {
 				+ "B(0|p=0.5,n=50) < 0.0000000000000009";
 		assertTrue(
 				"A worse parameter set should have never be accpeted with probability 1.0, which is only applied to better performing parameter-sets",
-				!as.contains(3.0) && !as.contains(2.0));
+				!as.contains(3) && !as.contains(2));
 		// 50 iterations should have accepted or rejected at least once
 		assertTrue(
 				"50 iterations should have accepted worse performing settings least once. - "

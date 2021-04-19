@@ -132,7 +132,7 @@ public class TokenScoreCalculator {
 	public void filterTokenScores() {
 		for (String token : getTokenScores().keySet()) {
 			if (!isInformativeToken(token)) {
-				getTokenScores().put(token, new Double(getTokenScores().get(token) - getTokenHighScore() * getSettings().getInformativeTokenThreshold()));
+				getTokenScores().put(token, Double.valueOf(getTokenScores().get(token) - getTokenHighScore() * 0.5));
 			}
 		}
 	}
@@ -144,7 +144,7 @@ public class TokenScoreCalculator {
 	 *        initialized!
 	 */
 	public boolean isInformativeToken(String token) {
-		return getTokenScores().get(token) > getTokenHighScore() * getSettings().getInformativeTokenThreshold();
+		return getTokenScores().get(token) > getTokenHighScore() * 0.5;
 	}
 
 	/**
@@ -175,7 +175,7 @@ public class TokenScoreCalculator {
 		Double overlapScore = TokenScoreCalculator.overlapScore(br.getQueryStart(), br.getQueryEnd(),
 				getProtein().getSequenceLength(), br.getSubjectStart(), br.getSubjectEnd(), br.getSubjectLength());
 		setTotalTokenBlastDatabaseScore(
-				getTotalTokenBlastDatabaseScore() + getSettings().getBlastDbWeight(br.getBlastDatabaseName()));
+				getTotalTokenBlastDatabaseScore() + getSettings().getDescriptionBlastDbWeight(br.getBlastDatabaseName()));
 		setTotalTokenOverlapScore(getTotalTokenOverlapScore() + overlapScore);
 		setTotalTokenBitScore(getTotalTokenBitScore() + br.getBitScore());
 	}
@@ -186,9 +186,9 @@ public class TokenScoreCalculator {
 	 */
 	public double tokenScore(String token, String blastDatabaseName) {
 		// Validate:
-		Double bitScoreWeight = getSettings().getTokenScoreBitScoreWeight();
-		Double databaseScoreWeight = getSettings().getTokenScoreDatabaseScoreWeight();
-		Double overlapScoreWeight = getSettings().getTokenScoreOverlapScoreWeight();
+		Double bitScoreWeight = getSettings().getDescriptionTokenScoreBitScoreWeight();
+		Double databaseScoreWeight = getSettings().getDescriptionTokenScoreDatabaseScoreWeight();
+		Double overlapScoreWeight = getSettings().getDescriptionTokenScoreOverlapScoreWeight();
 		double validateSumToOne = roundToNDecimalPlaces(bitScoreWeight + databaseScoreWeight + overlapScoreWeight, 9);
 		// Tolerate rounding error <= 10^-3
 		if (!(validateSumToOne >= 0.999 && validateSumToOne <= 1.001))
@@ -218,7 +218,7 @@ public class TokenScoreCalculator {
 	}
 
 	public void addCumulativeTokenBlastDatabaseScore(String token, String blastDatabaseName) {
-		Integer blastDatabaseWeight = getSettings().getBlastDbWeight(blastDatabaseName);
+		Integer blastDatabaseWeight = getSettings().getDescriptionBlastDbWeight(blastDatabaseName);
 		if (!getCumulativeTokenBlastDatabaseScores().containsKey(token))
 			getCumulativeTokenBlastDatabaseScores().put(token, new Double(blastDatabaseWeight));
 		else

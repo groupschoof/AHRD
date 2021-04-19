@@ -10,20 +10,20 @@ output: ./ahrd_output.csv
 blast_dbs:
   swissprot:
     weight: 26
-    description_score_bit_score_weight: 10.0
+    annotation_score_bit_score_weight: 10.0
     file: ./test/resources/swissprot_blast8_tabular.txt
     database: ./test/resources/swissprot_blast_db.fasta
     filter: ./test/resources/filter_descline_sprot.txt
   trembl:
     weight: 129
-    description_score_bit_score_weight: 1.0949950811147244
+    annotation_score_bit_score_weight: 1.0949950811147244
     file: ./test/resources/trembl_blast8_tabular.txt
     database: ./test/resources/trembl_blast_db.fasta
     filter: ./test/resources/filter_descline_trembl.txt
     gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
 #  tair:
 #    weight: 854
-#    description_score_bit_score_weight: 2.917405
+#    annotation_score_bit_score_weight: 2.917405
 #    file: ./test/resources/tair_blast8_tabular.txt
 #    database: ./test/resources/tair_blast_db.fasta
 #    fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"

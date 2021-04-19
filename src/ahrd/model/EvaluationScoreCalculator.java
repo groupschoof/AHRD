@@ -224,7 +224,7 @@ public class EvaluationScoreCalculator {
 							if (annot.getEvaluationScore().getScore() > bestCompEvlScr)
 								bestCompEvlScr = annot.getEvaluationScore().getScore();
 							// GOterm annotations scores
-							if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+							if (getSettings().doEvaluateGoTerms()) {
 								if (getSettings().doCalculateSimpleGoF1Scores())
 									annot.setSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, annot.getGoAnnotations()));
 								if (getSettings().doCalculateAncestryGoF1Scores())
@@ -252,7 +252,7 @@ public class EvaluationScoreCalculator {
 						if (cmpt.getEvaluationScore().getScore() > bestCompEvlScr)
 							bestCompEvlScr = cmpt.getEvaluationScore().getScore();
 						// If requested: Evaluate the GO annotations of the best blast result
-						if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+						if (getSettings().doAnnotateGoTerms() && getSettings().hasGroundTruthGoAnnotations()) {
 							if (getSettings().doCalculateSimpleGoF1Scores())
 								cmpt.setSimpleGoAnnotationScore(
 										calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, cmpt.getGoAnnotations()));
@@ -270,7 +270,7 @@ public class EvaluationScoreCalculator {
 			setEvalScoreMinBestCompScore(getEvalutionScore().getScore() - bestCompEvlScr);
 		}
 		// Evaluate AHRD's GO annotations
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+		if (getSettings().doEvaluateGoTerms()) {
 			// Calculation of an F1-score based on ground truth and prediction GO
 			// annotations alone
 			if (getSettings().doCalculateSimpleGoF1Scores())
@@ -491,7 +491,7 @@ public class EvaluationScoreCalculator {
 	 * BlastResult's GO annotations and remembering the highest achieved score.
 	 */
 	public void findHighestPossibleGoScore() {
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+		if (getSettings().doEvaluateGoTerms()) {
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
 				this.setHighestPossibleSimpleGoAnnotationScore(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>())); // In case ground truth go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {
@@ -555,7 +555,7 @@ public class EvaluationScoreCalculator {
 			}
 		}
 		// find the blast result with the go annotations that results in the highest possible precision
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+		if (getSettings().doAnnotateGoTerms() && getSettings().hasGroundTruthGoAnnotations()) {
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
 				this.setHighestPossibleSimpleGoAnnotationPrecision(0.0);
 				//this.setHighestPossibleSimpleGoAnnotationPrecision(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getPrecision()); // In case ground truth go annotation is empty
@@ -622,7 +622,7 @@ public class EvaluationScoreCalculator {
 			}
 		}
 		// find the blast result with the go annotations that results in the highest possible recall
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+		if (getSettings().doAnnotateGoTerms() && getSettings().hasGroundTruthGoAnnotations()) {
 			if (getSettings().doCalculateSimpleGoF1Scores()) {
 				this.setHighestPossibleSimpleGoAnnotationRecall(calcSimpleGoAnnotationScore(this.groundTruthGoAnnoatations, new HashSet<GOterm>()).getRecall()); // In case ground truth go annotation is empty
 				for (List<BlastResult> resultsFromBlastDatabase : getProtein().getBlastResults().values()) {

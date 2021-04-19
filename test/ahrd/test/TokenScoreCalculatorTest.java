@@ -210,18 +210,18 @@ public class TokenScoreCalculatorTest {
 		tsc.getCumulativeTokenBlastDatabaseScores().put(token, 0.5);
 		tsc.getCumulativeTokenOverlapScores().put(token, 0.5);
 
-		getSettings().setTokenScoreBitScoreWeight(0.5);
-		getSettings().setTokenScoreDatabaseScoreWeight(0.5);
-		getSettings().setTokenScoreOverlapScoreWeight(0.0011);
+		getSettings().setDescriptionTokenScoreBitScoreWeight(0.5);
+		getSettings().setDescriptionTokenScoreDatabaseScoreWeight(0.5);
+		getSettings().setDescriptionTokenScoreOverlapScoreWeight(0.0011);
 		try {
 			tsc.tokenScore("foo", "swissprot");
 			fail("Validation of the three weights in the formula Token-Score failed. Their sum should be >= 0.999 and <= 1.001");
 		} catch (IllegalArgumentException expectedException) {
 		}
 
-		getSettings().setTokenScoreBitScoreWeight(0.5);
-		getSettings().setTokenScoreDatabaseScoreWeight(0.3);
-		getSettings().setTokenScoreOverlapScoreWeight(0.198);
+		getSettings().setDescriptionTokenScoreBitScoreWeight(0.5);
+		getSettings().setDescriptionTokenScoreDatabaseScoreWeight(0.3);
+		getSettings().setDescriptionTokenScoreOverlapScoreWeight(0.198);
 		try {
 			tsc.tokenScore(token, "swissprot");
 			fail("Validation of the three weights in the formula Token-Score failed. Their sum should be >= 0.999 and <= 1.001");
@@ -233,18 +233,18 @@ public class TokenScoreCalculatorTest {
 		tsc.getCumulativeTokenBlastDatabaseScores().put("foo", 0.6);
 		tsc.getCumulativeTokenOverlapScores().put("foo", 0.7);
 
-		getSettings().setTokenScoreBitScoreWeight(0.5);
-		getSettings().setTokenScoreDatabaseScoreWeight(0.5);
-		getSettings().setTokenScoreOverlapScoreWeight(0.001);
+		getSettings().setDescriptionTokenScoreBitScoreWeight(0.5);
+		getSettings().setDescriptionTokenScoreDatabaseScoreWeight(0.5);
+		getSettings().setDescriptionTokenScoreOverlapScoreWeight(0.001);
 		try {
 			tsc.tokenScore(token, "swissprot");
 		} catch (IllegalArgumentException expectedException) {
 			fail("Validation of the three weights in the formula Token-Score failed. It is too restrictive, a delta of 0.001 has to be excepted.");
 		}
 
-		getSettings().setTokenScoreBitScoreWeight(0.5);
-		getSettings().setTokenScoreDatabaseScoreWeight(0.3);
-		getSettings().setTokenScoreOverlapScoreWeight(0.199);
+		getSettings().setDescriptionTokenScoreBitScoreWeight(0.5);
+		getSettings().setDescriptionTokenScoreDatabaseScoreWeight(0.3);
+		getSettings().setDescriptionTokenScoreOverlapScoreWeight(0.199);
 		try {
 			tsc.tokenScore(token, "swissprot");
 		} catch (IllegalArgumentException expectedException) {

@@ -35,7 +35,7 @@ public class TsvOutputWriter extends OutputWriter {
 		bw.write("\n");
 		// Column-Names:
 		bw.write(ahrdColumnNames());
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
+		if (getSettings().doAnnotateGoTerms() && getSettings().hasGoSlimFile()) {
 			bw.write("\tGO-Slim-Annotation");
 		}
 		bw.write("\n");
@@ -43,7 +43,7 @@ public class TsvOutputWriter extends OutputWriter {
 		for (Protein prot : getProteins()) {
 			// Generate the Human Readable Description:
 			String csvRow = buildDescriptionLine(prot, "\t");
-			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
+			if (getSettings().doAnnotateGoTerms() && getSettings().hasGoSlimFile()) {
 				csvRow += "\t" + combineGoTermsToString(prot.getGoSlimTerms());
 			}
 			

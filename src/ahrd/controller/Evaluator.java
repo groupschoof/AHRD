@@ -26,6 +26,12 @@ public class Evaluator extends AHRD {
 	
 	public Evaluator(String pathToInputYml) throws IOException {
 		super(pathToInputYml);
+		if (getSettings().doAnnotateDescriptions() && getSettings().hasGroundTruthFasta()) {
+			getSettings().setEvaluateDescriptions(true);
+		}
+		if (getSettings().doAnnotateGoTerms() && getSettings().hasGroundTruthGoAnnotations()) {
+			getSettings().setEvaluateGoTerms(true);
+		}
 	}
 
 	public void setupGroundTruthDescriptions() throws IOException, MissingAccessionException {
@@ -43,66 +49,64 @@ public class Evaluator extends AHRD {
 	}
 
 	public void setupGoAnnotationEvaluation() throws OWLOntologyCreationException, IOException, MissingAccessionException {
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
-			// Load a Map of all GO terms
-			if (goDB == null) {
-				goDB = new GOdatabase().getMap();
+		// Load a Map of all GO terms
+		if (goDB == null) {
+			goDB = new GOdatabase().getMap();
+		}
+		// Load ground truth GO annotations
+		for (String groundTruthGoAnnotationFileEntryLine : getSettings().getGroundTruthGoAnnotationsFromFile()) {
+			String[] groundTruthGoAnnotationFileEntry = groundTruthGoAnnotationFileEntryLine.split("\t");
+			String protAcc = groundTruthGoAnnotationFileEntry[0].trim();
+			String termAcc = groundTruthGoAnnotationFileEntry[1].trim();
+			Protein p = getProteins().get(protAcc);
+			if (p == null) {
+				throw new MissingAccessionException("Could not find protein for accession '" + protAcc + "'");
 			}
-			// Load ground truth GO annotations
-			for (String groundTruthGoAnnotationFileEntryLine : getSettings().getGroundTruthGoAnnotationsFromFile()) {
-				String[] groundTruthGoAnnotationFileEntry = groundTruthGoAnnotationFileEntryLine.split("\t");
-				String protAcc = groundTruthGoAnnotationFileEntry[0].trim();
-				String termAcc = groundTruthGoAnnotationFileEntry[1].trim();
-				Protein p = getProteins().get(protAcc);
-				if (p == null) {
-					throw new MissingAccessionException("Could not find protein for accession '" + protAcc + "'");
-				}
-				GOterm term = goDB.get(termAcc);
-				if (term == null) {
-					throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
-				}
-				p.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations().add(term);
+			GOterm term = goDB.get(termAcc);
+			if (term == null) {
+				throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 			}
-			// Add GOterm objects to predicted annotations
-			goAnnotsStringToObject();
-			// Annotate the best blast results with GOterm objects
-			if (getSettings().getWriteBestBlastHitsToOutput()) {
-				for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();){
-					Map<String, BlastResult> bestBlastResult = protIter.next().getEvaluationScoreCalculator().getBestUnchangedBlastResults();
-					if (bestBlastResult != null) {
-						for (String blastDb : bestBlastResult.keySet()) {
-						String bestBlastResultShortAccession = bestBlastResult.get(blastDb).getShortAccession();
-							if (getGoAnnotationReference().containsKey(bestBlastResultShortAccession)) {
-								String termAcc;
-								for (ReferenceGoAnnotation annotation : getGoAnnotationReference().get(bestBlastResultShortAccession)) {
-									termAcc = annotation.getGoTerm();
-									GOterm term = goDB.get(termAcc);
-									if (term == null) {
-										throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
-									}
-									bestBlastResult.get(blastDb).getGoAnnotations().add(term);
+			p.getEvaluationScoreCalculator().getGroundTruthGoAnnoatations().add(term);
+		}
+		// Add GOterm objects to predicted annotations
+		goAnnotsStringToObject();
+		// Annotate the best blast results with GOterm objects
+		if (getSettings().getWriteBestBlastHitsToOutput()) {
+			for (Iterator<Protein> protIter = getProteins().values().iterator(); protIter.hasNext();){
+				Map<String, BlastResult> bestBlastResult = protIter.next().getEvaluationScoreCalculator().getBestUnchangedBlastResults();
+				if (bestBlastResult != null) {
+					for (String blastDb : bestBlastResult.keySet()) {
+					String bestBlastResultShortAccession = bestBlastResult.get(blastDb).getShortAccession();
+						if (getGoAnnotationReference().containsKey(bestBlastResultShortAccession)) {
+							String termAcc;
+							for (ReferenceGoAnnotation annotation : getGoAnnotationReference().get(bestBlastResultShortAccession)) {
+								termAcc = annotation.getGoTerm();
+								GOterm term = goDB.get(termAcc);
+								if (term == null) {
+									throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 								}
+								bestBlastResult.get(blastDb).getGoAnnotations().add(term);
 							}
 						}
 					}
 				}
 			}
-			// If highest possible GO-annotation scores are requested all BlastResults have to be annotated first
-			if (getSettings().doFindHighestPossibleGoScore() || getSettings().doFindHighestPossiblePrecision() || getSettings().doFindHighestPossibleRecall()) {
-				for (Protein prot : getProteins().values()) {
-					for (List<BlastResult> blastDbResults : prot.getBlastResults().values()) {
-						for (BlastResult br : blastDbResults) {
-							String blastResultShortAccession = br.getShortAccession();
-							if (getGoAnnotationReference().containsKey(blastResultShortAccession)) {
-								String termAcc;
-								for (ReferenceGoAnnotation annotation : getGoAnnotationReference().get(blastResultShortAccession)) {
-									termAcc = annotation.getGoTerm();
-									GOterm term = goDB.get(termAcc);
-									if (term == null) {
-										throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
-									}
-									br.getGoAnnotations().add(term);
+		}
+		// If highest possible GO-annotation scores are requested all BlastResults have to be annotated first
+		if (getSettings().doFindHighestPossibleGoScore() || getSettings().doFindHighestPossiblePrecision() || getSettings().doFindHighestPossibleRecall()) {
+			for (Protein prot : getProteins().values()) {
+				for (List<BlastResult> blastDbResults : prot.getBlastResults().values()) {
+					for (BlastResult br : blastDbResults) {
+						String blastResultShortAccession = br.getShortAccession();
+						if (getGoAnnotationReference().containsKey(blastResultShortAccession)) {
+							String termAcc;
+							for (ReferenceGoAnnotation annotation : getGoAnnotationReference().get(blastResultShortAccession)) {
+								termAcc = annotation.getGoTerm();
+								GOterm term = goDB.get(termAcc);
+								if (term == null) {
+									throw new MissingAccessionException("Could not find GO term for accession '" + termAcc + "'");
 								}
+								br.getGoAnnotations().add(term);
 							}
 						}
 					}
@@ -145,14 +149,16 @@ public class Evaluator extends AHRD {
 			// Readable Description
 			evaluator.assignHumanReadableDescriptions();
 			// If requested iterate over all Proteins and assign the best scoring Gene Ontology terms
-			if (getSettings().hasGeneOntologyAnnotations()) {
+			if (getSettings().doAnnotateGoTerms()) {
 				evaluator.assignGeneOntologyTerms();
 			}
 			// Load a Map of all GO terms
 			// Load ground truth GO annotations
 			// Add GOterm objects to predicted annotations
 			// Annotate the best blast results with GOterm objects
-			evaluator.setupGoAnnotationEvaluation();
+			if (getSettings().doEvaluateGoTerms()) {
+				evaluator.setupGoAnnotationEvaluation();
+			}
 			// Sets up description and GOterm annotations of competitors in the EvaluationScoreCalculators of each Protein   
 			evaluator.setupCompetitors();
 			// Evaluate AHRD's and Competitors Performance for each Protein:
@@ -254,7 +260,7 @@ public class Evaluator extends AHRD {
 					annots.put(accession, annot);
 				}
 				// GO annotations
-				if(getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+				if(getSettings().doAnnotateGoTerms() && getSettings().hasGroundTruthGoAnnotations()) {
 					// Parse GO annotation lines and add GO annotations to competitor annotations
 					for (String competitorGoAnnotationLine : getSettings().getCompetitorGOAnnotations(competitor)) {
 						String[] values = competitorGoAnnotationLine.split("\t");

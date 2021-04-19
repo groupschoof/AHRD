@@ -36,15 +36,9 @@ public class GoAnnotationReferenceTest {
 	}
 
 	@Test
-	public void testHasGeneOntologyAnnotations() {
-		// Should have GO-Annotations with default test-Settings:
-		assertTrue(getSettings().hasGeneOntologyAnnotations());
-		getSettings().removeAllPathToGeneOntologyReferemces();
-		assertTrue(!getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyReference("swissprot","/not/existing/path.raw");
-		assertTrue(!getSettings().hasGeneOntologyAnnotations());
-		getSettings().setPathToGeneOntologyReference("swissprot","./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt");
-		assertTrue(getSettings().hasGeneOntologyAnnotations());
+	public void testdoAnnotateGoTerms() {
+		// Should also predict GO annotations with default test-Settings:
+		assertTrue(getSettings().doAnnotateGoTerms());
 	}
 
 	@Test

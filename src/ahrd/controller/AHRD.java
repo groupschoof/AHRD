@@ -4,6 +4,7 @@ import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Settings.setSettings;
 import static ahrd.controller.Utils.roundToNDecimalPlaces;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -37,7 +38,6 @@ public class AHRD {
 	public static final String VERSION = "3.11";
 
 	private Map<String, Protein> proteins;
-	private Map<String, Double> descriptionScoreBitScoreWeights = new HashMap<String, Double>();
 	private Map<String, Set<ReferenceGoAnnotation>> goAnnotationReference;
 	private Set<String> uniqueBlastResultShortAccessions;
 	private long timestamp;
@@ -73,7 +73,7 @@ public class AHRD {
 			// Readable Description
 			ahrd.assignHumanReadableDescriptions();
 			// If requested iterate over all Proteins and assign the best scoring Gene Ontology terms
-			if (getSettings().hasGeneOntologyAnnotations()) {
+			if (getSettings().doAnnotateGoTerms()) {
 				ahrd.assignGeneOntologyTerms();
 			}
 			// Log
@@ -119,9 +119,16 @@ public class AHRD {
 	public AHRD(String pathToYmlInput) throws IOException {
 		super();
 		setSettings(new Settings(pathToYmlInput));
+		// If GO annotation references are provided for any blast database GO annotation can be performed
+		for (String blastDatabaseName : getSettings().getBlastDatabases()) {
+			if (getSettings().getPathToGeneOntologyReference(blastDatabaseName) != null
+					&& new File(getSettings().getPathToGeneOntologyReference(blastDatabaseName)).exists()) {
+				getSettings().setAnnotateGoTerms(true);
+			}
+		}
 		// The following fields are only used if AHRD is requested to generate
 		// Gene Ontology term annotations:
-		if (getSettings().hasGeneOntologyAnnotations()) {
+		if (getSettings().doAnnotateGoTerms()) {
 			this.setUniqueBlastResultShortAccessions(new HashSet<String>());
 			this.setGoAnnotationReference(new HashMap<String, Set<ReferenceGoAnnotation>>());
 		}
@@ -134,18 +141,6 @@ public class AHRD {
 	public void parseBlastResults() throws IOException, MissingProteinException, MissingAccessionException, SAXException {
 		for (String blastDatabase : getSettings().getBlastDatabases()) {
 			BlastResult.readBlastResults(getProteins(), blastDatabase, getUniqueBlastResultShortAccessions());
-		}
-	}
-
-	/**
-	 * Method finds GO term annotations for Proteins in the searched Blast
-	 * databases and stores them in a Map.
-	 * 
-	 * @throws IOException
-	 */
-	public void setUpGoAnnotationReference() throws IOException {
-		if (getSettings().hasGeneOntologyAnnotations()) {
-			setGoAnnotationReference(ReferenceGoAnnotation.parseGoAnnotationReference(getUniqueBlastResultShortAccessions()));
 		}
 	}
 
@@ -185,12 +180,13 @@ public class AHRD {
 					+ takeMemoryUsage() + " MB");
 
 		// GO Annotation Reference (for Proteins in the searched Blast Databases)
-		setUpGoAnnotationReference();
-		if (writeLogMsgs) {
-			System.out.println("...parsed Gene Ontology Annotation (GOA) Reference in " + takeTime()
-					+ "sec, currently occupying " + takeMemoryUsage() + " MB");
+		if (getSettings().doAnnotateGoTerms()) {
+			setGoAnnotationReference(ReferenceGoAnnotation.parseGoAnnotationReference(getUniqueBlastResultShortAccessions()));
+			if (writeLogMsgs) {
+				System.out.println("...parsed Gene Ontology Annotation (GOA) Reference in " + takeTime()
+						+ "sec, currently occupying " + takeMemoryUsage() + " MB");
+			}
 		}
-
 	}
 
 	/**
@@ -245,7 +241,7 @@ public class AHRD {
 		for (String blastDbName : protein.getBlastResults().keySet()) {
 			for (BlastResult blastResult : protein.getBlastResults().get(blastDbName)) {
 				totalGoTermBitScore += blastResult.getBitScore();
-				totalGoTermBlastDatabaseScore += getSettings().getBlastDbWeight(blastDbName);
+				totalGoTermBlastDatabaseScore += getSettings().getGoBlastDbWeight(blastDbName);
 				// calculate overlap score
 				double overlapScore = TokenScoreCalculator.overlapScore(blastResult.getQueryStart(), blastResult.getQueryEnd(),
 						protein.getSequenceLength(), blastResult.getSubjectStart(), blastResult.getSubjectEnd(), blastResult.getSubjectLength());
@@ -262,9 +258,9 @@ public class AHRD {
 						}
 						// calculate cumulative blast database score
 						if (!cumulativeGoTermBlastDatabaseScores.containsKey(goTerm)) {
-							cumulativeGoTermBlastDatabaseScores.put(goTerm, new Double(getSettings().getBlastDbWeight(blastDbName)));
+							cumulativeGoTermBlastDatabaseScores.put(goTerm, Double.valueOf(getSettings().getGoBlastDbWeight(blastDbName)));
 						} else {
-							cumulativeGoTermBlastDatabaseScores.put(goTerm, new Double(getSettings().getBlastDbWeight(blastDbName) + cumulativeGoTermBlastDatabaseScores.get(goTerm)));
+							cumulativeGoTermBlastDatabaseScores.put(goTerm, Double.valueOf(getSettings().getGoBlastDbWeight(blastDbName) + cumulativeGoTermBlastDatabaseScores.get(goTerm)));
 						}
 						// calculate cumulative overlap score
 						if (!cumulativeGoTermOverlapScores.containsKey(goTerm)) {
@@ -317,9 +313,9 @@ public class AHRD {
 					for (ReferenceGoAnnotation annotation : reference) {
 						String termAcc = annotation.getGoTerm();
 						double evidenceCodeScore = 1 - (getSettings().getGoTermScoreEvidenceCodeScoreWeight() * (1 - (cumulativeGoTermEvidenceCodeWeights.get(termAcc) / termAnnotationCounts.get(termAcc)))); 
-						double goTermAbundancyScore = getSettings().getTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
-													+ getSettings().getTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
-													+ getSettings().getTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;
+						double goTermAbundancyScore = getSettings().getGoTokenScoreBitScoreWeight() * cumulativeGoTermBitScores.get(termAcc) / totalGoTermBitScore 
+													+ getSettings().getGoTokenScoreDatabaseScoreWeight() * cumulativeGoTermBlastDatabaseScores.get(termAcc) / totalGoTermBlastDatabaseScore
+													+ getSettings().getGoTokenScoreOverlapScoreWeight() * cumulativeGoTermOverlapScores.get(termAcc) / totalGoTermOverlapScore;
 						double goTermScore = goTermAbundancyScore * evidenceCodeScore;
 						goTermScores.put(termAcc, goTermScore);
 						if (goTermScore > goTermHighScore) {
@@ -331,8 +327,8 @@ public class AHRD {
 		}
 		// Filter GO Term-Scores
 		for (String goTerm : goTermScores.keySet()) {
-			if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getInformativeTokenThreshold()) {
-				goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getInformativeTokenThreshold()));
+			if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getGoInformativeTokenThreshold()) {
+				goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getGoInformativeTokenThreshold()));
 			}
 		}
 		// Find highest scoring GO annotation
@@ -349,14 +345,14 @@ public class AHRD {
 						Double goTermScore = goTermScores.get(annotation.getGoTerm());
 						sumGoTermScores += goTermScore * getSettings().getEvidenceCodeWeight(annotation.getEvidenceCode());
 						goTermCount++;
-						if (goTermScore > goTermHighScore * getSettings().getInformativeTokenThreshold()) {
+						if (goTermScore > goTermHighScore * getSettings().getGoInformativeTokenThreshold()) {
 							informativeGoTermCount++;
 						}
 					}
 				}
 				double correctionFactor = ((double) informativeGoTermCount) / ((double) goTermCount);
 				double lexicalScore = correctionFactor * sumGoTermScores / goTermHighScore;
-				double relativeBlastScore = getSettings().getDescriptionScoreBitScoreWeight(blastDbName) * blastResult.getBitScore() / maxBitScore;
+				double relativeBlastScore = getSettings().getGoScoreBitScoreWeight(blastDbName) * blastResult.getBitScore() / maxBitScore;
 				double goAnnotationScore = lexicalScore + relativeBlastScore;
 				if (goAnnotationScore > goAnnotationTopScore) {
 					goAnnotationTopScore = goAnnotationScore;
@@ -384,7 +380,7 @@ public class AHRD {
 	 * 
 	 */
 	public void annotateWithGoSlim() throws OWLOntologyCreationException, IOException, MissingAccessionException {
-		if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGoSlimFile()) {
+		if (getSettings().doAnnotateGoTerms() && getSettings().hasGoSlimFile()) {
 			Set<GOterm> goSlim = new HashSet<GOterm>();
 			// Load a Map of all GO terms
 			if (goDB == null) {
@@ -437,14 +433,6 @@ public class AHRD {
 
 	public void setProteins(Map<String, Protein> proteins) {
 		this.proteins = proteins;
-	}
-
-	public Map<String, Double> getDescriptionScoreBitScoreWeights() {
-		return descriptionScoreBitScoreWeights;
-	}
-
-	public void setDescriptionScoreBitScoreWeights(Map<String, Double> descriptionScoreBitScoreWeights) {
-		this.descriptionScoreBitScoreWeights = descriptionScoreBitScoreWeights;
 	}
 
 	public Map<String, Set<ReferenceGoAnnotation>> getGoAnnotationReference() {

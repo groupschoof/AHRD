@@ -28,8 +28,6 @@ public class GeneticTrainer extends Trainer {
 	private static int numberOfOffspring;
 	private static int numberOfMutants;
 	private Integer generationBestParametersWereFoundIn;
-	
-	private GeneticTrainerOutputWriter outWriter;
 
 	/**
 	 * Constructor initializes the Settings as given in the argument input.yml
@@ -39,7 +37,6 @@ public class GeneticTrainer extends Trainer {
 	 */
 	public GeneticTrainer(String pathToInputYml) throws IOException {
 		super(pathToInputYml);
-		this.outWriter = new GeneticTrainerOutputWriter();
 		numberOfSurvivors = (int) Math.round(getSettings().getPopulationSize() * GENERATIONAL_SURVIVAL_RATE);
 		numberOfOffspring = (int) Math.round(getSettings().getPopulationSize() * GENERATIONAL_OFFSPRING_RATE);
 		numberOfMutants = (int) Math.round(getSettings().getPopulationSize() * GENERATIONAL_MUTANT_RATE);
@@ -52,28 +49,40 @@ public class GeneticTrainer extends Trainer {
 		System.out.println("Usage:\njava -cp ahrd.jar ahrd.controller.GeneticTrainer input.yml\n");
 
 		try {
+			// Try to heuristically find optimal parameters for the annotation with descriptions
 			GeneticTrainer trainer = new GeneticTrainer(args[0]);
-			trainer.setup(false); // false -> Don't log memory and time-usages
-			if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
-				getSettings().setFindHighestPossibleGoScore(true);
+			if (getSettings().doEvaluateDescriptions()) {
+				trainer.setup(false); // false -> Don't log memory and time-usages
+				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
+				trainer.setupGroundTruthDescriptions();
+				trainer.outputWriter = new GeneticTrainerOutputWriter();
+				Parameters seed = getSettings().getDescriptionParameters().clone();
+				trainer.outputWriter.writeHeader(seed);
+				trainer.train(seed);
+				trainer.calcAvgMaxDescriptionScore();
+				trainer.outputWriter.writeFinalOutput(
+						trainer.getGenerationBestParametersWereFoundIn(),
+						trainer.getAvgMaxDescriptionScore(),
+						trainer.getBestParameters());
 			}
-			// After the setup the unique short accessions are no longer needed:
-			trainer.setUniqueBlastResultShortAccessions(null);
-			trainer.setupGroundTruthDescriptions();
-			trainer.setupGoAnnotationEvaluation();
-			// Try to find optimal parameters heuristically:
-			trainer.train();
-			// Calculate the average maximum evaluation score AHRD could have
-			// possibly achieved:
-			trainer.calcAvgMaxEvaluationScore();
-
-			// Write final output
-			Settings bestSettings = getSettings().clone();
-			bestSettings.setParameters(trainer.getBestParameters());
-			trainer.outWriter.writeFinalOutput(bestSettings, trainer.getAvgMaxEvaluationScore(),
-					trainer.getGenerationBestParametersWereFoundIn());
-			System.out.println("Logged path through parameter- and score-space into:\n"
-					+ getSettings().getPathToSimulatedAnnealingPathLog());
+			// Try to heuristically find optimal parameters for the annotation with GO terms
+			trainer = new GeneticTrainer(args[0]);
+			if (getSettings().doEvaluateGoTerms()) {
+				trainer.setup(false); // false -> Don't log memory and time-usages
+				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
+				getSettings().setFindHighestPossibleGoScore(true);
+				trainer.setupGoAnnotationEvaluation();
+				trainer.outputWriter = new GeneticTrainerOutputWriter();
+				Parameters seed = getSettings().getGoParameters().clone();
+				trainer.outputWriter.writeHeader(seed);
+				trainer.train(seed);
+				trainer.calcAvgMaxGoScore();
+				trainer.outputWriter.writeFinalOutput(
+						trainer.getGenerationBestParametersWereFoundIn(),
+						trainer.getAvgMaxGoScore(),
+						trainer.getBestParameters());
+			}
+			System.out.println("Logged path through parameter- and score-space into:\n"	+ getSettings().getPathToTrainingPathLog());
 			System.out.println("Written output into:\n" + getSettings().getPathToOutput());
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");
@@ -92,18 +101,17 @@ public class GeneticTrainer extends Trainer {
 	 * @throws OWLOntologyCreationException 
 	 * 
 	 */
-	public void train() throws IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
+	public void train(Parameters seed) throws IOException, SQLException, OWLOntologyCreationException, MissingAccessionException {
 		Set<Parameters> population = new HashSet<Parameters>();
 		// Set up first generation
 		List<String> sortedDistinctBlastDatabaseNames = new ArrayList<String>();
 		sortedDistinctBlastDatabaseNames.addAll(getSettings().getBlastDatabases());
 		Collections.sort(sortedDistinctBlastDatabaseNames);
-		// Add parameters from YML-input to first generation (enables seeding with high mean evaluation score parameter set)
-		Parameters seed = getSettings().getParameters().clone();
 		seed.setOrigin("seed");
+		// Add parameters from YML-input to first generation (enables seeding with high mean evaluation score parameter set)
 		population.add(seed);
 		for (int i = 2; i <= getSettings().getPopulationSize(); i++) {
-			population.add(Parameters.randomParameters(sortedDistinctBlastDatabaseNames));
+			population.add(seed.randomParameters(sortedDistinctBlastDatabaseNames));
 		}
 		int generation = 1;
 		double diffAvgEvalScoreToLastGeneration = 0;
@@ -115,19 +123,26 @@ public class GeneticTrainer extends Trainer {
 			// population
 			for (Parameters individual : population) {
 				if (individual.getAvgEvaluationScore() == null) {
-					getSettings().setParameters(individual);
-					reinitializeBlastResults();
-					// Iterate over all Proteins and assign the best scoring Human
-					// Readable Description
-					assignHumanReadableDescriptions();
-					if (getSettings().hasGeneOntologyAnnotations() && getSettings().hasGroundTruthGoAnnotations()) {
+					if (individual instanceof DescriptionParameters) { // We are optimizing description annotation
+						getSettings().setDescriptionParameters((DescriptionParameters) individual);
+						reinitializeBlastResults();
+						// Iterate over all Proteins and assign the best scoring Human Readable Description
+						assignHumanReadableDescriptions();
+						// Evaluate AHRD's performance for each Protein:
+						calculateEvaluationScores();
+						// Estimate average performance of current Parameters:
+						calcAveragesOfDescriptionScores();
+					} else { // We are optimizing GO annotation
+						getSettings().setGoParameters((GoParameters) individual);
+						reinitializeBlastResults();
+						// Iterate over all Proteins and assign the best scoring GO terms
 						assignGeneOntologyTerms();
 						goAnnotsStringToObject();
+						// Evaluate AHRD's performance for each Protein:
+						calculateEvaluationScores();
+						// Estimate average performance of current Parameters:
+						calcAveragesOfGoScores();
 					}
-					// Evaluate AHRD's performance for each Protein:
-					calculateEvaluationScores();
-					// Estimate average performance of current Parameters:
-					calcAveragesOfEvalScorePrecisionAndRecall();
 //					if(getSettings().getParameters().getOrigin().equals("seed")) {
 //						writeProteins(generation);
 //					}
@@ -167,11 +182,11 @@ public class GeneticTrainer extends Trainer {
 
 			// Fill the rest of the population with new parameter sets
 			while (population.size() <= getSettings().getPopulationSize()) {
-				population.add(Parameters.randomParameters(sortedDistinctBlastDatabaseNames));
+				population.add(seed.randomParameters(sortedDistinctBlastDatabaseNames));
 			}
 
-			// Remember the best parameter set and the generation it was found
-			// in
+			// Remember the best parameter set and the generation it was found in
+			Parameters bestParameters = fitnessRanking.last();
 			if (getBestParameters() != null) {
 				diffAvgEvalScoreToLastGeneration = fitnessRanking.last().getAvgEvaluationScore() - getBestParameters().getAvgEvaluationScore();
 			}
@@ -180,8 +195,10 @@ public class GeneticTrainer extends Trainer {
 				setBestParameters(fitnessRanking.last().clone());
 				setGenerationBestParametersWereFoundIn(generation);
 			}
+			
 			// Write output of current iteration:
-			this.outWriter.writeGeneticIterationOutput(generation, getBestParameters(), diffAvgEvalScoreToLastGeneration, getBestParameters().getOrigin());
+			this.outputWriter.writeIterationOutput(generation, getBestParameters(), diffAvgEvalScoreToLastGeneration, getBestParameters().getOrigin());
+
 			generation += 1;
 		}
 	}
@@ -211,8 +228,8 @@ public class GeneticTrainer extends Trainer {
 		return generationBestParametersWereFoundIn;
 	}
 
-	public void setGenerationBestParametersWereFoundIn(Integer generationBestParametersWereFoundIn) {
-		this.generationBestParametersWereFoundIn = generationBestParametersWereFoundIn;
+	public void setGenerationBestParametersWereFoundIn(Integer generation) {
+		this.generationBestParametersWereFoundIn = generation;
 	}
-	
+
 }

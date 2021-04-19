@@ -13,19 +13,19 @@ token_score_overlap_score_weight: 0.3221
 blast_dbs:
   swissprot:
     weight: 653
-    description_score_bit_score_weight: 2.717061
+    annotation_score_bit_score_weight: 2.717061
     file: ./test/resources/swissprot_blast8_tabular.txt
     database: ./test/resources/swissprot_blast_db.fasta
     filter: ./test/resources/filter_descline_sprot.txt
   trembl:
     weight: 904
-    description_score_bit_score_weight: 2.590211
+    annotation_score_bit_score_weight: 2.590211
     file: ./test/resources/trembl_blast8_tabular.txt
     database: ./test/resources/trembl_blast_db.fasta
     filter: ./test/resources/filter_descline_trembl.txt
   tair:
     weight: 854
-    description_score_bit_score_weight: 2.917405
+    annotation_score_bit_score_weight: 2.917405
     file: ./test/resources/tair_blast8_tabular.txt
     database: ./test/resources/tair_blast_db.fasta
     fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"

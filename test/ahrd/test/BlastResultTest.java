@@ -214,7 +214,7 @@ public class BlastResultTest {
 		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
 		getSettings().getBlastDbSettings().get("trembl").put("database",
 				"./test/resources/bgh04634_trembl_database.fasta");
-		getSettings().removeAllPathToGeneOntologyReferemces();
+		getSettings().removeAllPathToGeneOntologyReferences();
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
 		BlastResult.parseBlastDatabase(protDb, "trembl", brs);
@@ -241,7 +241,7 @@ public class BlastResultTest {
 		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
 		getSettings().getBlastDbSettings().get("trembl").put("database",
 				"./test/resources/bgh04634_trembl_database.fasta");
-		getSettings().removeAllPathToGeneOntologyReferemces();
+		getSettings().removeAllPathToGeneOntologyReferences();
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);
 		BlastResult.parseBlastDatabase(protDb, "trembl", brs);
@@ -260,7 +260,7 @@ public class BlastResultTest {
 		getSettings().getBlastDbSettings().get("trembl").put("file", "./test/resources/bgh04634_vs_trEMBL.txt");
 		getSettings().getBlastDbSettings().get("trembl").put("database",
 				"./test/resources/bgh04634_trembl_database.fasta");
-		getSettings().removeAllPathToGeneOntologyReferemces();
+		getSettings().removeAllPathToGeneOntologyReferences();
 		getSettings().setWriteBestBlastHitsToOutput(true);
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "trembl", null);

@@ -12,7 +12,7 @@ blast_dbs:
     file: ./test/resources/swissprot_blast8_tabular.txt
     database: ./test/resources/swissprot_blast_db.fasta
     filter: ./test/resources/filter_descline_sprot.txt
-    description_score_bit_score_weight: 0.2
+    annotation_score_bit_score_weight: 0.2
   tair:
     weight: 50
     file: ./test/resources/tair_blast8_tabular.txt
@@ -20,7 +20,7 @@ blast_dbs:
     fasta_header_regex: "^>(?<accession>[aA][tT][0-9mMcC][gG]\\d+(\\.\\d+)?)\\s+\\|[^\\|]+\\|\\s+(?<description>[^\\|]+)(\\s*\\|.*)?$"
     short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"
     filter: ./test/resources/filter_descline_tair.txt
-    description_score_bit_score_weight: 0.4
+    annotation_score_bit_score_weight: 0.4
     gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
     gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t[^\\t]+\\t[^\\t]+\\t[^\\t]+\\t(?<evidenceCode>[^\\t]+)\\t"
   trembl:
@@ -28,5 +28,5 @@ blast_dbs:
     file: ./test/resources/trembl_blast8_tabular.txt
     database: ./test/resources/trembl_blast_db.fasta
     filter: ./test/resources/filter_descline_trembl.txt
-    description_score_bit_score_weight: 0.4
+    annotation_score_bit_score_weight: 0.4
     gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt

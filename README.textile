@@ -128,8 +128,8 @@ The above example demonstrates how the first regular expression does not match a
 
 h3. 2.3 Multithreading
 
-The default behaviour of AHRD to only use one CPU core can be overridden with the argument @multithreading: true@.
-This can greatly reduce the runtime of AHRD's annotation ("2.1":#21-ahrd-example-usages), evaluation ("2.6":#2.6-computing-f-Scores-for-selected-parameter-sets) and optimization ("2.7":#27-parameter-optimization). However it can not speed up the input of large datasets.
+The default behaviour of AHRD to only use one CPU core, can be overridden with the argument @multithreading: true@.
+This can greatly reduce the runtime of AHRD's annotation ("2.1":#21-ahrd-example-usages), evaluation ("2.6":#2.6-computing-f-Scores-for-selected-parameter-sets-ahrd-evaluator) and optimization ("2.7":#27-parameter-optimization). However it can not speed up the input of large datasets.
 Another caveat is that AHRD will then use as many threads as you CPU has (logical) cores.
 So use this option with caution on computing resources shared with other users.
 
@@ -221,7 +221,7 @@ Two approaches for parameter optimization can be chosen from:
 
 Basically the input file is almost identical to the AHRD evaluator run. The following additional parameters are available to modify the behavior of _both_ approaches; all numeric values given show the _default_ used for the respective parameter:
 
-# @path_log: your_log_file.tsv@ For the genetic algorithm: Stores the best parameters the evaluation found in each successive generation, their F1-Score, the difference in score to the best of the last generation and the method leading the particular parameter set (<b>random</b>ly generated, <b>mutation</b> of a parameter set, <b>recombination</b> of two parameter sets, <b>seed</b> parameter set the algorithm was started with). For the simmulated annealing: Stores the parameters evaluated in any optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set.
+# @path_log: your_log_file.tsv@ For the genetic algorithm: Stores the best parameters the evaluation found in each successive generation, their F1-Score, the difference in score to the best of the last generation and the method leading the particular parameter set (<b>random</b>ly generated, <b>mutation</b> of a parameter set, <b>recombination</b> of two parameter sets, <b>seed</b> parameter set the algorithm was started with). For the simmulated annealing: Stores the parameters evaluated in each optimization iteration, their F1-Score, and the difference in score to the currently accepted parameter set.
 # @f_measure_beta_parameter: 1.0@ The scaling factor used to compute the F-Score of an assigned HRD when comparing it with the reference. See <a href="https://en.wikipedia.org/wiki/F1_score">Wikipedia/F1_score</a> for details.
 # @mutator_mean: 0.25@  Mutate a randomly selected parameter by value gaussian normal distributed with this mean 
 # @mutator_deviation: 0.15@  Mutate a randomly selected parameter by value gaussian normal distributed with this standard deviation
@@ -289,7 +289,7 @@ token_score_overlap_score_weight: 0.3221 </pre>
 and Blast-Database specific, for example for UniprotKB/Swissprot:
 
 <pre>weight: 653
-description_score_bit_score_weight: 2.717061 </pre>
+annotation_score_bit_score_weight: 2.717061 </pre>
 
 h4. 3.3.1 Parameters controlling the parsing of tabular sequence similarity search result tables (legacy BLAST, BLAST+, and BLAT)
 
