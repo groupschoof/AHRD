@@ -358,13 +358,13 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 
 	public Double getAnnotationScoreBitScoreWeight(String blastDatabaseName) {
 		return Double.parseDouble(getParametersOfBlastDb(blastDatabaseName)
-				.get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT));
+				.get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
 	}
 
 	public void setAnnotationScoreBitScoreWeight(String blastDatabaseName,
 			String dsbsw) {
 		getParametersOfBlastDb(blastDatabaseName).put(
-				Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT, dsbsw);
+				Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY, dsbsw);
 	}
 
 	public Double getTokenScoreBitScoreWeight() {

@@ -38,49 +38,20 @@ public class Settings implements Cloneable {
 	public static void setSettings(Settings s) {
 		settings.set(s);
 	}
-
+	
+	
 	/**
 	 * Keys to parse the YML-Input:
 	 */
+	// Global input:
 	public static final String PROTEINS_FASTA_KEY = "proteins_fasta";
 	public static final String PROTEINS_FASTA_REGEX_KEY = "proteins_fasta_regex";
+	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
+	public static final String ACCESSION_GROUP_NAME = "accession";
 	public static final Pattern DEFAULT_PROTEINS_FASTA_REGEX = Pattern.compile("^>(?<accession>\\S+).*$");
-	public static final String BLAST_DBS_KEY = "blast_dbs";
-	public static final String BLAST_DB_WEIGHT_KEY = "weight";
-	public static final String BLAST_RESULT_FILE_KEY = "file";
-	public static final String BLAST_DATABASE_KEY = "database";
-	public static final String BLAST_BLACKLIST_KEY = "blacklist";
-	public static final String BLAST_FILTER_KEY = "filter";
-	public static final String TOKEN_BLACKLIST_KEY = "token_blacklist";
-	public static final String GENE_ONTOLOGY_REFERENCE_KEY = "gene_ontology_reference";
-	public static final String OUTPUT_KEY = "output";
-	public static final String TRAINING_PATH_LOG_KEY = "path_log";
-	public static final String WRITE_SCORES_TO_OUTPUT = "write_scores_to_output";
-	public static final String WRITE_BEST_BLAST_HITS_TO_OUTPUT = "write_best_blast_hits_to_output";
-	public static final String WRITE_TOKEN_SET_TO_OUTPUT = "write_token_set_to_output";
-	public static final String HRD_SCORES_OUTPUT_PATH = "hrd_scores_output";
-	public static final String TOKEN_SCORE_BIT_SCORE_WEIGHT = "token_score_bit_score_weight";
-	public static final String TOKEN_SCORE_DATABASE_SCORE_WEIGHT = "token_score_database_score_weight";
-	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT = "token_score_overlap_score_weight";
-	public static final String GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT = "go_term_score_evidence_code_score_weight";
-	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT = "description_score_bit_score_weight";
-	public static final String ANNOTATION_SCORE_BIT_SCORE_WEIGHT = "annotation_score_bit_score_weight";
-	public static final String GROUND_TRUTH_FASTA_KEY = "ground_truth_fasta";
-	public static final String GROUND_TRUTH_DESCRIPTION_FILTER_KEY = "ground_truth_description_filter";
-	public static final String GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY = "ground_truth_description_blacklist";
-	public static final String GROUND_TRUTH_TOKEN_BLACKLIST_KEY = "ground_truth_token_blacklist";
-	public static final String GROUND_TRUTH_FASTA_REGEX_KEY = "ground_truth_fasta_regex";
-	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
-	public static final String TEMPERATURE_KEY = "temperature";
-	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
-	public static final String OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY = "optimization_acceptance_probability_scaling_factor";
-	public static final String MUTATOR_MEAN_KEY = "mutator_mean";
-	public static final String MUTATOR_DEVIATION_KEY = "mutator_deviation";
-	public static final String NO_START_POSITIONS_IN_PARAM_SPACE = "no_start_positions_in_parameter_space";
-	public static final String REMEMBER_SIMULATED_ANNEALING_PATH_KEY = "remember_simulated_annealing_path";
-	public static final String P_MUTATE_SAME_PARAMETER_SCALE_KEY = "p_mutate_same_parameter_scale";
-	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
-	public static final String OUTPUT_FASTA_KEY = "output_fasta";
+	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
+	public static final String SHORT_ACCESSION_REGEX_KEY = "short_accession_regex";
+	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
 	public static final String SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY = "seq_sim_search_table_comment_line_regex";
 	public static final String SEQ_SIM_SEARCH_TABLE_SEP_KEY = "seq_sim_search_table_sep";
 	public static final String SEQ_SIM_SEARCH_TABLE_QUERY_COL_KEY = "seq_sim_search_table_query_col";
@@ -93,94 +64,174 @@ public class Settings implements Cloneable {
 	public static final String SEQ_SIM_SEARCH_TABLE_SUBJECT_END_COL_KEY = "seq_sim_search_table_subject_end_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY = "seq_sim_search_table_e_value_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY = "seq_sim_search_table_bit_score_col";
+	// Global runtime characteristics:
+	public static final String MULTITHREADING_KEY = "multithreading";
+	// Global output:
+	public static final String OUTPUT_KEY = "output";
+	public static final String OUTPUT_FASTA_KEY = "output_fasta";
+	// Global Evaluation output:
+	public static final String WRITE_BEST_BLAST_HITS_TO_OUTPUT_KEY = "write_best_blast_hits_to_output";
+	public static final String F_MEASURE_BETA_PARAM_KEY = "f_measure_beta_parameter";
+	public static final String FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY = "find_highest_possible_evaluation_score";
+	public static final String EVALUATE_ONLY_VALID_TOKENS_KEY = "evaluate_only_valid_tokens";
+	public static final String COMPETITORS_KEY = "competitors";
+	public static final String COMPETITOR_DESCRIPTIONS_FILE_KEY = "descriptions";
+	public static final String COMPETITOR_GOA_FILE_KEY = "go_annotations";
+	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score";
+	public static final String WRITE_FSCORE_DETAILS_TO_OUTPUT_KEY = "write_fscore_details_to_output";
+	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
+	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
+	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary";
+	// Global Training:
+	public static final String TEMPERATURE_KEY = "temperature";
+	public static final String COOL_DOWN_BY_KEY = "cool_down_by";
+	public static final String OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY = "optimization_acceptance_probability_scaling_factor";
+	public static final String MUTATOR_MEAN_KEY = "mutator_mean";
+	public static final String MUTATOR_DEVIATION_KEY = "mutator_deviation";
+	public static final String REMEMBER_SIMULATED_ANNEALING_PATH_KEY = "remember_simulated_annealing_path";
+	public static final String P_MUTATE_SAME_PARAMETER_SCALE_KEY = "p_mutate_same_parameter_scale";
+	public static final String GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY = "number_of_generations";
+	public static final String GENETIC_TRAINING_POPULATION_SIZE_KEY = "population_size";
+	// BLAST databases:
+	public static final String BLAST_DBS_KEY = "blast_dbs";
+	public static final String BLAST_DB_WEIGHT_KEY = "weight";
+	public static final String BLAST_RESULT_FILE_KEY = "file";
+	public static final String BLAST_DATABASE_KEY = "database";
+	public static final String BLAST_BLACKLIST_KEY = "blacklist";
+	public static final String BLAST_FILTER_KEY = "filter";
+	public static final String TOKEN_BLACKLIST_KEY = "token_blacklist";
+	public static final String DESCRIPTION_GROUP_NAME = "description";
 	public static final String FASTA_HEADER_REGEX_KEY = "fasta_header_regex";
 	public static final Pattern DEFAULT_FASTA_HEADER_REGEX = Pattern
 			.compile("^>(?<accession>\\S+)\\s+(?<description>.+?)(\\s+(((OS|os)=.+)|((GN|gn)=.+)))?$");
-	public static final String SHORT_ACCESSION_REGEX_KEY = "short_accession_regex";
-	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
+	// Parameters (separate for HRD and GO):
+	public static final String TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY = "token_score_bit_score_weight";
+	public static final String TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY = "token_score_database_score_weight";
+	public static final String TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY = "token_score_overlap_score_weight";
+	public static final String ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY = "annotation_score_bit_score_weight";
+	public static final String TRAINING_PATH_LOG_KEY = "path_log";
+	// Description specific parameters:
+	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY = "description_score_bit_score_weight";
+	public static final String GROUND_TRUTH_FASTA_KEY = "ground_truth_fasta";
+	public static final String GROUND_TRUTH_DESCRIPTION_FILTER_KEY = "ground_truth_description_filter";
+	public static final String GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY = "ground_truth_description_blacklist";
+	public static final String GROUND_TRUTH_TOKEN_BLACKLIST_KEY = "ground_truth_token_blacklist";
+	public static final String GROUND_TRUTH_FASTA_REGEX_KEY = "ground_truth_fasta_regex";
+	public static final String HRD_SCORES_OUTPUT_PATH_KEY = "hrd_scores_output";
+	// GO specific parameters:
+	public static final String INFORMATIVE_TOKEN_THRESHOLD_KEY = "informative_token_threshold";
+	public static final String GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY = "go_term_score_evidence_code_score_weight";
+	public static final String GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY = "ground_truth_go_annotations";
+	public static final String GENE_ONTOLOGY_REFERENCE_KEY = "gene_ontology_reference";
+	public static final String GO_TERM_GROUP_NAME = "goTerm";
 	public static final String GENE_ONTOLOGY_REFERENCE_REGEX_KEY = "gene_ontology_reference_regex";
 	public static final Pattern DEFAULT_GENE_ONTOLOGY_REFERENCE_REGEX = Pattern
 			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})\\s+\\S+\\s+(?<evidenceCode>\\S+)");
-	public static final String EVALUATE_ONLY_VALID_TOKENS_KEY = "evaluate_only_valid_tokens";
-	public static final String DEFAULT_LINE_SEP = "(\r|\n)+";
 	public static final String GO_DB_PATH_KEY = "go_db_path";
-	public static final String GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY = "ground_truth_go_annotations";
 	public static final String GO_F1_SIMPLE_KEY = "simple_GO_f1_scores";
 	public static final String GO_F1_ANCESTRY_KEY = "ancestry_GO_f1_scores";
 	public static final String GO_F1_SEMSIM_KEY = "semsim_GO_f1_scores";
 	public static final String GO_SLIM_PATH_KEY = "go_slim";
 	public static final Pattern GO_SLIM_FILE_GOTERM_REGEX = Pattern.compile("^id: (?<goTerm>GO:\\d{7})$");
-	public static final String GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY = "number_of_generations";
-	public static final String GENETIC_TRAINING_POPULATION_SIZE_KEY = "population_size";
-	public static final String COMPETITORS_KEY = "competitors";
-	public static final String COMPETITOR_DESCRIPTIONS_FILE_KEY = "descriptions";
-	public static final String COMPETITOR_GOA_FILE_KEY = "go_annotations";
-	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score";
-	public static final String WRITE_FSCORE_DETAILS_TO_OUTPUT = "write_fscore_details_to_output";
-	public static final String INFORMATIVE_TOKEN_THRESHOLD = "informative_token_threshold";
 	public static final String REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY = "reference_go_annotation_evidence_code_weights";
-	public static final String ACCESSION_GROUP_NAME = "accession";
-	public static final String SHORT_ACCESSION_GROUP_NAME = "shortAccession";
-	public static final String DESCRIPTION_GROUP_NAME = "description";
-	public static final String GO_TERM_GROUP_NAME = "goTerm";
-	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
-	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
-	public static final String WRITE_EVALUATION_SUMMARY_KEY = "write_evaluation_summary"; 
-	public static final String MULTITHREADING = "multithreading";
 	
 	/**
 	 * Fields:
 	 */
+	// Global WHAT TO DO! ////////////////////////////////////////////////////////////////////////////
 	private boolean annotateDescriptions = true;
 	private boolean evaluateDescriptions = false;
 	private boolean trainDescriptions = false;
 	private boolean annotateGoTerms = false;
 	private boolean evaluateGoTerms = false;
 	private boolean trainGoTerms = false;
-	
+	// Global input: /////////////////////////////////////////////////////////////////////////////////
 	private String pathToProteinsFasta;
 	private Pattern proteinsFastaRegex;
-	private String pathToGroundTruthFasta;
-	private String pathToGroundTruthDescriptionBlacklist;
-	private Set<String> groundTruthDescriptionBlacklist;
-	private String pathToGroundTruthDescriptionFilter;
-	private List<String> groundTruthDescriptionFilter;
-	private String pathToGroundTruthTokenBlacklist;
-	private Set<String> groundTruthTokenBlacklist = new HashSet<String>();
-	private Pattern groundTruthFastaRegex;
+	/**
+	 * The following fields control how the result table of a sequence
+	 * similarity search is parsed. All concerned fields start with
+	 * 'seqSimSearchTable'.
+	 */
+	private Pattern seqSimSearchTableCommentLineRegex = null;
+	private String seqSimSearchTableSep = "\t";
+	private Integer seqSimSearchTableQueryCol = 0;
+	private Pattern seqSimSearchTableQueryColRegex;
+	private Integer seqSimSearchTableSubjectCol = 1;
+	private Integer seqSimSearchTableQueryStartCol = 6;
+	private Integer seqSimSearchTableQueryEndCol = 7;
+	private Integer seqSimSearchTableSubjectStartCol = 8;
+	private Integer seqSimSearchTableSubjectEndCol = 9;
+	private Integer seqSimSearchTableEValueCol = 10;
+	private Integer seqSimSearchTableBitScoreCol = 11;
+	/**
+	 * Default description line blacklist.
+	 * Is applied to all blast databases that don't have a description line blacklist specified.
+	 */
+	private Set<String> defaultBlastResultsBlacklist = new HashSet<>();
+	/**
+	 * Default description line filter.
+	 * Is applied to all blast databases that don't have a description line filter specified.
+	 */
+	private List<String> defaultBlastResultsFilter = new ArrayList<>();
+	/**
+	 * Default token blacklist.
+	 * Is applied to all blast databases that don't have a token blacklist specified.
+	 */
+	private Set<String> defaultTokenBlacklist = new HashSet<>();
+	// Global runtime characteristics: ///////////////////////////////////////////////////////////////
+	/**
+	 * Triggers AHRD to annotate and evaluate proteins using all available CPU cores
+	 */
+	private boolean multithreading = false;
+	// Global output: ////////////////////////////////////////////////////////////////////////////////
 	private String pathToOutput;
 	/**
-	 * File to write the AHRD-Scores of each BlastHit's Description into, if
-	 * requested.
+	 * Write output as fasta-file?
 	 */
-	private String pathToHRDScoresOutput;
-	/**
-	 * Trainer logs path through parameter- and score-space into this file:
-	 */
-	private String pathToTrainingPathLog;
-	/**
-	 * Parameters representing weights and factors in the various formulas used
-	 * in AHRD. They are subject to optimization and can be set by the user.
-	 */
-	private DescriptionParameters descriptionParameters = new DescriptionParameters();
-	private GoParameters goParameters = new GoParameters();
+	private boolean outputFasta = false;
 	
-	private Boolean writeTokenSetToOutput;
-	private Boolean writeBestBlastHitsToOutput = false;
-	/**
-	 * Forces AHRD to write out all internal scores (Sum(Token-Scores),
-	 * Description- and Lexical-Scores, etc.
-	 */
-	private Boolean writeScoresToOutput;
+	// Global Evaluation output: /////////////////////////////////////////////////////////////////////
 	/**
 	 * F-Measure's Beta-Parameter as set in the input.yml or default 1.0
 	 */
 	private Double fMeasureBetaParameter = 1.0;
-	private Map<String, Map<String, String>> blastDbSettings = new HashMap<String, Map<String, String>>();
-	private List<String> sortedBlastDatabaseNames;
-	private Map<String, Set<String>> blastResultsBlacklists = new HashMap<String, Set<String>>();
-	private Map<String, List<String>> blastResultsFilter = new HashMap<String, List<String>>();
-	private Map<String, Set<String>> tokenBlacklists = new HashMap<String, Set<String>>();
+	private Boolean writeBestBlastHitsToOutput = false;
+	/**
+	 * Evaluation or Optimization might be interested in the highest possibly
+	 * achievable evaluation-score:
+	 */
+	private boolean findHighestPossibleEvaluationScore = false;
+	/**
+	 * If set to TRUE the AHRD Evaluation Score is based ONLY on tokens that
+	 * pass the Blacklisting. Otherwise all Tokens are submitted to evaluation.
+	 */
+	private Boolean evaluateOnlyValidTokens = true;
+	/**
+	 * Competitors to be compared to AHRD in evaluation run
+	 */
+	private Map<String, Map<String, String>> competitorSettings = new HashMap<String, Map<String, String>>();
+	/**
+	 * Adds the precision and recall to the output of all F-scores 
+	 */
+	private boolean writeFscoreDetailsToOutput = false;
+	/**
+	 * Triggers the calculation and output of the highest possible precision of descriptions and gene ontology terms.
+	 */
+	private boolean findHighestPossiblePrecision = false;
+	/**
+	 * Triggers the calculation and output of the highest possible recall of descriptions and gene ontology terms.
+	 */
+	private boolean findHighestPossibleRecall = false;
+	/**
+	 * Triggers the output of averages and coverages of all scores at the end of the evalution output
+	 */
+	private boolean writeEvaluationSummary = false;
+	// Global Training: //////////////////////////////////////////////////////////////////////////////
+	/**
+	 * Trainer logs path through parameter- and score-space into this file:
+	 */
+	private String pathToTrainingPathLog;
 	/**
 	 * For the <strong>simulated annealing</strong> algorithm, this will be
 	 * current temperature. (Default is 75000)
@@ -228,35 +279,42 @@ public class Settings implements Cloneable {
 	 */
 	private boolean rememberSimulatedAnnealingPath = false;
 	/**
-	 * Evaluation or Optimization might be interested in the highest possibly
-	 * achievable evaluation-score:
+	 * The number of generation to be consecutively evolved and evaluated when performing parameter optimization in the genetic trainer
 	 */
-	private boolean findHighestPossibleEvaluationScore = false;
+	private int numberOfGenerations = 100;
 	/**
-	 * Write output as fasta-file?
+	 * The size of each generation to be evolved and evaluated when performing parameter optimization in the genetic trainer
 	 */
-	private boolean outputFasta = false;
+	private int populationSize = 200;
+	// BLAST databases: //////////////////////////////////////////////////////////////////////////////
+	private Map<String, Map<String, String>> blastDbSettings = new HashMap<String, Map<String, String>>();
+	private List<String> sortedBlastDatabaseNames;
+	private Map<String, Set<String>> blastResultsBlacklists = new HashMap<String, Set<String>>();
+	private Map<String, List<String>> blastResultsFilter = new HashMap<String, List<String>>();
+	private Map<String, Set<String>> tokenBlacklists = new HashMap<String, Set<String>>();
+	// Parameters (separate for HRD and GO): /////////////////////////////////////////////////////////
 	/**
-	 * The following fields control how the result table of a sequence
-	 * similarity search is parsed. All concerned fields start with
-	 * 'seqSimSearchTable'.
+	 * Parameters representing weights and factors in the various formulas used
+	 * in AHRD. They are subject to optimization and can be set by the user.
 	 */
-	private Pattern seqSimSearchTableCommentLineRegex = null;
-	private String seqSimSearchTableSep = "\t";
-	private Integer seqSimSearchTableQueryCol = 0;
-	private Pattern seqSimSearchTableQueryColRegex;
-	private Integer seqSimSearchTableSubjectCol = 1;
-	private Integer seqSimSearchTableQueryStartCol = 6;
-	private Integer seqSimSearchTableQueryEndCol = 7;
-	private Integer seqSimSearchTableSubjectStartCol = 8;
-	private Integer seqSimSearchTableSubjectEndCol = 9;
-	private Integer seqSimSearchTableEValueCol = 10;
-	private Integer seqSimSearchTableBitScoreCol = 11;
+	private DescriptionParameters descriptionParameters = new DescriptionParameters();
+	private GoParameters goParameters = new GoParameters();
+	// Description specific parameters: //////////////////////////////////////////////////////////////
+	
+	private String pathToGroundTruthFasta;
+	private String pathToGroundTruthDescriptionBlacklist;
+	private Set<String> groundTruthDescriptionBlacklist;
+	private String pathToGroundTruthDescriptionFilter;
+	private List<String> groundTruthDescriptionFilter;
+	private String pathToGroundTruthTokenBlacklist;
+	private Set<String> groundTruthTokenBlacklist = new HashSet<String>();
+	private Pattern groundTruthFastaRegex;
 	/**
-	 * If set to TRUE the AHRD Evaluation Score is based ONLY on tokens that
-	 * pass the Blacklisting. Otherwise all Tokens are submitted to evaluation.
+	 * File to write the AHRD-Scores of each BlastHit's Description into, if
+	 * requested.
 	 */
-	private Boolean evaluateOnlyValidTokens = true;
+	private String pathToHRDScoresOutput;
+	// GO specific parameters: ////////////////////////////////////////////////////////////////////////
 	/**
 	 * The path in witch to keep: - Downloaded reviewed part of Uniprot -
 	 * Downloaded Gene Ontology mysql database dump - Serialized copy of the
@@ -294,26 +352,15 @@ public class Settings implements Cloneable {
 	 */
 	private String pathToGoSlimFile;
 	/**
-	 * The number of generation to be consecutively evolved and evaluated when performing parameter optimization in the genetic trainer
-	 */
-	private int numberOfGenerations = 100;
-	/**
-	 * The size of each generation to be evolved and evaluated when performing parameter optimization in the genetic trainer
-	 */
-	private int populationSize = 200;
-	/**
-	 * Competitors to be compared to AHRD in evaluation run
-	 */
-	private Map<String, Map<String, String>> competitorSettings = new HashMap<String, Map<String, String>>();
-	/**
 	 * Evaluation or Optimization might be interested in the highest possibly
 	 * achievable score for go annotations:
 	 */
 	private boolean findHighestPossibleGoScore = false;
 	/**
-	 * Adds the precision and recall to the output of all (go based) F-scores 
+	 * Weights of reference go annotation evidence codes for prediction of query protein go term annotations  
 	 */
-	private boolean writeFscoreDetailsToOutput = false;
+	private Map<String, Double> evidenceCodeWeights = new HashMap<String, Double>();
+	
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -326,42 +373,6 @@ public class Settings implements Cloneable {
 	}
 	
 	/**
-	 * Default description line blacklist.
-	 * Is applied to all blast databases that don't have a description line blacklist specified.
-	 */
-	private Set<String> defaultBlastResultsBlacklist = new HashSet<String>();
-	/**
-	 * Default description line filter.
-	 * Is applied to all blast databases that don't have a description line filter specified.
-	 */
-	private List<String> defaultBlastResultsFilter = new ArrayList<String>();
-	/**
-	 * Default token blacklist.
-	 * Is applied to all blast databases that don't have a token blacklist specified.
-	 */
-	private Set<String> defaultTokenBlacklist = new HashSet<String>();
-	/**
-	 * Triggers the calculation and output of the highest possible precision of descriptions and gene ontology terms.
-	 */
-	private boolean findHighestPossiblePrecision = false;
-	/**
-	 * Triggers the calculation and output of the highest possible recall of descriptions and gene ontology terms.
-	 */
-	private boolean findHighestPossibleRecall = false;
-	/**
-	 * Triggers the output of averages and coverages of all scores at the end of the evalution output
-	 */
-	private boolean writeEvaluationSummary = false;
-	/**
-	 * Weights of reference go annotation evidence codes for prediction of query protein go term annotations  
-	 */
-	private Map<String, Double> evidenceCodeWeights = new HashMap<String, Double>();
-	/**
-	 * Triggers AHRD to annotate and evaluate proteins using all available CPU cores
-	 */
-	private boolean multithreading = false;
-
-	/**
 	 * Initializes an Instance with content read from a YML-File:
 	 * 
 	 * @throws IOException
@@ -370,102 +381,17 @@ public class Settings implements Cloneable {
 	public void initialize(String pathToYml) throws IOException {
 		YamlReader reader = new YamlReader(new FileReader(pathToYml));
 		Map<String, Object> input = (Map<String, Object>) reader.read();
-		this.blastDbSettings = (Map<String, Map<String, String>>) input.get(BLAST_DBS_KEY);
+		// Global input: /////////////////////////////////////////////////////////////////////////////////
 		this.setPathToProteinsFasta((String) input.get(PROTEINS_FASTA_KEY));
 		if (input.get(PROTEINS_FASTA_REGEX_KEY) != null) {
 			this.setProteinsFastaRegex(Pattern.compile((String) input.get(PROTEINS_FASTA_REGEX_KEY)));
 		} else {
 			this.setProteinsFastaRegex(DEFAULT_PROTEINS_FASTA_REGEX);
 		}
-		// If started to evaluate parameters or train the algorithm, ground truth descriptions are stored in this file:
-		setPathToGroundTruthFasta((String) input.get(GROUND_TRUTH_FASTA_KEY));
-		this.setPathToOutput((String) input.get(OUTPUT_KEY));
-		if (input.get(HRD_SCORES_OUTPUT_PATH) != null && !input.get(HRD_SCORES_OUTPUT_PATH).equals(""))
-			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH));
-		// Trainer logs path through parameter-space here:
-		if (input.get(TRAINING_PATH_LOG_KEY) != null)
-			setPathToTrainingPathLog((String) input.get(TRAINING_PATH_LOG_KEY));
-		this.setDescriptionTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
-		this.setDescriptionTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
-		this.setDescriptionTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
-		this.setGoTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT)));
-		this.setGoTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT)));
-		this.setGoTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT)));
-		if (input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT) != null) {
-			this.setGoTermScoreEvidenceCodeScoreWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT)));
-		}
-		this.setWriteTokenSetToOutput(Boolean.parseBoolean((String) input.get(WRITE_TOKEN_SET_TO_OUTPUT)));
-		// Writing best blast hits to output is only supported in evaluation mode. So otherwise the default 'false' will be kept.
-		if (isInEvaluationMode()) {
-			this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT)));
-		}
-		this.setWriteScoresToOutput(Boolean.parseBoolean((String) input.get(WRITE_SCORES_TO_OUTPUT)));
-		this.setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
-		if (input.get(BLAST_BLACKLIST_KEY) != null) {
-			this.setDefaultBlastResultsBlacklist(new HashSet<String>(fromFile((String) input.get(BLAST_BLACKLIST_KEY))));
-		}
-		if (input.get(BLAST_FILTER_KEY) != null) {
-			this.setDefaultBlastResultsFilter(fromFile((String) input.get(BLAST_FILTER_KEY)));
-		}
-		if (input.get(TOKEN_BLACKLIST_KEY) != null) {
-			this.setDefaultTokenBlacklist(new HashSet<String>(fromFile((String) input.get(TOKEN_BLACKLIST_KEY))));
-		}
-		// Generate the Blacklists and Filters for each Blast-Database from their appropriate files:
-		for (String blastDatabaseName : getBlastDatabases()) {
-			if (getPathToBlastResultsBlacklist(blastDatabaseName) != null) {
-				this.blastResultsBlacklists.put(blastDatabaseName, new HashSet<String>(fromFile(getPathToBlastResultsBlacklist(blastDatabaseName))));
-			}
-			if (getPathToBlastResultsFilter(blastDatabaseName) != null) {
-				this.blastResultsFilter.put(blastDatabaseName, fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
-			}
-			if (getPathToTokenBlacklist(blastDatabaseName) != null) {
-				this.tokenBlacklists.put(blastDatabaseName, new HashSet<String>(fromFile(getPathToTokenBlacklist(blastDatabaseName))));
-			}
-			// Set Database-Weights and Description-Score-Bit-Score-Weight:
-			this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName,
-					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
-			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT) != null) {
-				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT));
-			} else {
-				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
-			}
-			this.getGoParameters().setBlastDbWeight(blastDatabaseName,
-					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
-			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT) != null) {
-				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT));
-			} else {
-				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT));
-			}
-		}
-		// If started in evaluation-mode the F-Measure's Beta-Parameter can be set
-		// to some other value than 1.0
-		if (input.get(F_MEASURE_BETA_PARAM_KEY) != null)
-			this.fMeasureBetaParameter = Double.parseDouble((String) input.get(F_MEASURE_BETA_PARAM_KEY));
-		// Simulated Annealing can be started with custom temperature and value
-		// it is cooled-down by each step:
-		if (input.get(TEMPERATURE_KEY) != null)
-			this.setTemperature(Integer.parseInt((String) input.get(TEMPERATURE_KEY)));
-		if (input.get(COOL_DOWN_BY_KEY) != null)
-			this.coolDownBy = Integer.parseInt((String) input.get(COOL_DOWN_BY_KEY));
-		if (input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY) != null)
-			this.setOptimizationAcceptanceProbabilityScalingFactor(
-					Double.parseDouble((String) input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY)));
-		if (input.get(MUTATOR_MEAN_KEY) != null)
-			this.setMutatorMean(Double.parseDouble((String) input.get(MUTATOR_MEAN_KEY)));
-		if (input.get(MUTATOR_DEVIATION_KEY) != null)
-			this.setMutatorDeviation(Double.parseDouble((String) input.get(MUTATOR_DEVIATION_KEY)));
-		this.setRememberSimulatedAnnealingPath(Boolean.parseBoolean((String) input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY)));
-		if (input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY) != null)
-			this.setpMutateSameParameterScale(Double.parseDouble((String) input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY)));
-		// Evaluation or Optimization might be interested in the highest
-		// possibly achievable evaluation-score:
-		this.setFindHighestPossibleEvaluationScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY)));
-		// Set any non default parameters controlling, how sequence similarity
-		// search result tables are parsed:
+		/**
+		 *  Set any non default parameters controlling, how sequence similarity
+		 *  search result tables are parsed:
+		 */ 
 		if (input.get(SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY) != null) {
 			this.setSeqSimSearchTableCommentLineRegex(
 					Pattern.compile(input.get(SEQ_SIM_SEARCH_TABLE_COMMENT_LINE_REGEX_KEY).toString()));
@@ -508,9 +434,121 @@ public class Settings implements Cloneable {
 			this.setSeqSimSearchTableBitScoreCol(
 					Integer.parseInt(input.get(SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY).toString()));
 		}
+		this.setOutputFasta(Boolean.parseBoolean((String) input.get(OUTPUT_FASTA_KEY)));
+		if (input.get(BLAST_BLACKLIST_KEY) != null) {
+			this.setDefaultBlastResultsBlacklist(new HashSet<String>(fromFile((String) input.get(BLAST_BLACKLIST_KEY))));
+		}
+		if (input.get(BLAST_FILTER_KEY) != null) {
+			this.setDefaultBlastResultsFilter(fromFile((String) input.get(BLAST_FILTER_KEY)));
+		}
+		if (input.get(TOKEN_BLACKLIST_KEY) != null) {
+			this.setDefaultTokenBlacklist(new HashSet<String>(fromFile((String) input.get(TOKEN_BLACKLIST_KEY))));
+		}
+		// Global runtime characteristics: ///////////////////////////////////////////////////////////////
+		if (input.get(MULTITHREADING_KEY) != null) {
+			this.setMultithreading(Boolean.parseBoolean((String) input.get(MULTITHREADING_KEY)));
+		}
+		// Global output: ////////////////////////////////////////////////////////////////////////////////
+		this.setPathToOutput((String) input.get(OUTPUT_KEY));
+		// Global Evaluation output: /////////////////////////////////////////////////////////////////////
+		if (input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT_KEY) != null) {
+			this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT_KEY)));
+		}
+		/**
+		 *  Evaluation or Optimization might be interested in the highest possibly achievable evaluation-score:
+		 */
+		this.setFindHighestPossibleEvaluationScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_EVALUATION_SCORE_KEY)));
 		if (input.get(EVALUATE_ONLY_VALID_TOKENS_KEY) != null) {
 			this.setEvaluateOnlyValidTokens(Boolean.parseBoolean((String) input.get(EVALUATE_ONLY_VALID_TOKENS_KEY)));
 		}
+		if (input.get(COMPETITORS_KEY) != null) {
+			setCompetitorSettings((Map<String, Map<String, String>>) input.get(COMPETITORS_KEY));
+		}
+		this.setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT_KEY)));
+		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
+		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
+		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
+		// Global Training: //////////////////////////////////////////////////////////////////////////////
+		/**
+		 *  Trainer logs path through parameter-space here:
+		 */
+		if (input.get(TRAINING_PATH_LOG_KEY) != null)
+			setPathToTrainingPathLog((String) input.get(TRAINING_PATH_LOG_KEY));
+		/**
+		 *  If started in evaluation-mode the F-Measure's Beta-Parameter can be set to some other value than 1.0
+		 */
+		if (input.get(F_MEASURE_BETA_PARAM_KEY) != null)
+			this.fMeasureBetaParameter = Double.parseDouble((String) input.get(F_MEASURE_BETA_PARAM_KEY));
+		/**
+		 *  Simulated Annealing can be started with custom temperature and value it is cooled-down by each step:
+		 */
+		if (input.get(TEMPERATURE_KEY) != null)
+			this.setTemperature(Integer.parseInt((String) input.get(TEMPERATURE_KEY)));
+		if (input.get(COOL_DOWN_BY_KEY) != null)
+			this.coolDownBy = Integer.parseInt((String) input.get(COOL_DOWN_BY_KEY));
+		if (input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY) != null)
+			this.setOptimizationAcceptanceProbabilityScalingFactor(
+					Double.parseDouble((String) input.get(OPTIMIZATION_ACCEPTANCE_PROBABILITY_SCALING_FACTOR_KEY)));
+		if (input.get(MUTATOR_MEAN_KEY) != null)
+			this.setMutatorMean(Double.parseDouble((String) input.get(MUTATOR_MEAN_KEY)));
+		if (input.get(MUTATOR_DEVIATION_KEY) != null)
+			this.setMutatorDeviation(Double.parseDouble((String) input.get(MUTATOR_DEVIATION_KEY)));
+		this.setRememberSimulatedAnnealingPath(Boolean.parseBoolean((String) input.get(REMEMBER_SIMULATED_ANNEALING_PATH_KEY)));
+		if (input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY) != null)
+			this.setpMutateSameParameterScale(Double.parseDouble((String) input.get(P_MUTATE_SAME_PARAMETER_SCALE_KEY)));
+		if (input.get(GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY) != null) {
+			this.setNumberOfGenerations(Integer.parseInt((String) input.get(GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY)));
+		}
+		if (input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY) != null) {
+			this.setPopulationSize(Integer.parseInt((String) input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY)));
+		}
+		// BLAST databases: //////////////////////////////////////////////////////////////////////////////
+		this.blastDbSettings = (Map<String, Map<String, String>>) input.get(BLAST_DBS_KEY);
+		// Generate the Blacklists and Filters for each Blast-Database from their appropriate files:
+		for (String blastDatabaseName : getBlastDatabases()) {
+			if (getPathToBlastResultsBlacklist(blastDatabaseName) != null) {
+				this.blastResultsBlacklists.put(blastDatabaseName, new HashSet<String>(fromFile(getPathToBlastResultsBlacklist(blastDatabaseName))));
+			}
+			if (getPathToBlastResultsFilter(blastDatabaseName) != null) {
+				this.blastResultsFilter.put(blastDatabaseName, fromFile(getPathToBlastResultsFilter(blastDatabaseName)));
+			}
+			if (getPathToTokenBlacklist(blastDatabaseName) != null) {
+				this.tokenBlacklists.put(blastDatabaseName, new HashSet<String>(fromFile(getPathToTokenBlacklist(blastDatabaseName))));
+			}
+			// Set Database-Weights and Description-Score-Bit-Score-Weight:
+			this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName,
+					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
+			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
+			} else {
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY));
+			}
+			this.getGoParameters().setBlastDbWeight(blastDatabaseName,
+					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
+			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
+				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
+			} else {
+				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY));
+			}
+		}
+		// Parameters (separate for HRD and GO): /////////////////////////////////////////////////////////
+		this.setDescriptionTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
+		this.setDescriptionTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY)));
+		this.setDescriptionTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY)));
+		this.setGoTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
+		this.setGoTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY)));
+		this.setGoTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY)));
+		// Description specific parameters: //////////////////////////////////////////////////////////////
+		/**
+		 *  If started to evaluate parameters or train the algorithm, ground truth descriptions are stored in this file:
+		 */
+		setPathToGroundTruthFasta((String) input.get(GROUND_TRUTH_FASTA_KEY));
+		if (input.get(HRD_SCORES_OUTPUT_PATH_KEY) != null && !input.get(HRD_SCORES_OUTPUT_PATH_KEY).equals(""))
+			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH_KEY));
 		if (input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY) != null) {
 			this.setPathToGroundTruthDescriptionBlacklist(input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY).toString());
 			this.setGroundTruthDescriptionBlacklist(new HashSet<String>(fromFile(getPathToGroundTruthDescriptionBlacklist())));
@@ -519,10 +557,12 @@ public class Settings implements Cloneable {
 			this.setPathToGroundTruthDescriptionFilter(input.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY).toString());
 			this.setGroundTruthDescriptionFilter(fromFile(getPathToGroundTruthDescriptionFilter()));
 		}
-		// If the ground_truth_token_blacklist parameter is set the provided file will be used as blacklist for the ground truth tokens.
-		// Otherwise the evaluate_only_valid_tokens parameter is checked. If set to 'true' (its default) the defaultTokenBlacklist is used to filter the ground truth tokens.
-		// If evaluate_only_valid_tokens is set to 'false' the ground truth token black list remains empty,
-		// which will result in ALL ground truth tokens being used in the evaluation (so no filtering takes place).
+		/**
+		 *  If the ground_truth_token_blacklist parameter is set the provided file will be used as blacklist for the ground truth tokens.
+		 *  Otherwise the evaluate_only_valid_tokens parameter is checked. If set to 'true' (its default) the defaultTokenBlacklist is used to filter the ground truth tokens.
+		 *  If evaluate_only_valid_tokens is set to 'false' the ground truth token black list remains empty,
+		 *  which will result in ALL ground truth tokens being used in the evaluation (so no filtering takes place).
+		 */
 		if (input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY) != null) {
 			this.setPathToGroundTruthTokenBlacklist(input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY).toString());
 			this.setGroundTruthTokenBlacklist(new HashSet<String>(fromFile(getPathToGroundTruthTokenBlacklist())));
@@ -536,6 +576,10 @@ public class Settings implements Cloneable {
 		} else {
 			this.setGroundTruthFastaRegex(DEFAULT_FASTA_HEADER_REGEX);
 		}
+		// GO specific parameters: ////////////////////////////////////////////////////////////////////////
+		if (input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY) != null) {
+			this.setGoTermScoreEvidenceCodeScoreWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY)));
+		}
 		if (input.get(GO_DB_PATH_KEY) != null) {
 			this.setPathToGoDatabase(input.get(GO_DB_PATH_KEY).toString());
 		}
@@ -544,8 +588,9 @@ public class Settings implements Cloneable {
 		}
 		this.setCalculateAncestryGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_ANCESTRY_KEY)));
 		this.setCalculateSemSimGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_SEMSIM_KEY)));
-		// If non of the GO F1 Keys is specified in the YML input the simple
-		// version is used as default
+		/**
+		 *  If non of the GO F1 Keys is specified in the YML input the simple version is used as default
+		 */ 
 		if (input.get(GO_F1_SIMPLE_KEY) != null) {
 			this.setCalculateSimpleGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_SIMPLE_KEY)));
 		} else {
@@ -556,25 +601,9 @@ public class Settings implements Cloneable {
 		if (input.get(GO_SLIM_PATH_KEY) != null) {
 			this.setPathToGoSlimFile(input.get(GO_SLIM_PATH_KEY).toString());
 		}
-		if (input.get(GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY) != null) {
-			this.setNumberOfGenerations(Integer.parseInt((String) input.get(GENETIC_TRAINING_NUMBER_OF_GENERATIONS_KEY)));
-		}
-		if (input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY) != null) {
-			this.setPopulationSize(Integer.parseInt((String) input.get(GENETIC_TRAINING_POPULATION_SIZE_KEY)));
-		}
-		if (input.get(COMPETITORS_KEY) != null) {
-			setCompetitorSettings((Map<String, Map<String, String>>) input.get(COMPETITORS_KEY));
-		}
 		this.setFindHighestPossibleGoScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY)));
-		this.setWriteFscoreDetailsToOutput(Boolean.parseBoolean((String) input.get(WRITE_FSCORE_DETAILS_TO_OUTPUT)));
-		if (input.get(INFORMATIVE_TOKEN_THRESHOLD) != null) {
-			this.setGoInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD)));
-		}
-		this.setFindHighestPossiblePrecision(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_PRECISION_KEY)));
-		this.setFindHighestPossibleRecall(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_RECALL_KEY)));
-		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
-		if (input.get(MULTITHREADING) != null) {
-			this.setMultithreading(Boolean.parseBoolean((String) input.get(MULTITHREADING)));
+		if (input.get(INFORMATIVE_TOKEN_THRESHOLD_KEY) != null) {
+			this.setGoInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD_KEY)));
 		}
 		/**
 		 * Initialize default reference go annotation evidence code weights
@@ -906,28 +935,12 @@ public class Settings implements Cloneable {
 		this.getGoParameters().setInformativeTokenThreshold(informativeTokenThreshold);
 	}
 
-	public Boolean getWriteTokenSetToOutput() {
-		return writeTokenSetToOutput;
-	}
-
-	public void setWriteTokenSetToOutput(Boolean writeTokenSetToOutput) {
-		this.writeTokenSetToOutput = writeTokenSetToOutput;
-	}
-
 	public Boolean getWriteBestBlastHitsToOutput() {
 		return writeBestBlastHitsToOutput;
 	}
 
 	public void setWriteBestBlastHitsToOutput(Boolean writeBestBlastHitsToOutput) {
 		this.writeBestBlastHitsToOutput = writeBestBlastHitsToOutput;
-	}
-
-	public Boolean getWriteScoresToOutput() {
-		return writeScoresToOutput;
-	}
-
-	public void setWriteScoresToOutput(Boolean writeScoresToOutput) {
-		this.writeScoresToOutput = writeScoresToOutput;
 	}
 
 	public Map<String, Map<String, String>> getBlastDbSettings() {
