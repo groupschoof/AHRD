@@ -128,10 +128,10 @@ The above example demonstrates how the first regular expression does not match a
 
 h3. 2.3 Multithreading
 
-The default behaviour of AHRD to only use one CPU core, can be overridden with the argument @multithreading: true@.
-This can greatly reduce the runtime of AHRD's annotation ("2.1":#21-ahrd-example-usages), evaluation ("2.6":#2.6-computing-f-Scores-for-selected-parameter-sets-ahrd-evaluator) and optimization ("2.7":#27-parameter-optimization). However it can not speed up the input of large datasets.
-Another caveat is that AHRD will then use as many threads as you CPU has (logical) cores.
-So use this option with caution on computing resources shared with other users.
+The default behaviour of AHRD, to only use one CPU core, can be overridden with the argument @n_threads@.
+Use it to specify the number of CPU threads AHRD is allowed to use.
+This can greatly reduce the runtime of AHRD's annotation optimization ("2.7":#27-parameter-optimization). However it can not speed up the input of large datasets.
+Another caveat is that AHRD will not be able to fully saturate each CPU core - It unfortunately does not scale optimally.
 
 h3. 2.4 Output
 

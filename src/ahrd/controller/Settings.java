@@ -65,7 +65,7 @@ public class Settings implements Cloneable {
 	public static final String SEQ_SIM_SEARCH_TABLE_E_VALUE_COL_KEY = "seq_sim_search_table_e_value_col";
 	public static final String SEQ_SIM_SEARCH_TABLE_BIT_SCORE_COL_KEY = "seq_sim_search_table_bit_score_col";
 	// Global runtime characteristics:
-	public static final String MULTITHREADING_KEY = "multithreading";
+	public static final String NTHREADS_KEY = "n_threads";
 	// Global output:
 	public static final String OUTPUT_KEY = "output";
 	public static final String OUTPUT_FASTA_KEY = "output_fasta";
@@ -181,9 +181,10 @@ public class Settings implements Cloneable {
 	private Set<String> defaultTokenBlacklist = new HashSet<>();
 	// Global runtime characteristics: ///////////////////////////////////////////////////////////////
 	/**
-	 * Triggers AHRD to annotate and evaluate proteins using all available CPU cores
+	 * The number of CPU threads AHRD is allowed to use.
+	 * Default (1) leads to single threaded operation.
 	 */
-	private boolean multithreading = false;
+	private int nThreads = 1;
 	// Global output: ////////////////////////////////////////////////////////////////////////////////
 	private String pathToOutput;
 	/**
@@ -445,8 +446,11 @@ public class Settings implements Cloneable {
 			this.setDefaultTokenBlacklist(new HashSet<String>(fromFile((String) input.get(TOKEN_BLACKLIST_KEY))));
 		}
 		// Global runtime characteristics: ///////////////////////////////////////////////////////////////
-		if (input.get(MULTITHREADING_KEY) != null) {
-			this.setMultithreading(Boolean.parseBoolean((String) input.get(MULTITHREADING_KEY)));
+		if (input.get(NTHREADS_KEY) != null) {
+			int n = Integer.parseInt((String) input.get(NTHREADS_KEY));
+			if (n > 1) {
+				this.setNthreads(n);
+			}
 		}
 		// Global output: ////////////////////////////////////////////////////////////////////////////////
 		this.setPathToOutput((String) input.get(OUTPUT_KEY));
@@ -1475,12 +1479,12 @@ public class Settings implements Cloneable {
 		this.writeEvaluationSummary = writeEvaluationSummary;
 	}
 
-	public boolean doMultithreading() {
-		return multithreading;
+	public int getNthreads() {
+		return this.nThreads;
 	}
 
-	public void setMultithreading(boolean multithreading) {
-		this.multithreading = multithreading;
+	public void setNthreads(int n) {
+		this.nThreads = n;
 	}
 
 	public boolean doAnnotateDescriptions() {

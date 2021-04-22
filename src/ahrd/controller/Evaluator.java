@@ -141,16 +141,20 @@ public class Evaluator extends AHRD {
 
 		try {
 			Evaluator evaluator = new Evaluator(args[0]);
-			evaluator.setup(false); // false -> Don't log memory and time-usages
+			evaluator.setup(true); // false -> Don't log memory and time-usages
 			// After the setup the unique short accessions are no longer needed:
 			evaluator.setUniqueBlastResultShortAccessions(null);
 			evaluator.setupGroundTruthDescriptions();
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			evaluator.assignHumanReadableDescriptions();
+			System.out.println("...assigned highestest scoring human readable descriptions in " + evaluator.takeTime()
+			+ "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
 			// If requested iterate over all Proteins and assign the best scoring Gene Ontology terms
 			if (getSettings().doAnnotateGoTerms()) {
 				evaluator.assignGeneOntologyTerms();
+				System.out.println("...assigned highestest scoring GO terms in " + evaluator.takeTime()
+				+ "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
 			}
 			// Load a Map of all GO terms
 			// Load ground truth GO annotations
@@ -176,6 +180,8 @@ public class Evaluator extends AHRD {
 			// If requested, calculate the highest possibly achievable recall for descriptions and go annotations:
 			if (getSettings().doFindHighestPossibleRecall())
 				evaluator.findHighestPossibleRecall();
+			System.out.println("...evaluated annotations in " + evaluator.takeTime()
+			+ "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
 			// Generate Output:
 			TsvOutputWriter ow = new EvaluatorOutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
@@ -197,13 +203,7 @@ public class Evaluator extends AHRD {
 	 * Settings.
 	 */
 	public void calculateEvaluationScores() {
-		if(!getSettings().doMultithreading()) {
-			for (Protein prot : getProteins().values()) {
-				prot.getEvaluationScoreCalculator().assignEvaluationScores();
-			}
-		} else {
-			getProteins().values().parallelStream().forEach(prot -> prot.getEvaluationScoreCalculator().assignEvaluationScores());
-		}
+		getProteins().values().parallelStream().forEach(prot -> prot.getEvaluationScoreCalculator().assignEvaluationScores());
 	}
 	
 	/**
