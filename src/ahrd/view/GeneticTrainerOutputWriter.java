@@ -6,8 +6,8 @@ import ahrd.controller.Parameters;
 
 public class GeneticTrainerOutputWriter extends TrainerOutputWriter {
 
-	public GeneticTrainerOutputWriter() throws IOException {
-		super();
+	public GeneticTrainerOutputWriter(String logPath) throws IOException {
+		super(logPath);
 	}
 
 	@Override

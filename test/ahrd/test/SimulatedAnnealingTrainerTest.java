@@ -76,7 +76,7 @@ public class SimulatedAnnealingTrainerTest {
 	public void testRememberSimulatedAnnealingPath() throws OWLOntologyCreationException, IOException, MissingAccessionException {
 		// Just do two cycles:
 		getSettings().setTemperature(2);
-		this.trainer.setOutputWriter(new SimulatedAnnealingTrainerOutputWriter());
+		this.trainer.setOutputWriter(new SimulatedAnnealingTrainerOutputWriter(getSettings().getPathToDescriptionTrainingPathLog()));
 		Parameters p = getSettings().getDescriptionParameters().clone();
 		this.trainer.getOutputWriter().generateHeader(false, p);
 		this.trainer.train(p);

@@ -77,7 +77,6 @@ public class Settings implements Cloneable {
 	public static final String COMPETITORS_KEY = "competitors";
 	public static final String COMPETITOR_DESCRIPTIONS_FILE_KEY = "descriptions";
 	public static final String COMPETITOR_GOA_FILE_KEY = "go_annotations";
-	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score";
 	public static final String WRITE_FSCORE_DETAILS_TO_OUTPUT_KEY = "write_fscore_details_to_output";
 	public static final String FIND_HIGHEST_POSSIBLE_PRECISION_KEY = "find_highest_possible_precision";
 	public static final String FIND_HIGHEST_POSSIBLE_RECALL_KEY = "find_highest_possible_recall";
@@ -111,6 +110,7 @@ public class Settings implements Cloneable {
 	public static final String ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY = "annotation_score_bit_score_weight";
 	public static final String TRAINING_PATH_LOG_KEY = "path_log";
 	// Description specific parameters:
+	public static final String DESCRIPTION_SETTINGS_KEY = "description_settings";
 	public static final String DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY = "description_score_bit_score_weight";
 	public static final String GROUND_TRUTH_FASTA_KEY = "ground_truth_fasta";
 	public static final String GROUND_TRUTH_DESCRIPTION_FILTER_KEY = "ground_truth_description_filter";
@@ -119,6 +119,7 @@ public class Settings implements Cloneable {
 	public static final String GROUND_TRUTH_FASTA_REGEX_KEY = "ground_truth_fasta_regex";
 	public static final String HRD_SCORES_OUTPUT_PATH_KEY = "hrd_scores_output";
 	// GO specific parameters:
+	public static final String GO_SETTINGS_KEY = "go_settings";
 	public static final String INFORMATIVE_TOKEN_THRESHOLD_KEY = "informative_token_threshold";
 	public static final String GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY = "go_term_score_evidence_code_score_weight";
 	public static final String GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY = "ground_truth_go_annotations";
@@ -134,6 +135,7 @@ public class Settings implements Cloneable {
 	public static final String GO_SLIM_PATH_KEY = "go_slim";
 	public static final Pattern GO_SLIM_FILE_GOTERM_REGEX = Pattern.compile("^id: (?<goTerm>GO:\\d{7})$");
 	public static final String REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY = "reference_go_annotation_evidence_code_weights";
+	public static final String FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY = "find_highest_possible_go_score";
 	
 	/**
 	 * Fields:
@@ -230,10 +232,6 @@ public class Settings implements Cloneable {
 	private boolean writeEvaluationSummary = false;
 	// Global Training: //////////////////////////////////////////////////////////////////////////////
 	/**
-	 * Trainer logs path through parameter- and score-space into this file:
-	 */
-	private String pathToTrainingPathLog;
-	/**
 	 * For the <strong>simulated annealing</strong> algorithm, this will be
 	 * current temperature. (Default is 75000)
 	 */
@@ -300,8 +298,8 @@ public class Settings implements Cloneable {
 	 */
 	private DescriptionParameters descriptionParameters = new DescriptionParameters();
 	private GoParameters goParameters = new GoParameters();
-	// Description specific parameters: //////////////////////////////////////////////////////////////
-	
+	// Description specific settings: //////////////////////////////////////////////////////////////
+	private Map<String, Object> descriptionSettings;
 	private String pathToGroundTruthFasta;
 	private String pathToGroundTruthDescriptionBlacklist;
 	private Set<String> groundTruthDescriptionBlacklist;
@@ -315,7 +313,13 @@ public class Settings implements Cloneable {
 	 * requested.
 	 */
 	private String pathToHRDScoresOutput;
-	// GO specific parameters: ////////////////////////////////////////////////////////////////////////
+	/**
+	 * Trainer logs path through parameter- and score-space into this file:
+	 */
+	private String pathToDescriptionTrainingPathLog;
+	private String pathToDescriptionOutput;
+	// GO specific settings: ////////////////////////////////////////////////////////////////////////
+	private Map<String, Object> goSettings;
 	/**
 	 * The path in witch to keep: - Downloaded reviewed part of Uniprot -
 	 * Downloaded Gene Ontology mysql database dump - Serialized copy of the
@@ -361,7 +365,11 @@ public class Settings implements Cloneable {
 	 * Weights of reference go annotation evidence codes for prediction of query protein go term annotations  
 	 */
 	private Map<String, Double> evidenceCodeWeights = new HashMap<String, Double>();
-	
+	/**
+	 * Trainer logs path through parameter- and score-space into this file:
+	 */
+	private String pathToGoTrainingPathLog;
+	private String pathToGoOutput;
 
 	/**
 	 * Construct from contents of file 'AHRD_input.yml'.
@@ -453,7 +461,16 @@ public class Settings implements Cloneable {
 			}
 		}
 		// Global output: ////////////////////////////////////////////////////////////////////////////////
+		/**
+		 * Sets the path for the output file.
+		 * If specified on a global level and both description and GO training are preformed the output will be overridden.
+		 */
 		this.setPathToOutput((String) input.get(OUTPUT_KEY));
+		if (input.get(OUTPUT_KEY) != null) {
+			this.setPathToDescriptionOutput((String) input.get(OUTPUT_KEY));
+			this.setPathToGoOutput((String) input.get(OUTPUT_KEY));
+		}
+		
 		// Global Evaluation output: /////////////////////////////////////////////////////////////////////
 		if (input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT_KEY) != null) {
 			this.setWriteBestBlastHitsToOutput(Boolean.parseBoolean((String) input.get(WRITE_BEST_BLAST_HITS_TO_OUTPUT_KEY)));
@@ -474,10 +491,14 @@ public class Settings implements Cloneable {
 		this.setWriteEvaluationSummary(Boolean.parseBoolean((String) input.get(WRITE_EVALUATION_SUMMARY_KEY)));
 		// Global Training: //////////////////////////////////////////////////////////////////////////////
 		/**
-		 *  Trainer logs path through parameter-space here:
+		 *  Trainer logs path through parameter-space here.
+		 *  Specified on a global level will lead to both description and GO training using the same file:
+		 *  So result will be overridden.
 		 */
-		if (input.get(TRAINING_PATH_LOG_KEY) != null)
-			setPathToTrainingPathLog((String) input.get(TRAINING_PATH_LOG_KEY));
+		if (input.get(TRAINING_PATH_LOG_KEY) != null) {
+			setPathToDescriptionTrainingPathLog((String) input.get(TRAINING_PATH_LOG_KEY));
+			setPathToGoTrainingPathLog((String) input.get(TRAINING_PATH_LOG_KEY));
+		}
 		/**
 		 *  If started in evaluation-mode the F-Measure's Beta-Parameter can be set to some other value than 1.0
 		 */
@@ -520,44 +541,79 @@ public class Settings implements Cloneable {
 				this.tokenBlacklists.put(blastDatabaseName, new HashSet<String>(fromFile(getPathToTokenBlacklist(blastDatabaseName))));
 			}
 			// Set Database-Weights and Description-Score-Bit-Score-Weight:
-			this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName,
-					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
-			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
-				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
-			} else {
-				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY));
+			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY) != null) {
+				this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName,
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
 			}
-			this.getGoParameters().setBlastDbWeight(blastDatabaseName,
-					this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
 			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
-				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
 						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
 			} else {
-				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
 						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY));
 			}
 		}
-		// Parameters (separate for HRD and GO): /////////////////////////////////////////////////////////
-		this.setDescriptionTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
-		this.setDescriptionTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY)));
-		this.setDescriptionTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY)));
-		this.setGoTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
-		this.setGoTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY)));
-		this.setGoTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY)));
-		// Description specific parameters: //////////////////////////////////////////////////////////////
+		if (input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
+			this.setDescriptionTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
+		}
+		if (input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY) != null) {
+			this.setDescriptionTokenScoreDatabaseScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY)));
+		}
+		if (input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY) != null) {
+			this.setDescriptionTokenScoreOverlapScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY)));
+		}
+		// Description specific settings: //////////////////////////////////////////////////////////////
+		this.descriptionSettings = (Map<String, Object>) input.get(DESCRIPTION_SETTINGS_KEY);
+		if (descriptionSettings != null) {
+			if (descriptionSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
+				this.setDescriptionTokenScoreBitScoreWeight(Double.parseDouble((String) descriptionSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
+			}
+			if (descriptionSettings.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY) != null) {
+				this.setDescriptionTokenScoreDatabaseScoreWeight(Double.parseDouble((String) descriptionSettings.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY)));
+			}
+			if (descriptionSettings.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY) != null) {
+				this.setDescriptionTokenScoreOverlapScoreWeight(Double.parseDouble((String) descriptionSettings.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY)));	
+			}
+			Map<String, Map<String, String>> descriptionBlastDbSettings = (Map<String, Map<String, String>>) descriptionSettings.get(BLAST_DBS_KEY);
+			for (String blastDatabaseName : getBlastDatabases()) {
+				this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName,
+						descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
+			}
+			if (descriptionSettings.get(TRAINING_PATH_LOG_KEY) != null && !descriptionSettings.get(TRAINING_PATH_LOG_KEY).equals("")) {
+				setPathToDescriptionTrainingPathLog((String) descriptionSettings.get(TRAINING_PATH_LOG_KEY));
+			}
+			if (descriptionSettings.get(OUTPUT_KEY) != null && !descriptionSettings.get(OUTPUT_KEY).equals("")) {
+				this.setPathToDescriptionOutput((String) descriptionSettings.get(OUTPUT_KEY));
+			}
+		}
+		
+		//
 		/**
 		 *  If started to evaluate parameters or train the algorithm, ground truth descriptions are stored in this file:
 		 */
-		setPathToGroundTruthFasta((String) input.get(GROUND_TRUTH_FASTA_KEY));
-		if (input.get(HRD_SCORES_OUTPUT_PATH_KEY) != null && !input.get(HRD_SCORES_OUTPUT_PATH_KEY).equals(""))
-			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH_KEY));
-		if (input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY) != null) {
-			this.setPathToGroundTruthDescriptionBlacklist(input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY).toString());
-			this.setGroundTruthDescriptionBlacklist(new HashSet<String>(fromFile(getPathToGroundTruthDescriptionBlacklist())));
+		if (descriptionSettings != null && descriptionSettings.get(GROUND_TRUTH_FASTA_KEY) != null && new File((String) descriptionSettings.get(GROUND_TRUTH_FASTA_KEY)).exists()) {
+			setPathToGroundTruthFasta((String) descriptionSettings.get(GROUND_TRUTH_FASTA_KEY));
+		} else if (input.get(GROUND_TRUTH_FASTA_KEY) != null && new File((String) input.get(GROUND_TRUTH_FASTA_KEY)).exists()) {
+			setPathToGroundTruthFasta((String) input.get(GROUND_TRUTH_FASTA_KEY));
 		}
-		if (input.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY) != null) {
+		if (descriptionSettings != null && descriptionSettings.get(HRD_SCORES_OUTPUT_PATH_KEY) != null && !descriptionSettings.get(HRD_SCORES_OUTPUT_PATH_KEY).equals("")) {
+			setPathToHRDScoresOutput((String) descriptionSettings.get(HRD_SCORES_OUTPUT_PATH_KEY));
+		} else if (input.get(HRD_SCORES_OUTPUT_PATH_KEY) != null && !input.get(HRD_SCORES_OUTPUT_PATH_KEY).equals("")) {
+			setPathToHRDScoresOutput((String) input.get(HRD_SCORES_OUTPUT_PATH_KEY));
+		}
+		if (descriptionSettings != null && descriptionSettings.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY) != null && new File((String) descriptionSettings.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY)).exists()) {
+			this.setPathToGroundTruthDescriptionBlacklist(descriptionSettings.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY).toString());
+			this.setGroundTruthDescriptionBlacklist(new HashSet<>(fromFile(getPathToGroundTruthDescriptionBlacklist())));
+		} else if (input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY) != null && new File((String) input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY)).exists()) {
+			this.setPathToGroundTruthDescriptionBlacklist(input.get(GROUND_TRUTH_DESCRIPTION_BLACKLIST_KEY).toString());
+			this.setGroundTruthDescriptionBlacklist(new HashSet<>(fromFile(getPathToGroundTruthDescriptionBlacklist())));
+		}
+		if (descriptionSettings != null && descriptionSettings.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY) != null && new File((String) descriptionSettings.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY)).exists()) {
+			this.setPathToGroundTruthDescriptionFilter(descriptionSettings.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY).toString());
+			this.setGroundTruthDescriptionFilter(fromFile(getPathToGroundTruthDescriptionFilter()));
+		} else if (input.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY) != null && new File((String) input.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY)).exists()) {
 			this.setPathToGroundTruthDescriptionFilter(input.get(GROUND_TRUTH_DESCRIPTION_FILTER_KEY).toString());
 			this.setGroundTruthDescriptionFilter(fromFile(getPathToGroundTruthDescriptionFilter()));
 		}
@@ -567,48 +623,77 @@ public class Settings implements Cloneable {
 		 *  If evaluate_only_valid_tokens is set to 'false' the ground truth token black list remains empty,
 		 *  which will result in ALL ground truth tokens being used in the evaluation (so no filtering takes place).
 		 */
-		if (input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY) != null) {
+		if (descriptionSettings != null && descriptionSettings.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY) != null && new File((String) descriptionSettings.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY)).exists()) {
+			this.setPathToGroundTruthTokenBlacklist(descriptionSettings.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY).toString());
+			this.setGroundTruthTokenBlacklist(new HashSet<>(fromFile(getPathToGroundTruthTokenBlacklist())));
+		} else if (input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY) != null && new File((String) input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY)).exists()) {
 			this.setPathToGroundTruthTokenBlacklist(input.get(GROUND_TRUTH_TOKEN_BLACKLIST_KEY).toString());
-			this.setGroundTruthTokenBlacklist(new HashSet<String>(fromFile(getPathToGroundTruthTokenBlacklist())));
-		} else {
-			if (this.getEvaluateOnlyValidTokens()) {
-				this.setGroundTruthTokenBlacklist(this.getDefaultTokenBlacklist());
-			}
+			this.setGroundTruthTokenBlacklist(new HashSet<>(fromFile(getPathToGroundTruthTokenBlacklist())));
+		} else if (this.getEvaluateOnlyValidTokens()) {
+			this.setGroundTruthTokenBlacklist(this.getDefaultTokenBlacklist());
 		}
-		if (input.get(GROUND_TRUTH_FASTA_REGEX_KEY) != null) {
+		if (descriptionSettings != null && descriptionSettings.get(GROUND_TRUTH_FASTA_REGEX_KEY) != null && !descriptionSettings.get(GROUND_TRUTH_FASTA_REGEX_KEY).equals("")) {
+			this.setGroundTruthFastaRegex(Pattern.compile((String) descriptionSettings.get(GROUND_TRUTH_FASTA_REGEX_KEY)));
+		} else if (input.get(GROUND_TRUTH_FASTA_REGEX_KEY) != null && !input.get(GROUND_TRUTH_FASTA_REGEX_KEY).equals("")) {
 			this.setGroundTruthFastaRegex(Pattern.compile((String) input.get(GROUND_TRUTH_FASTA_REGEX_KEY)));
 		} else {
 			this.setGroundTruthFastaRegex(DEFAULT_FASTA_HEADER_REGEX);
 		}
-		// GO specific parameters: ////////////////////////////////////////////////////////////////////////
-		if (input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY) != null) {
-			this.setGoTermScoreEvidenceCodeScoreWeight(Double.parseDouble((String) input.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY)));
-		}
-		if (input.get(GO_DB_PATH_KEY) != null) {
-			this.setPathToGoDatabase(input.get(GO_DB_PATH_KEY).toString());
-		}
-		if (input.get(GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY) != null) {
-			this.setPathToGroundTruthGoAnnotations(input.get(GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY).toString());
-		}
-		this.setCalculateAncestryGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_ANCESTRY_KEY)));
-		this.setCalculateSemSimGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_SEMSIM_KEY)));
-		/**
-		 *  If non of the GO F1 Keys is specified in the YML input the simple version is used as default
-		 */ 
-		if (input.get(GO_F1_SIMPLE_KEY) != null) {
-			this.setCalculateSimpleGoF1Scores(Boolean.parseBoolean((String) input.get(GO_F1_SIMPLE_KEY)));
-		} else {
-			if (input.get(GO_F1_ANCESTRY_KEY) == null && input.get(GO_F1_SEMSIM_KEY) == null) {
-				this.setCalculateSimpleGoF1Scores(true);
+		// GO specific setting: ////////////////////////////////////////////////////////////////////////
+		this.goSettings = (Map<String, Object>) input.get(GO_SETTINGS_KEY);
+		if (goSettings != null) {
+			if (goSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
+				this.setGoTokenScoreBitScoreWeight(Double.parseDouble((String) goSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
 			}
+			if (goSettings.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY) != null) {
+				this.setGoTokenScoreDatabaseScoreWeight(Double.parseDouble((String) goSettings.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY)));
+			}
+			if (goSettings.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY) != null) {
+				this.setGoTokenScoreOverlapScoreWeight(Double.parseDouble((String) goSettings.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY)));	
+			}
+			Map<String, Map<String, String>> goBlastDbSettings = (Map<String, Map<String, String>>) goSettings.get(BLAST_DBS_KEY);
+			for (String blastDatabaseName : getBlastDatabases()) {
+				this.getGoParameters().setBlastDbWeight(blastDatabaseName,
+						goBlastDbSettings.get(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
+				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
+						goBlastDbSettings.get(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
+			}
+			if (goSettings.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY) != null) {
+				this.setGoTermScoreEvidenceCodeScoreWeight(Double.parseDouble((String) goSettings.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY)));
+			}
+			if (goSettings.get(INFORMATIVE_TOKEN_THRESHOLD_KEY) != null) {
+				this.setGoInformativeTokenThreshold(Double.parseDouble((String) goSettings.get(INFORMATIVE_TOKEN_THRESHOLD_KEY)));
+			}
+			if (goSettings.get(TRAINING_PATH_LOG_KEY) != null && !goSettings.get(TRAINING_PATH_LOG_KEY).equals("")) {
+				setPathToGoTrainingPathLog((String) goSettings.get(TRAINING_PATH_LOG_KEY));
+			}
+			if (goSettings.get(OUTPUT_KEY) != null && !goSettings.get(OUTPUT_KEY).equals("")) {
+				this.setPathToGoOutput((String) goSettings.get(OUTPUT_KEY));
+			}
+			if (goSettings.get(GO_DB_PATH_KEY) != null) {
+				this.setPathToGoDatabase(goSettings.get(GO_DB_PATH_KEY).toString());
+			}
+			if (goSettings.get(GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY) != null) {
+				this.setPathToGroundTruthGoAnnotations(goSettings.get(GROUND_TRUTH_GO_ANNOTATIONS_PATH_KEY).toString());
+			}
+			this.setCalculateAncestryGoF1Scores(Boolean.parseBoolean((String) goSettings.get(GO_F1_ANCESTRY_KEY)));
+			this.setCalculateSemSimGoF1Scores(Boolean.parseBoolean((String) goSettings.get(GO_F1_SEMSIM_KEY)));
+			/**
+			 *  If non of the GO F1 Keys is specified in the YML input the simple version is used as default
+			 */ 
+			if (goSettings.get(GO_F1_SIMPLE_KEY) != null) {
+				this.setCalculateSimpleGoF1Scores(Boolean.parseBoolean((String) goSettings.get(GO_F1_SIMPLE_KEY)));
+			} else {
+				if (goSettings.get(GO_F1_ANCESTRY_KEY) == null && goSettings.get(GO_F1_SEMSIM_KEY) == null) {
+					this.setCalculateSimpleGoF1Scores(true);
+				}
+			}
+			if (goSettings.get(GO_SLIM_PATH_KEY) != null) {
+				this.setPathToGoSlimFile(goSettings.get(GO_SLIM_PATH_KEY).toString());
+			}
+			this.setFindHighestPossibleGoScore(Boolean.parseBoolean((String) goSettings.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY)));
 		}
-		if (input.get(GO_SLIM_PATH_KEY) != null) {
-			this.setPathToGoSlimFile(input.get(GO_SLIM_PATH_KEY).toString());
-		}
-		this.setFindHighestPossibleGoScore(Boolean.parseBoolean((String) input.get(FIND_HIGHEST_POSSIBLE_GO_SCORE_KEY)));
-		if (input.get(INFORMATIVE_TOKEN_THRESHOLD_KEY) != null) {
-			this.setGoInformativeTokenThreshold(Double.parseDouble((String) input.get(INFORMATIVE_TOKEN_THRESHOLD_KEY)));
-		}
+		
 		/**
 		 * Initialize default reference go annotation evidence code weights
 		 * (see: http://www.geneontology.org/page/guide-go-evidence-codes)
@@ -642,8 +727,8 @@ public class Settings implements Cloneable {
 		/**
 		 * Override default evidence codes weights if specified in YML input
 		 */
-		if (input.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY) != null) {
-			for (Map.Entry<String, String> pair : ((Map<String, String>) input.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY)).entrySet()) {
+		if (goSettings != null && goSettings.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY) != null) {
+			for (Map.Entry<String, String> pair : ((Map<String, String>) goSettings.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY)).entrySet()) {
 				getEvidenceCodeWeights().put(pair.getKey(), Double.parseDouble(pair.getValue()));
 			}
 		}
@@ -845,8 +930,13 @@ public class Settings implements Cloneable {
 		return getPathToGroundTruthFasta() != null && new File(getPathToGroundTruthFasta()).exists();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public String getPathToGeneOntologyReference(String blastDatabaseName) {
-		return getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_KEY);
+		if (goSettings != null) {
+			return ((Map<String, Map<String, String>>) goSettings.get(BLAST_DBS_KEY)).get(blastDatabaseName).get(Settings.GENE_ONTOLOGY_REFERENCE_KEY);
+		} else {
+			return null;
+		}
 	}
 
 	public boolean hasGeneOntologyAnnotation(String blastDatabaseName) {
@@ -857,13 +947,15 @@ public class Settings implements Cloneable {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setPathToGeneOntologyReference(String blastDatabaseName, String path) {
-		getBlastDbSettings(blastDatabaseName).put(GENE_ONTOLOGY_REFERENCE_KEY, path);
+		((Map<String, Map<String, String>>) goSettings.get(BLAST_DBS_KEY)).get(blastDatabaseName).put(Settings.GENE_ONTOLOGY_REFERENCE_KEY, path);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void removeAllPathToGeneOntologyReferences() {
 		for (String blastDatabaseName : getBlastDatabases()) {
-			getBlastDbSettings(blastDatabaseName).remove(GENE_ONTOLOGY_REFERENCE_KEY);
+			((Map<String, Map<String, String>>) goSettings.get(BLAST_DBS_KEY)).get(blastDatabaseName).remove(Settings.GENE_ONTOLOGY_REFERENCE_KEY);
 		}
 	}
 
@@ -1089,12 +1181,20 @@ public class Settings implements Cloneable {
 		this.optimizationAcceptanceProbabilityScalingFactor = optimizationAcceptanceProbabilityScalingFactor;
 	}
 
-	public String getPathToTrainingPathLog() {
-		return pathToTrainingPathLog;
+	public String getPathToDescriptionTrainingPathLog() {
+		return pathToDescriptionTrainingPathLog;
 	}
 
-	public void setPathToTrainingPathLog(String path) {
-		this.pathToTrainingPathLog = path;
+	public void setPathToDescriptionTrainingPathLog(String path) {
+		this.pathToDescriptionTrainingPathLog = path;
+	}
+	
+	public String getPathToGoTrainingPathLog() {
+		return pathToGoTrainingPathLog;
+	}
+
+	public void setPathToGoTrainingPathLog(String path) {
+		this.pathToGoTrainingPathLog = path;
 	}
 
 	public Double getpMutateSameParameterScale() {
@@ -1204,9 +1304,11 @@ public class Settings implements Cloneable {
 	 * 
 	 * @return Pattern
 	 */
+	@SuppressWarnings("unchecked")
 	public Pattern getGoReferenceRegex(String blastDatabaseName) {
-		if (getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_REGEX_KEY) != null) {
-			return Pattern.compile(getBlastDbSettings(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_REGEX_KEY).toString());
+		String regex = ((Map<String, Map<String, String>>) goSettings.get(BLAST_DBS_KEY)).get(blastDatabaseName).get(Settings.GENE_ONTOLOGY_REFERENCE_REGEX_KEY);
+		if (regex != null) {
+			return Pattern.compile(regex);
 		}
 		return DEFAULT_GENE_ONTOLOGY_REFERENCE_REGEX;
 	}
@@ -1533,6 +1635,22 @@ public class Settings implements Cloneable {
 
 	public void setTrainGoTerms(boolean trainGoTerms) {
 		this.trainGoTerms = trainGoTerms;
+	}
+
+	public String getPathToDescriptionOutput() {
+		return pathToDescriptionOutput;
+	}
+
+	public void setPathToDescriptionOutput(String pathToDescriptionOutput) {
+		this.pathToDescriptionOutput = pathToDescriptionOutput;
+	}
+
+	public String getPathToGoOutput() {
+		return pathToGoOutput;
+	}
+
+	public void setPathToGoOutput(String pathToGoOutput) {
+		this.pathToGoOutput = pathToGoOutput;
 	}
 
 }

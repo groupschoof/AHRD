@@ -1,19 +1,15 @@
 package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
-import static ahrd.controller.Utils.randomMultipleOfOneTenth;
 import static ahrd.controller.Utils.randomMultipleOfOne;
 import static ahrd.controller.Utils.randomMultipleOfTen;
-import static ahrd.controller.Utils.randomSaveSubtract;
 import static ahrd.controller.Utils.roundToNDecimalPlaces;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * The following parameters are those subject to optimization. They are stored
@@ -117,7 +113,7 @@ public class GoParameters extends Parameters implements Cloneable {
 		} else {
 			// Mutate a Parameter associated with a Blast-Database:
 			int indOfBlastDbToMutate = randParamToMutate - numberOfNonDbParameters();
-			int blastDbIndex = (new Double(
+			int blastDbIndex = (Double.valueOf(
 					Math.floor(indOfBlastDbToMutate / 2.0))).intValue();
 			String blastDbToMutate = getSettings().getSortedBlastDatabases()
 					.get(blastDbIndex);

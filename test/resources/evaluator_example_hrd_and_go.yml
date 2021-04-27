@@ -1,9 +1,8 @@
 proteins_fasta: ./test/resources/proteins.fasta
 ground_truth_fasta: ./test/resources/ground_truth.fasta
-ground_truth_go_annotations: ./test/resources/ground_truth_go_annotations.goa
+
 output: ./evaluator_output.tsv
 find_highest_possible_evaluation_score: true
-find_highest_possible_go_score: true
 write_scores_to_output: false
 semsim_GO_f1_scores: true
 write_best_blast_hits_to_output: true
@@ -13,7 +12,7 @@ token_blacklist: ./test/resources/blacklist_token.txt
 token_score_bit_score_weight: 0.468
 token_score_database_score_weight: 0.2098
 token_score_overlap_score_weight: 0.3221
-go_term_score_information_content_weight: 0.8
+
 blast_dbs:
   swissprot:
     weight: 653
@@ -38,6 +37,29 @@ blast_dbs:
     filter: ./test/resources/filter_descline_tair.txt
     gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
     gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t[^\\t]+\\t[^\\t]+\\t[^\\t]+\\t(?<evidenceCode>[^\\t]+)\\t"
+
+go_settings:
+  token_score_bit_score_weight: 0.468
+  token_score_database_score_weight: 0.2098
+  token_score_overlap_score_weight: 0.3221
+  go_term_score_evidence_code_weight: 0.8
+  informative_token_threshold: 0.02
+  blast_dbs:
+    swissprot:
+      weight: 653
+      annotation_score_bit_score_weight: 2.717061
+      gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt 
+    trembl:
+      weight: 904
+      annotation_score_bit_score_weight: 2.590211
+    tair:
+      weight: 854
+      annotation_score_bit_score_weight: 2.917405
+      gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
+      gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t[^\\t]+\\t[^\\t]+\\t[^\\t]+\\t(?<evidenceCode>[^\\t]+)\\t"
+  ground_truth_go_annotations: ./test/resources/ground_truth_go_annotations.goa
+  find_highest_possible_go_score: true
+
 competitors:
   eggNogMapper:
     descriptions: ./test/resources/emapper_descriptions.tsv

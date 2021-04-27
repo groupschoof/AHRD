@@ -1,8 +1,6 @@
 package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
-import static ahrd.controller.Utils.randomMultipleOfOne;
-import static ahrd.controller.Utils.randomMultipleOfTen;
 import static ahrd.controller.Utils.randomSaveSubtract;
 import static ahrd.controller.Utils.roundToNDecimalPlaces;
 
@@ -143,7 +141,7 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 	 *         mutate.
 	 */
 	public static long mutateBlastDatabaseWeightBy() {
-		return new Double(Math.ceil(100.0 * mutatePercentageBy())).longValue();
+		return Double.valueOf(Math.ceil(100.0 * mutatePercentageBy())).longValue();
 	}
 	
 	/**

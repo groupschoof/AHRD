@@ -2,7 +2,6 @@ proteins_fasta: ./test/resources/proteins.fasta
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
-go_term_score_information_content_weight: 0.8
 blacklist: ./test/resources/blacklist_descline.txt
 token_blacklist: ./test/resources/blacklist_token.txt
 output: ./ahrd_output.csv
@@ -21,12 +20,30 @@ blast_dbs:
     short_accession_regex: "^(?<shortAccession>[^\\.]+)(\\.\\d+)?$"
     filter: ./test/resources/filter_descline_tair.txt
     annotation_score_bit_score_weight: 0.4
-    gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
-    gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t[^\\t]+\\t[^\\t]+\\t[^\\t]+\\t(?<evidenceCode>[^\\t]+)\\t"
   trembl:
     weight: 10
     file: ./test/resources/trembl_blast8_tabular.txt
     database: ./test/resources/trembl_blast_db.fasta
     filter: ./test/resources/filter_descline_trembl.txt
     annotation_score_bit_score_weight: 0.4
-    gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
+
+go_settings:
+  token_score_bit_score_weight: 0.5
+  token_score_database_score_weight: 0.3
+  token_score_overlap_score_weight: 0.2
+  go_term_score_evidence_code_weight: 0.5
+  informative_token_threshold: 0.1
+  blast_dbs:
+    swissprot:
+      weight: 100
+      annotation_score_bit_score_weight: 0.2
+    tair:
+      weight: 50
+      annotation_score_bit_score_weight: 0.4
+      gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_TAIR10_GOA.txt
+      gene_ontology_reference_regex: "^AT[1-5CM]G\\d{5}\\t\\S+\\t(?<shortAccession>AT[1-5CM]G\\d{5})(\\.\\d{1,2})?\\t[^\\t]+\\t[^\\t]+\\t(?<goTerm>GO:\\d{7})\\t[^\\t]+\\t[^\\t]+\\t[^\\t]+\\t(?<evidenceCode>[^\\t]+)\\t"
+    trembl:
+      weight: 10
+      annotation_score_bit_score_weight: 0.4
+      gene_ontology_reference: ./test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt
+

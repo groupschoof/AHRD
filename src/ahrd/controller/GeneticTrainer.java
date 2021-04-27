@@ -52,38 +52,45 @@ public class GeneticTrainer extends Trainer {
 			// Try to heuristically find optimal parameters for the annotation with descriptions
 			GeneticTrainer trainer = new GeneticTrainer(args[0]);
 			if (getSettings().doEvaluateDescriptions()) {
-				trainer.setup(false); // false -> Don't log memory and time-usages
+				trainer.setup(true); // false -> Don't log memory and time-usages
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				trainer.setupGroundTruthDescriptions();
-				trainer.outputWriter = new GeneticTrainerOutputWriter();
+				trainer.outputWriter = new GeneticTrainerOutputWriter(getSettings().getPathToDescriptionTrainingPathLog());
 				Parameters seed = getSettings().getDescriptionParameters().clone();
 				trainer.outputWriter.writeHeader(seed);
 				trainer.train(seed);
 				trainer.calcAvgMaxDescriptionScore();
+				if (getSettings().getPathToOutput() == null) {
+					getSettings().setPathToOutput(getSettings().getPathToDescriptionOutput());
+				}
 				trainer.outputWriter.writeFinalOutput(
 						trainer.getGenerationBestParametersWereFoundIn(),
 						trainer.getAvgMaxDescriptionScore(),
 						trainer.getBestParameters());
+				System.out.println("Logged path through description parameter- and score-space into:\n"	+ getSettings().getPathToDescriptionTrainingPathLog());
+				System.out.println("Written output into:\n" + getSettings().getPathToOutput());
 			}
 			// Try to heuristically find optimal parameters for the annotation with GO terms
 			trainer = new GeneticTrainer(args[0]);
 			if (getSettings().doEvaluateGoTerms()) {
-				trainer.setup(false); // false -> Don't log memory and time-usages
+				trainer.setup(true); // false -> Don't log memory and time-usages
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				getSettings().setFindHighestPossibleGoScore(true);
 				trainer.setupGoAnnotationEvaluation();
-				trainer.outputWriter = new GeneticTrainerOutputWriter();
+				trainer.outputWriter = new GeneticTrainerOutputWriter(getSettings().getPathToGoTrainingPathLog());
 				Parameters seed = getSettings().getGoParameters().clone();
 				trainer.outputWriter.writeHeader(seed);
 				trainer.train(seed);
 				trainer.calcAvgMaxGoScore();
+				getSettings().setPathToOutput(getSettings().getPathToGoOutput());
 				trainer.outputWriter.writeFinalOutput(
 						trainer.getGenerationBestParametersWereFoundIn(),
 						trainer.getAvgMaxGoScore(),
 						trainer.getBestParameters());
+				System.out.println("Logged path through GO parameter- and score-space into:\n"	+ getSettings().getPathToGoTrainingPathLog());
+				System.out.println("Written output into:\n" + getSettings().getPathToOutput());
 			}
-			System.out.println("Logged path through parameter- and score-space into:\n"	+ getSettings().getPathToTrainingPathLog());
-			System.out.println("Written output into:\n" + getSettings().getPathToOutput());
+			
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
@@ -186,7 +193,6 @@ public class GeneticTrainer extends Trainer {
 			}
 
 			// Remember the best parameter set and the generation it was found in
-			Parameters bestParameters = fitnessRanking.last();
 			if (getBestParameters() != null) {
 				diffAvgEvalScoreToLastGeneration = fitnessRanking.last().getAvgEvaluationScore() - getBestParameters().getAvgEvaluationScore();
 			}

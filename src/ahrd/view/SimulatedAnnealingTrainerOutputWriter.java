@@ -6,8 +6,8 @@ import ahrd.controller.Parameters;
 
 public class SimulatedAnnealingTrainerOutputWriter extends TrainerOutputWriter {
 
-	public SimulatedAnnealingTrainerOutputWriter() throws IOException {
-		super();
+	public SimulatedAnnealingTrainerOutputWriter(String logPath) throws IOException {
+		super(logPath);
 	}
 	
 	@Override

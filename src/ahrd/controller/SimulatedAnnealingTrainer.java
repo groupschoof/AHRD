@@ -43,7 +43,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 				trainer.setup(false); // false -> Don't log memory and time-usages
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				trainer.setupGroundTruthDescriptions();
-				trainer.outputWriter = new SimulatedAnnealingTrainerOutputWriter();
+				trainer.outputWriter = new SimulatedAnnealingTrainerOutputWriter(getSettings().getPathToDescriptionTrainingPathLog());
 				Parameters seed = getSettings().getDescriptionParameters().clone();
 				trainer.outputWriter.writeHeader(seed);
 				trainer.train(seed);
@@ -60,7 +60,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				getSettings().setFindHighestPossibleGoScore(true);
 				trainer.setupGoAnnotationEvaluation();
-				trainer.outputWriter = new SimulatedAnnealingTrainerOutputWriter();
+				trainer.outputWriter = new SimulatedAnnealingTrainerOutputWriter(getSettings().getPathToGoTrainingPathLog());
 				Parameters seed = getSettings().getGoParameters().clone();
 				trainer.outputWriter.writeHeader(seed);
 				trainer.train(seed);
@@ -70,7 +70,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 						trainer.getAvgMaxGoScore(),
 						trainer.getBestParameters());
 			}
-			System.out.println("Logged path through parameter- and score-space into:\n" + getSettings().getPathToTrainingPathLog());
+			System.out.println("Logged path through parameter- and score-space into:\n" + getSettings().getPathToDescriptionTrainingPathLog());
 			System.out.println("Written output into:\n"	+ getSettings().getPathToOutput());
 		} catch (Exception e) {
 			System.err.println("We are sorry, an unexpected ERROR occurred:");

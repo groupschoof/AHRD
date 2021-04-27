@@ -21,10 +21,10 @@ public abstract class TrainerOutputWriter {
 	protected BufferedWriter pathBufWrtr;
 	protected BufferedWriter outBufWrtr;
 
-	protected TrainerOutputWriter() throws IOException {
+	protected TrainerOutputWriter(String logPath) throws IOException {
 		super();
 		// Prepare buffered output-writer
-		this.pathBufWrtr = new BufferedWriter(new FileWriter(getSettings().getPathToTrainingPathLog()));
+		this.pathBufWrtr = new BufferedWriter(new FileWriter(logPath));
 	}
 	
 	/**

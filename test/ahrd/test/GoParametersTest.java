@@ -1,6 +1,7 @@
 package ahrd.test;
 
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.controller.Settings.setSettings;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -25,7 +26,7 @@ public class GoParametersTest {
 
 	@Before
 	public void setUp() throws IOException {
-		TestUtils.initTestSettings();
+		setSettings(new Settings("./test/resources/ahrd_input_seq_sim_table_go_prediction.yml"));
 	}
 
 	@Test
@@ -143,9 +144,9 @@ public class GoParametersTest {
 	@Test
 	public void testMutateTokenScoreBitScoreWeight() {
 		Parameters p = getSettings().getGoParameters();
-		Double dbsw = new Double(p.getTokenScoreDatabaseScoreWeight());
-		Double osw = new Double(p.getTokenScoreOverlapScoreWeight());
-		Double bsw = new Double(p.getTokenScoreBitScoreWeight());
+		Double dbsw = Double.valueOf(p.getTokenScoreDatabaseScoreWeight());
+		Double osw = Double.valueOf(p.getTokenScoreOverlapScoreWeight());
+		Double bsw = Double.valueOf(p.getTokenScoreBitScoreWeight());
 		// test:
 		p.mutateTokenScoreBitScoreWeight();
 		assertEquals(
@@ -163,9 +164,9 @@ public class GoParametersTest {
 	@Test
 	public void testMutateTokenScoreOverlapScoreWeight() {
 		Parameters p = getSettings().getGoParameters();
-		Double dbsw = new Double(p.getTokenScoreDatabaseScoreWeight());
-		Double osw = new Double(p.getTokenScoreOverlapScoreWeight());
-		Double bsw = new Double(p.getTokenScoreBitScoreWeight());
+		Double dbsw = Double.valueOf(p.getTokenScoreDatabaseScoreWeight());
+		Double osw = Double.valueOf(p.getTokenScoreOverlapScoreWeight());
+		Double bsw = Double.valueOf(p.getTokenScoreBitScoreWeight());
 		// test:
 		p.mutateTokenScoreOverlapScoreWeight();
 		assertEquals(
@@ -183,9 +184,9 @@ public class GoParametersTest {
 	@Test
 	public void testMutateTokenScoreDatabaseScoreWeight() {
 		Parameters p = getSettings().getGoParameters();
-		Double dbsw = new Double(p.getTokenScoreDatabaseScoreWeight());
-		Double osw = new Double(p.getTokenScoreOverlapScoreWeight());
-		Double bsw = new Double(p.getTokenScoreBitScoreWeight());
+		Double dbsw = Double.valueOf(p.getTokenScoreDatabaseScoreWeight());
+		Double osw = Double.valueOf(p.getTokenScoreOverlapScoreWeight());
+		Double bsw = Double.valueOf(p.getTokenScoreBitScoreWeight());
 		// test:
 		p.mutateTokenScoreDatabaseScoreWeight();
 		assertEquals(
@@ -203,10 +204,10 @@ public class GoParametersTest {
 	@Test
 	public void testMutateGoTermScoreEvidenceCodeScoreWeight() {
 		GoParameters p = getSettings().getGoParameters();
-		Double dbsw = new Double(p.getTokenScoreDatabaseScoreWeight());
-		Double osw = new Double(p.getTokenScoreOverlapScoreWeight());
-		Double bsw = new Double(p.getTokenScoreBitScoreWeight());
-		Double goTermScoreEvidenceCodeScoreWeight = new Double(p.getGoTermScoreEvidenceCodeScoreWeight());
+		Double dbsw = Double.valueOf(p.getTokenScoreDatabaseScoreWeight());
+		Double osw = Double.valueOf(p.getTokenScoreOverlapScoreWeight());
+		Double bsw = Double.valueOf(p.getTokenScoreBitScoreWeight());
+		Double goTermScoreEvidenceCodeScoreWeight = Double.valueOf(p.getGoTermScoreEvidenceCodeScoreWeight());
 		// test:
 		p.mutateGoTermScoreEvidenceCodeScoreWeight();
 		assertEquals(
@@ -225,7 +226,7 @@ public class GoParametersTest {
 	}
 
 	@Test
-	public void testNeighbour() {
+	public void testNeighbour() throws IOException {
 		// test
 		GoParameters n = getSettings().getGoParameters().neighbour(0.0);
 		assertNotNull("The neighbor of current Settings must not be NULL.", n);
@@ -255,7 +256,7 @@ public class GoParametersTest {
 			GoParameters n2 = n.neighbour(1.0);
 			assertEquals(
 					"The neighbor must remember which Parameter has been mutated to evolve him from its parent.",
-					new Integer(paramInd), n2.getLastMutatedParameter());
+					Integer.valueOf(paramInd), n2.getLastMutatedParameter());
 			if (paramInd < n.numberOfNonDbParameters()) {
 				switch (paramInd) {
 				case 0: assertTrue("TokenScoreBitScoreWeight should have been mutated.",!n.getTokenScoreBitScoreWeight().equals(n2.getTokenScoreBitScoreWeight())); break;
@@ -266,7 +267,7 @@ public class GoParametersTest {
 				}
 			} else {
 				String blastDbName = getSettings().getSortedBlastDatabases()
-						.get((new Double(Math.floor((paramInd - n.numberOfNonDbParameters()) / 2.0)))
+						.get((Double.valueOf(Math.floor((paramInd - n.numberOfNonDbParameters()) / 2.0)))
 								.intValue());
 				boolean mutatedBlastDbWeight = ! ((paramInd - n.numberOfNonDbParameters()) % 2 == 1);
 				if (mutatedBlastDbWeight)

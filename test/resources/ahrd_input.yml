@@ -22,6 +22,22 @@ blast_dbs:
     database: ./test/resources/trembl_blast_db.fasta
     filter: ./test/resources/filter_descline_trembl.txt
     annotation_score_bit_score_weight: 0.4
+go_settings:
+  token_score_bit_score_weight: 0.55
+  token_score_database_score_weight: 0.25
+  token_score_overlap_score_weight: 0.2
+  go_term_score_evidence_code_weight: 0.3
+  informative_token_threshold: 0.1
+  blast_dbs:
+    swissprot:
+      weight: 80
+      annotation_score_bit_score_weight: 0.5
+    tair:
+      weight: 60
+      annotation_score_bit_score_weight: 0.3
+    trembl:
+      weight: 20
+      annotation_score_bit_score_weight: 0.2
 token_score_bit_score_weight: 0.5
 token_score_database_score_weight: 0.3
 token_score_overlap_score_weight: 0.2
