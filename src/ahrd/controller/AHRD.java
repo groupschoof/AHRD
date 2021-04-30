@@ -2,6 +2,8 @@ package ahrd.controller;
 
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Settings.setSettings;
+import static ahrd.controller.Settings.SHORT_ACCESSION_GROUP_NAME;
+import static ahrd.controller.Settings.DEFAULT_SHORT_ACCESSION_REGEX;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +38,7 @@ public class AHRD {
 	public static final String VERSION = "3.11";
 
 	private Map<String, Protein> proteins;
+	private Map<String, Protein> shortAccsProteins;
 	private Map<String, Set<ReferenceGoAnnotation>> goAnnotationReference;
 	private Set<String> uniqueBlastResultShortAccessions;
 	private long timestamp;
@@ -441,6 +444,29 @@ public class AHRD {
 
 	public void setGoDB(Map<String, GOterm> goDB) {
 		this.goDB = goDB;
+	}
+
+	public Map<String, Protein> getShortAccsProteins() {
+		if (shortAccsProteins == null) {
+			shortAccsProteins = new HashMap<>();
+			for (Protein p : getProteins().values()) {
+				Matcher m = DEFAULT_SHORT_ACCESSION_REGEX.matcher(p.getAccession());
+				String shortAccession = p.getAccession();
+				if (!m.find()) {
+					System.err.println("WARNING: Regular Expression '" + DEFAULT_SHORT_ACCESSION_REGEX.toString()
+							+ "' does NOT match - using pattern.find(...) - Protein Accession '" + p.getAccession()
+							+ "' - continuing with the original accession. This might lead to unrecognized ground thruth GO annotations!");
+				} else {
+					shortAccession = m.group(SHORT_ACCESSION_GROUP_NAME);
+				}
+				shortAccsProteins.put(shortAccession, p);
+			}
+		}
+		return shortAccsProteins;
+	}
+
+	public void setShortAccsProteins(Map<String, Protein> shortAccsProteins) {
+		this.shortAccsProteins = shortAccsProteins;
 	}
 
 }

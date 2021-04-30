@@ -58,9 +58,12 @@ public class Evaluator extends AHRD {
 			String[] groundTruthGoAnnotationFileEntry = groundTruthGoAnnotationFileEntryLine.split("\t");
 			String protAcc = groundTruthGoAnnotationFileEntry[0].trim();
 			String termAcc = groundTruthGoAnnotationFileEntry[1].trim();
-			Protein p = getProteins().get(protAcc);
+			Protein p = getProteins().get(protAcc); // If the ground truth uses long protein accessions
 			if (p == null) {
-				throw new MissingAccessionException("Could not find protein for accession '" + protAcc + "'");
+				p = getShortAccsProteins().get(protAcc); // Otherwise try if the ground truth uses short protein accessions
+				if (p == null) {
+					throw new MissingAccessionException("Could not find protein for accession '" + protAcc + "'");
+				}
 			}
 			GOterm term = goDB.get(termAcc);
 			if (term == null) {
