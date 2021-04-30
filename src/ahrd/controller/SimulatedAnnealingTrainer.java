@@ -40,7 +40,13 @@ public class SimulatedAnnealingTrainer extends Trainer {
 			// Try to heuristically find optimal parameters for the annotation with descriptions
 			SimulatedAnnealingTrainer trainer = new SimulatedAnnealingTrainer(args[0]);
 			if (getSettings().doEvaluateDescriptions()) {
-				trainer.setup(false); // false -> Don't log memory and time-usages
+				if (getSettings().doAnnotateGoTerms()) {
+					getSettings().setAnnotateGoTerms(false); // prevent parsing of GO references (can save a LOT of time)
+					trainer.setup(true); // true -> Log memory and time-usages
+					getSettings().setAnnotateGoTerms(true);
+				} else {
+					trainer.setup(true); // true -> Log memory and time-usages
+				}
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				trainer.setupGroundTruthDescriptions();
 				trainer.outputWriter = new SimulatedAnnealingTrainerOutputWriter(getSettings().getPathToDescriptionTrainingPathLog());
@@ -48,6 +54,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 				trainer.outputWriter.writeHeader(seed);
 				trainer.train(seed);
 				trainer.calcAvgMaxDescriptionScore();
+				getSettings().setPathToOutput(getSettings().getPathToDescriptionOutput());
 				trainer.outputWriter.writeFinalOutput(
 						trainer.getBestParametersFoundAtTemperature(),
 						trainer.getAvgMaxDescriptionScore(),
@@ -56,7 +63,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 			// Try to heuristically find optimal parameters for the annotation with GO terms
 			trainer = new SimulatedAnnealingTrainer(args[0]);
 			if (getSettings().doEvaluateGoTerms()) { 
-				trainer.setup(false); // false -> Don't log memory and time-usages
+				trainer.setup(true); // true -> Log memory and time-usages
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				getSettings().setFindHighestPossibleGoScore(true);
 				trainer.setupGoAnnotationEvaluation();
@@ -65,6 +72,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 				trainer.outputWriter.writeHeader(seed);
 				trainer.train(seed);
 				trainer.calcAvgMaxGoScore();
+				getSettings().setPathToOutput(getSettings().getPathToGoOutput());
 				trainer.outputWriter.writeFinalOutput(
 						trainer.getBestParametersFoundAtTemperature(),
 						trainer.getAvgMaxGoScore(),

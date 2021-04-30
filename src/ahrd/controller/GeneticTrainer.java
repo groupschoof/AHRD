@@ -52,7 +52,13 @@ public class GeneticTrainer extends Trainer {
 			// Try to heuristically find optimal parameters for the annotation with descriptions
 			GeneticTrainer trainer = new GeneticTrainer(args[0]);
 			if (getSettings().doEvaluateDescriptions()) {
-				trainer.setup(true); // false -> Don't log memory and time-usages
+				if (getSettings().doAnnotateGoTerms()) {
+					getSettings().setAnnotateGoTerms(false); // prevent parsing of GO references (can save a LOT of time)
+					trainer.setup(true); // true -> Log memory and time-usages
+					getSettings().setAnnotateGoTerms(true);
+				} else {
+					trainer.setup(true); // true -> Log memory and time-usages
+				}
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				trainer.setupGroundTruthDescriptions();
 				trainer.outputWriter = new GeneticTrainerOutputWriter(getSettings().getPathToDescriptionTrainingPathLog());
@@ -60,9 +66,7 @@ public class GeneticTrainer extends Trainer {
 				trainer.outputWriter.writeHeader(seed);
 				trainer.train(seed);
 				trainer.calcAvgMaxDescriptionScore();
-				if (getSettings().getPathToOutput() == null) {
-					getSettings().setPathToOutput(getSettings().getPathToDescriptionOutput());
-				}
+				getSettings().setPathToOutput(getSettings().getPathToDescriptionOutput());
 				trainer.outputWriter.writeFinalOutput(
 						trainer.getGenerationBestParametersWereFoundIn(),
 						trainer.getAvgMaxDescriptionScore(),

@@ -463,7 +463,7 @@ public class Settings implements Cloneable {
 		// Global output: ////////////////////////////////////////////////////////////////////////////////
 		/**
 		 * Sets the path for the output file.
-		 * If specified on a global level and both description and GO training are preformed the output will be overridden.
+		 * If specified on a global level and both description and GO training are performed the output will be overridden.
 		 */
 		this.setPathToOutput((String) input.get(OUTPUT_KEY));
 		if (input.get(OUTPUT_KEY) != null) {
