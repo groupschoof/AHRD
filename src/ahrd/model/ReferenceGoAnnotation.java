@@ -1,16 +1,21 @@
 package ahrd.model;
 
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.controller.Utils.isGZipped;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 public class ReferenceGoAnnotation {
 
@@ -47,8 +52,12 @@ public class ReferenceGoAnnotation {
 		for (String blastDatabaseName : getSettings().getBlastDatabases()) {
 			if (getSettings().hasGeneOntologyAnnotation(blastDatabaseName)) {
 				try {
-					goaIn = new BufferedReader(new FileReader(getSettings()
-							.getPathToGeneOntologyReference(blastDatabaseName)));
+					String referencesPath = getSettings().getPathToGeneOntologyReference(blastDatabaseName);
+					if (isGZipped(new File(referencesPath))) {
+						goaIn = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(referencesPath))));
+					} else {
+						goaIn = new BufferedReader(new FileReader(referencesPath));
+					}
 					Pattern p = getSettings().getGoReferenceRegex(blastDatabaseName);
 					String line, shortAcc, term, code = "";
 					while ((line = goaIn.readLine()) != null) {

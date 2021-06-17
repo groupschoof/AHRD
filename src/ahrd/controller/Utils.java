@@ -2,9 +2,10 @@ package ahrd.controller;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Provides globally used utility-methods. E.g. for reading files or creating
@@ -215,4 +217,30 @@ public class Utils {
 		}
 		return sb.toString();
 	}
+	
+	/**
+	 * Adapted from https://stackoverflow.com/questions/4818468
+	 * * (Creative Commons Attribution Share Alike license)
+	 * 
+	 * Checks the fist bytes of a file for its "magic number": A signature indicating the file type.
+	 * Returns TRUE if the file was compressed using the gzip format.
+	 * @param f
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean isGZipped(File f) throws IOException {   
+		RandomAccessFile raf = null;
+		int magicNumber = Integer.MIN_VALUE;
+		try {
+			raf = new RandomAccessFile(f, "r");
+			magicNumber = (raf.read() & 0xff | ((raf.read() << 8) & 0xff00));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			raf.close();
+		}
+		return GZIPInputStream.GZIP_MAGIC == magicNumber;
+	}
+	
 }

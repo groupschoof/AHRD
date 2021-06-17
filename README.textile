@@ -318,9 +318,9 @@ _NOTE:_ All above column numbers start counting with zero, i.e. the first column
 
 h4. 3.3.2 Parameters controlling Gene Ontology term annotations
 
-AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the "Uniprot server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @goa_uniprot_all.gaf.gz@ (last visit Apr 7th 2021)
-
-To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter @gene_ontology_reference@. See example file @./test/resources/ahrd_input_seq_sim_table_go_prediction.yml@ for more details.
+AHRD is capable of annotating the Query proteins with Gene Ontology (GO) terms. It does so, by transferring the reference GO terms found in the Blast Hit AHRD selects as source of the resulting HRD. To be able to pass these reference GO terms AHRD needs a reference GO annotation file (GOA). By default AHRD expects this GOA file to be in the standard Uniprot format. You can download the latest GOA file from the "EBI FTP-server":http://ftp.ebi.ac.uk/pub/databases/GO/goa/UNIPROT/. To obtain GO annotations for all UniprotKB proteins download file @goa_uniprot_all.gaf.gz@ (last visit June 17th 2021)
+AHRD can read the compressed .gz file directly. You don't have to uncompress it first.
+To have AHRD annotate your proteins with GO terms, you just need to provide the optional parameter @gene_ontology_reference@. See example file @./test/resources/ahrd_input_seq_sim_table_go_prediction.yml@ for more details. 
 
 h5. 3.3.2.1 Custom reference Gene Ontology annotations (non UniprotKB GOA)
 

@@ -4,10 +4,14 @@ import static ahrd.controller.Settings.ACCESSION_GROUP_NAME;
 import static ahrd.controller.Settings.SHORT_ACCESSION_GROUP_NAME;
 import static ahrd.controller.Settings.DESCRIPTION_GROUP_NAME;
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.controller.Utils.isGZipped;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 import ahrd.controller.Settings;
 import ahrd.exception.MissingAccessionException;
@@ -336,7 +341,13 @@ public class BlastResult implements Comparable<BlastResult> {
 		// Subject HRDs.
 		BufferedReader fastaIn = null;
 		try {
-			fastaIn = new BufferedReader(new FileReader(getSettings().getPathToBlastDatabase(blastDbName)));
+			
+			String dbPath = getSettings().getPathToBlastDatabase(blastDbName);
+			if (isGZipped(new File(dbPath))) {
+				fastaIn = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(dbPath))));
+			} else {
+				fastaIn = new BufferedReader(new FileReader(dbPath));
+			}
 			String str, hrd = new String();
 			String acc = "";
 			Integer hitAALength = new Integer(0);

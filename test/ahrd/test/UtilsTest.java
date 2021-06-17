@@ -2,7 +2,9 @@ package ahrd.test;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -80,5 +82,13 @@ public class UtilsTest {
 					distRands.contains(d));
 		}
 	}
-
+	
+	@Test
+	public void testIsGZipped() throws IOException {
+		File notGZippedFile = new File("test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt");
+		assertFalse(Utils.isGZipped(notGZippedFile));
+		File gZippedFile = new File("test/resources/reference_gene_ontology_annotations_uniprotKB_GOA.txt.gz");
+		assertTrue(Utils.isGZipped(gZippedFile));
+	}
+	
 }
