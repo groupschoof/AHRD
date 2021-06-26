@@ -127,7 +127,7 @@ public class Settings implements Cloneable {
 	public static final String GO_TERM_GROUP_NAME = "goTerm";
 	public static final String GENE_ONTOLOGY_REFERENCE_REGEX_KEY = "gene_ontology_reference_regex";
 	public static final Pattern DEFAULT_GENE_ONTOLOGY_REFERENCE_REGEX = Pattern
-			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})\\s+\\S+\\s+(?<evidenceCode>\\S+)");
+			.compile("^UniProtKB\\t(?<shortAccession>[^\\t]+)\\t[^\\t]+\\t(?!NOT\\|)[^\\t]*\\t(?<goTerm>GO:\\d{7})\\t[^\\t]+\\t(?<evidenceCode>[^\\t]+)");
 	public static final String GO_DB_PATH_KEY = "go_db_path";
 	public static final String GO_F1_SIMPLE_KEY = "simple_GO_f1_scores";
 	public static final String GO_F1_ANCESTRY_KEY = "ancestry_GO_f1_scores";
