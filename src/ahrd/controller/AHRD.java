@@ -73,13 +73,16 @@ public class AHRD {
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			ahrd.assignHumanReadableDescriptions();
+			// Log
+			System.out.println("...assigned highestest scoring human readable descriptions in " + ahrd.takeTime() 
+			+ "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
 			// If requested iterate over all Proteins and assign the best scoring Gene Ontology terms
 			if (getSettings().doAnnotateGoTerms()) {
 				ahrd.assignGeneOntologyTerms();
+				// Log
+				System.out.println("...assigned highestest scoring GO terms in " + ahrd.takeTime() 
+				+ "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
 			}
-			// Log
-			System.out.println("...assigned highestest scoring human readable descriptions in " + ahrd.takeTime()
-					+ "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
 			// If requested assign GO slim terms in addition to detailed GO term
 			// annotation
 			ahrd.annotateWithGoSlim();
