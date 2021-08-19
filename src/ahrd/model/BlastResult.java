@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -34,6 +35,8 @@ import ahrd.exception.MissingProteinException;
  * @author klee, hallab
  */
 public class BlastResult implements Comparable<BlastResult> {
+	
+	private static final Logger LOGGER = Logger.getLogger("global");
 
 	public static final String TOKEN_SPLITTER_REGEX = "-|/|;|\\\\|,|:|\"|'|\\.|\\s+|\\||\\(|\\)";
 
@@ -368,16 +371,15 @@ public class BlastResult implements Comparable<BlastResult> {
 					// Process the current Fasta-Header-Line:
 					Matcher m = getSettings().getFastaHeaderRegex(blastDbName).matcher(str);
 					if (!m.matches()) {
-						// Provided REGEX to parse FASTA header does not work in
-						// this case:
-						System.err.println("WARNING: FASTA header line\n" + str.trim()
-								+ "\ndoes not match provided regular expression\n"
-								+ getSettings().getFastaHeaderRegex(blastDbName).toString()
-								+ "\n. The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded.\n"
-								+ "To fix this, please use - Blast database specific - parameter "
-								+ Settings.FASTA_HEADER_REGEX_KEY
-								+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
-								+ blastDbName + "'.");
+						// Provided REGEX to parse FASTA header does not work in this case:
+						LOGGER.warning("FASTA header line " + str.trim()
+						+ " does not match provided regular expression "
+						+ getSettings().getFastaHeaderRegex(blastDbName).toString()
+						+ ". The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded. "
+						+ "To fix this, please use - Blast database specific - parameter "
+						+ Settings.FASTA_HEADER_REGEX_KEY
+						+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
+						+ blastDbName + "'.");
 					} else if (blastResults.containsKey(m.group(ACCESSION_GROUP_NAME).trim())) {
 						// Found the next Blast HIT:
 						acc = m.group(ACCESSION_GROUP_NAME).trim();
@@ -567,7 +569,7 @@ public class BlastResult implements Comparable<BlastResult> {
 			Matcher m = p.matcher(getAccession());
 			setShortAccession(getAccession());
 			if (!m.find()) {
-				System.err.println("WARNING: Regular Expression '" + p.toString()
+				LOGGER.warning("Regular Expression '" + p.toString()
 						+ "' does NOT match - using pattern.find(...) - Blast Hit Accession '" + getAccession()
 						+ "' - continuing with the original accession. This might lead to unrecognized reference GO annotations!");
 			} else {

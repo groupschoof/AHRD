@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.xml.sax.SAXException;
@@ -31,12 +33,15 @@ import ahrd.model.ReferenceGoAnnotation;
 import ahrd.view.FastaOutputWriter;
 import ahrd.view.OutputWriter;
 import ahrd.view.TsvOutputWriter;
+import ahrd.view.DualConsoleHandler;
 import nu.xom.ParsingException;
 
 public class AHRD {
 
 	public static final String VERSION = "3.11";
-
+	
+	protected static final Logger LOGGER = Logger.getLogger("global");
+	
 	private Map<String, Protein> proteins;
 	private Map<String, Protein> shortAccsProteins;
 	private Map<String, Set<ReferenceGoAnnotation>> goAnnotationReference;
@@ -66,7 +71,7 @@ public class AHRD {
 		try {
 			AHRD ahrd = new AHRD(args[0]);
 			// Load and parse all inputs
-			ahrd.setup(true);
+			ahrd.setup();
 			// After the setup the unique short accessions are no longer needed:
 			ahrd.setUniqueBlastResultShortAccessions(null);
 
@@ -74,29 +79,22 @@ public class AHRD {
 			// Readable Description
 			ahrd.assignHumanReadableDescriptions();
 			// Log
-			System.out.println("...assigned highestest scoring human readable descriptions in " + ahrd.takeTime() 
-			+ "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
+			LOGGER.info("Assigned highestest scoring human readable descriptions in " + ahrd.takeTime() + "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
 			// If requested iterate over all Proteins and assign the best scoring Gene Ontology terms
 			if (getSettings().doAnnotateGoTerms()) {
 				ahrd.assignGeneOntologyTerms();
-				// Log
-				System.out.println("...assigned highestest scoring GO terms in " + ahrd.takeTime() 
-				+ "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
+				LOGGER.info("Assigned highestest scoring GO terms in " + ahrd.takeTime() + "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
 			}
 			// If requested assign GO slim terms in addition to detailed GO term
 			// annotation
 			ahrd.annotateWithGoSlim();
 			// Write result to output-file:
-			System.out.println("Writing output to '" + getSettings().getPathToOutput() + "'.");
+			LOGGER.info("Writing output to '" + getSettings().getPathToOutput() + "'.");
 			OutputWriter ow = initializeOutputWriter(ahrd.getProteins().values());
 			ow.writeOutput();
-			// Log
-			System.out.println("Wrote output in " + ahrd.takeTime() + "sec, currently occupying "
-					+ ahrd.takeMemoryUsage() + " MB");
-
-			System.out.println("\n\nDONE");
+			LOGGER.info("Wrote output in " + ahrd.takeTime() + "sec, currently occupying " + ahrd.takeMemoryUsage() + " MB");
 		} catch (Exception e) {
-			System.err.println("We are sorry, an un-expected ERROR occurred:");
+			LOGGER.severe("We are sorry, an un-expected ERROR occurred:");
 			e.printStackTrace(System.err);
 		}
 	}
@@ -122,6 +120,13 @@ public class AHRD {
 	 */
 	public AHRD(String pathToYmlInput) throws IOException {
 		super();
+		// Replace all previous logging handlers with one that pushes SEVERE and WARNING to stderr and all other levels to stdout 
+		LOGGER.setUseParentHandlers(false);
+		for(Handler handler : LOGGER.getHandlers()) {
+		    LOGGER.removeHandler(handler);
+		}
+		LOGGER.addHandler(new DualConsoleHandler());
+		// Parse the settings from the YML input
 		setSettings(new Settings(pathToYmlInput));
 		// Limit the size of Java's default common threadpool to the specified number of threads
 		System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", Integer.toString(getSettings().getNthreads() - 1));
@@ -167,31 +172,22 @@ public class AHRD {
 	 * @throws SAXException
 	 * @throws ParsingException
 	 */
-	public void setup(boolean writeLogMsgs)
+	public void setup()
 			throws IOException, MissingAccessionException, MissingProteinException, SAXException, ParsingException {
-		if (writeLogMsgs)
-			System.out.println("Started AHRD...\n");
-
+		LOGGER.info("Started AHRD...");
 		takeTime();
-
+		
 		initializeProteins();
-		if (writeLogMsgs)
-			System.out.println("...initialised proteins in " + takeTime() + "sec, currently occupying "
-					+ takeMemoryUsage() + " MB");
-
+		LOGGER.info("Initialised proteins in " + takeTime() + "sec, currently occupying " + takeMemoryUsage() + " MB");
+		
 		// multiple blast-results against different Blast-Databases
 		parseBlastResults();
-		if (writeLogMsgs)
-			System.out.println("...parsed blast results in " + takeTime() + "sec, currently occupying "
-					+ takeMemoryUsage() + " MB");
+		LOGGER.info("Parsed blast results in " + takeTime() + "sec, currently occupying " + takeMemoryUsage() + " MB");
 
 		// GO Annotation Reference (for Proteins in the searched Blast Databases)
 		if (getSettings().doAnnotateGoTerms()) {
 			setGoAnnotationReference(ReferenceGoAnnotation.parseGoAnnotationReference(getUniqueBlastResultShortAccessions()));
-			if (writeLogMsgs) {
-				System.out.println("...parsed Gene Ontology Annotation (GOA) Reference in " + takeTime()
-						+ "sec, currently occupying " + takeMemoryUsage() + " MB");
-			}
+			LOGGER.info("Parsed Gene Ontology Annotation (GOA) Reference in " + takeTime() + "sec, currently occupying " + takeMemoryUsage() + " MB");
 		}
 	}
 
@@ -456,9 +452,9 @@ public class AHRD {
 				Matcher m = DEFAULT_SHORT_ACCESSION_REGEX.matcher(p.getAccession());
 				String shortAccession = p.getAccession();
 				if (!m.find()) {
-					System.err.println("WARNING: Regular Expression '" + DEFAULT_SHORT_ACCESSION_REGEX.toString()
-							+ "' does NOT match - using pattern.find(...) - Protein Accession '" + p.getAccession()
-							+ "' - continuing with the original accession. This might lead to unrecognized ground thruth GO annotations!");
+					LOGGER.warning("Regular Expression '" + DEFAULT_SHORT_ACCESSION_REGEX.toString()
+					+ "' does NOT match - using pattern.find(...) - Protein Accession '" + p.getAccession()
+					+ "' - continuing with the original accession. This might lead to unrecognized ground thruth GO annotations!");
 				} else {
 					shortAccession = m.group(SHORT_ACCESSION_GROUP_NAME);
 				}

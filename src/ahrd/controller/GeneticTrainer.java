@@ -54,10 +54,10 @@ public class GeneticTrainer extends Trainer {
 			if (getSettings().doEvaluateDescriptions()) {
 				if (getSettings().doAnnotateGoTerms()) {
 					getSettings().setAnnotateGoTerms(false); // prevent parsing of GO references (can save a LOT of time)
-					trainer.setup(true); // true -> Log memory and time-usages
+					trainer.setup();
 					getSettings().setAnnotateGoTerms(true);
 				} else {
-					trainer.setup(true); // true -> Log memory and time-usages
+					trainer.setup();
 				}
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				trainer.setupGroundTruthDescriptions();
@@ -71,13 +71,13 @@ public class GeneticTrainer extends Trainer {
 						trainer.getGenerationBestParametersWereFoundIn(),
 						trainer.getAvgMaxDescriptionScore(),
 						trainer.getBestParameters());
-				System.out.println("Logged path through description parameter- and score-space into:\n"	+ getSettings().getPathToDescriptionTrainingPathLog());
-				System.out.println("Written output into:\n" + getSettings().getPathToOutput());
+				LOGGER.info("Logged path through description parameter- and score-space into: "	+ getSettings().getPathToDescriptionTrainingPathLog());
+				LOGGER.info("Written output into: " + getSettings().getPathToOutput());
 			}
 			// Try to heuristically find optimal parameters for the annotation with GO terms
 			trainer = new GeneticTrainer(args[0]);
 			if (getSettings().doEvaluateGoTerms()) {
-				trainer.setup(true); // false -> Don't log memory and time-usages
+				trainer.setup();
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				getSettings().setFindHighestPossibleGoScore(true);
 				trainer.setupGoAnnotationEvaluation();
@@ -91,12 +91,12 @@ public class GeneticTrainer extends Trainer {
 						trainer.getGenerationBestParametersWereFoundIn(),
 						trainer.getAvgMaxGoScore(),
 						trainer.getBestParameters());
-				System.out.println("Logged path through GO parameter- and score-space into:\n"	+ getSettings().getPathToGoTrainingPathLog());
-				System.out.println("Written output into:\n" + getSettings().getPathToOutput());
+				LOGGER.info("Logged path through GO parameter- and score-space into: "	+ getSettings().getPathToGoTrainingPathLog());
+				LOGGER.info("Written output into: " + getSettings().getPathToOutput());
 			}
 			
 		} catch (Exception e) {
-			System.err.println("We are sorry, an unexpected ERROR occurred:");
+			LOGGER.severe("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
 		}
 
@@ -129,7 +129,7 @@ public class GeneticTrainer extends Trainer {
 		// simulate generational succession
 		while (generation <= getSettings().getNumberOfGenerations()) {
 			// Show progress
-			System.out.println("Evaluating generation " + generation + " of " + getSettings().getNumberOfGenerations());
+			LOGGER.info("Evaluating generation " + generation + " of " + getSettings().getNumberOfGenerations());
 			// Determine the fitness of each individual (parameter set) in the
 			// population
 			for (Parameters individual : population) {

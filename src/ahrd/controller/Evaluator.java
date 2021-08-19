@@ -27,9 +27,11 @@ public class Evaluator extends AHRD {
 	public Evaluator(String pathToInputYml) throws IOException {
 		super(pathToInputYml);
 		if (getSettings().doAnnotateDescriptions() && getSettings().hasGroundTruthFasta()) {
+			LOGGER.config("Annotation of descriptions activated and found ground truth fasta: Performing evaluation of description prediction.");
 			getSettings().setEvaluateDescriptions(true);
 		}
 		if (getSettings().doAnnotateGoTerms() && getSettings().hasGroundTruthGoAnnotations()) {
+			LOGGER.config("Annotation of GO terms activated and found GO ground truth: Performing evaluation of GO prediction.");
 			getSettings().setEvaluateGoTerms(true);
 		}
 	}
@@ -144,20 +146,18 @@ public class Evaluator extends AHRD {
 
 		try {
 			Evaluator evaluator = new Evaluator(args[0]);
-			evaluator.setup(true); // false -> Don't log memory and time-usages
+			evaluator.setup();
 			// After the setup the unique short accessions are no longer needed:
 			evaluator.setUniqueBlastResultShortAccessions(null);
 			evaluator.setupGroundTruthDescriptions();
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			evaluator.assignHumanReadableDescriptions();
-			System.out.println("...assigned highestest scoring human readable descriptions in " + evaluator.takeTime()
-			+ "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
+			LOGGER.info("Assigned highestest scoring human readable descriptions in " + evaluator.takeTime()	+ "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
 			// If requested iterate over all Proteins and assign the best scoring Gene Ontology terms
 			if (getSettings().doAnnotateGoTerms()) {
 				evaluator.assignGeneOntologyTerms();
-				System.out.println("...assigned highestest scoring GO terms in " + evaluator.takeTime()
-				+ "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
+				LOGGER.info("Aassigned highestest scoring GO terms in " + evaluator.takeTime() + "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
 			}
 			// Load a Map of all GO terms
 			// Load ground truth GO annotations
@@ -183,14 +183,13 @@ public class Evaluator extends AHRD {
 			// If requested, calculate the highest possibly achievable recall for descriptions and go annotations:
 			if (getSettings().doFindHighestPossibleRecall())
 				evaluator.findHighestPossibleRecall();
-			System.out.println("...evaluated annotations in " + evaluator.takeTime()
-			+ "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
+			LOGGER.info("Evaluated annotations in " + evaluator.takeTime() + "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
 			// Generate Output:
 			TsvOutputWriter ow = new EvaluatorOutputWriter(evaluator.getProteins().values());
 			ow.writeOutput();
-			System.out.println("Written output into:\n" + getSettings().getPathToOutput());
+			LOGGER.info("Written output into: " + getSettings().getPathToOutput());
 		} catch (Exception e) {
-			System.err.println("We are sorry, an unexpected ERROR occurred:");
+			LOGGER.severe("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
 		}
 

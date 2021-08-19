@@ -42,10 +42,10 @@ public class SimulatedAnnealingTrainer extends Trainer {
 			if (getSettings().doEvaluateDescriptions()) {
 				if (getSettings().doAnnotateGoTerms()) {
 					getSettings().setAnnotateGoTerms(false); // prevent parsing of GO references (can save a LOT of time)
-					trainer.setup(true); // true -> Log memory and time-usages
+					trainer.setup();
 					getSettings().setAnnotateGoTerms(true);
 				} else {
-					trainer.setup(true); // true -> Log memory and time-usages
+					trainer.setup();
 				}
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				trainer.setupGroundTruthDescriptions();
@@ -63,7 +63,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 			// Try to heuristically find optimal parameters for the annotation with GO terms
 			trainer = new SimulatedAnnealingTrainer(args[0]);
 			if (getSettings().doEvaluateGoTerms()) { 
-				trainer.setup(true); // true -> Log memory and time-usages
+				trainer.setup();
 				trainer.setUniqueBlastResultShortAccessions(null); // After the setup the unique short accessions are no longer needed
 				getSettings().setFindHighestPossibleGoScore(true);
 				trainer.setupGoAnnotationEvaluation();
@@ -78,10 +78,10 @@ public class SimulatedAnnealingTrainer extends Trainer {
 						trainer.getAvgMaxGoScore(),
 						trainer.getBestParameters());
 			}
-			System.out.println("Logged path through parameter- and score-space into:\n" + getSettings().getPathToDescriptionTrainingPathLog());
-			System.out.println("Written output into:\n"	+ getSettings().getPathToOutput());
+			LOGGER.info("Logged path through parameter- and score-space into: " + getSettings().getPathToDescriptionTrainingPathLog());
+			LOGGER.info("Written output into: "	+ getSettings().getPathToOutput());
 		} catch (Exception e) {
-			System.err.println("We are sorry, an unexpected ERROR occurred:");
+			LOGGER.severe("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
 		}
 

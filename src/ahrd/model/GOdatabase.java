@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -33,6 +34,8 @@ import java.lang.Math;
 
 
 public class GOdatabase {
+	
+	private static final Logger LOGGER = Logger.getLogger("global");
 
 	private static final String reviewedUniProtURL = "ftp://ftp.expasy.org/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.dat.gz";
 	private static final String reviewedUniProtFileName = "uniprot_sprot.dat.gz";
@@ -65,20 +68,20 @@ public class GOdatabase {
 		}
 	}
 	private HashMap<String, GOterm> buildGoDbFromOWL(String pathToGoDatabase) throws IOException, OWLOntologyCreationException {
-		System.out.println("Building GO database using OWLAPI (https://github.com/owlcs/owlapi)");
+		LOGGER.info("Building GO database using OWLAPI (https://github.com/owlcs/owlapi)");
 		HashMap<String, GOterm> accGoDb = new HashMap<String, GOterm>();
 
 		String reviewedUniProtFilePath =  pathToGoDatabase + reviewedUniProtFileName;		
 		// Download SwissProt if not already on drive
 		if (!new File(reviewedUniProtFilePath).exists()) {
-			System.out.println("Downloading reviewed Uniprot (aprox. 570MB) from:\n"+ reviewedUniProtURL); 
+			LOGGER.info("Downloading reviewed Uniprot (aprox. 570MB) from:\n"+ reviewedUniProtURL); 
 			download(reviewedUniProtURL, reviewedUniProtFilePath);
 		}
 
 		String geneOntologyMonthlyOwlReleasePath = pathToGoDatabase + geneOntologyMonthlyOwlReleaseFileName;
 		// Download gene ontology OWL if not alrady on drive
 		if (!new File(geneOntologyMonthlyOwlReleasePath).exists()) {
-			System.out.println("Downloading GO database (aprox. 150MB) from: " + geneOntologyMonthlyOwlReleaseURL);
+			LOGGER.info("Downloading GO database (aprox. 150MB) from: " + geneOntologyMonthlyOwlReleaseURL);
 			download(geneOntologyMonthlyOwlReleaseURL, geneOntologyMonthlyOwlReleasePath);
 		}
 				
@@ -87,9 +90,9 @@ public class GOdatabase {
 		// Load the gene ontology from file
 		OWLOntology ontology = manager.loadOntologyFromOntologyDocument(new File(geneOntologyMonthlyOwlReleasePath));
 		// Print the ontology ID
-		System.out.println("Loaded ontology version: " + ontology.getOntologyID().getVersionIRI().get());
+		LOGGER.info("Loaded ontology version: " + ontology.getOntologyID().getVersionIRI().get());
 		// Print the format of the ontology
-		System.out.println("Ontology format: " + manager.getOntologyFormat(ontology).getKey());
+		LOGGER.info("Ontology format: " + manager.getOntologyFormat(ontology).getKey());
 		// An OWLReasoner provides the basic query functionality needed, for example the ability
         // to obtain the subclasses of a class etc. To do this reasoner factory is used.
 		OWLReasonerFactory reasonerFactory = new StructuralReasonerFactory();
@@ -97,7 +100,7 @@ public class GOdatabase {
 		// Ask the reasoner to do all the necessary work now
         reasoner.precomputeInferences();
         // Determine if the ontology is actually consistent.
-        System.out.println("Consistent: " + reasoner.isConsistent());
+        LOGGER.info("Consistent: " + reasoner.isConsistent());
 		OWLDataFactory dataFactory = manager.getOWLDataFactory();
 
 		// Iterate over all classes and store terms in map
@@ -171,7 +174,7 @@ public class GOdatabase {
 		    		}
 		    	}
 	    	   	if (accGoDb.get(id) == null) {
-		    		System.err.println("Id " + id + " not found in accGoDb!");
+		    		LOGGER.warning("Id " + id + " not found in accGoDb!");
 		    	} else {
 		    		/* Add the go term itself to its own ancestry.
 		    		 * It was this way in the deprecated mysql dumps and is kept up this way here, to not break other methods using the GOdatabase.
@@ -187,12 +190,12 @@ public class GOdatabase {
 		long processGoTimeElapsedMilli = processGoFinishTime - processGoStartTime;
 		double processGoTimeElapsedSec = roundToNDecimalPlaces((double) processGoTimeElapsedMilli / (double) 1000, 1);
 
-		System.out.println("Number of ancestry relations retrieved from OWL: " + ancestryCounter);
-		System.out.println("Time to process the ancestry: " + processGoTimeElapsedSec + " s");
+		LOGGER.info("Number of ancestry relations retrieved from OWL: " + ancestryCounter);
+		LOGGER.info("Time to process the ancestry: " + processGoTimeElapsedSec + " s");
 		
 		// Read in SwissProt annotations
 		// Counts each annotation towards a GO term and its complete ancestry  
-		System.out.println("Reading and counting aprox. 3 million SwissProt annotations ...");
+		LOGGER.info("Reading and counting aprox. 3 million SwissProt annotations ...");
 		long processSwissProtStartTime = System.currentTimeMillis();
 		int bpCount = 0;
 		int ccCount = 0;
@@ -211,7 +214,7 @@ public class GOdatabase {
 					String termAcc = m.group("goTerm");
 					GOterm term = accGoDb.get(termAcc);
 					if (term == null) {
-						System.err.println("Error: GO-accession (" + termAcc + ") of SwissProt annotation not found in Gene Ontology.");
+						LOGGER.warning("Error: GO-accession (" + termAcc + ") of SwissProt annotation not found in Gene Ontology.");
 					} else {
 						Set<GOterm> ancestry = term.getAncestry();
 						if (!term.getObsolete()) {
@@ -246,14 +249,14 @@ public class GOdatabase {
 			br.close();
 		}
 		
-		System.out.println("Found " + matchcount + " go annotation lines in " + linecount + " lines of SwissProt dat file.");
-		System.out.println("Biological process terms: " + bpCount);
-		System.out.println("Cellular component terms: " + ccCount);
-		System.out.println("Molecular function terms: " + mfCount);
+		LOGGER.info("Found " + matchcount + " go annotation lines in " + linecount + " lines of SwissProt dat file.");
+		LOGGER.info("Biological process terms: " + bpCount);
+		LOGGER.info("Cellular component terms: " + ccCount);
+		LOGGER.info("Molecular function terms: " + mfCount);
 		long processSwissProtFinishTime = System.currentTimeMillis();
 		long processSwissProtElapsedTimeMilli = processSwissProtFinishTime - processSwissProtStartTime;
 		double proccesSwissProtElapsedTimeSec = roundToNDecimalPlaces((double) processSwissProtElapsedTimeMilli /(double) 1000, 1);
-		System.out.println("Time to process SwissProt annotations: " + proccesSwissProtElapsedTimeSec + " s");
+		LOGGER.info("Time to process SwissProt annotations: " + proccesSwissProtElapsedTimeSec + " s");
 		// Calculate the information content from the term annotation frequencies
 		for (GOterm term : accGoDb.values() ){
 			switch(term.getOntology()) {
@@ -273,30 +276,30 @@ public class GOdatabase {
 				break; //meta term: Not counted towards any of the three ontologies
 			}
 		}
-		System.out.println("Finished calculating information content.");
-		System.out.println("GO terms in database: " + accGoDb.size());
+		LOGGER.info("Finished calculating information content.");
+		LOGGER.info("GO terms in database: " + accGoDb.size());
 		
 		// Check consistency of root term annotation count and information content
 		if (accGoDb.get(bpRootAcc).getAnnotationCount() != bpCount) {
-			System.out.println("Consistency error in GO frequencies of the biological process ontology");
-			System.out.println("Term frequency: " + accGoDb.get(bpRootAcc).getAnnotationCount());
+			LOGGER.warning("Consistency error in GO frequencies of the biological process ontology");
+			LOGGER.warning("Term frequency: " + accGoDb.get(bpRootAcc).getAnnotationCount());
 		}
 		if (accGoDb.get(ccRootAcc).getAnnotationCount() != ccCount) {
-			System.out.println("Consistency error in GO frequencies of the cellular component ontology");
-			System.out.println("Term frequency: " + accGoDb.get(ccRootAcc).getAnnotationCount());
+			LOGGER.warning("Consistency error in GO frequencies of the cellular component ontology");
+			LOGGER.warning("Term frequency: " + accGoDb.get(ccRootAcc).getAnnotationCount());
 		}
 		if (accGoDb.get(mfRootAcc).getAnnotationCount() != mfCount) {
-			System.out.println("Consistency error in GO frequencies of the molecular function ontology");
-			System.out.println("Term frequency: " + accGoDb.get(mfRootAcc).getAnnotationCount());
+			LOGGER.warning("Consistency error in GO frequencies of the molecular function ontology");
+			LOGGER.warning("Term frequency: " + accGoDb.get(mfRootAcc).getAnnotationCount());
 		}
 		if (accGoDb.get(bpRootAcc).getInformationContent() != 0.0) {
-			System.err.println("Root term of biological process ontology has a non zero information content: " + accGoDb.get(bpRootAcc).getInformationContent());
+			LOGGER.warning("Root term of biological process ontology has a non zero information content: " + accGoDb.get(bpRootAcc).getInformationContent());
 		}
 		if (accGoDb.get(ccRootAcc).getInformationContent() != 0.0) {
-			System.err.println("Root term of cellular component has a non zero information content: " + accGoDb.get(ccRootAcc).getInformationContent());
+			LOGGER.warning("Root term of cellular component has a non zero information content: " + accGoDb.get(ccRootAcc).getInformationContent());
 		}
 		if (accGoDb.get(mfRootAcc).getInformationContent() != 0.0) {
-			System.err.println("Root term of molecular function ontology has a non zero information content: " + accGoDb.get(mfRootAcc).getInformationContent());
+			LOGGER.warning("Root term of molecular function ontology has a non zero information content: " + accGoDb.get(mfRootAcc).getInformationContent());
 		}
 
 		// Serialize accession based GO database and write it to file	
@@ -307,11 +310,11 @@ public class GOdatabase {
 			out.writeObject(accGoDb);
 			out.close();
 			fileOut.close();
-			System.out.println("Serialized database (aprox. 10MB) saved in: " + serializedAccGoDBFilePath);
+			LOGGER.info("Serialized database (aprox. 10MB) saved in: " + serializedAccGoDBFilePath);
 		} catch (IOException i) {
 			i.printStackTrace();
 		}
-		System.out.println("Done building new GO database based on OWL file!");
+		LOGGER.info("Done building new GO database based on OWL file!");
 		return accGoDb;
 	}
 
@@ -319,17 +322,17 @@ public class GOdatabase {
 	@SuppressWarnings("unchecked")
 	private HashMap<String, GOterm> deserializeAccGoDb(String serializedAccGoDBFilePath) {
 		if (new File(serializedAccGoDBFilePath).exists()) {
-			System.out.println("Proviously build GO database found: " + serializedAccGoDBFilePath);
+			LOGGER.info("Proviously build GO database found: " + serializedAccGoDBFilePath);
 			try {
 				FileInputStream fileIn = new FileInputStream(serializedAccGoDBFilePath);
 				ObjectInputStream in = new ObjectInputStream(fileIn);
 				HashMap<String, GOterm> goDbFromFile = (HashMap<String, GOterm>) in.readObject();
 				in.close();
 				fileIn.close();
-				System.out.println("Sucessfully deserialized. Size: " + goDbFromFile.size() + " terms");
+				LOGGER.info("Sucessfully deserialized. Size: " + goDbFromFile.size() + " terms");
 				return goDbFromFile;
 			} catch (java.io.InvalidClassException exp) {
-				System.out.println("GOterm class incompatibility discovered while deserializing GO database object."
+				LOGGER.severe("GOterm class incompatibility discovered while deserializing GO database object."
 						+ "\nThe accGoDb.ser file in the ./AHRD/data folder seems to have been created with a differnt build of AHRD."
 						+ "\nPlease trigger the automatic rebuild process for the GO database by deleting the accGoDbOwl.ser file before you run AHRD again.");
 				exp.printStackTrace();
@@ -338,7 +341,7 @@ public class GOdatabase {
 				i.printStackTrace();
 				return null;
 			} catch (ClassNotFoundException c) {
-				System.err.println("GOterm class not found for deserialization of GO database object");
+				LOGGER.warning("GOterm class not found for deserialization of GO database object");
 				c.printStackTrace();
 				return null;
 			}

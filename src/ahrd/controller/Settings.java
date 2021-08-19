@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import com.esotericsoftware.yamlbeans.YamlReader;
@@ -39,10 +42,13 @@ public class Settings implements Cloneable {
 		settings.set(s);
 	}
 	
-	
+	private static final Logger LOGGER = Logger.getLogger("global");
+		
 	/**
 	 * Keys to parse the YML-Input:
 	 */
+	// Message logging:
+	public static final String LOGGING_LEVEL_KEY = "logging_level";
 	// Global input:
 	public static final String PROTEINS_FASTA_KEY = "proteins_fasta";
 	public static final String PROTEINS_FASTA_REGEX_KEY = "proteins_fasta_regex";
@@ -390,7 +396,15 @@ public class Settings implements Cloneable {
 	public void initialize(String pathToYml) throws IOException {
 		YamlReader reader = new YamlReader(new FileReader(pathToYml));
 		Map<String, Object> input = (Map<String, Object>) reader.read();
+		// Message logging: //////////////////////////////////////////////////////////////////////////////
+		if (input.get(LOGGING_LEVEL_KEY) != null) {
+			this.setLoggingLevel(Level.parse(((String) input.get(LOGGING_LEVEL_KEY)).toUpperCase()));
+		}
+		if (LOGGER.getLevel() != null) {
+			LOGGER.config("Logging level is set to: " + LOGGER.getLevel().getName());
+		}
 		// Global input: /////////////////////////////////////////////////////////////////////////////////
+		LOGGER.fine("Reading settings from " + pathToYml);
 		this.setPathToProteinsFasta((String) input.get(PROTEINS_FASTA_KEY));
 		if (input.get(PROTEINS_FASTA_REGEX_KEY) != null) {
 			this.setProteinsFastaRegex(Pattern.compile((String) input.get(PROTEINS_FASTA_REGEX_KEY)));
@@ -459,6 +473,9 @@ public class Settings implements Cloneable {
 			if (n > 1) {
 				this.setNthreads(n);
 			}
+			LOGGER.config("Using " + n + " threads");
+		} else {
+			LOGGER.config(NTHREADS_KEY + " is not set. Only using a single thread.");
 		}
 		// Global output: ////////////////////////////////////////////////////////////////////////////////
 		/**
@@ -565,6 +582,7 @@ public class Settings implements Cloneable {
 		// Description specific settings: //////////////////////////////////////////////////////////////
 		this.descriptionSettings = (Map<String, Object>) input.get(DESCRIPTION_SETTINGS_KEY);
 		if (descriptionSettings != null) {
+			LOGGER.config("Using separate settings for the description prediction");
 			if (descriptionSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
 				this.setDescriptionTokenScoreBitScoreWeight(Double.parseDouble((String) descriptionSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
 			}
@@ -642,6 +660,7 @@ public class Settings implements Cloneable {
 		// GO specific setting: ////////////////////////////////////////////////////////////////////////
 		this.goSettings = (Map<String, Object>) input.get(GO_SETTINGS_KEY);
 		if (goSettings != null) {
+			LOGGER.config("Using separate settings for the GO prediction");
 			if (goSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
 				this.setGoTokenScoreBitScoreWeight(Double.parseDouble((String) goSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
 			}
@@ -660,9 +679,13 @@ public class Settings implements Cloneable {
 			}
 			if (goSettings.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY) != null) {
 				this.setGoTermScoreEvidenceCodeScoreWeight(Double.parseDouble((String) goSettings.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY)));
+			} else {
+				LOGGER.config("Using separate settings for the GO prediction but didn't specify 'go_term_score_evidence_code_score_weight': Using the default value of " + getGoTermScoreEvidenceCodeScoreWeight() + " instead.");
 			}
 			if (goSettings.get(INFORMATIVE_TOKEN_THRESHOLD_KEY) != null) {
 				this.setGoInformativeTokenThreshold(Double.parseDouble((String) goSettings.get(INFORMATIVE_TOKEN_THRESHOLD_KEY)));
+			} else {
+				LOGGER.config("Using separate settings for the GO prediction but didn't specify 'informative_token_threshold': Using the default value of " + getGoInformativeTokenThreshold() + " instead.");
 			}
 			if (goSettings.get(TRAINING_PATH_LOG_KEY) != null && !goSettings.get(TRAINING_PATH_LOG_KEY).equals("")) {
 				setPathToGoTrainingPathLog((String) goSettings.get(TRAINING_PATH_LOG_KEY));
@@ -728,6 +751,7 @@ public class Settings implements Cloneable {
 		 * Override default evidence codes weights if specified in YML input
 		 */
 		if (goSettings != null && goSettings.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY) != null) {
+			LOGGER.fine("Evidence code weights specified in YML input. Overriding defaults");
 			for (Map.Entry<String, String> pair : ((Map<String, String>) goSettings.get(REFERENCE_GO_ANNOTATION_EVIDENCE_CODE_WEIGHTS_KEY)).entrySet()) {
 				getEvidenceCodeWeights().put(pair.getKey(), Double.parseDouble(pair.getValue()));
 			}
@@ -1651,6 +1675,13 @@ public class Settings implements Cloneable {
 
 	public void setPathToGoOutput(String pathToGoOutput) {
 		this.pathToGoOutput = pathToGoOutput;
+	}
+
+	public void setLoggingLevel(Level loggingLevel) {
+		for (Handler handler : LOGGER.getHandlers()) {
+			handler.setLevel(loggingLevel);
+		}
+		LOGGER.setLevel(loggingLevel);
 	}
 
 }

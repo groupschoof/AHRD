@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 
 import nu.xom.ParsingException;
 
@@ -34,7 +35,8 @@ public class SimulatedAnnealingTrainerTest {
 	public void setUp() throws IOException, MissingAccessionException,
 			MissingProteinException, SAXException, ParsingException {
 		trainer = new SimulatedAnnealingTrainer("./test/resources/trainer_input.yml");
-		trainer.setup(false); // false -> Don't log memory and time-usages
+		getSettings().setLoggingLevel(Level.WARNING);
+		trainer.setup();
 		trainer.setupGroundTruthDescriptions();
 		// Sets up description and GOterm annotations of competitors in the EvaluationScoreCalculators of each Protein
 		trainer.setupCompetitors();
@@ -236,7 +238,7 @@ public class SimulatedAnnealingTrainerTest {
 		assertTrue(!getSettings().getWriteBestBlastHitsToOutput());
 		// After setup the competitor annotations
 		// "description from best Blast-Hits" should NOT have been saved:
-		this.trainer.setup(false);
+		this.trainer.setup();
 		for (Protein p : this.trainer.getProteins().values()) {
 			assertTrue(
 					"Setting up SimulatedAnnealingTrainer with flag 'write_best_blast_hits_to_output: false' should enforce NOT remembering competitor annotations 'description from best Blast-Hits'.",

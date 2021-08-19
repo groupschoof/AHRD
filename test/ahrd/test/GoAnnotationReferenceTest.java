@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import nu.xom.ParsingException;
 
@@ -33,6 +34,7 @@ public class GoAnnotationReferenceTest {
 	public void setUp() throws IOException {
 		ahrd = new AHRD(
 				"./test/resources/ahrd_input_seq_sim_table_go_prediction.yml");
+		getSettings().setLoggingLevel(Level.WARNING);
 	}
 
 	@Test
@@ -45,7 +47,7 @@ public class GoAnnotationReferenceTest {
 	public void testUniqueShortAccessions() throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
 			ParsingException {
-		ahrd.setup(false);
+		ahrd.setup();
 		assertNotNull(ahrd.getUniqueBlastResultShortAccessions());
 		// Somehow assertEquals does not work on Collections as expected, hence
 		// the following work-around:
@@ -65,7 +67,7 @@ public class GoAnnotationReferenceTest {
 	public void testParseGoAnnotationReference() throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
 			ParsingException {
-		ahrd.setup(false);
+		ahrd.setup();
 		assertNotNull(ahrd.getGoAnnotationReference());
 		assertTrue(!ahrd.getGoAnnotationReference().isEmpty());
 		assertEquals(4, ahrd.getGoAnnotationReference().size());
@@ -82,7 +84,7 @@ public class GoAnnotationReferenceTest {
 	public void testAnnotatesGoTerms() throws IOException,
 			MissingAccessionException, MissingProteinException, SAXException,
 			ParsingException, SQLException, OWLOntologyCreationException {
-		ahrd.setup(false);
+		ahrd.setup();
 		ahrd.assignGeneOntologyTerms();
 		Protein p = ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056");
 		assertNotNull(p.getGoResults());

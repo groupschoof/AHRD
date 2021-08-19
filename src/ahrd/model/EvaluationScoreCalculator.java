@@ -8,8 +8,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class EvaluationScoreCalculator {
+	
+	private static final Logger LOGGER = Logger.getLogger("global");
 
 	private Protein protein;
 	/**
@@ -441,7 +444,7 @@ public class EvaluationScoreCalculator {
 			}
 		}
 		if (f.getScore() > 1.0) { // Something went very wrong - Should never be happening
-			System.out.println("p: " + precision + "\tr: " + recall + "\tf1: " + f);
+			LOGGER.warning("Calculated a semantic similarity based F-score greater than 1. This should never be happening.\tp: " + precision + "\tr: " + recall + "\tf1: " + f);
 		}
 		f.setPrecision(precision);
 		f.setRecall(recall);
