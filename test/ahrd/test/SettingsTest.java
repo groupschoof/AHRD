@@ -36,7 +36,7 @@ public class SettingsTest {
 		assertNotNull(getSettings().getTokenBlacklist("trembl"));
 		assertEquals(
 				"Test-Temperature in input.yml is set to 10 and should have been initialized correctly.",
-				new Integer(10), getSettings().getTemperature());
+				Integer.valueOf(10), getSettings().getTemperature());
 	}
 
 	@Test
@@ -45,21 +45,21 @@ public class SettingsTest {
 		// Assert default values:
 		assertNull(getSettings().getSeqSimSearchTableCommentLineRegex());
 		assertEquals("\t", getSettings().getSeqSimSearchTableSep());
-		assertEquals(new Integer(0), getSettings()
+		assertEquals(Integer.valueOf(0), getSettings()
 				.getSeqSimSearchTableQueryCol());
-		assertEquals(new Integer(1), getSettings()
+		assertEquals(Integer.valueOf(1), getSettings()
 				.getSeqSimSearchTableSubjectCol());
-		assertEquals(new Integer(6), getSettings()
+		assertEquals(Integer.valueOf(6), getSettings()
 				.getSeqSimSearchTableQueryStartCol());
-		assertEquals(new Integer(7), getSettings()
+		assertEquals(Integer.valueOf(7), getSettings()
 				.getSeqSimSearchTableQueryEndCol());
-		assertEquals(new Integer(8), getSettings()
+		assertEquals(Integer.valueOf(8), getSettings()
 				.getSeqSimSearchTableSubjectStartCol());
-		assertEquals(new Integer(9), getSettings()
+		assertEquals(Integer.valueOf(9), getSettings()
 				.getSeqSimSearchTableSubjectEndCol());
-		assertEquals(new Integer(10), getSettings()
+		assertEquals(Integer.valueOf(10), getSettings()
 				.getSeqSimSearchTableEValueCol());
-		assertEquals(new Integer(11), getSettings()
+		assertEquals(Integer.valueOf(11), getSettings()
 				.getSeqSimSearchTableBitScoreCol());
 		assertEquals(
 				Pattern.compile(
@@ -74,21 +74,21 @@ public class SettingsTest {
 		assertEquals(Pattern.compile("#").toString(), getSettings()
 				.getSeqSimSearchTableCommentLineRegex().toString());
 		assertEquals("\t", getSettings().getSeqSimSearchTableSep());
-		assertEquals(new Integer(10), getSettings()
+		assertEquals(Integer.valueOf(10), getSettings()
 				.getSeqSimSearchTableQueryCol());
-		assertEquals(new Integer(11), getSettings()
+		assertEquals(Integer.valueOf(11), getSettings()
 				.getSeqSimSearchTableSubjectCol());
-		assertEquals(new Integer(16), getSettings()
+		assertEquals(Integer.valueOf(16), getSettings()
 				.getSeqSimSearchTableQueryStartCol());
-		assertEquals(new Integer(17), getSettings()
+		assertEquals(Integer.valueOf(17), getSettings()
 				.getSeqSimSearchTableQueryEndCol());
-		assertEquals(new Integer(18), getSettings()
+		assertEquals(Integer.valueOf(18), getSettings()
 				.getSeqSimSearchTableSubjectStartCol());
-		assertEquals(new Integer(19), getSettings()
+		assertEquals(Integer.valueOf(19), getSettings()
 				.getSeqSimSearchTableSubjectEndCol());
-		assertEquals(new Integer(20), getSettings()
+		assertEquals(Integer.valueOf(20), getSettings()
 				.getSeqSimSearchTableEValueCol());
-		assertEquals(new Integer(21), getSettings()
+		assertEquals(Integer.valueOf(21), getSettings()
 				.getSeqSimSearchTableBitScoreCol());
 		assertEquals(
 				Pattern.compile(

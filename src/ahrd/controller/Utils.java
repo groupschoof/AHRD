@@ -79,7 +79,7 @@ public class Utils {
 	 */
 	public static Long randomMultipleOfTen() {
 		Random rand = Utils.random;
-		return new Long((rand.nextInt(10) + 1) * 10);
+		return Long.valueOf((rand.nextInt(10) + 1) * 10);
 	}
 
 	public static boolean randomTrueOrFalse() {

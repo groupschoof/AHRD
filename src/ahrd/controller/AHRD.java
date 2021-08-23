@@ -237,9 +237,9 @@ public class AHRD {
 							String goTerm = annotation.getGoTerm();
 							// calculate cumulative bit score
 							if (!cumulativeGoTermBitScores.containsKey(goTerm)) {
-								cumulativeGoTermBitScores.put(goTerm, new Double(blastResult.getBitScore()));
+								cumulativeGoTermBitScores.put(goTerm, blastResult.getBitScore());
 							} else {
-								cumulativeGoTermBitScores.put(goTerm, new Double(blastResult.getBitScore() + cumulativeGoTermBitScores.get(goTerm)));
+								cumulativeGoTermBitScores.put(goTerm, blastResult.getBitScore() + cumulativeGoTermBitScores.get(goTerm));
 							}
 							// calculate cumulative blast database score
 							if (!cumulativeGoTermBlastDatabaseScores.containsKey(goTerm)) {
@@ -257,7 +257,7 @@ public class AHRD {
 					}
 					// calculate max bit score
 					if (blastResult.getBitScore() > maxBitScore) {
-						maxBitScore = new Double(blastResult.getBitScore());
+						maxBitScore = blastResult.getBitScore();
 					}
 				}
 			}
@@ -313,7 +313,7 @@ public class AHRD {
 			// Filter GO Term-Scores
 			for (String goTerm : goTermScores.keySet()) {
 				if (goTermScores.get(goTerm) < goTermHighScore * getSettings().getGoInformativeTokenThreshold()) {
-					goTermScores.put(goTerm, new Double(goTermScores.get(goTerm) - goTermHighScore * getSettings().getGoInformativeTokenThreshold()));
+					goTermScores.put(goTerm, goTermScores.get(goTerm) - goTermHighScore * getSettings().getGoInformativeTokenThreshold());
 				}
 			}
 			// Find highest scoring GO annotation

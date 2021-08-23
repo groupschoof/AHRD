@@ -101,8 +101,7 @@ public class DescriptionParameters extends Parameters implements Cloneable {
 		} else {
 			// Mutate a Parameter associated with a Blast-Database:
 			int indOfBlastDbToMutate = randParamToMutate - numberOfNonDbParameters();
-			int blastDbIndex = (new Double(
-					Math.floor(indOfBlastDbToMutate / 2.0))).intValue();
+			int blastDbIndex = (int) Math.floor(indOfBlastDbToMutate / 2.0);
 			String blastDbToMutate = getSettings().getSortedBlastDatabases()
 					.get(blastDbIndex);
 			boolean mutateWeight = (indOfBlastDbToMutate % 2 == 0);

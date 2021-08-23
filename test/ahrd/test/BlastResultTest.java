@@ -74,12 +74,12 @@ public class BlastResultTest {
 				new BlastResult("accession_1", 1.0, 10, 20, 10, 20, 300, "swissprot", p1), null);
 		assertEquals(1, blastResults.size());
 		assertEquals(1, blastResults.get("accession_1").size());
-		assertEquals(new Double(300), blastResults.get("accession_1").get(0).getBitScore());
+		assertEquals(Double.valueOf(300), blastResults.get("accession_1").get(0).getBitScore());
 		BlastResult.addBlastResult(blastResults,
 				new BlastResult("accession_1", 1.0, 10, 20, 10, 20, 300, "swissprot", p2), null);
 		assertEquals(1, blastResults.size());
 		assertEquals(2, blastResults.get("accession_1").size());
-		assertEquals(new Double(300), blastResults.get("accession_1").get(1).getBitScore());
+		assertEquals(Double.valueOf(300), blastResults.get("accession_1").get(1).getBitScore());
 		assertEquals(p2, blastResults.get("accession_1").get(1).getProtein());
 		BlastResult.addBlastResult(blastResults,
 				new BlastResult("accession_2", 1.0, 10, 20, 10, 20, 300, "swissprot", p2), null);
@@ -108,14 +108,14 @@ public class BlastResultTest {
 		assertEquals(brs.get("AT1G01040.1").get(0).getProtein(), protDb.get("gene:chr01.502:mRNA:chr01.502"));
 		BlastResult br = brs.get("AT3G03300.2").get(0);
 		assertEquals(br.getAccession(), "AT3G03300.2");
-		assertEquals(br.getBitScore(), new Double(94.4), 0.0000001);
+		assertEquals(br.getBitScore(), Double.valueOf(94.4), 0.0000001);
 		assertEquals(br.getBlastDatabaseName(), "tair");
 		assertNull(br.getDescription());
 		assertEquals(br.getEValue(), Math.pow(10, -20), Math.pow(10, -21));
-		assertEquals(br.getQueryEnd(), new Integer(99));
-		assertEquals(br.getQueryStart(), new Integer(1));
-		assertEquals(br.getSubjectEnd(), new Integer(1067));
-		assertEquals(br.getSubjectStart(), new Integer(969));
+		assertEquals(br.getQueryEnd(), Integer.valueOf(99));
+		assertEquals(br.getQueryStart(), Integer.valueOf(1));
+		assertEquals(br.getSubjectEnd(), Integer.valueOf(1067));
+		assertEquals(br.getSubjectStart(), Integer.valueOf(969));
 		assertNull(br.getSubjectLength());
 		// Assert that multiple High Scoring Pairs are read out as a single Hit,
 		// that is the one with the best Bit-Score:
@@ -132,11 +132,11 @@ public class BlastResultTest {
 		assertTrue(!p1.getBlastResults().get("tair").isEmpty());
 		assertEquals(7, p1.getBlastResults().get("tair").size());
 		assertEquals("AT3G03300.2", p1.getBlastResults().get("tair").get(0).getAccession());
-		assertEquals(new Integer(1375), p1.getBlastResults().get("tair").get(0).getSubjectLength());
+		assertEquals(Integer.valueOf(1375), p1.getBlastResults().get("tair").get(0).getSubjectLength());
 		assertTrue(!p2.getBlastResults().get("tair").isEmpty());
 		assertEquals(200, p2.getBlastResults().get("tair").size());
 		assertEquals("AT3G45420.1", p2.getBlastResults().get("tair").get(199).getAccession());
-		assertEquals(new Integer(668), p2.getBlastResults().get("tair").get(199).getSubjectLength());
+		assertEquals(Integer.valueOf(668), p2.getBlastResults().get("tair").get(199).getSubjectLength());
 	}
 
 	@Test

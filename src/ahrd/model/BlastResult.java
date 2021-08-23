@@ -353,7 +353,7 @@ public class BlastResult implements Comparable<BlastResult> {
 			}
 			String str, hrd = new String();
 			String acc = "";
-			Integer hitAALength = new Integer(0);
+			Integer hitAALength = Integer.valueOf(0);
 			boolean hit = false;
 			while ((str = fastaIn.readLine()) != null) {
 				if (str.startsWith(">")) {
@@ -362,7 +362,7 @@ public class BlastResult implements Comparable<BlastResult> {
 					if (hit) {
 						fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
 						// Clean up to enable processing the next Hit
-						hitAALength = new Integer(0);
+						hitAALength = Integer.valueOf(0);
 						// Note, that the boolean 'hit' will be set in the
 						// following If-Else-Block.
 
@@ -511,9 +511,9 @@ public class BlastResult implements Comparable<BlastResult> {
 	 *         descriptionScore, tokens and evaluationScore.
 	 */
 	public BlastResult clone() {
-		return new BlastResult(new String(this.getAccession()), new Double(eValue), new String(description),
-				new Integer(queryStart), new Integer(queryEnd), new Integer(subjectStart), new Integer(subjectEnd),
-				new Integer(subjectLength), new Double(bitScore), new String(blastDatabaseName));
+		return new BlastResult(new String(this.getAccession()), Double.valueOf(eValue), new String(description),
+				Integer.valueOf(queryStart), Integer.valueOf(queryEnd), Integer.valueOf(subjectStart), Integer.valueOf(subjectEnd),
+				Integer.valueOf(subjectLength), Double.valueOf(bitScore), new String(blastDatabaseName));
 	}
 
 	/**

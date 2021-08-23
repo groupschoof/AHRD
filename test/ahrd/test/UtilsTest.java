@@ -58,7 +58,7 @@ public class UtilsTest {
 		// Should contain one of each 10,20,30,..,100:
 		for (long t = 10; t <= 100; t += 10) {
 			assertTrue("Random Multiple-Of-Ten should contain " + t,
-					distRands.contains(new Long(t)));
+					distRands.contains(t));
 		}
 	}
 
@@ -77,7 +77,7 @@ public class UtilsTest {
 		assertEquals(10, distRands.size());
 		// Should contain one of each 10,20,30,..,100:
 		for (long t = 10; t <= 100; t += 10) {
-			Double d = new Double(t * 0.01);
+			Double d = t * 0.01;
 			assertTrue("Random Multiple-Of-One-Tenth should contain " + d,
 					distRands.contains(d));
 		}

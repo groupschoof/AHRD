@@ -172,10 +172,10 @@ public class TokenScoreCalculatorTest {
 		Protein p = TestUtils.mockProtein();
 		TokenScoreCalculator tsc = p.getTokenScoreCalculator();
 		tsc.setTokenHighScore(0.666);
-		tsc.getTokenScores().put("sheep", new Double(0.222));
-		tsc.getTokenScores().put("goat", new Double(0.444));
-		tsc.getTokenScores().put("ram", new Double(0.111));
-		tsc.getTokenScores().put("batsheep", new Double(0.555));
+		tsc.getTokenScores().put("sheep", 0.222);
+		tsc.getTokenScores().put("goat", 0.444);
+		tsc.getTokenScores().put("ram", 0.111);
+		tsc.getTokenScores().put("batsheep", 0.555);
 		tsc.filterTokenScores();
 		// 0.666 / 2 = 0.333
 		assertEquals(-0.11100000000000002, tsc.getTokenScores().get("sheep"), 0);
