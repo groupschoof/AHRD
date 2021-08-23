@@ -30,9 +30,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 import org.semanticweb.owlapi.search.EntitySearcher;
 
-import java.lang.Math;
-
-
 public class GOdatabase {
 	
 	private static final Logger LOGGER = Logger.getLogger("global");

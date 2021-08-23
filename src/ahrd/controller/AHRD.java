@@ -20,7 +20,6 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.xml.sax.SAXException;
 
 import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
@@ -34,7 +33,6 @@ import ahrd.view.FastaOutputWriter;
 import ahrd.view.OutputWriter;
 import ahrd.view.TsvOutputWriter;
 import ahrd.view.DualConsoleHandler;
-import nu.xom.ParsingException;
 
 public class AHRD {
 
@@ -149,7 +147,7 @@ public class AHRD {
 		setProteins(Protein.initializeProteins(getSettings().getProteinsFasta()));
 	}
 
-	public void parseBlastResults() throws IOException, MissingProteinException, MissingAccessionException, SAXException {
+	public void parseBlastResults() throws IOException, MissingProteinException, MissingAccessionException {
 		for (String blastDatabase : getSettings().getBlastDatabases()) {
 			BlastResult.readBlastResults(getProteins(), blastDatabase, getUniqueBlastResultShortAccessions());
 		}
@@ -169,11 +167,8 @@ public class AHRD {
 	 * @throws IOException
 	 * @throws MissingAccessionException
 	 * @throws MissingProteinException
-	 * @throws SAXException
-	 * @throws ParsingException
 	 */
-	public void setup()
-			throws IOException, MissingAccessionException, MissingProteinException, SAXException, ParsingException {
+	public void setup()	throws IOException, MissingAccessionException, MissingProteinException {
 		LOGGER.info("Started AHRD...");
 		takeTime();
 		

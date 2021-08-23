@@ -6,18 +6,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import nu.xom.ParsingException;
-
 import org.junit.Before;
 import org.junit.Test;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.xml.sax.SAXException;
 
 import ahrd.controller.AHRD;
 import ahrd.controller.Utils;
@@ -44,9 +39,7 @@ public class GoAnnotationReferenceTest {
 	}
 
 	@Test
-	public void testUniqueShortAccessions() throws IOException,
-			MissingAccessionException, MissingProteinException, SAXException,
-			ParsingException {
+	public void testUniqueShortAccessions() throws IOException, MissingAccessionException, MissingProteinException {
 		ahrd.setup();
 		assertNotNull(ahrd.getUniqueBlastResultShortAccessions());
 		// Somehow assertEquals does not work on Collections as expected, hence
@@ -64,9 +57,7 @@ public class GoAnnotationReferenceTest {
 	}
 
 	@Test
-	public void testParseGoAnnotationReference() throws IOException,
-			MissingAccessionException, MissingProteinException, SAXException,
-			ParsingException {
+	public void testParseGoAnnotationReference() throws IOException, MissingAccessionException, MissingProteinException {
 		ahrd.setup();
 		assertNotNull(ahrd.getGoAnnotationReference());
 		assertTrue(!ahrd.getGoAnnotationReference().isEmpty());
@@ -81,9 +72,7 @@ public class GoAnnotationReferenceTest {
 	}
 
 	@Test
-	public void testAnnotatesGoTerms() throws IOException,
-			MissingAccessionException, MissingProteinException, SAXException,
-			ParsingException, SQLException, OWLOntologyCreationException {
+	public void testAnnotatesGoTerms() throws IOException, MissingAccessionException, MissingProteinException {
 		ahrd.setup();
 		ahrd.assignGeneOntologyTerms();
 		Protein p = ahrd.getProteins().get("gene:chr01.1056:mRNA:chr01.1056");

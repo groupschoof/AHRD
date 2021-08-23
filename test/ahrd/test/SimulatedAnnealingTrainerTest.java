@@ -11,12 +11,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
-import nu.xom.ParsingException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.xml.sax.SAXException;
 
 import ahrd.controller.DescriptionParameters;
 import ahrd.controller.Parameters;
@@ -32,8 +29,7 @@ public class SimulatedAnnealingTrainerTest {
 	private SimulatedAnnealingTrainer trainer;
 
 	@Before
-	public void setUp() throws IOException, MissingAccessionException,
-			MissingProteinException, SAXException, ParsingException {
+	public void setUp() throws IOException, MissingAccessionException, MissingProteinException {
 		trainer = new SimulatedAnnealingTrainer("./test/resources/trainer_input.yml");
 		getSettings().setLoggingLevel(Level.WARNING);
 		trainer.setup();
@@ -231,9 +227,7 @@ public class SimulatedAnnealingTrainerTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void testEvalScoreWithNoCompetitors() throws IOException,
-			MissingAccessionException, MissingProteinException, SAXException,
-			ParsingException {
+	public void testEvalScoreWithNoCompetitors() throws IOException, MissingAccessionException, MissingProteinException {
 		// Default should be FALSE
 		assertTrue(!getSettings().getWriteBestBlastHitsToOutput());
 		// After setup the competitor annotations

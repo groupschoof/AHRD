@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +75,7 @@ public class EvaluatorTest {
 	}
 	
 	@Test
-	public void testSetupCompetitors() throws IOException, MissingAccessionException, SQLException, OWLOntologyCreationException {
+	public void testSetupCompetitors() throws IOException, MissingAccessionException, OWLOntologyCreationException {
 		evaluator.initializeProteins();
 		evaluator.setupGroundTruthDescriptions();
 		evaluator.assignHumanReadableDescriptions();

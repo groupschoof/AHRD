@@ -3,16 +3,13 @@ package ahrd.controller;
 import static ahrd.controller.Settings.getSettings;
 import static ahrd.controller.Utils.randomMultipleOfOne;
 import static ahrd.controller.Utils.randomMultipleOfTen;
-import static ahrd.controller.Utils.randomSaveSubtract;
 import static ahrd.controller.Utils.roundToNDecimalPlaces;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * The following parameters are those subject to optimization. They are stored

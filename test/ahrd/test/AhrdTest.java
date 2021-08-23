@@ -15,7 +15,6 @@ import ahrd.exception.MissingAccessionException;
 import ahrd.exception.MissingProteinException;
 import ahrd.model.BlastResult;
 import ahrd.model.Protein;
-import nu.xom.ParsingException;
 
 public class AhrdTest {
 
