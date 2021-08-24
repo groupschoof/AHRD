@@ -52,6 +52,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 				trainer.outputWriter = new SimulatedAnnealingTrainerOutputWriter(getSettings().getPathToDescriptionTrainingPathLog());
 				Parameters seed = getSettings().getDescriptionParameters().clone();
 				trainer.outputWriter.writeHeader(seed);
+				LOGGER.info("Performing description-based simulated annealing...");
 				trainer.train(seed);
 				trainer.calcAvgMaxDescriptionScore();
 				getSettings().setPathToOutput(getSettings().getPathToDescriptionOutput());
@@ -59,6 +60,8 @@ public class SimulatedAnnealingTrainer extends Trainer {
 						trainer.getBestParametersFoundAtTemperature(),
 						trainer.getAvgMaxDescriptionScore(),
 						trainer.getBestParameters());
+				LOGGER.info("Logged path through parameter- and score-space into: " + getSettings().getPathToDescriptionTrainingPathLog());
+				LOGGER.info("Written output into: "	+ getSettings().getPathToOutput());
 			}
 			// Try to heuristically find optimal parameters for the annotation with GO terms
 			trainer = new SimulatedAnnealingTrainer(args[0]);
@@ -70,6 +73,7 @@ public class SimulatedAnnealingTrainer extends Trainer {
 				trainer.outputWriter = new SimulatedAnnealingTrainerOutputWriter(getSettings().getPathToGoTrainingPathLog());
 				Parameters seed = getSettings().getGoParameters().clone();
 				trainer.outputWriter.writeHeader(seed);
+				LOGGER.info("Performing the GO-based simulated annealing...");
 				trainer.train(seed);
 				trainer.calcAvgMaxGoScore();
 				getSettings().setPathToOutput(getSettings().getPathToGoOutput());
@@ -77,9 +81,10 @@ public class SimulatedAnnealingTrainer extends Trainer {
 						trainer.getBestParametersFoundAtTemperature(),
 						trainer.getAvgMaxGoScore(),
 						trainer.getBestParameters());
+				LOGGER.info("Logged path through parameter- and score-space into: " + getSettings().getPathToGoTrainingPathLog());
+				LOGGER.info("Written output into: "	+ getSettings().getPathToOutput());
 			}
-			LOGGER.info("Logged path through parameter- and score-space into: " + getSettings().getPathToDescriptionTrainingPathLog());
-			LOGGER.info("Written output into: "	+ getSettings().getPathToOutput());
+			
 		} catch (Exception e) {
 			LOGGER.severe("We are sorry, an unexpected ERROR occurred:");
 			e.printStackTrace(System.err);
