@@ -26,6 +26,7 @@ h2. Table of contents
 ## "Parameter Optimization":#27-parameter-optimization
 ### "Parameter Optimization via Genetic Algorithm":#271-parameter-optimization-via-genetic-algorithm
 ### "Parameter Optimization via Simulated Annealing":#272-parameter-optimization-via-simulated-annealing
+## "Logging Messages":#28-logging-messages
 # "Algorithm":#3-algorithm
 ## "Pseudo-Code":#31-pseudo-code
 ## "Used Formulae and Parameters":#32-used-formulae-and-parameters
@@ -254,6 +255,22 @@ _Note:_ See @./test/resources/simmulated_annealing_trainer_example_input.yml@ fo
 # @cool_down_by: 1@  Dimish temperature by this value after each simulated annealing iteration
 # @optimization_acceptance_probability_scaling_factor: 2500000000.0@  Used to scale the probability of accepting a currently evaluated parameter set. @P(Accept) := exp(-delta_scores*scaling_factor/current-temperature)@
 # @remember_simulated_annealing_path: false@  Set to @true@, if you want the optimization to remember already visited parameter sets and their performance. This increases memory usage but improves final results.  
+
+h3. 2.8 Logging Messages
+
+AHRD pushes messages to stdout and stderr in accordance to 7 levels of importance:
+
+<pre>SEVERE (highest value)
+WARNING
+INFO (default)
+CONFIG
+FINE
+FINER
+FINEST (lowest value)</pre>
+
+They can be specified using the @logging_level@ YML-key.
+
+Using "ALL" shows all levels and logging can also be completely deactivated using "OFF".
 
 h2. 3 Algorithm
 
