@@ -10,15 +10,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 import ahrd.controller.Evaluator;
 import ahrd.exception.MissingAccessionException;
-import ahrd.exception.MissingProteinException;
 import ahrd.model.Protein;
 import ahrd.model.GroundTruthDescription;
 import ahrd.model.TokenScoreCalculator;
-import nu.xom.ParsingException;
 
 public class GroundTruthDescriptionTest {
 
@@ -45,7 +42,7 @@ public class GroundTruthDescriptionTest {
 
 	@Test
 	public void testSwissprotBatch1GroundTruthTokens()
-			throws IOException, MissingAccessionException, MissingProteinException, SAXException, ParsingException {
+			throws IOException, MissingAccessionException {
 		Evaluator e = new Evaluator("./test/resources/evaluator_filter_ground_truth_test.yml");
 		e.initializeProteins();
 		e.setupGroundTruthDescriptions();
