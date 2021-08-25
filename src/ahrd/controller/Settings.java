@@ -673,12 +673,18 @@ public class Settings implements Cloneable {
 			LOGGER.config("Using separate settings for the GO prediction");
 			if (goSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
 				this.setGoTokenScoreBitScoreWeight(Double.parseDouble((String) goSettings.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
+			} else {
+				LOGGER.severe("Using separate settings for GO prediction but didn't specify " + TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY + ".");
 			}
 			if (goSettings.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY) != null) {
 				this.setGoTokenScoreDatabaseScoreWeight(Double.parseDouble((String) goSettings.get(TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY)));
+			} else {
+				LOGGER.severe("Using separate settings for GO prediction but didn't specify " + TOKEN_SCORE_DATABASE_SCORE_WEIGHT_KEY + ".");
 			}
 			if (goSettings.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY) != null) {
 				this.setGoTokenScoreOverlapScoreWeight(Double.parseDouble((String) goSettings.get(TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY)));	
+			} else {
+				LOGGER.severe("Using separate settings for GO prediction but didn't specify " + TOKEN_SCORE_OVERLAP_SCORE_WEIGHT_KEY + ".");
 			}
 			Map<String, Map<String, String>> goBlastDbSettings = (Map<String, Map<String, String>>) goSettings.get(BLAST_DBS_KEY);
 			for (String blastDatabaseName : getBlastDatabases()) {
