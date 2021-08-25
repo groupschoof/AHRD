@@ -54,7 +54,6 @@ public abstract class OutputWriter {
 			else
 				descLine += "Unknown protein";
 		}
-		descLine += separator;
 		// Gene-Ontology-Results:
 		descLine += combineGoTermStrings(protein.getGoResults());
 		
