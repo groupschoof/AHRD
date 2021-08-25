@@ -569,6 +569,16 @@ public class Settings implements Cloneable {
 				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
 						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY));
 			}
+			if (blastDbSettings.get(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_KEY) != null) {
+				LOGGER.warning(GENE_ONTOLOGY_REFERENCE_KEY + " specified for BLAST database '" + blastDatabaseName + "' under blast_dbs. "
+						+ "Settings for the prediction of GO terms must be provided separately under go_settings. "
+						+ "Otherwise GO annotation will not be performed. ");
+			}
+			if (blastDbSettings.get(blastDatabaseName).get(GENE_ONTOLOGY_REFERENCE_REGEX_KEY) != null) {
+				LOGGER.warning(GENE_ONTOLOGY_REFERENCE_REGEX_KEY + " specified for BLAST database '" + blastDatabaseName + "' under blast_dbs. "
+						+ "Settings for the prediction of GO terms must be provided separately under go_settings. "
+						+ "Otherwise GO annotation will not be performed. ");
+			}
 		}
 		if (input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
 			this.setDescriptionTokenScoreBitScoreWeight(Double.parseDouble((String) input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY)));
