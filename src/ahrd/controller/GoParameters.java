@@ -55,8 +55,8 @@ public class GoParameters extends Parameters implements Cloneable {
 		// Init BlastDbs' Parameters:
 		for (String blastDbName : sortedDistinctBlastDatabaseNames) {
 			out.setAnnotationScoreBitScoreWeight(blastDbName,
-					randomMultipleOfOne().toString());
-			out.setBlastDbWeight(blastDbName, randomMultipleOfTen().toString());
+					randomMultipleOfOne());
+			out.setBlastDbWeight(blastDbName, randomMultipleOfTen());
 		}
 		// Set origin for genetic training output
 		out.setOrigin("random");
@@ -175,9 +175,9 @@ public class GoParameters extends Parameters implements Cloneable {
 			offspring.setInformativeTokenThreshold(goPartner.getInformativeTokenThreshold());
 		for (String blastDbName : getSettings().getSortedBlastDatabases()) {
 			if(rand.nextBoolean())
-				offspring.setAnnotationScoreBitScoreWeight(blastDbName, goPartner.getAnnotationScoreBitScoreWeight(blastDbName).toString());
+				offspring.setAnnotationScoreBitScoreWeight(blastDbName, goPartner.getAnnotationScoreBitScoreWeight(blastDbName));
 			if(rand.nextBoolean())
-				offspring.setBlastDbWeight(blastDbName, goPartner.getBlastDbWeight(blastDbName).toString());
+				offspring.setBlastDbWeight(blastDbName, goPartner.getBlastDbWeight(blastDbName));
 		}
 		offspring.normalizeTokenScoreWeights();
 		offspring.setAvgEvaluationScore(null);
@@ -195,14 +195,13 @@ public class GoParameters extends Parameters implements Cloneable {
 	public GoParameters clone() {
 		GoParameters clone = (GoParameters) super.clone();
 		// Clone the Blast-Database-Parameters-Map and Values:
-		Map<String, Map<String, String>> blastDbSettings = new HashMap<String, Map<String, String>>();
+		Map<String, Map<String, Double>> blastDbSettings = new HashMap<String, Map<String, Double>>();
 		for (String blastDb : getBlastDbParameters().keySet()) {
-			blastDbSettings.put(blastDb, new HashMap<String, String>());
+			blastDbSettings.put(blastDb, new HashMap<String, Double>());
 			for (String iterKey : getParametersOfBlastDb(blastDb).keySet()) {
 				blastDbSettings.get(blastDb)
 						.put(new String(iterKey),
-								new String(getParametersOfBlastDb(blastDb).get(
-										iterKey)));
+								getParametersOfBlastDb(blastDb).get(iterKey));
 			}
 		}
 		clone.blastDbParameters = blastDbSettings;

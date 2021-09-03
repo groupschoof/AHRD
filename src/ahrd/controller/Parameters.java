@@ -25,7 +25,7 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 	protected Double tokenScoreDatabaseScoreWeight;
 	protected Double tokenScoreOverlapScoreWeight;
 
-	protected Map<String, Map<String, String>> blastDbParameters = new HashMap<String, Map<String, String>>();
+	protected Map<String, Map<String, Double>> blastDbParameters = new HashMap<String, Map<String, Double>>();
 	/**
 	 * If we test different settings in the parameter-space, remember the
 	 * average evaluation-score (objective-function).
@@ -119,14 +119,14 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 	 * @param blastDatabaseName
 	 */
 	public void mutateBlastDatabaseWeight(String blastDatabaseName) {
-		Long bdbw = getBlastDbWeight(blastDatabaseName).longValue();
-		Long mutateBy = mutateBlastDatabaseWeightBy();
+		Integer bdbw = getBlastDbWeight(blastDatabaseName);
+		Integer mutateBy = mutateBlastDatabaseWeightBy();
 		if (randomSaveSubtract(bdbw, mutateBy))
 			bdbw -= mutateBy;
 		else
 			bdbw += mutateBy;
 
-		setBlastDbWeight(blastDatabaseName, bdbw.toString());
+		setBlastDbWeight(blastDatabaseName, bdbw);
 	}
 
 	/**
@@ -140,8 +140,8 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 	 * @return Long - The value to add or subtract from the Percentage to
 	 *         mutate.
 	 */
-	public static long mutateBlastDatabaseWeightBy() {
-		return Double.valueOf(Math.ceil(100.0 * mutatePercentageBy())).longValue();
+	public static int mutateBlastDatabaseWeightBy() {
+		return (int) Math.ceil(100.0 * mutatePercentageBy());
 	}
 	
 	/**
@@ -154,7 +154,7 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 			bsw -= mutateBy;
 		else
 			bsw += mutateBy;
-		setAnnotationScoreBitScoreWeight(blastDatabaseName, bsw.toString());
+		setAnnotationScoreBitScoreWeight(blastDatabaseName, bsw);
 	}
 
 	/**
@@ -334,35 +334,30 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 		return getBlastDbParameters().keySet();
 	}
 
-	protected Map<String, String> getParametersOfBlastDb(String blastDbName) {
-		Map<String, String> out = getBlastDbParameters().get(blastDbName);
+	protected Map<String, Double> getParametersOfBlastDb(String blastDbName) {
+		Map<String, Double> out = getBlastDbParameters().get(blastDbName);
 		// Init new on first request:
 		if (out == null) {
-			out = new HashMap<String, String>();
+			out = new HashMap<String, Double>();
 			getBlastDbParameters().put(blastDbName, out);
 		}
 		return out;
 	}
 
 	public Integer getBlastDbWeight(String blastDatabaseName) {
-		return Integer.parseInt(getParametersOfBlastDb(blastDatabaseName).get(
-				Settings.BLAST_DB_WEIGHT_KEY));
+		return getParametersOfBlastDb(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY).intValue();
 	}
 
-	public void setBlastDbWeight(String blastDatabaseName, String bdbw) {
-		getParametersOfBlastDb(blastDatabaseName).put(
-				Settings.BLAST_DB_WEIGHT_KEY, bdbw);
+	public void setBlastDbWeight(String blastDatabaseName, Integer bdbw) {
+		getParametersOfBlastDb(blastDatabaseName).put(Settings.BLAST_DB_WEIGHT_KEY, bdbw.doubleValue());
 	}
 
 	public Double getAnnotationScoreBitScoreWeight(String blastDatabaseName) {
-		return Double.parseDouble(getParametersOfBlastDb(blastDatabaseName)
-				.get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
+		return getParametersOfBlastDb(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY);
 	}
 
-	public void setAnnotationScoreBitScoreWeight(String blastDatabaseName,
-			String dsbsw) {
-		getParametersOfBlastDb(blastDatabaseName).put(
-				Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY, dsbsw);
+	public void setAnnotationScoreBitScoreWeight(String blastDatabaseName, Double dsbsw) {
+		getParametersOfBlastDb(blastDatabaseName).put(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY, dsbsw);
 	}
 
 	public Double getTokenScoreBitScoreWeight() {
@@ -399,7 +394,7 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 		this.avgEvaluationScore = avgEvaluationScore;
 	}
 
-	public Map<String, Map<String, String>> getBlastDbParameters() {
+	public Map<String, Map<String, Double>> getBlastDbParameters() {
 		return blastDbParameters;
 	}
 

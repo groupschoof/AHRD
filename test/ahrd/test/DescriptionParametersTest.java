@@ -268,24 +268,11 @@ public class DescriptionParametersTest {
 		// All primitive types get automatically cloned by Object.clone(),
 		// so just test the Maps:
 		for (String blastDb : p.getBlastDatabases()) {
-			// For some very strange reason, calls to the getter
-			// 'getBlastDbWeight(String blastDatabaseName)' return
-			// Integer-Object, as in this case Integer.parseInt returns the same
-			// object for the equal int-values. Maybe this is some optimization
-			// of Memory-Usage in the JVM? - Anyway, this is the reason, why
-			// here we compare the original Strings, held in the Map
-			// blastDbSettings:
-			assertTrue(
-					"The BlastDatabaseWeights should not be the same objects.",
-					(p.getBlastDbParameters().get(blastDb)
-							.get(Settings.BLAST_DB_WEIGHT_KEY) != c
-							.getBlastDbParameters().get(blastDb)
-							.get(Settings.BLAST_DB_WEIGHT_KEY)));
-			assertTrue(
-					"The BlastDatabase's DescriptionScoreBitScoreWeight should not be the same objects.",
-					System.identityHashCode(p
-							.getAnnotationScoreBitScoreWeight(blastDb)) != System.identityHashCode(c
-							.getAnnotationScoreBitScoreWeight(blastDb)));
+			assertTrue("The BlastDatabaseMaps should not be the same objects.",
+					p.getBlastDbParameters().get(blastDb) != c.getBlastDbParameters().get(blastDb));
+			assertTrue("The BlastDatabaseMaps should not have the same identityHashCode.",
+					System.identityHashCode(p.getBlastDbParameters().get(blastDb))
+					!= System.identityHashCode(c.getBlastDbParameters().get(blastDb)));
 		}
 		// Test passing on the average evaluation score:
 		assertEquals(p.getAvgEvaluationScore(), c.getAvgEvaluationScore(), 0.0);
@@ -343,12 +330,12 @@ public class DescriptionParametersTest {
 				"Changed TokenScoreOverlapScoreWeight should result in inequality.",
 				!p.equals(q));
 		q = p.clone();
-		q.setBlastDbWeight("swissprot", "696");
+		q.setBlastDbWeight("swissprot", 696);
 		assertTrue(
 				"Changed Swissprot-BlastDbWeight should result in inequality.",
 				!p.equals(q));
 		q = p.clone();
-		q.setAnnotationScoreBitScoreWeight("swissprot", "1.5");
+		q.setAnnotationScoreBitScoreWeight("swissprot", 1.5);
 		assertTrue(
 				"Changed Swissprot-AnnotationScoreBitScoreWeight should result in inequality.",
 				!p.equals(q));

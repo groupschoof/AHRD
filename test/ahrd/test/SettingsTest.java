@@ -109,24 +109,11 @@ public class SettingsTest {
 		// All primitive types get automatically cloned by Object.clone(),
 		// so just test the Maps:
 		for (String blastDb : s.getBlastDatabases()) {
-			// For some very strange reason, calls to the getter
-			// 'getBlastDbWeight(String blastDatabaseName)' return
-			// Integer-Object, as in this case Integer.parseInt returns the same
-			// object for the equal int-values. Maybe this is some optimization
-			// of Memory-Usage in the JVM? - Anyway, this is the reason, why
-			// here we compare the original Strings, held in the Map
-			// blastDbSettings:
-			assertTrue(
-					"The BlastDatabaseWeights should not be the same objects.",
-					(s.getBlastDbSettings().get(blastDb)
-							.get(Settings.BLAST_DB_WEIGHT_KEY) != c
-							.getBlastDbSettings().get(blastDb)
-							.get(Settings.BLAST_DB_WEIGHT_KEY)));
-			assertTrue(
-					"The BlastDatabase's DescriptionScoreBitScoreWeight should not be the same objects.",
-					System.identityHashCode(s
-							.getDescriptionScoreBitScoreWeight(blastDb)) != System.identityHashCode(c
-							.getDescriptionScoreBitScoreWeight(blastDb)));
+			assertTrue("The BlastDatabaseMaps should not be the same objects.",
+					s.getBlastDbSettings().get(blastDb) != c.getBlastDbSettings().get(blastDb));
+			assertTrue("The BlastDatabaseMaps should not have the same identityHashCode.",
+					System.identityHashCode(s.getBlastDbSettings().get(blastDb))
+					!= System.identityHashCode(c.getBlastDbSettings().get(blastDb)));
 		}
 		// Test passing on the average evaluation score:
 		assertEquals(s.getAvgDescriptionEvaluationScore(), c.getAvgDescriptionEvaluationScore(), 0.0);

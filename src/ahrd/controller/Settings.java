@@ -559,15 +559,16 @@ public class Settings implements Cloneable {
 			}
 			// Set Database-Weights and Description-Score-Bit-Score-Weight:
 			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY) != null) {
-				this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName,
-						this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
+				this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName, Integer.parseInt(
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY)));
 			}
 			if (this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
-				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
-			} else {
-				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY));
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, Double.parseDouble(
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY)));
+			} else if (this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
+				LOGGER.config("The use of '" + DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY + "' is deprecated. Please use '" + ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY + "' instead.");
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, Double.parseDouble(
+						this.getBlastDbSettings(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY)));
 			}
 		}
 		if (input.get(TOKEN_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
@@ -594,10 +595,10 @@ public class Settings implements Cloneable {
 			}
 			Map<String, Map<String, String>> descriptionBlastDbSettings = (Map<String, Map<String, String>>) descriptionSettings.get(BLAST_DBS_KEY);
 			for (String blastDatabaseName : getBlastDatabases()) {
-				this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName,
-						descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
-				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
+				this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName, Integer.parseInt(
+						descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY)));
+				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, Double.parseDouble(
+						descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY)));
 			}
 			if (descriptionSettings.get(TRAINING_PATH_LOG_KEY) != null && !descriptionSettings.get(TRAINING_PATH_LOG_KEY).equals("")) {
 				setPathToDescriptionTrainingPathLog((String) descriptionSettings.get(TRAINING_PATH_LOG_KEY));
@@ -672,10 +673,10 @@ public class Settings implements Cloneable {
 			}
 			Map<String, Map<String, String>> goBlastDbSettings = (Map<String, Map<String, String>>) goSettings.get(BLAST_DBS_KEY);
 			for (String blastDatabaseName : getBlastDatabases()) {
-				this.getGoParameters().setBlastDbWeight(blastDatabaseName,
-						goBlastDbSettings.get(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY));
-				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName,
-						goBlastDbSettings.get(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY));
+				this.getGoParameters().setBlastDbWeight(blastDatabaseName, Integer.parseInt(
+						goBlastDbSettings.get(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY)));
+				this.getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, Double.parseDouble(
+						goBlastDbSettings.get(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY)));
 			}
 			if (goSettings.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY) != null) {
 				this.setGoTermScoreEvidenceCodeScoreWeight(Double.parseDouble((String) goSettings.get(GO_TERM_SCORE_EVIDENCE_CODE_SCORE_WEIGHT_KEY)));
@@ -837,7 +838,7 @@ public class Settings implements Cloneable {
 		return getDescriptionParameters().getBlastDbWeight(blastDatabaseName);
 	}
 
-	public void setDescriptionBlastDbWeight(String blastDatabaseName, String bdbw) {
+	public void setDescriptionBlastDbWeight(String blastDatabaseName, Integer bdbw) {
 		getDescriptionParameters().setBlastDbWeight(blastDatabaseName, bdbw);
 	}
 	
@@ -845,7 +846,7 @@ public class Settings implements Cloneable {
 		return getGoParameters().getBlastDbWeight(blastDatabaseName);
 	}
 
-	public void setGoBlastDbWeight(String blastDatabaseName, String bdbw) {
+	public void setGoBlastDbWeight(String blastDatabaseName, Integer bdbw) {
 		getGoParameters().setBlastDbWeight(blastDatabaseName, bdbw);
 	}
 
@@ -853,7 +854,7 @@ public class Settings implements Cloneable {
 		return getDescriptionParameters().getAnnotationScoreBitScoreWeight(blastDatabaseName);
 	}
 
-	public void setDescriptionScoreBitScoreWeight(String blastDatabaseName, String dsbsw) {
+	public void setDescriptionScoreBitScoreWeight(String blastDatabaseName, Double dsbsw) {
 		getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, dsbsw);
 	}
 	
@@ -861,7 +862,7 @@ public class Settings implements Cloneable {
 		return getGoParameters().getAnnotationScoreBitScoreWeight(blastDatabaseName);
 	}
 
-	public void setGoScoreBitScoreWeight(String blastDatabaseName, String dsbsw) {
+	public void setGoScoreBitScoreWeight(String blastDatabaseName, Double dsbsw) {
 		getGoParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, dsbsw);
 	}
 

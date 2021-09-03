@@ -47,7 +47,7 @@ public class ParametersTest {
 	public void testMutateBlastDatabaseWeightBy() {
 		getSettings().setMutatorDeviation(0.7);
 		getSettings().setMutatorMean(0.7);
-		Long mutateBy = null;
+		Integer mutateBy = null;
 		// As it is a random variable, try a couple of times:
 		for (int i = 0; i < 10000; i++) {
 			mutateBy = Parameters.mutateBlastDatabaseWeightBy();

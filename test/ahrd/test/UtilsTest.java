@@ -44,19 +44,19 @@ public class UtilsTest {
 
 	@Test
 	public void testRandomMultipleOfTen() {
-		List<Long> rands = new ArrayList<Long>();
+		List<Integer> rands = new ArrayList<Integer>();
 		for (int i = 0; i < 100000; i++) {
-			Long r = Utils.randomMultipleOfTen();
+			Integer r = Utils.randomMultipleOfTen();
 			assertTrue(
 					"Random Multiple-Of-Ten should fullfill >=10 and <=100, but is "
 							+ r, (r >= 10 && r <= 100));
 			rands.add(r);
 		}
-		Set<Long> distRands = new HashSet<Long>(rands);
+		Set<Integer> distRands = new HashSet<Integer>(rands);
 		// Should have 10 entries:
 		assertEquals(10, distRands.size());
 		// Should contain one of each 10,20,30,..,100:
-		for (long t = 10; t <= 100; t += 10) {
+		for (int t = 10; t <= 100; t += 10) {
 			assertTrue("Random Multiple-Of-Ten should contain " + t,
 					distRands.contains(t));
 		}

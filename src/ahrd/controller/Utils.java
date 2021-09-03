@@ -75,11 +75,11 @@ public class Utils {
 	/**
 	 * Random: >= 10 and <= 100
 	 * 
-	 * @return Long
+	 * @return int
 	 */
-	public static Long randomMultipleOfTen() {
+	public static int randomMultipleOfTen() {
 		Random rand = Utils.random;
-		return Long.valueOf((rand.nextInt(10) + 1) * 10);
+		return (rand.nextInt(10) + 1) * 10;
 	}
 
 	public static boolean randomTrueOrFalse() {
