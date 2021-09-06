@@ -189,9 +189,12 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 	 * Token-Score-Formula.
 	 */
 	public void mutateTokenScoreBitScoreWeight() {
-		setTokenScoreBitScoreWeight(mutateZeroToOne(getTokenScoreBitScoreWeight()));
-		// normalize:
-		normalizeTokenScoreWeights();
+		double before = getTokenScoreBitScoreWeight();
+		while (getTokenScoreBitScoreWeight() == before) {
+			setTokenScoreBitScoreWeight(mutateZeroToOne(getTokenScoreBitScoreWeight()));
+			// normalize:
+			normalizeTokenScoreWeights();
+		}
 	}
 
 	/**
@@ -200,9 +203,12 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 	 * Token-Score-Formula.
 	 */
 	public void mutateTokenScoreDatabaseScoreWeight() {
-		setTokenScoreDatabaseScoreWeight(mutateZeroToOne(getTokenScoreDatabaseScoreWeight()));
-		// normalize:
-		normalizeTokenScoreWeights();
+		double before = getTokenScoreDatabaseScoreWeight();
+		while (getTokenScoreDatabaseScoreWeight() == before) {
+			setTokenScoreDatabaseScoreWeight(mutateZeroToOne(getTokenScoreDatabaseScoreWeight()));
+			// normalize:
+			normalizeTokenScoreWeights();
+		}
 	}
 
 	/**
@@ -211,9 +217,12 @@ public abstract class Parameters implements Cloneable, Comparable<Parameters> {
 	 * Token-Score-Formula.
 	 */
 	public void mutateTokenScoreOverlapScoreWeight() {
-		setTokenScoreOverlapScoreWeight(mutateZeroToOne(getTokenScoreOverlapScoreWeight()));
-		// normalize:
-		normalizeTokenScoreWeights();
+		double before = getTokenScoreOverlapScoreWeight();
+		while (getTokenScoreOverlapScoreWeight() == before) {
+			setTokenScoreOverlapScoreWeight(mutateZeroToOne(getTokenScoreOverlapScoreWeight()));
+			// normalize:
+			normalizeTokenScoreWeights();
+		}
 	}
 	
 	/**
