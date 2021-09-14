@@ -88,16 +88,20 @@ Example files for all input files can be found under @./test/resources/@. _NOTE:
 
 h4. 2.2.1 Required input data
 
-# Protein sequences in fasta format
-# Sequence Similarity Search (@blastp@ or @blat@) results in tabular format
+* Query protein sequences in FASTA format
 
+* Sequence Similarity Search (@blastp@ or @blat@) results in tabular format
 Recommended Sequence Similarity Search:
-
 For your query proteins you should start independent BLAST searches e.g.  in the three different databases mentioned above:
+<pre>blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -out query_vs_swissprot.txt</pre>
 
-<pre>
-blastp -outfmt 6 -query query_sequences_AA.fasta -db uniprot_swissprot.fasta -out query_vs_swissprot.txt
-</pre>
+* The reference databases that were searched
+These should usually be FASTA formated.
+Providers of database often distribute them in the compressed gzip format.
+AHRD is able to recognize and directly parse gzipped databases, so you don't have to spend the time and storage space to unpack them.
+If large databases (UniProt/TrEMBL, UniProt/uniref90, NCBI nr) are used, parsing them becomes a very time intensive step in AHRD.
+To speed this up we recommend using "seqkit":https://github.com/shenwei356/seqkit to create a smaller tsv file containing only the information AHRD needs:
+<pre>seqkit fx2tab -nl uniref90.fasta.gz > uniref90.fasta.tsv.gz</pre>Make sure to use the ".tsv" or ".tsv.gz" suffix so AHRD can recognize the file format correctly.
 
 h4. 2.2.2 Optional input data
 

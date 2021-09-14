@@ -340,39 +340,30 @@ public class BlastResult implements Comparable<BlastResult> {
 	 */
 	public static void parseBlastDatabase(Map<String, Protein> proteinDb, String blastDbName,
 			Map<String, List<BlastResult>> blastResults) throws IOException {
-		// Parse line by line FASTA Blast search DB. Extract Subject Lengths and
-		// Subject HRDs.
-		BufferedReader fastaIn = null;
+		// Parese reference database line by line
+		BufferedReader dbIn = null;
 		try {
-			
 			String dbPath = getSettings().getPathToBlastDatabase(blastDbName);
 			if (isGZipped(new File(dbPath))) {
-				fastaIn = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(dbPath))));
+				dbIn = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(dbPath))));
 			} else {
-				fastaIn = new BufferedReader(new FileReader(dbPath));
+				dbIn = new BufferedReader(new FileReader(dbPath));
 			}
 			String str, hrd = new String();
 			String acc = "";
 			Integer hitAALength = Integer.valueOf(0);
 			boolean hit = false;
-			while ((str = fastaIn.readLine()) != null) {
-				if (str.startsWith(">")) {
-					// Finished reading in the original Fasta-Entry of a
-					// Blast-Hit? If so, process it:
-					if (hit) {
-						fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
-						// Clean up to enable processing the next Hit
-						hitAALength = Integer.valueOf(0);
-						// Note, that the boolean 'hit' will be set in the
-						// following If-Else-Block.
-
-					}
-
-					// Process the current Fasta-Header-Line:
-					Matcher m = getSettings().getFastaHeaderRegex(blastDbName).matcher(str);
+			if (dbPath.endsWith(".tsv") || dbPath.endsWith(".tsv.gz")) {
+				// Database is in tabular format produced by "seqkit fx2tab -nl" (fastaHeader \t seqLength)
+				// The accession and description are extracted from the first column
+				// The sequence length can be directly read from second column 
+				while ((str = dbIn.readLine()) != null) {
+					String[] tsvLine = str.split("\t");
+					// Because seqkit removes the ">" from the header it is added back in, so the same REGEX can be applied 
+					Matcher m = getSettings().getFastaHeaderRegex(blastDbName).matcher(">" + tsvLine[0]); 
 					if (!m.matches()) {
 						// Provided REGEX to parse FASTA header does not work in this case:
-						LOGGER.warning("FASTA header line " + str.trim()
+						LOGGER.warning("FASTA header line " + ">" + tsvLine[0]
 						+ " does not match provided regular expression "
 						+ getSettings().getFastaHeaderRegex(blastDbName).toString()
 						+ ". The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded. "
@@ -384,26 +375,60 @@ public class BlastResult implements Comparable<BlastResult> {
 						// Found the next Blast HIT:
 						acc = m.group(ACCESSION_GROUP_NAME).trim();
 						hrd = m.group(DESCRIPTION_GROUP_NAME).trim();
-						// Following lines, until the next header, contain
-						// information to be collected:
-						hit = true;
-					} else {
-						// Found a Protein in the FASTA database, that is of no
-						// relevance within this context:
-						hit = false;
+						hitAALength = Integer.parseInt(tsvLine[1].trim());
+						fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
 					}
-				} else if (hit) {
-					// Process non header-line, if and only if, we are reading
-					// the sequence of a Blast-Hit:
-					hitAALength += str.trim().length();
 				}
+			} else {
+				// Parse line by line FASTA Blast search DB. Extract Subject Lengths and Subject HRDs.
+				while ((str = dbIn.readLine()) != null) {
+					if (str.startsWith(">")) {
+						// Finished reading in the original Fasta-Entry of a
+						// Blast-Hit? If so, process it:
+						if (hit) {
+							fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
+							// Clean up to enable processing the next Hit
+							hitAALength = Integer.valueOf(0);
+							// Note, that the boolean 'hit' will be set in the
+							// following If-Else-Block.
+						}
+						// Process the current Fasta-Header-Line:
+						Matcher m = getSettings().getFastaHeaderRegex(blastDbName).matcher(str);
+						if (!m.matches()) {
+							// Provided REGEX to parse FASTA header does not work in this case:
+							LOGGER.warning("FASTA header line " + str.trim()
+							+ " does not match provided regular expression "
+							+ getSettings().getFastaHeaderRegex(blastDbName).toString()
+							+ ". The header and the following entry, including possibly respective matching BLAST Hits, are ignored and discarded. "
+							+ "To fix this, please use - Blast database specific - parameter "
+							+ Settings.FASTA_HEADER_REGEX_KEY
+							+ " to provide a regular expression that matches ALL FASTA headers in Blast database '"
+							+ blastDbName + "'.");
+						} else if (blastResults.containsKey(m.group(ACCESSION_GROUP_NAME).trim())) {
+							// Found the next Blast HIT:
+							acc = m.group(ACCESSION_GROUP_NAME).trim();
+							hrd = m.group(DESCRIPTION_GROUP_NAME).trim();
+							// Following lines, until the next header, contain
+							// information to be collected:
+							hit = true;
+						} else {
+							// Found a Protein in the FASTA database, that is of no
+							// relevance within this context:
+							hit = false;
+						}
+					} else if (hit) {
+						// Process non header-line, if and only if, we are reading
+						// the sequence of a Blast-Hit:
+						hitAALength += str.trim().length();
+					}
+				}
+				// Was the last read FASTA entry a Blast-Hit? If so, it needs
+				// processing:
+				if (hit)
+					fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
 			}
-			// Was the last read FASTA entry a Blast-Hit? If so, it needs
-			// processing:
-			if (hit)
-				fastaEntryValuesForBlastHit(blastResults, acc, hitAALength, hrd);
 		} finally {
-			fastaIn.close();
+			dbIn.close();
 		}
 	}
 

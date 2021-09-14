@@ -1,6 +1,7 @@
 package ahrd.test;
 
 import static ahrd.controller.Settings.getSettings;
+import static ahrd.controller.Settings.BLAST_DATABASE_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -123,7 +124,28 @@ public class BlastResultTest {
 	}
 
 	@Test
-	public void testParseBlastDatabase() throws IOException, MissingProteinException, MissingAccessionException {
+	public void testParseBlastDatabaseFasta() throws IOException, MissingProteinException, MissingAccessionException {
+		Map<String, Protein> protDb = TestUtils.mockProteinDb();
+		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "tair", null);
+		BlastResult.parseBlastDatabase(protDb, "tair", brs);
+		Protein p1 = protDb.get("gene:chr01.502:mRNA:chr01.502");
+		Protein p2 = protDb.get("gene:chr01.1056:mRNA:chr01.1056");
+		assertTrue(!p1.getBlastResults().get("tair").isEmpty());
+		assertEquals(7, p1.getBlastResults().get("tair").size());
+		assertEquals("AT3G03300.2", p1.getBlastResults().get("tair").get(0).getAccession());
+		assertEquals(Integer.valueOf(1375), p1.getBlastResults().get("tair").get(0).getSubjectLength());
+		assertTrue(!p2.getBlastResults().get("tair").isEmpty());
+		assertEquals(200, p2.getBlastResults().get("tair").size());
+		assertEquals("AT3G45420.1", p2.getBlastResults().get("tair").get(199).getAccession());
+		assertEquals(Integer.valueOf(668), p2.getBlastResults().get("tair").get(199).getSubjectLength());
+	}
+	
+	@Test
+	public void testParseBlastDatabaseTsv() throws IOException, MissingProteinException, MissingAccessionException {
+		Map<String, Map<String, String>> BlastDbSettings = getSettings().getBlastDbSettings();
+		Map<String, String> tairSettings = BlastDbSettings.get("tair");
+		tairSettings.put(BLAST_DATABASE_KEY, tairSettings.get(BLAST_DATABASE_KEY) + ".tsv");
+		getSettings().setBlastDbSettings(BlastDbSettings);
 		Map<String, Protein> protDb = TestUtils.mockProteinDb();
 		Map<String, List<BlastResult>> brs = BlastResult.parseBlastResults(protDb, "tair", null);
 		BlastResult.parseBlastDatabase(protDb, "tair", brs);
