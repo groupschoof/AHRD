@@ -101,7 +101,7 @@ Providers of database often distribute them in the compressed gzip format.
 AHRD is able to recognize and directly parse gzipped databases, so you don't have to spend the time and storage space to unpack them.
 If large databases (UniProt/TrEMBL, UniProt/uniref90, NCBI nr) are used, parsing them becomes a very time intensive step in AHRD.
 To speed this up we recommend using "seqkit":https://github.com/shenwei356/seqkit to create a smaller tsv file containing only the information AHRD needs:
-<pre>seqkit fx2tab -nl uniref90.fasta.gz > uniref90.fasta.tsv.gz</pre>Make sure to use the ".tsv" or ".tsv.gz" suffix so AHRD can recognize the file format correctly.
+<pre>seqkit fx2tab -nl uniref90.fasta.gz -o uniref90.fasta.tsv.gz</pre>Make sure to use the ".tsv" or ".tsv.gz" suffix so AHRD can recognize the file format correctly.
 
 h4. 2.2.2 Optional input data
 
