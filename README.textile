@@ -381,19 +381,19 @@ fn1. Buchfink B, Reuter K, Drost HG, "Sensitive protein alignments at tree-of-li
 
 High quality genome projects that used AHRD:
 
-fn2. Young, Nevin D., Frédéric Debellé, Giles E. D. Oldroyd, Rene Geurts, Steven B. Cannon, Michael K. Udvardi, Vagner A. Benedito, et al. “The Medicago Genome Provides Insight into the Evolution of Rhizobial Symbioses.” Nature 480, no. 7378 (December 22, 2011): 520–24. doi:10.1038/nature10625.
+fn2. Young, Nevin D., Frédéric Debellé, Giles E. D. Oldroyd, Rene Geurts, Steven B. Cannon, Michael K. Udvardi, Vagner A. Benedito, et al. “The Medicago Genome Provides Insight into the Evolution of Rhizobial Symbioses.” Nature 480, no. 7378 (December 22, 2011): 520–24. "doi:10.1038/nature10625":https://doi.org/10.1038/nature10625
 
-fn3. The Tomato Genome Consortium. “The Tomato Genome Sequence Provides Insights into Fleshy Fruit Evolution.” Nature 485, no. 7400 (May 31, 2012): 635–41. doi:10.1038/nature11119.
+fn3. The Tomato Genome Consortium. “The Tomato Genome Sequence Provides Insights into Fleshy Fruit Evolution.” Nature 485, no. 7400 (May 31, 2012): 635–41. "doi:10.1038/nature11119":https://doi.org/10.1038/nature11119
 
-fn4. International Wheat Genome Sequencing Consortium (IWGSC). “A Chromosome-Based Draft Sequence of the Hexaploid Bread Wheat (Triticum Aestivum) Genome.” Science (New York, N.Y.) 345, no. 6194 (July 18, 2014): 1251788. doi:10.1126/science.1251788.
+fn4. International Wheat Genome Sequencing Consortium (IWGSC). “A Chromosome-Based Draft Sequence of the Hexaploid Bread Wheat (Triticum Aestivum) Genome.” Science (New York, N.Y.) 345, no. 6194 (July 18, 2014): 1251788. "doi:10.1126/science.1251788":https://doi.org/10.1126/science.1251788
 
-fn5. International Barley Genome Sequencing Consortium, Klaus F. X. Mayer, Robbie Waugh, John W. S. Brown, Alan Schulman, Peter Langridge, Matthias Platzer, et al. “A Physical, Genetic and Functional Sequence Assembly of the Barley Genome.” Nature 491, no. 7426 (November 29, 2012): 711–16. doi:10.1038/nature11543.
+fn5. International Barley Genome Sequencing Consortium, Klaus F. X. Mayer, Robbie Waugh, John W. S. Brown, Alan Schulman, Peter Langridge, Matthias Platzer, et al. “A Physical, Genetic and Functional Sequence Assembly of the Barley Genome.” Nature 491, no. 7426 (November 29, 2012): 711–16. "doi:10.1038/nature11543":https://doi.org/10.1038/nature11543
 
-fn6. Wang, W., G. Haberer, H. Gundlach, C. Gläßer, T. Nussbaumer, M. C. Luo, A. Lomsadze, et al. “The Spirodela Polyrhiza Genome Reveals Insights into Its Neotenous Reduction Fast Growth and Aquatic Lifestyle.” Nature Communications 5 (2014): 3311. doi:10.1038/ncomms4311.
+fn6. Wang, W., G. Haberer, H. Gundlach, C. Gläßer, T. Nussbaumer, M. C. Luo, A. Lomsadze, et al. “The Spirodela Polyrhiza Genome Reveals Insights into Its Neotenous Reduction Fast Growth and Aquatic Lifestyle.” Nature Communications 5 (2014): 3311. "doi:10.1038/ncomms4311":https://doi.org/10.1038/ncomms4311
 
-fn7. Guo, Shaogui, Jianguo Zhang, Honghe Sun, Jerome Salse, William J. Lucas, Haiying Zhang, Yi Zheng, et al. “The Draft Genome of Watermelon (Citrullus Lanatus) and Resequencing of 20 Diverse Accessions.” Nature Genetics 45, no. 1 (January 2013): 51–58. doi:10.1038/ng.2470.
+fn7. Guo, Shaogui, Jianguo Zhang, Honghe Sun, Jerome Salse, William J. Lucas, Haiying Zhang, Yi Zheng, et al. “The Draft Genome of Watermelon (Citrullus Lanatus) and Resequencing of 20 Diverse Accessions.” Nature Genetics 45, no. 1 (January 2013): 51–58. "doi:10.1038/ng.2470":https://doi.org/10.1038/ng.2470
 
 AHRD was applied on all plant genomes present in the public database *PlantsDB*:
 
-fn8. Spannagl, Manuel, Thomas Nussbaumer, Kai C. Bader, Mihaela M. Martis, Michael Seidel, Karl G. Kugler, Heidrun Gundlach, and Klaus F. X. Mayer. “PGSB PlantsDB: Updates to the Database Framework for Comparative Plant Genome Research.” Nucleic Acids Research 44, no. D1 (January 4, 2016): D1141–47. doi:10.1093/nar/gkv1130.
+fn8. Spannagl, Manuel, Thomas Nussbaumer, Kai C. Bader, Mihaela M. Martis, Michael Seidel, Karl G. Kugler, Heidrun Gundlach, and Klaus F. X. Mayer. “PGSB PlantsDB: Updates to the Database Framework for Comparative Plant Genome Research.” Nucleic Acids Research 44, no. D1 (January 4, 2016): D1141–47. "doi:10.1093/nar/gkv1130":https://doi.org/10.1093/nar/gkv1130
 
