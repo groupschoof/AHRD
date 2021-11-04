@@ -607,8 +607,14 @@ public class Settings implements Cloneable {
 			for (String blastDatabaseName : getBlastDatabases()) {
 				this.getDescriptionParameters().setBlastDbWeight(blastDatabaseName, Integer.parseInt(
 						descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.BLAST_DB_WEIGHT_KEY)));
-				this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, Double.parseDouble(
-						descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY)));
+				if (descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
+					this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, Double.parseDouble(
+							descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY)));
+				} else if (descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY) != null) {
+					LOGGER.config("The use of '" + DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY + "' is deprecated. Please use '" + ANNOTATION_SCORE_BIT_SCORE_WEIGHT_KEY + "' instead.");
+					this.getDescriptionParameters().setAnnotationScoreBitScoreWeight(blastDatabaseName, Double.parseDouble(
+							descriptionBlastDbSettings.get(blastDatabaseName).get(Settings.DESCRIPTION_SCORE_BIT_SCORE_WEIGHT_KEY)));
+				}
 			}
 			if (descriptionSettings.get(TRAINING_PATH_LOG_KEY) != null && !descriptionSettings.get(TRAINING_PATH_LOG_KEY).equals("")) {
 				setPathToDescriptionTrainingPathLog((String) descriptionSettings.get(TRAINING_PATH_LOG_KEY));
