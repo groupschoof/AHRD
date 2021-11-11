@@ -264,9 +264,12 @@ public class Evaluator extends AHRD {
 				// Add competitor annotations to the evaluation score calculators of the appropriate proteins
 				for (Map.Entry<String, CompetitorAnnotation> annot : annots.entrySet()) {
 					Protein p = getProteins().get(annot.getKey());
-					if (p == null)
-						throw new MissingAccessionException(
-								"Could not find Protein for Accession '" + annot.getKey() + "'");
+					if (p == null) {
+						p = getShortAccsProteins().get(annot.getKey()); // Otherwise try if the ground truth uses short protein accessions
+						if (p == null) {
+							throw new MissingAccessionException("Could not find protein for accession '" + annot.getKey() + "'");
+						}
+					}
 					p.getEvaluationScoreCalculator().addCompetitorAnnotation(competitor, annot.getValue());
 				}	
 			}
