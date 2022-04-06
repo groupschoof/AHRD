@@ -628,9 +628,9 @@ public class Settings implements Cloneable {
 		/**
 		 *  If started to evaluate parameters or train the algorithm, ground truth descriptions are stored in this file:
 		 */
-		if (descriptionSettings != null && descriptionSettings.get(GROUND_TRUTH_FASTA_KEY) != null && new File((String) descriptionSettings.get(GROUND_TRUTH_FASTA_KEY)).exists()) {
+		if (descriptionSettings != null && descriptionSettings.get(GROUND_TRUTH_FASTA_KEY) != null) {
 			setPathToGroundTruthFasta((String) descriptionSettings.get(GROUND_TRUTH_FASTA_KEY));
-		} else if (input.get(GROUND_TRUTH_FASTA_KEY) != null && new File((String) input.get(GROUND_TRUTH_FASTA_KEY)).exists()) {
+		} else if (input.get(GROUND_TRUTH_FASTA_KEY) != null) {
 			setPathToGroundTruthFasta((String) input.get(GROUND_TRUTH_FASTA_KEY));
 		}
 		if (descriptionSettings != null && descriptionSettings.get(HRD_SCORES_OUTPUT_PATH_KEY) != null && !descriptionSettings.get(HRD_SCORES_OUTPUT_PATH_KEY).equals("")) {
@@ -974,7 +974,14 @@ public class Settings implements Cloneable {
 	}
 
 	public boolean hasGroundTruthFasta() throws IOException {
-		return getPathToGroundTruthFasta() != null && new File(getPathToGroundTruthFasta()).exists();
+		if (getPathToGroundTruthFasta() != null) {
+			if (new File(getPathToGroundTruthFasta()).exists()) {
+				return true;
+			} else {
+				LOGGER.warning("A ground truth fasta file was specified but can not be found. Evaluation of descriptions disabled.");
+			}
+		}
+		return false;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -987,9 +994,13 @@ public class Settings implements Cloneable {
 	}
 
 	public boolean hasGeneOntologyAnnotation(String blastDatabaseName) {
-		if (getPathToGeneOntologyReference(blastDatabaseName) != null
-				&& new File(getPathToGeneOntologyReference(blastDatabaseName)).exists()) {
-			return true;
+		if (getPathToGeneOntologyReference(blastDatabaseName) != null) {
+			if (new File(getPathToGeneOntologyReference(blastDatabaseName)).exists()) {
+				return true;
+			} else {
+				LOGGER.warning("A reference GO annotation file was specified for '" + blastDatabaseName+ "' but can not be found. "
+						+ "Annotation of GO terms from '" + blastDatabaseName + "'disabled.");
+			}
 		}
 		return false;
 	}
@@ -1433,7 +1444,14 @@ public class Settings implements Cloneable {
 	}
 
 	public Boolean hasGroundTruthGoAnnotations() {
-		return getPathToGroundTruthGoAnnotations() != null && new File(getPathToGroundTruthGoAnnotations()).exists();
+		if (getPathToGroundTruthGoAnnotations() != null) {
+			if (new File(getPathToGroundTruthGoAnnotations()).exists()) {
+				return true;
+			} else {
+				LOGGER.warning("A ground truth GO annotation file was specified but can not be found. Evaluation of GO terms disabled.");
+			}
+		}
+		return false;
 	}
 
 	public List<String> getGroundTruthGoAnnotationsFromFile() throws IOException {
@@ -1477,7 +1495,14 @@ public class Settings implements Cloneable {
 	}
 	
 	public Boolean hasGoSlimFile() {
-		return getPathToGoSlimFile() != null && new File(getPathToGoSlimFile()).exists(); 
+		if (getPathToGoSlimFile() != null) {
+			if (new File(getPathToGoSlimFile()).exists()) {
+				return true;
+			} else {
+				LOGGER.warning("A GO slim file was specified but can not be found. Annotation of GO slim terms disabled.");
+			}
+		}
+		return false;
 	}
 
 	public static Pattern getGoSlimFileGotermRegex() {
