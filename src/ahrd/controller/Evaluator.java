@@ -153,11 +153,11 @@ public class Evaluator extends AHRD {
 			// Iterate over all Proteins and assign the best scoring Human
 			// Readable Description
 			evaluator.assignHumanReadableDescriptions();
-			LOGGER.info("Assigned highestest scoring human readable descriptions in " + evaluator.takeTime()	+ "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
+			LOGGER.info("Assigned highest scoring human readable descriptions in " + evaluator.takeTime()	+ "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
 			// If requested iterate over all Proteins and assign the best scoring Gene Ontology terms
 			if (getSettings().doAnnotateGoTerms()) {
 				evaluator.assignGeneOntologyTerms();
-				LOGGER.info("Assigned highestest scoring GO terms in " + evaluator.takeTime() + "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
+				LOGGER.info("Assigned highest scoring GO terms in " + evaluator.takeTime() + "sec, currently occupying " + evaluator.takeMemoryUsage() + " MB");
 			}
 			// Load a Map of all GO terms
 			// Load ground truth GO annotations
