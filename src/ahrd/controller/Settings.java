@@ -95,7 +95,7 @@ public class Settings implements Cloneable {
 	public static final Pattern DEFAULT_SHORT_ACCESSION_REGEX = Pattern.compile("^[^|]+\\|(?<shortAccession>[^|]+)");
 	public static final String REFERENCE_GO_REGEX_KEY = "reference_go_regex";
 	public static final Pattern DEFAULT_REFERENCE_GO_REGEX = Pattern
-			.compile("^UniProtKB\\s+(?<shortAccession>\\S+)\\s+\\S+\\s+(?<goTerm>GO:\\d{7})");
+			.compile("^UniProtKB\\t(?<shortAccession>[^\\t]+)\\t[^\\t]+\\t(?!NOT\\|)[^\\t]*\\t(?<goTerm>GO:\\d{7})");
 	public static final String PREFER_REFERENCE_WITH_GO_ANNOS_KEY = "prefer_reference_with_go_annos";
 	public static final String EVALUATE_VALID_TAKENS_KEY = "evaluate_valid_tokens";
 	public static final String DEFAULT_LINE_SEP = "(\r|\n)+"; 
