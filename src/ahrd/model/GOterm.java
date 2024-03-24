@@ -4,6 +4,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Data structure representing a more complete Gene Ontology Term. Currently not
+ * in use.
+ * 
+ * @author Asis Hallab
+ */
+@Deprecated
 public class GOterm {
 
 	private String accession;
